@@ -42,12 +42,6 @@ test:rust:stable:
     TARGET: native
   script:
     - time cargo test --all --release
-  only:
-    - triggers
-    - tags
-    - master
-    - schedules
-    - /^pr-.*$/
   tags:
     - rust-stable 
 
