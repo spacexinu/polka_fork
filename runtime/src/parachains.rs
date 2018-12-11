@@ -44,7 +44,10 @@ pub trait Trait: session::Trait {
 decl_storage! {
 	trait Store for Module<T: Trait> as Parachains {
 		// Vector of all parachain IDs.
-		pub Parachains get(active_parachains): Vec<Id>;
+		pub Parachains get(active_parachains) build(||{
+			let only_ids: Vec<_> = self.parachains.iter().map(|&(ref id, _, _)| id).cloned().collect();
+      only_ids.encode()
+    }): Vec<Id>;
 		// The parachains registered at present.
 		pub Code get(parachain_code): map Id => Option<Vec<u8>>;
 		// The heads of the parachains registered at present. these are kept sorted.
@@ -62,10 +65,6 @@ decl_storage! {
 			let mut p = config.parachains.clone();
 			p.sort_unstable_by_key(|&(ref id, _, _)| id.clone());
 			p.dedup_by_key(|&mut (ref id, _, _)| id.clone());
-
-			let only_ids: Vec<_> = p.iter().map(|&(ref id, _, _)| id).cloned().collect();
-
-			storage.insert(Self::hash(<Parachains<T>>::key()).to_vec(), only_ids.encode());
 
 			for (id, code, genesis) in p {
 				let code_key = Self::hash(&<Code<T>>::key_for(&id)).to_vec();
