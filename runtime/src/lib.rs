@@ -352,7 +352,7 @@ impl_runtime_apis! {
 			Consensus::authorities()  // only possible as long as parachain validator crypto === aura crypto
 		}
 		fn duty_roster() -> parachain::DutyRoster {
-			Parachains::calculate_duty_roster()
+			Parachains::calculate_duty_roster(System::random(&b"parachains"[..]))
 		}
 		fn active_parachains() -> Vec<parachain::Id> {
 			Parachains::active_parachains()
