@@ -5,13 +5,13 @@ authors = ["Parity Technologies <admin@parity.io>"]
 edition = "2018"
 
 [dependencies]
-client = { package = "sc-client", git = "https://github.com/tomaka/polkadot", branch = "hack" }
+client = { package = "sc-client", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
 jsonrpc-core = "14.0.3"
 polkadot-primitives = { path = "../primitives" }
-sp-runtime = { git = "https://github.com/tomaka/polkadot", branch = "hack"  }
-sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack"  }
-sc-rpc = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-txpool-api = { package = "sp-transaction-pool", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-frame-rpc-system = { package = "substrate-frame-rpc-system", git = "https://github.com/tomaka/polkadot", branch = "hack"  }
-pallet-transaction-payment-rpc = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
+sp-runtime = { git = "https://github.com/tomaka/polkadot", branch = "hack-2"  }
+sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack-2"  }
+sc-rpc = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+txpool-api = { package = "sp-transaction-pool", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+frame-rpc-system = { package = "substrate-frame-rpc-system", git = "https://github.com/tomaka/polkadot", branch = "hack-2"  }
+pallet-transaction-payment-rpc = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
 codec = { package = "parity-scale-codec", version = "1.1.0", default-features = false }

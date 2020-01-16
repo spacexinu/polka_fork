@@ -12,21 +12,21 @@ rustc-hex = { version = "2.0.1", default-features = false }
 serde = { version = "1.0.102", default-features = false }
 serde_derive = { version = "1.0.102", optional = true }
 
-sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack", default-features = false }
-inherents = { package = "sp-inherents", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-rstd = { package = "sp-std", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-sp-io = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-sp-runtime = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-sp-staking = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-sp-core = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
+sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack-2", default-features = false }
+inherents = { package = "sp-inherents", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+rstd = { package = "sp-std", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+sp-io = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+sp-runtime = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+sp-staking = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+sp-core = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
 
-authorship = { package = "pallet-authorship", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-balances = { package = "pallet-balances", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-session = { package = "pallet-session", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-frame-support = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-staking = { package = "pallet-staking", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-system = { package = "frame-system", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-timestamp = { package = "pallet-timestamp", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
+authorship = { package = "pallet-authorship", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+balances = { package = "pallet-balances", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+session = { package = "pallet-session", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+frame-support = { git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+staking = { package = "pallet-staking", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+system = { package = "frame-system", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+timestamp = { package = "pallet-timestamp", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
 
 primitives = { package = "polkadot-primitives", path = "../../primitives", default-features = false }
 polkadot-parachain = { path = "../../parachain", default-features = false }
@@ -35,12 +35,12 @@ polkadot-parachain = { path = "../../parachain", default-features = false }
 hex-literal = "0.2.1"
 libsecp256k1 = "0.3.2"
 tiny-keccak = "1.5.0"
-keyring = { package = "sp-keyring", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-trie = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-babe = { package = "pallet-babe", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-randomness-collective-flip = { package = "pallet-randomness-collective-flip", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
-pallet-staking-reward-curve = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-treasury = { package = "pallet-treasury", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack" }
+keyring = { package = "sp-keyring", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-trie = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+babe = { package = "pallet-babe", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+randomness-collective-flip = { package = "pallet-randomness-collective-flip", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
+pallet-staking-reward-curve = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+treasury = { package = "pallet-treasury", git = "https://github.com/tomaka/polkadot", default-features = false, branch = "hack-2" }
 trie-db = "0.18.0"
 serde_json = "1.0.41"
 

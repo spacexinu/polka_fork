@@ -19,22 +19,22 @@ parachain = { package = "polkadot-parachain", path = "../parachain" }
 polkadot-primitives = { path = "../primitives" }
 polkadot-erasure-coding = { path = "../erasure-coding" }
 table = { package = "polkadot-statement-table", path = "../statement-table" }
-grandpa = { package = "sc-finality-grandpa", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-inherents = { package = "sp-inherents", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-consensus = { package = "sp-consensus", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-primitives = { package = "sp-core", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-txpool-api = { package = "sp-transaction-pool", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-blockchain = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sc-client-api = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-timestamp = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-block-builder = { package = "sc-block-builder", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-trie = { package = "sp-trie", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-runtime_primitives = { package = "sp-runtime", git = "https://github.com/tomaka/polkadot", branch = "hack" }
+grandpa = { package = "sc-finality-grandpa", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+inherents = { package = "sp-inherents", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+consensus = { package = "sp-consensus", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+primitives = { package = "sp-core", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+txpool-api = { package = "sp-transaction-pool", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-blockchain = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sc-client-api = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-timestamp = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+block-builder = { package = "sc-block-builder", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+trie = { package = "sp-trie", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+runtime_primitives = { package = "sp-runtime", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
 bitvec = { version = "0.15.2", default-features = false, features = ["alloc"] }
-runtime_babe = { package = "pallet-babe", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-babe-primitives = { package = "sp-consensus-babe", git = "https://github.com/tomaka/polkadot", branch = "hack" }
-keystore = { package = "sc-keystore", git = "https://github.com/tomaka/polkadot", branch = "hack" }
+runtime_babe = { package = "pallet-babe", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+babe-primitives = { package = "sp-consensus-babe", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+keystore = { package = "sc-keystore", git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
 
 [dev-dependencies]
-sp-keyring = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
+sp-keyring = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }

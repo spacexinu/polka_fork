@@ -13,18 +13,18 @@ polkadot-validation = { path = "../validation" }
 polkadot-primitives = { path = "../primitives" }
 polkadot-erasure-coding = { path = "../erasure-coding" }
 codec = { package = "parity-scale-codec", version = "1.1.0", default-features = false, features = ["derive"] }
-sc-network = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sc-network-gossip = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-core = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-runtime = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
+sc-network = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sc-network-gossip = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-core = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-runtime = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
 futures = "0.3.1"
 log = "0.4.8"
 exit-future = "0.2.0"
-sc-client = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-blockchain = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
+sc-client = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-blockchain = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-api = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
 wasm-timer = "0.2.4"
 
 [dev-dependencies]
-sp-keyring = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
-sp-state-machine = { git = "https://github.com/tomaka/polkadot", branch = "hack" }
+sp-keyring = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
+sp-state-machine = { git = "https://github.com/tomaka/polkadot", branch = "hack-2" }
