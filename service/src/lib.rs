@@ -431,23 +431,23 @@ pub fn new_full<Runtime, Dispatch, Extrinsic>(config: Configuration)
 		let babe = babe::start_babe(babe_config)?;
 		service.spawn_essential_task(babe);
 
-		if authority_discovery_enabled {
-			let network = service.network();
-			let dht_event_stream = network.event_stream().filter_map(|e| async move { match e {
-				Event::Dht(e) => Some(e),
-				_ => None,
-			}}).boxed();
-			let authority_discovery = authority_discovery::AuthorityDiscovery::new(
-				service.client(),
-				network,
-				sentry_nodes,
-				service.keystore(),
-				dht_event_stream,
-			);
-			let future01_authority_discovery = authority_discovery.map(|x| Ok(x)).compat();
+		// if authority_discovery_enabled {
+		// 	let network = service.network();
+		// 	let dht_event_stream = network.event_stream().filter_map(|e| async move { match e {
+		// 		Event::Dht(e) => Some(e),
+		// 		_ => None,
+		// 	}}).boxed();
+		// 	let authority_discovery = authority_discovery::AuthorityDiscovery::new(
+		// 		service.client(),
+		// 		network,
+		// 		sentry_nodes,
+		// 		service.keystore(),
+		// 		dht_event_stream,
+		// 	);
+		// 	let future01_authority_discovery = authority_discovery.map(|x| Ok(x)).compat();
 
-			service.spawn_task(future01_authority_discovery);
-		}
+		// 	service.spawn_task(future01_authority_discovery);
+		// }
 	}
 
 	// if the node isn't actively participating in consensus then it doesn't
