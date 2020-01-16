@@ -336,7 +336,6 @@ mod tests {
 		type Currency = Balances;
 		type Prefix = Prefix;
 	}
-	type System = system::Module<Test>;
 	type Balances = balances::Module<Test>;
 	type Claims = Module<Test>;
 

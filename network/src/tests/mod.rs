@@ -29,7 +29,8 @@ use polkadot_primitives::parachain::{
 use sp_core::crypto::UncheckedInto;
 use codec::Encode;
 use sc_network::{
-	PeerId, Context, ReputationChange, config::Roles, specialization::NetworkSpecialization,
+	PeerId, Context, ReputationChange, config::Roles, message::generic::ConsensusMessage,
+	specialization::NetworkSpecialization,
 };
 
 use futures::executor::block_on;
@@ -54,6 +55,10 @@ impl Context<Block> for TestContext {
 			i if i < 0 => self.disconnected.push(peer),
 			_ => {}
 		}
+	}
+
+	fn send_consensus(&mut self, _who: PeerId, _consensus: Vec<ConsensusMessage>) {
+		unimplemented!()
 	}
 
 	fn send_chain_specific(&mut self, who: PeerId, message: Vec<u8>) {

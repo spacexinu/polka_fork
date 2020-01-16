@@ -21,8 +21,8 @@ use std::thread;
 
 use log::{error, info, trace, warn};
 use sp_blockchain::{Result as ClientResult};
-use sp_runtime::traits::{Header as HeaderT, Block as BlockT, HasherFor};
-use sp_api::{ApiExt, ProvideRuntimeApi};
+use sp_runtime::traits::{Header as HeaderT, ProvideRuntimeApi, Block as BlockT};
+use sp_api::ApiExt;
 use client::{
 	BlockchainEvents, BlockBody,
 	blockchain::ProvideCache,
@@ -207,10 +207,8 @@ where
 fn fetch_candidates<P>(client: &P, extrinsics: Vec<<Block as BlockT>::Extrinsic>, parent: &BlockId)
 	-> ClientResult<Option<Vec<CandidateReceipt>>>
 where
-	P: ProvideRuntimeApi<Block>,
+	P: ProvideRuntimeApi,
 	P::Api: ParachainHost<Block, Error = sp_blockchain::Error>,
-	// Rust bug: https://github.com/rust-lang/rust/issues/24159
-	sp_api::StateBackendFor<P, Block>: sp_api::StateBackend<HasherFor<Block>>,
 {
 	let api = client.runtime_api();
 
@@ -230,11 +228,9 @@ where
 /// Creates a task to prune entries in availability store upon block finalization.
 async fn prune_unneeded_availability<P, S>(client: Arc<P>, mut sender: S)
 where
-	P: ProvideRuntimeApi<Block> + BlockchainEvents<Block> + BlockBody<Block> + Send + Sync + 'static,
+	P: ProvideRuntimeApi + BlockchainEvents<Block> + BlockBody<Block> + Send + Sync + 'static,
 	P::Api: ParachainHost<Block> + ApiExt<Block, Error=sp_blockchain::Error>,
 	S: Sink<WorkerMsg> + Clone + Send + Sync + Unpin,
-	// Rust bug: https://github.com/rust-lang/rust/issues/24159
-	sp_api::StateBackendFor<P, Block>: sp_api::StateBackend<HasherFor<Block>>,
 {
 	let mut finality_notification_stream = client.finality_notification_stream();
 
@@ -628,19 +624,16 @@ impl<I, P> Drop for AvailabilityBlockImport<I, P> {
 }
 
 impl<I, P> BlockImport<Block> for AvailabilityBlockImport<I, P> where
-	I: BlockImport<Block, Transaction = sp_api::TransactionFor<P, Block>> + Send + Sync,
+	I: BlockImport<Block> + Send + Sync,
 	I::Error: Into<ConsensusError>,
-	P: ProvideRuntimeApi<Block> + ProvideCache<Block>,
+	P: ProvideRuntimeApi + ProvideCache<Block>,
 	P::Api: ParachainHost<Block, Error = sp_blockchain::Error>,
-	// Rust bug: https://github.com/rust-lang/rust/issues/24159
-	sp_api::StateBackendFor<P, Block>: sp_api::StateBackend<sp_core::Blake2Hasher>
 {
 	type Error = ConsensusError;
-	type Transaction = sp_api::TransactionFor<P, Block>;
 
 	fn import_block(
 		&mut self,
-		block: BlockImportParams<Block, Self::Transaction>,
+		block: BlockImportParams<Block>,
 		new_cache: HashMap<CacheKeyId, Vec<u8>>,
 	) -> Result<ImportResult, Self::Error> {
 		trace!(
@@ -752,11 +745,9 @@ impl<I, P> AvailabilityBlockImport<I, P> {
 		to_worker: mpsc::UnboundedSender<WorkerMsg>,
 	) -> Self
 	where
-		P: ProvideRuntimeApi<Block> + BlockBody<Block> + BlockchainEvents<Block> + Send + Sync + 'static,
+		P: ProvideRuntimeApi + BlockBody<Block> + BlockchainEvents<Block> + Send + Sync + 'static,
 		P::Api: ParachainHost<Block>,
 		P::Api: ApiExt<Block, Error = sp_blockchain::Error>,
-		// Rust bug: https://github.com/rust-lang/rust/issues/24159
-		sp_api::StateBackendFor<P, Block>: sp_api::StateBackend<HasherFor<Block>>,
 	{
 		let (signal, exit) = exit_future::signal();
 
