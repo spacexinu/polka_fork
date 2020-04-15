@@ -7348,8 +7348,7 @@ dependencies = [
 [[package]]
 name = "sysinfo"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ccb41798287e8e299a701b5560d886d6ca2c3e7115e9ea2cb68c123aec339b7"
+source = "git+https://github.com/bkchr/sysinfo.git?branch=bkchr-fix-invalid-slice-access-old#617618722c532ecaf4d0f55d5ffa95ff06ebe36a"
 dependencies = [
  "cfg-if",
  "doc-comment",
