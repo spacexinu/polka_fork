@@ -6,17 +6,17 @@ edition = "2018"
 license = "GPL-3.0"
 
 [dependencies]
-sc-block-builder = { git = "https://github.com/paritytech/substrate", branch = "master" }
-substrate-test-client = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-block-builder = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
+substrate-test-client = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
 polkadot-test-runtime = { path = ".." }
 polkadot-runtime-common = { path = "../../common" }
 polkadot-primitives = { path = "../../../primitives" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
 codec = { package = "parity-scale-codec", version = "1.0.0" }
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-client = { git = "https://github.com/paritytech/substrate", branch = "master" }
-pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
+sc-client = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "andre/westend-babe-timewarp" }
 futures = "0.3.1"
