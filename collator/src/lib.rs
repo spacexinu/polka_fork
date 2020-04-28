@@ -80,10 +80,6 @@ const COLLATION_TIMEOUT: Duration = Duration::from_secs(30);
 /// An abstraction over the `Network` with useful functions for a `Collator`.
 pub trait Network: Send + Sync {
 	/// Create a `Stream` of checked statements for the given `relay_parent`.
-	///
-	/// The returned stream will not terminate, so it is required to make sure that the stream is
-	/// dropped when it is not required anymore. Otherwise, it will stick around in memory
-	/// infinitely.
 	fn checked_statements(&self, relay_parent: Hash) -> Pin<Box<dyn Stream<Item=SignedStatement> + Send>>;
 }
 
