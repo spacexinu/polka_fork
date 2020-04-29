@@ -4189,6 +4189,7 @@ dependencies = [
  "sp-keyring",
  "sp-runtime",
  "sp-state-machine",
+ "stream-cancel",
  "wasm-timer",
 ]
 
@@ -7025,6 +7026,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "10102ac8d55e35db2b3fafc26f81ba8647da2e15879ab686a67e6d19af2685e8"
 dependencies = [
  "rand 0.5.6",
+]
+
+[[package]]
+name = "stream-cancel"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15c2f5be039aed0d08b3596461637480d35858ca4360c905b0e802b934fa8e48"
+dependencies = [
+ "futures-core",
+ "futures-util",
+ "pin-project",
+ "tokio 0.2.19",
 ]
 
 [[package]]
