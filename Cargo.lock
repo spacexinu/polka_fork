@@ -7386,7 +7386,7 @@ name = "substrate-prometheus-endpoint"
 version = "0.8.0-rc2"
 source = "git+https://github.com/paritytech/substrate#df59acf4e8aaad672fc40146a1001d0177cb8ed3"
 dependencies = [
- "async-std 1.6.0",
+ "async-std",
  "derive_more 0.99.7",
  "futures-util",
  "hyper 0.13.5",
