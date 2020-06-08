@@ -568,10 +568,10 @@ Availability Core Transitions within Block
                                            |    No backing |     \ Backing      | (no change)
                                            |               |      -\            |
                                            |         +-----v-----+  \     +-----v-----+
-                                           |         |           |   \    |           |
-                                           |         | Free      -----+---> Occupied  |
-                                           |         |           |        |           |
-                                           |         +-----------+        +-----------+
+                                           |         |           |   +---->           |
+                                           |         | Free      |        | Occupied  |
+                                           |         |           <---------           |
+                                           |         +-----------+    ^   +-----------+
                                            |                 Availability Timeout
 ```
 
