@@ -1253,7 +1253,7 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 [[package]]
 name = "fork-tree"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
 ]
@@ -1261,7 +1261,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1278,7 +1278,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "parity-scale-codec",
@@ -1296,7 +1296,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1311,7 +1311,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "11.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -1322,7 +1322,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "bitmask",
  "frame-metadata",
@@ -1347,7 +1347,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support-procedural-tools",
  "proc-macro2 1.0.17",
@@ -1358,7 +1358,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate",
@@ -1370,7 +1370,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "proc-macro2 1.0.17",
  "quote 1.0.6",
@@ -1380,7 +1380,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -1396,7 +1396,7 @@ dependencies = [
 [[package]]
 name = "frame-system-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -1410,7 +1410,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -2532,7 +2532,7 @@ dependencies = [
  "bytes 0.5.4",
  "futures 0.3.5",
  "lazy_static",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "libp2p-core-derive",
  "libp2p-dns",
  "libp2p-identify",
@@ -2543,11 +2543,11 @@ dependencies = [
  "libp2p-ping",
  "libp2p-swarm",
  "libp2p-tcp",
- "libp2p-wasm-ext 0.19.0 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-wasm-ext",
  "libp2p-websocket",
  "libp2p-yamux",
  "multihash",
- "parity-multiaddr 0.9.0 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "parity-multiaddr 0.9.0",
  "parking_lot 0.10.2",
  "pin-project",
  "smallvec 1.4.0",
@@ -2570,42 +2570,8 @@ dependencies = [
  "libsecp256k1",
  "log 0.4.8",
  "multihash",
- "multistream-select 0.8.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
- "parity-multiaddr 0.9.0 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
- "parking_lot 0.10.2",
- "pin-project",
- "prost",
- "prost-build",
- "rand 0.7.3",
- "ring",
- "rw-stream-sink",
- "sha2",
- "smallvec 1.4.0",
- "thiserror",
- "unsigned-varint",
- "void",
- "zeroize",
-]
-
-[[package]]
-name = "libp2p-core"
-version = "0.19.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f5e30dcd8cb13a02ad534e214da234eca1595a76b5788b645dfa5c734d2124b"
-dependencies = [
- "asn1_der",
- "bs58",
- "ed25519-dalek",
- "either",
- "fnv",
- "futures 0.3.5",
- "futures-timer 3.0.2",
- "lazy_static",
- "libsecp256k1",
- "log 0.4.8",
- "multihash",
- "multistream-select 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-multiaddr 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multistream-select",
+ "parity-multiaddr 0.9.0",
  "parking_lot 0.10.2",
  "pin-project",
  "prost",
@@ -2636,7 +2602,7 @@ version = "0.19.0"
 source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std#dcc3ee7c401ad8f92d0842b7017d0b4e97ace384"
 dependencies = [
  "futures 0.3.5",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "log 0.4.8",
 ]
 
@@ -2646,7 +2612,7 @@ version = "0.19.1"
 source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std#dcc3ee7c401ad8f92d0842b7017d0b4e97ace384"
 dependencies = [
  "futures 0.3.5",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "libp2p-swarm",
  "log 0.4.8",
  "prost",
@@ -2666,7 +2632,7 @@ dependencies = [
  "fnv",
  "futures 0.3.5",
  "futures_codec",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "libp2p-swarm",
  "log 0.4.8",
  "multihash",
@@ -2692,7 +2658,7 @@ dependencies = [
  "either",
  "futures 0.3.5",
  "lazy_static",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "libp2p-swarm",
  "log 0.4.8",
  "net2",
@@ -2711,7 +2677,7 @@ dependencies = [
  "fnv",
  "futures 0.3.5",
  "futures_codec",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "log 0.4.8",
  "parking_lot 0.10.2",
  "unsigned-varint",
@@ -2725,7 +2691,7 @@ dependencies = [
  "curve25519-dalek",
  "futures 0.3.5",
  "lazy_static",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "log 0.4.8",
  "prost",
  "prost-build",
@@ -2743,7 +2709,7 @@ version = "0.19.2"
 source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std#dcc3ee7c401ad8f92d0842b7017d0b4e97ace384"
 dependencies = [
  "futures 0.3.5",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "libp2p-swarm",
  "log 0.4.8",
  "rand 0.7.3",
@@ -2757,7 +2723,7 @@ version = "0.19.0"
 source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std#dcc3ee7c401ad8f92d0842b7017d0b4e97ace384"
 dependencies = [
  "futures 0.3.5",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "log 0.4.8",
  "rand 0.7.3",
  "smallvec 1.4.0",
@@ -2775,7 +2741,7 @@ dependencies = [
  "futures-timer 3.0.2",
  "get_if_addrs",
  "ipnet",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "log 0.4.8",
  "socket2",
 ]
@@ -2787,21 +2753,7 @@ source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async
 dependencies = [
  "futures 0.3.5",
  "js-sys",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
- "parity-send-wrapper",
- "wasm-bindgen",
- "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "libp2p-wasm-ext"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f59fdbb5706f2723ca108c088b1c7a37f735a8c328021f0508007162627e9885"
-dependencies = [
- "futures 0.3.5",
- "js-sys",
- "libp2p-core 0.19.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libp2p-core",
  "parity-send-wrapper",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -2815,7 +2767,7 @@ dependencies = [
  "async-tls",
  "either",
  "futures 0.3.5",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "log 0.4.8",
  "quicksink",
  "rustls",
@@ -2832,7 +2784,7 @@ version = "0.19.0"
 source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std#dcc3ee7c401ad8f92d0842b7017d0b4e97ace384"
 dependencies = [
  "futures 0.3.5",
- "libp2p-core 0.19.1 (git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std)",
+ "libp2p-core",
  "parking_lot 0.10.2",
  "thiserror",
  "yamux",
@@ -3160,20 +3112,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "multistream-select"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "991c33683908c588b8f2cf66c221d8f390818c1bdcd13fce55208408e027a796"
-dependencies = [
- "bytes 0.5.4",
- "futures 0.3.5",
- "log 0.4.8",
- "pin-project",
- "smallvec 1.4.0",
- "unsigned-varint",
-]
-
-[[package]]
 name = "nalgebra"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3402,7 +3340,7 @@ dependencies = [
 [[package]]
 name = "pallet-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3418,7 +3356,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3433,7 +3371,7 @@ dependencies = [
 [[package]]
 name = "pallet-babe"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3455,7 +3393,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3469,7 +3407,7 @@ dependencies = [
 [[package]]
 name = "pallet-collective"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3485,7 +3423,7 @@ dependencies = [
 [[package]]
 name = "pallet-democracy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3500,7 +3438,7 @@ dependencies = [
 [[package]]
 name = "pallet-elections-phragmen"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3515,7 +3453,7 @@ dependencies = [
 [[package]]
 name = "pallet-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3531,7 +3469,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3551,7 +3489,7 @@ dependencies = [
 [[package]]
 name = "pallet-identity"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "enumflags2",
  "frame-benchmarking",
@@ -3567,7 +3505,7 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3587,7 +3525,7 @@ dependencies = [
 [[package]]
 name = "pallet-indices"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3603,7 +3541,7 @@ dependencies = [
 [[package]]
 name = "pallet-membership"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3617,7 +3555,7 @@ dependencies = [
 [[package]]
 name = "pallet-multisig"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3632,7 +3570,7 @@ dependencies = [
 [[package]]
 name = "pallet-nicks"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3646,7 +3584,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3661,7 +3599,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3682,7 +3620,7 @@ dependencies = [
 [[package]]
 name = "pallet-proxy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3697,7 +3635,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3710,7 +3648,7 @@ dependencies = [
 [[package]]
 name = "pallet-recovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -3725,7 +3663,7 @@ dependencies = [
 [[package]]
 name = "pallet-scheduler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3740,7 +3678,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3760,7 +3698,7 @@ dependencies = [
 [[package]]
 name = "pallet-session-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3774,7 +3712,7 @@ dependencies = [
 [[package]]
 name = "pallet-society"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3788,7 +3726,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3810,7 +3748,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking-reward-curve"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2 1.0.17",
@@ -3821,7 +3759,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3835,7 +3773,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3853,7 +3791,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3867,7 +3805,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -3885,7 +3823,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -3898,7 +3836,7 @@ dependencies = [
 [[package]]
 name = "pallet-treasury"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3913,7 +3851,7 @@ dependencies = [
 [[package]]
 name = "pallet-utility"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3929,7 +3867,7 @@ dependencies = [
 [[package]]
 name = "pallet-vesting"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "enumflags2",
  "frame-benchmarking",
@@ -3977,24 +3915,6 @@ dependencies = [
 name = "parity-multiaddr"
 version = "0.9.0"
 source = "git+https://github.com/dignifiedquire/rust-libp2p?branch=upgrade-async-std#dcc3ee7c401ad8f92d0842b7017d0b4e97ace384"
-dependencies = [
- "arrayref",
- "bs58",
- "byteorder",
- "data-encoding",
- "multihash",
- "percent-encoding 2.1.0",
- "serde",
- "static_assertions",
- "unsigned-varint",
- "url 2.1.1",
-]
-
-[[package]]
-name = "parity-multiaddr"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12ca96399f4a01aa89c59220c4f52ac371940eb4e53e3ce990da796f364bdf69"
 dependencies = [
  "arrayref",
  "bs58",
@@ -5676,7 +5596,7 @@ dependencies = [
 [[package]]
 name = "sc-authority-discovery"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "bytes 0.5.4",
  "derive_more 0.99.7",
@@ -5703,7 +5623,7 @@ dependencies = [
 [[package]]
 name = "sc-basic-authorship"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5727,7 +5647,7 @@ dependencies = [
 [[package]]
 name = "sc-block-builder"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sc-client-api",
@@ -5743,7 +5663,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "impl-trait-for-tuples",
  "sc-chain-spec-derive",
@@ -5759,7 +5679,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2 1.0.17",
@@ -5770,7 +5690,7 @@ dependencies = [
 [[package]]
 name = "sc-cli"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
@@ -5810,7 +5730,7 @@ dependencies = [
 [[package]]
 name = "sc-client-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "fnv",
@@ -5846,7 +5766,7 @@ dependencies = [
 [[package]]
 name = "sc-client-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "blake2-rfc",
  "hash-db",
@@ -5875,7 +5795,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
@@ -5886,7 +5806,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-babe"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "fork-tree",
@@ -5928,7 +5848,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-babe-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "futures 0.3.5",
@@ -5951,7 +5871,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-epochs"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "fork-tree",
  "parity-scale-codec",
@@ -5964,7 +5884,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-slots"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5986,7 +5906,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-uncles"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "log 0.4.8",
  "sc-client-api",
@@ -6000,7 +5920,7 @@ dependencies = [
 [[package]]
 name = "sc-executor"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "lazy_static",
@@ -6028,7 +5948,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-common"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "log 0.4.8",
@@ -6045,7 +5965,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmi"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -6060,7 +5980,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmtime"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "cranelift-codegen",
  "cranelift-wasm",
@@ -6081,7 +6001,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "assert_matches",
  "derive_more 0.99.7",
@@ -6119,7 +6039,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "finality-grandpa",
@@ -6136,7 +6056,7 @@ dependencies = [
 [[package]]
 name = "sc-informant"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "ansi_term 0.12.1",
  "futures 0.3.5",
@@ -6155,7 +6075,7 @@ dependencies = [
 [[package]]
 name = "sc-keystore"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "hex",
@@ -6170,7 +6090,7 @@ dependencies = [
 [[package]]
 name = "sc-light"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "hash-db",
  "lazy_static",
@@ -6189,7 +6109,7 @@ dependencies = [
 [[package]]
 name = "sc-network"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "bitflags",
  "bs58",
@@ -6241,7 +6161,7 @@ dependencies = [
 [[package]]
 name = "sc-network-gossip"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -6256,7 +6176,7 @@ dependencies = [
 [[package]]
 name = "sc-network-test"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "env_logger",
  "futures 0.3.5",
@@ -6283,7 +6203,7 @@ dependencies = [
 [[package]]
 name = "sc-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "bytes 0.5.4",
  "fnv",
@@ -6310,7 +6230,7 @@ dependencies = [
 [[package]]
 name = "sc-peerset"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "libp2p",
@@ -6323,7 +6243,7 @@ dependencies = [
 [[package]]
 name = "sc-proposer-metrics"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "log 0.4.8",
  "substrate-prometheus-endpoint",
@@ -6332,7 +6252,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -6364,7 +6284,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "futures 0.3.5",
@@ -6388,7 +6308,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-server"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-http-server",
@@ -6404,7 +6324,7 @@ dependencies = [
 [[package]]
 name = "sc-service"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "directories",
@@ -6467,7 +6387,7 @@ dependencies = [
 [[package]]
 name = "sc-state-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -6481,7 +6401,7 @@ dependencies = [
 [[package]]
 name = "sc-telemetry"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "bytes 0.5.4",
  "futures 0.3.5",
@@ -6503,7 +6423,7 @@ dependencies = [
 [[package]]
 name = "sc-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "erased-serde",
  "log 0.4.8",
@@ -6518,7 +6438,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-graph"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "futures 0.3.5",
@@ -6538,7 +6458,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "futures 0.3.5",
@@ -6936,7 +6856,7 @@ dependencies = [
 [[package]]
 name = "sp-allocator"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "log 0.4.8",
@@ -6948,7 +6868,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -6963,7 +6883,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate",
@@ -6975,7 +6895,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -6987,7 +6907,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.11",
@@ -7000,7 +6920,7 @@ dependencies = [
 [[package]]
 name = "sp-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7012,7 +6932,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -7023,7 +6943,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7035,7 +6955,7 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "log 0.4.8",
@@ -7051,7 +6971,7 @@ dependencies = [
 [[package]]
 name = "sp-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "serde",
  "serde_json",
@@ -7060,7 +6980,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "futures 0.3.5",
@@ -7083,7 +7003,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7097,7 +7017,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-babe"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "merlin",
  "parity-scale-codec",
@@ -7114,7 +7034,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -7126,7 +7046,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -7168,7 +7088,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "kvdb",
  "parking_lot 0.10.2",
@@ -7177,7 +7097,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "proc-macro2 1.0.17",
  "quote 1.0.6",
@@ -7187,7 +7107,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7198,7 +7118,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "finality-grandpa",
  "log 0.4.8",
@@ -7214,7 +7134,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -7224,7 +7144,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "parity-scale-codec",
@@ -7236,7 +7156,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7256,7 +7176,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -7267,7 +7187,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -7279,7 +7199,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections-compact"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2 1.0.17",
@@ -7290,7 +7210,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -7300,7 +7220,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "backtrace",
  "log 0.4.8",
@@ -7309,7 +7229,7 @@ dependencies = [
 [[package]]
 name = "sp-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "serde",
  "sp-core",
@@ -7318,7 +7238,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -7340,7 +7260,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -7355,7 +7275,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -7367,7 +7287,7 @@ dependencies = [
 [[package]]
 name = "sp-serializer"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "serde",
  "serde_json",
@@ -7376,7 +7296,7 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7389,7 +7309,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -7399,7 +7319,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "hash-db",
  "log 0.4.8",
@@ -7418,12 +7338,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 
 [[package]]
 name = "sp-storage"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "impl-serde 0.2.3",
  "ref-cast",
@@ -7435,7 +7355,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7449,7 +7369,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "tracing",
 ]
@@ -7457,7 +7377,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "derive_more 0.99.7",
  "futures 0.3.5",
@@ -7473,7 +7393,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -7487,7 +7407,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "futures-core",
@@ -7499,7 +7419,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "impl-serde 0.2.3",
  "parity-scale-codec",
@@ -7511,7 +7431,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7651,7 +7571,7 @@ dependencies = [
 [[package]]
 name = "substrate-browser-utils"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "chrono",
  "clear_on_drop",
@@ -7662,7 +7582,7 @@ dependencies = [
  "futures-timer 3.0.2",
  "js-sys",
  "kvdb-web",
- "libp2p-wasm-ext 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libp2p-wasm-ext",
  "log 0.4.8",
  "rand 0.6.5",
  "rand 0.7.3",
@@ -7678,7 +7598,7 @@ dependencies = [
 [[package]]
 name = "substrate-build-script-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "platforms",
 ]
@@ -7686,7 +7606,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.5",
@@ -7709,7 +7629,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.8.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "async-std",
  "derive_more 0.99.7",
@@ -7723,7 +7643,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7745,7 +7665,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "cfg-if",
  "frame-executive",
@@ -7785,7 +7705,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 dependencies = [
  "futures 0.3.5",
  "parity-scale-codec",
@@ -7806,7 +7726,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder-runner"
 version = "1.0.6"
-source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#ef151eb15165080224a83f4568533f0112dedc0b"
+source = "git+https://github.com/tomaka/polkadot?branch=async-std-1-6-2#f6a4e0b3e7d02873ccee4eb255c22f48fd8eaa58"
 
 [[package]]
 name = "substrate-wasm-builder-runner"
