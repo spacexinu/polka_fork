@@ -29,10 +29,11 @@ use service::{error::Error as ServiceError, ServiceBuilder};
 use grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use sc_executor::native_executor_instance;
 use log::info;
+use sp_trie::PrefixedMemoryDB;
 pub use service::{
-	AbstractService, Role, PruningMode, TransactionPoolOptions, Error, RuntimeGenesis,
+	Role, PruningMode, TransactionPoolOptions, Error, RuntimeGenesis, RpcHandlers,
 	TFullClient, TLightClient, TFullBackend, TLightBackend, TFullCallExecutor, TLightCallExecutor,
-	Configuration, ChainSpec, ServiceBuilderCommand,
+	Configuration, ChainSpec, ServiceComponents, TaskManager,
 };
 pub use service::config::{DatabaseConfig, PrometheusConfig};
 pub use sc_executor::NativeExecutionDispatch;
@@ -149,7 +150,7 @@ fn set_prometheus_registry(config: &mut Configuration) -> Result<(), ServiceErro
 /// Use this macro if you don't actually need the full service, but just the builder in order to
 /// be able to perform chain operations.
 macro_rules! new_full_start {
-	($config:expr, $runtime:ty, $executor:ty, $informant_prefix:expr $(,)?) => {{
+	($config:expr, $runtime:ty, $executor:ty) => {{
 		set_prometheus_registry(&mut $config)?;
 
 		let mut import_setup = None;
@@ -158,7 +159,6 @@ macro_rules! new_full_start {
 		let builder = service::ServiceBuilder::new_full::<
 			Block, $runtime, $executor
 		>($config)?
-			.with_informant_prefix($informant_prefix.unwrap_or_default())?
 			.with_select_chain(|_, backend| {
 				Ok(sc_consensus::LongestChain::new(backend.clone()))
 			})?
@@ -192,7 +192,7 @@ macro_rules! new_full_start {
 					grandpa::block_import_with_authority_set_hard_forks(
 						client.clone(),
 						&(client.clone() as Arc<_>),
-						select_chain,
+						select_chain.clone(),
 						grandpa_hard_forks,
 					)?;
 
@@ -210,6 +210,7 @@ macro_rules! new_full_start {
 					Some(Box::new(justification_import)),
 					None,
 					client,
+					select_chain,
 					inherent_data_providers.clone(),
 					spawn_task_handle,
 					registry,
@@ -276,7 +277,6 @@ macro_rules! new_full {
 		$grandpa_pause:expr,
 		$runtime:ty,
 		$dispatch:ty,
-		$informant_prefix:expr $(,)?
 	) => {{
 		use sc_network::Event;
 		use sc_client_api::ExecutorProvider;
@@ -298,9 +298,12 @@ macro_rules! new_full {
 		let slot_duration = $slot_duration;
 
 		let (builder, mut import_setup, inherent_data_providers, mut rpc_setup) =
-			new_full_start!($config, $runtime, $dispatch, $informant_prefix);
+			new_full_start!($config, $runtime, $dispatch);
 
-		let service = builder
+		let ServiceComponents {
+			client, network, select_chain, keystore, transaction_pool, prometheus_registry,
+			task_manager, telemetry_on_connect_sinks, ..
+		} = builder
 			.with_finality_proof_provider(|client, backend| {
 				let provider = client as Arc<dyn grandpa::StorageAndProofProvider<_, _>>;
 				Ok(Arc::new(GrandpaFinalityProofProvider::new(backend, provider)) as _)
@@ -313,16 +316,10 @@ macro_rules! new_full {
 		let shared_voter_state = rpc_setup.take()
 			.expect("The SharedVoterState is present for Full Services or setup failed before. qed");
 
-		let client = service.client();
 		let known_oracle = client.clone();
 
 		let mut handles = FullNodeHandles::default();
-		let select_chain = if let Some(select_chain) = service.select_chain() {
-			select_chain
-		} else {
-			info!("The node cannot start as an authority because it can't select chain.");
-			return Ok((service, client, handles));
-		};
+		let select_chain = select_chain.ok_or(ServiceError::SelectChainRequired)?;
 		let gossip_validator_select_chain = select_chain.clone();
 
 		let is_known = move |block_hash: &Hash| {
@@ -345,13 +342,13 @@ macro_rules! new_full {
 		};
 
 		let polkadot_network_service = network_protocol::start(
-			service.network(),
+			network.clone(),
 			network_protocol::Config {
 				collating_for: $collating_for,
 			},
 			(is_known, client.clone()),
 			client.clone(),
-			service.spawn_task_handle(),
+			task_manager.spawn_handle(),
 		).map_err(|e| format!("Could not spawn network worker: {:?}", e))?;
 
 		let authority_handles = if is_collator || role.is_authority() {
@@ -382,14 +379,14 @@ macro_rules! new_full {
 				client: client.clone(),
 				network: polkadot_network_service.clone(),
 				collators: polkadot_network_service.clone(),
-				spawner: service.spawn_task_handle(),
+				spawner: task_manager.spawn_handle(),
 				availability_store: availability_store.clone(),
 				select_chain: select_chain.clone(),
-				keystore: service.keystore(),
+				keystore: keystore.clone(),
 				max_block_data_size,
 			}.build();
 
-			service.spawn_essential_task("validation-service", Box::pin(validation_service));
+			task_manager.spawn_essential_handle().spawn("validation-service", Box::pin(validation_service));
 
 			handles.validation_service_handle = Some(validation_service_handle.clone());
 
@@ -405,30 +402,29 @@ macro_rules! new_full {
 
 			let proposer = consensus::ProposerFactory::new(
 				client.clone(),
-				service.transaction_pool(),
+				transaction_pool,
 				validation_service_handle,
 				slot_duration,
-				service.prometheus_registry().as_ref(),
+				prometheus_registry.as_ref(),
 			);
 
-			let select_chain = service.select_chain().ok_or(ServiceError::SelectChainRequired)?;
 			let can_author_with =
 				consensus_common::CanAuthorWithNativeVersion::new(client.executor().clone());
 
 			let block_import = availability_store.block_import(
 				block_import,
 				client.clone(),
-				service.spawn_task_handle(),
-				service.keystore(),
+				task_manager.spawn_handle(),
+				keystore.clone(),
 			)?;
 
 			let babe_config = babe::BabeParams {
-				keystore: service.keystore(),
+				keystore: keystore.clone(),
 				client: client.clone(),
 				select_chain,
 				block_import,
 				env: proposer,
-				sync_oracle: service.network(),
+				sync_oracle: network.clone(),
 				inherent_data_providers: inherent_data_providers.clone(),
 				force_authoring,
 				babe_link,
@@ -436,7 +432,7 @@ macro_rules! new_full {
 			};
 
 			let babe = babe::start_babe(babe_config)?;
-			service.spawn_essential_task("babe", babe);
+			task_manager.spawn_essential_handle().spawn_blocking("babe", babe);
 		}
 
 		if matches!(role, Role::Authority{..} | Role::Sentry{..}) {
@@ -445,7 +441,7 @@ macro_rules! new_full {
 					Role::Authority { ref sentry_nodes } => (
 						sentry_nodes.clone(),
 						authority_discovery::Role::Authority (
-							service.keystore(),
+							keystore.clone(),
 						),
 					),
 					Role::Sentry {..} => (
@@ -455,29 +451,28 @@ macro_rules! new_full {
 					_ => unreachable!("Due to outer matches! constraint; qed."),
 				};
 
-				let network = service.network();
 				let network_event_stream = network.event_stream("authority-discovery");
 				let dht_event_stream = network_event_stream.filter_map(|e| async move { match e {
 					Event::Dht(e) => Some(e),
 					_ => None,
 				}}).boxed();
 				let authority_discovery = authority_discovery::AuthorityDiscovery::new(
-					service.client(),
-					network,
+					client.clone(),
+					network.clone(),
 					sentries,
 					dht_event_stream,
 					authority_discovery_role,
-					service.prometheus_registry(),
+					prometheus_registry.clone(),
 				);
 
-				service.spawn_task("authority-discovery", authority_discovery);
+				task_manager.spawn_handle().spawn("authority-discovery", authority_discovery);
 			}
 		}
 
 		// if the node isn't actively participating in consensus then it doesn't
 		// need a keystore, regardless of which protocol we use below.
 		let keystore = if is_authority {
-			Some(service.keystore() as BareCryptoStorePtr)
+			Some(keystore as BareCryptoStorePtr)
 		} else {
 			None
 		};
@@ -523,15 +518,15 @@ macro_rules! new_full {
 			let grandpa_config = grandpa::GrandpaParams {
 				config,
 				link: link_half,
-				network: service.network(),
+				network: network.clone(),
 				inherent_data_providers: inherent_data_providers.clone(),
-				telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
+				telemetry_on_connect: Some(telemetry_on_connect_sinks.on_connect_stream()),
 				voting_rule,
-				prometheus_registry: service.prometheus_registry(),
+				prometheus_registry: prometheus_registry.clone(),
 				shared_voter_state,
 			};
 
-			service.spawn_essential_task(
+			task_manager.spawn_essential_handle().spawn_blocking(
 				"grandpa-voter",
 				grandpa::run_grandpa_voter(grandpa_config)?
 			);
@@ -539,12 +534,12 @@ macro_rules! new_full {
 			grandpa::setup_disabled_grandpa(
 				client.clone(),
 				&inherent_data_providers,
-				service.network(),
+				network.clone(),
 			)?;
 		}
 
 		handles.polkadot_network = Some(polkadot_network_service);
-		(service, client, handles)
+		(task_manager, client, handles)
 	}}
 }
 
@@ -579,14 +574,18 @@ macro_rules! new_light {
 				client,
 				backend,
 				fetcher,
-				_select_chain,
+				mut select_chain,
 				_,
 				spawn_task_handle,
 				registry,
 			| {
+				let select_chain = select_chain.take()
+					.ok_or_else(|| service::Error::SelectChainRequired)?;
+
 				let fetch_checker = fetcher
 					.map(|fetcher| fetcher.checker().clone())
 					.ok_or_else(|| "Trying to start light import queue without active fetch checker")?;
+
 				let grandpa_block_import = grandpa::light_block_import(
 					client.clone(), backend, &(client.clone() as Arc<_>), Arc::new(fetch_checker)
 				)?;
@@ -608,6 +607,7 @@ macro_rules! new_light {
 					None,
 					Some(Box::new(finality_proof_import)),
 					client,
+					select_chain,
 					inherent_data_providers.clone(),
 					spawn_task_handle,
 					registry,
@@ -634,22 +634,32 @@ macro_rules! new_light {
 				Ok(polkadot_rpc::create_light(light_deps))
 			})?
 			.build_light()
+			.map(|ServiceComponents { task_manager, rpc_handlers, .. }| {
+				(task_manager, rpc_handlers)
+			})
 	}}
 }
 
 /// Builds a new object suitable for chain operations.
-pub fn new_chain_ops<Runtime, Dispatch, Extrinsic>(mut config: Configuration)
-	-> Result<impl ServiceBuilderCommand<Block=Block>, ServiceError>
+pub fn new_chain_ops<Runtime, Dispatch, Extrinsic>(mut config: Configuration) -> Result<
+	(
+		Arc<service::TFullClient<Block, Runtime, Dispatch>>, 
+		Arc<TFullBackend<Block>>,
+		consensus_common::import_queue::BasicQueue<Block, PrefixedMemoryDB<BlakeTwo256>>,
+		TaskManager,
+	),
+	ServiceError
+>
 where
 	Runtime: ConstructRuntimeApi<Block, service::TFullClient<Block, Runtime, Dispatch>> + Send + Sync + 'static,
 	Runtime::RuntimeApi:
 	RuntimeApiCollection<Extrinsic, StateBackend = sc_client_api::StateBackendFor<TFullBackend<Block>, Block>>,
 	Dispatch: NativeExecutionDispatch + 'static,
 	Extrinsic: RuntimeExtrinsic,
-	<Runtime::RuntimeApi as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
 	config.keystore = service::config::KeystoreConfig::InMemory;
-	Ok(new_full_start!(config, Runtime, Dispatch, None).0)
+	let (builder, _, _, _) = new_full_start!(config, Runtime, Dispatch);
+	Ok(builder.to_chain_ops_parts())
 }
 
 /// Create a new Polkadot service for a full node.
@@ -661,10 +671,9 @@ pub fn polkadot_new_full(
 	authority_discovery_enabled: bool,
 	slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
-	informant_prefix: Option<String>,
 )
 	-> Result<(
-		impl AbstractService,
+		TaskManager,
 		Arc<impl PolkadotClient<
 			Block,
 			TFullBackend<Block>,
@@ -682,7 +691,6 @@ pub fn polkadot_new_full(
 		grandpa_pause,
 		polkadot_runtime::RuntimeApi,
 		PolkadotExecutor,
-		informant_prefix,
 	);
 
 	Ok((service, client, handles))
@@ -697,9 +705,8 @@ pub fn kusama_new_full(
 	authority_discovery_enabled: bool,
 	slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
-	informant_prefix: Option<String>,
 ) -> Result<(
-		impl AbstractService,
+		TaskManager,
 		Arc<impl PolkadotClient<
 			Block,
 			TFullBackend<Block>,
@@ -718,7 +725,6 @@ pub fn kusama_new_full(
 		grandpa_pause,
 		kusama_runtime::RuntimeApi,
 		KusamaExecutor,
-		informant_prefix,
 	);
 
 	Ok((service, client, handles))
@@ -733,10 +739,9 @@ pub fn westend_new_full(
 	authority_discovery_enabled: bool,
 	slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
-	informant_prefix: Option<String>,
 )
 	-> Result<(
-		impl AbstractService,
+		TaskManager,
 		Arc<impl PolkadotClient<
 			Block,
 			TFullBackend<Block>,
@@ -754,7 +759,6 @@ pub fn westend_new_full(
 		grandpa_pause,
 		westend_runtime::RuntimeApi,
 		WestendExecutor,
-		informant_prefix,
 	);
 
 	Ok((service, client, handles))
@@ -773,40 +777,24 @@ pub struct FullNodeHandles {
 
 /// Create a new Polkadot service for a light client.
 pub fn polkadot_new_light(mut config: Configuration) -> Result<
-	impl AbstractService<
-		Block = Block,
-		RuntimeApi = polkadot_runtime::RuntimeApi,
-		Backend = TLightBackend<Block>,
-		SelectChain = LongestChain<TLightBackend<Block>, Block>,
-		CallExecutor = TLightCallExecutor<Block, PolkadotExecutor>,
-	>, ServiceError>
+	(TaskManager, Arc<RpcHandlers>), ServiceError
+>
 {
 	new_light!(config, polkadot_runtime::RuntimeApi, PolkadotExecutor)
 }
 
 /// Create a new Kusama service for a light client.
 pub fn kusama_new_light(mut config: Configuration) -> Result<
-	impl AbstractService<
-		Block = Block,
-		RuntimeApi = kusama_runtime::RuntimeApi,
-		Backend = TLightBackend<Block>,
-		SelectChain = LongestChain<TLightBackend<Block>, Block>,
-		CallExecutor = TLightCallExecutor<Block, KusamaExecutor>,
-	>, ServiceError>
+	(TaskManager, Arc<RpcHandlers>), ServiceError
+>
 {
 	new_light!(config, kusama_runtime::RuntimeApi, KusamaExecutor)
 }
 
 /// Create a new Westend service for a light client.
 pub fn westend_new_light(mut config: Configuration, ) -> Result<
-	impl AbstractService<
-		Block = Block,
-		RuntimeApi = westend_runtime::RuntimeApi,
-		Backend = TLightBackend<Block>,
-		SelectChain = LongestChain<TLightBackend<Block>, Block>,
-		CallExecutor = TLightCallExecutor<Block, KusamaExecutor>
-	>,
-	ServiceError>
+	(TaskManager, Arc<RpcHandlers>), ServiceError
+>
 {
 	new_light!(config, westend_runtime::RuntimeApi, KusamaExecutor)
 }

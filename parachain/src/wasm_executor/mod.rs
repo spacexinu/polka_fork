@@ -21,12 +21,12 @@
 //! a WASM VM for re-execution of a parachain candidate.
 
 use std::any::{TypeId, Any};
-use crate::primitives::{ValidationParams, ValidationResult, UpwardMessage};
+use crate::primitives::{ValidationParams, ValidationResult};
 use codec::{Decode, Encode};
 use sp_core::storage::ChildInfo;
 use sp_core::traits::CallInWasm;
-use sp_wasm_interface::HostFunctions as _;
 use sp_externalities::Extensions;
+use sp_wasm_interface::HostFunctions as _;
 
 #[cfg(not(any(target_os = "android", target_os = "unknown")))]
 pub use validation_host::{run_worker, ValidationPool, EXECUTION_TIMEOUT_SEC};
@@ -36,18 +36,6 @@ mod validation_host;
 // maximum memory in bytes
 const MAX_RUNTIME_MEM: usize = 1024 * 1024 * 1024; // 1 GiB
 const MAX_CODE_MEM: usize = 16 * 1024 * 1024; // 16 MiB
-
-sp_externalities::decl_extension! {
-	/// The extension that is registered at the `Externalities` when validating a parachain state
-	/// transition.
-	pub(crate) struct ParachainExt(Box<dyn Externalities>);
-}
-
-impl ParachainExt {
-	pub fn new<T: Externalities + 'static>(ext: T) -> Self {
-		Self(Box::new(ext))
-	}
-}
 
 /// A stub validation-pool defined when compiling for Android or WASM.
 #[cfg(any(target_os = "android", target_os = "unknown"))]
@@ -124,32 +112,25 @@ impl std::error::Error for Error {
 	}
 }
 
-/// Externalities for parachain validation.
-pub trait Externalities: Send {
-	/// Called when a message is to be posted to the parachain's relay chain.
-	fn post_upward_message(&mut self, message: UpwardMessage) -> Result<(), String>;
-}
-
 /// Validate a candidate under the given validation code.
 ///
 /// This will fail if the validation code is not a proper parachain validation module.
-pub fn validate_candidate<E: Externalities + 'static>(
+pub fn validate_candidate(
 	validation_code: &[u8],
 	params: ValidationParams,
-	ext: E,
 	options: ExecutionMode<'_>,
 ) -> Result<ValidationResult, Error> {
 	match options {
 		ExecutionMode::Local => {
-			validate_candidate_internal(validation_code, &params.encode(), ext)
+			validate_candidate_internal(validation_code, &params.encode())
 		},
 		#[cfg(not(any(target_os = "android", target_os = "unknown")))]
 		ExecutionMode::Remote(pool) => {
-			pool.validate_candidate(validation_code, params, ext, false)
+			pool.validate_candidate(validation_code, params, false)
 		},
 		#[cfg(not(any(target_os = "android", target_os = "unknown")))]
 		ExecutionMode::RemoteTest(pool) => {
-			pool.validate_candidate(validation_code, params, ext, true)
+			pool.validate_candidate(validation_code, params, true)
 		},
 		#[cfg(any(target_os = "android", target_os = "unknown"))]
 		ExecutionMode::Remote(pool) =>
@@ -165,21 +146,16 @@ pub fn validate_candidate<E: Externalities + 'static>(
 }
 
 /// The host functions provided by the wasm executor to the parachain wasm blob.
-type HostFunctions = (
-	sp_io::SubstrateHostFunctions,
-	crate::wasm_api::parachain::HostFunctions,
-);
+type HostFunctions = sp_io::SubstrateHostFunctions;
 
 /// Validate a candidate under the given validation code.
 ///
 /// This will fail if the validation code is not a proper parachain validation module.
-pub fn validate_candidate_internal<E: Externalities + 'static>(
+pub fn validate_candidate_internal(
 	validation_code: &[u8],
 	encoded_call_data: &[u8],
-	externalities: E,
 ) -> Result<ValidationResult, Error> {
 	let mut extensions = Extensions::new();
-	extensions.register(ParachainExt::new(externalities));
 	extensions.register(sp_core::traits::TaskExecutorExt(sp_core::tasks::executor()));
 
 	let mut ext = ValidationExternalities(extensions);
@@ -276,12 +252,36 @@ impl sp_externalities::Externalities for ValidationExternalities {
 		panic!("storage_append: unsupported feature for parachain validation")
 	}
 
+	fn storage_start_transaction(&mut self) {
+		panic!("storage_start_transaction: unsupported feature for parachain validation")
+	}
+
+	fn storage_rollback_transaction(&mut self) -> Result<(), ()> {
+		panic!("storage_rollback_transaction: unsupported feature for parachain validation")
+	}
+
+	fn storage_commit_transaction(&mut self) -> Result<(), ()> {
+		panic!("storage_commit_transaction: unsupported feature for parachain validation")
+	}
+
 	fn wipe(&mut self) {
 		panic!("wipe: unsupported feature for parachain validation")
 	}
 
 	fn commit(&mut self) {
 		panic!("commit: unsupported feature for parachain validation")
+	}
+
+	fn read_write_count(&self) -> (u32, u32, u32, u32) {
+		panic!("read_write_count: unsupported feature for parachain validation")
+	}
+
+	fn reset_read_write_count(&mut self) {
+		panic!("reset_read_write_count: unsupported feature for parachain validation")
+	}
+
+	fn set_whitelist(&mut self, _: Vec<Vec<u8>>) {
+		panic!("set_whitelist: unsupported feature for parachain validation")
 	}
 
 	fn set_offchain_storage(&mut self, _: &[u8], _: std::option::Option<&[u8]>) {

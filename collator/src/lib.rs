@@ -50,20 +50,20 @@ use std::sync::Arc;
 use std::time::Duration;
 use std::pin::Pin;
 
-use futures::{future, Future, Stream, FutureExt, TryFutureExt, StreamExt, task::Spawn};
+use futures::{future, Future, Stream, FutureExt, StreamExt, task::Spawn};
 use log::warn;
 use sc_client_api::{StateBackend, BlockchainEvents};
 use sp_blockchain::HeaderBackend;
 use sp_core::Pair;
 use polkadot_primitives::{
-	BlockId, Hash, Block,
+	BlockId, Hash, Block, DownwardMessage,
 	parachain::{
 		self, BlockData, DutyRoster, HeadData, Id as ParaId,
 		PoVBlock, ValidatorId, CollatorPair, LocalValidationData, GlobalValidationSchedule,
 	}
 };
 use polkadot_cli::{
-	ProvideRuntimeApi, AbstractService, ParachainHost, IdentifyVariant,
+	ProvideRuntimeApi, ParachainHost, IdentifyVariant,
 	service::{self, Role}
 };
 pub use polkadot_cli::service::Configuration;
@@ -81,6 +81,7 @@ use polkadot_service_new::{
 	self as polkadot_service,
 	Error as ServiceError, FullNodeHandles, PolkadotClient,
 };
+use sc_service::SpawnTaskHandle;
 
 const COLLATION_TIMEOUT: Duration = Duration::from_secs(30);
 
@@ -100,24 +101,17 @@ impl Network for polkadot_network::protocol::Service {
 	}
 }
 
-/// Error to return when the head data was invalid.
-#[derive(Clone, Copy, Debug)]
-pub struct InvalidHead;
-
 /// Collation errors.
 #[derive(Debug)]
 pub enum Error {
 	/// Error on the relay-chain side of things.
 	Polkadot(String),
-	/// Error on the collator side of things.
-	Collator(InvalidHead),
 }
 
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match *self {
 			Error::Polkadot(ref err) => write!(f, "Polkadot node error: {}", err),
-			Error::Collator(_) => write!(f, "Collator node error: Invalid head data"),
 		}
 	}
 }
@@ -147,7 +141,7 @@ pub trait BuildParachainContext {
 /// This can be implemented through an externally attached service or a stub.
 /// This is expected to be a lightweight, shared type like an Arc.
 pub trait ParachainContext: Clone {
-	type ProduceCandidate: Future<Output = Result<(BlockData, HeadData), InvalidHead>>;
+	type ProduceCandidate: Future<Output = Option<(BlockData, HeadData)>>;
 
 	/// Produce a candidate, given the relay parent hash, the latest ingress queue information
 	/// and the last parachain head.
@@ -156,6 +150,7 @@ pub trait ParachainContext: Clone {
 		relay_parent: Hash,
 		global_validation: GlobalValidationSchedule,
 		local_validation: LocalValidationData,
+		downward_messages: Vec<DownwardMessage>,
 	) -> Self::ProduceCandidate;
 }
 
@@ -165,10 +160,10 @@ pub async fn collate<P>(
 	local_id: ParaId,
 	global_validation: GlobalValidationSchedule,
 	local_validation_data: LocalValidationData,
+	downward_messages: Vec<DownwardMessage>,
 	mut para_context: P,
 	key: Arc<CollatorPair>,
-)
-	-> Result<parachain::Collation, Error>
+) -> Option<parachain::Collation>
 	where
 		P: ParachainContext,
 		P::ProduceCandidate: Send,
@@ -177,7 +172,8 @@ pub async fn collate<P>(
 		relay_parent,
 		global_validation,
 		local_validation_data,
-	).map_err(Error::Collator).await?;
+		downward_messages,
+	).await?;
 
 	let pov_block = PoVBlock {
 		block_data,
@@ -204,7 +200,7 @@ pub async fn collate<P>(
 		pov: pov_block,
 	};
 
-	Ok(collation)
+	Some(collation)
 }
 
 #[cfg(feature = "service-rewr")]
@@ -244,8 +240,8 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 
 
 #[cfg(not(feature = "service-rewr"))]
-fn build_collator_service<SP, P, C, R, Extrinsic>(
-	spawner: SP,
+fn build_collator_service<P, C, R, Extrinsic>(
+	spawner: SpawnTaskHandle,
 	handles: FullNodeHandles,
 	client: Arc<C>,
 	para_id: ParaId,
@@ -273,7 +269,6 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 		P::ParachainContext: Send + 'static,
 		<P::ParachainContext as ParachainContext>::ProduceCandidate: Send,
 		Extrinsic: service::Codec + Send + Sync + 'static,
-		SP: Spawn + Clone + Send + Sync + 'static,
 {
 	let polkadot_network = handles.polkadot_network
 		.ok_or_else(|| "Collator cannot run when Polkadot-specific networking has not been started")?;
@@ -286,7 +281,7 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 
 	let parachain_context = match build_parachain_context.build(
 		client.clone(),
-		spawner,
+		spawner.clone(),
 		polkadot_network.clone(),
 	) {
 		Ok(ctx) => ctx,
@@ -325,6 +320,7 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 					Some(local_validation) => local_validation,
 					None => return future::Either::Left(future::ok(())),
 				};
+				let downward_messages = try_fr!(api.downward_messages(&id, para_id));
 
 				let validators = try_fr!(api.validators(&id));
 
@@ -339,10 +335,16 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 					para_id,
 					global_validation,
 					local_validation,
+					downward_messages,
 					parachain_context,
 					key,
-				).map_ok(move |collation| {
-					network.distribute_collation(targets, collation)
+				).map(move |collation| {
+					match collation {
+						Some(collation) => network.distribute_collation(targets, collation),
+						None => log::trace!("Skipping collation as `collate` returned `None`"),
+					}
+
+					Ok(())
 				});
 
 				future::Either::Right(collation_work)
@@ -362,7 +364,7 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 
 			let future = silenced.map(drop);
 
-			tokio::spawn(future);
+			spawner.spawn("collation-work", future);
 		}
 	}.boxed();
 
@@ -371,13 +373,15 @@ fn build_collator_service<SP, P, C, R, Extrinsic>(
 
 /// Async function that will run the collator node with the given `RelayChainContext` and `ParachainContext`
 /// built by the given `BuildParachainContext` and arguments to the underlying polkadot node.
-pub async fn start_collator<P>(
+pub fn start_collator<P>(
 	build_parachain_context: P,
 	para_id: ParaId,
 	key: Arc<CollatorPair>,
 	config: Configuration,
-	informant_prefix: Option<String>,
-) -> Result<(), polkadot_service::Error>
+) -> Result<
+	(Pin<Box<dyn Future<Output = ()> + Send>>, sc_service::TaskManager),
+	polkadot_service::Error
+>
 where
 	P: 'static + BuildParachainContext,
 	P::ParachainContext: Send + 'static,
@@ -390,65 +394,63 @@ where
 	}
 
 	if config.chain_spec.is_kusama() {
-		let (service, client, handlers) = service::kusama_new_full(
+		let (task_manager, client, handlers) = service::kusama_new_full(
 			config,
 			Some((key.public(), para_id)),
 			None,
 			false,
 			6000,
 			None,
-			informant_prefix,
 		)?;
-		let spawn_handle = service.spawn_task_handle();
-		build_collator_service(
+		let spawn_handle = task_manager.spawn_handle();
+		let future = build_collator_service(
 			spawn_handle,
 			handlers,
 			client,
 			para_id,
 			key,
 			build_parachain_context
-		)?.await;
+		)?;
+		Ok((future.boxed(), task_manager))
 	} else if config.chain_spec.is_westend() {
-		let (service, client, handlers) = service::westend_new_full(
+		let (task_manager, client, handlers) = service::westend_new_full(
 			config,
 			Some((key.public(), para_id)),
 			None,
 			false,
 			6000,
 			None,
-			informant_prefix,
 		)?;
-		let spawn_handle = service.spawn_task_handle();
-		build_collator_service(
+		let spawn_handle = task_manager.spawn_handle();
+		let future = build_collator_service(
 			spawn_handle,
 			handlers,
 			client,
 			para_id,
 			key,
 			build_parachain_context
-		)?.await;
+		)?;
+		Ok((future.boxed(), task_manager))
 	} else {
-		let (service, client, handles) = service::polkadot_new_full(
+		let (task_manager, client, handles) = service::polkadot_new_full(
 			config,
 			Some((key.public(), para_id)),
 			None,
 			false,
 			6000,
 			None,
-			informant_prefix,
 		)?;
-		let spawn_handle = service.spawn_task_handle();
-		build_collator_service(
+		let spawn_handle = task_manager.spawn_handle();
+		let future = build_collator_service(
 			spawn_handle,
 			handles,
 			client,
 			para_id,
 			key,
-			build_parachain_context,
-		)?.await;
+			build_parachain_context
+		)?;
+		Ok((future.boxed(), task_manager))
 	}
-
-	Ok(())
 }
 
 #[cfg(not(feature = "service-rewr"))]
@@ -470,19 +472,20 @@ mod tests {
 	struct DummyParachainContext;
 
 	impl ParachainContext for DummyParachainContext {
-		type ProduceCandidate = future::Ready<Result<(BlockData, HeadData), InvalidHead>>;
+		type ProduceCandidate = future::Ready<Option<(BlockData, HeadData)>>;
 
 		fn produce_candidate(
 			&mut self,
 			_relay_parent: Hash,
 			_global: GlobalValidationSchedule,
 			_local_validation: LocalValidationData,
+			_: Vec<DownwardMessage>,
 		) -> Self::ProduceCandidate {
 			// send messages right back.
-			future::ok((
+			future::ready(Some((
 				BlockData(vec![1, 2, 3, 4, 5,]),
 				HeadData(vec![9, 9, 9]),
-			))
+			)))
 		}
 	}
 
@@ -501,21 +504,20 @@ mod tests {
 		}
 	}
 
-	// Make sure that the future returned by `start_collator` implementes `Send`.
+	// Make sure that the future returned by `start_collator` implements `Send`.
 	#[test]
 	fn start_collator_is_send() {
 		fn check_send<T: Send>(_: T) {}
 
 		let cli = Cli::from_iter(&["-dev"]);
-		let task_executor = Arc::new(|_, _| unimplemented!());
-		let config = cli.create_configuration(&cli.run.base, task_executor).unwrap();
+		let task_executor = |_, _| {};
+		let config = cli.create_configuration(&cli.run.base, task_executor.into()).unwrap();
 
 		check_send(start_collator(
 			BuildDummyParachainContext,
 			0.into(),
 			Arc::new(CollatorPair::generate().0),
 			config,
-			None,
 		));
 	}
 }

@@ -23,14 +23,12 @@ use adder::{HeadData as AdderHead, BlockData as AdderBody};
 use sp_core::Pair;
 use codec::{Encode, Decode};
 use primitives::{
-	Hash,
+	Hash, DownwardMessage,
 	parachain::{HeadData, BlockData, Id as ParaId, LocalValidationData, GlobalValidationSchedule},
 };
-use collator::{
-	InvalidHead, ParachainContext, Network, BuildParachainContext, Cli, SubstrateCli,
-};
+use collator::{ParachainContext, Network, BuildParachainContext, Cli, SubstrateCli};
 use parking_lot::Mutex;
-use futures::future::{Ready, ok, err, TryFutureExt};
+use futures::future::{Ready, ready, FutureExt};
 
 const GENESIS: AdderHead = AdderHead {
 	number: 0,
@@ -55,18 +53,19 @@ struct AdderContext {
 
 /// The parachain context.
 impl ParachainContext for AdderContext {
-	type ProduceCandidate = Ready<Result<(BlockData, HeadData), InvalidHead>>;
+	type ProduceCandidate = Ready<Option<(BlockData, HeadData)>>;
 
 	fn produce_candidate(
 		&mut self,
 		_relay_parent: Hash,
 		_global_validation: GlobalValidationSchedule,
 		local_validation: LocalValidationData,
+		_: Vec<DownwardMessage>,
 	) -> Self::ProduceCandidate
 	{
-		let adder_head = match AdderHead::decode(&mut &local_validation.parent_head.0[..]) {
-			Ok(adder_head) => adder_head,
-			Err(_) => return err(InvalidHead)
+		let adder_head = match AdderHead::decode(&mut &local_validation.parent_head.0[..]).ok() {
+			Some(res) => res,
+			None => return ready(None),
 		};
 
 		let mut db = self.db.lock();
@@ -94,7 +93,7 @@ impl ParachainContext for AdderContext {
 			next_head.number, next_body.state.overflowing_add(next_body.add).0);
 
 		db.insert(next_head.clone(), next_body);
-		ok((encoded_body, encoded_head))
+		ready(Some((encoded_body, encoded_head)))
 	}
 }
 
@@ -136,13 +135,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	let cli = Cli::from_iter(&["-dev"]);
 	let runner = cli.create_runner(&cli.run.base)?;
 	runner.async_run(|config| {
-		collator::start_collator(
+		let (future, task_manager) = collator::start_collator(
 			context,
 			id,
 			key,
 			config,
-			None,
-		).map_err(|e| e.into())
+		)?;
+
+		Ok((future.map(Ok), task_manager))
 	})?;
 
 	Ok(())

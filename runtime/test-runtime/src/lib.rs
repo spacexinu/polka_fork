@@ -175,6 +175,20 @@ impl babe::Trait for Runtime {
 
 	// session module is the trigger
 	type EpochChangeTrigger = babe::ExternalTrigger;
+
+	type KeyOwnerProofSystem = ();
+
+	type KeyOwnerProof = <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(
+		KeyTypeId,
+		babe::AuthorityId,
+	)>>::Proof;
+
+	type KeyOwnerIdentification = <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(
+		KeyTypeId,
+		babe::AuthorityId,
+	)>>::IdentificationTuple;
+
+	type HandleEquivocation = ();
 }
 
 parameter_types! {
@@ -401,7 +415,7 @@ impl<LocalCall> system::offchain::CreateSignedTransaction<LocalCall> for Runtime
 			system::CheckSpecVersion::<Runtime>::new(),
 			system::CheckTxVersion::<Runtime>::new(),
 			system::CheckGenesis::<Runtime>::new(),
-			system::CheckEra::<Runtime>::from(generic::Era::mortal(period, current_block)),
+			system::CheckMortality::<Runtime>::from(generic::Era::mortal(period, current_block)),
 			system::CheckNonce::<Runtime>::from(nonce),
 			system::CheckWeight::<Runtime>::new(),
 			transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
@@ -499,7 +513,7 @@ construct_runtime! {
 		RandomnessCollectiveFlip: randomness_collective_flip::{Module, Storage},
 
 		// Must be before session.
-		Babe: babe::{Module, Call, Storage, Config, Inherent(Timestamp)},
+		Babe: babe::{Module, Call, Storage, Config, Inherent},
 
 		Timestamp: timestamp::{Module, Call, Storage, Inherent},
 		Indices: indices::{Module, Call, Storage, Config<T>, Event<T>},
@@ -545,7 +559,7 @@ pub type SignedExtra = (
 	system::CheckSpecVersion<Runtime>,
 	system::CheckTxVersion<Runtime>,
 	system::CheckGenesis<Runtime>,
-	system::CheckEra<Runtime>,
+	system::CheckMortality<Runtime>,
 	system::CheckNonce<Runtime>,
 	system::CheckWeight<Runtime>,
 	transaction_payment::ChargeTransactionPayment::<Runtime>,
@@ -656,6 +670,9 @@ sp_api::impl_runtime_apis! {
 		fn signing_context() -> SigningContext {
 			Parachains::signing_context()
 		}
+		fn downward_messages(id: parachain::Id) -> Vec<primitives::DownwardMessage> {
+			Parachains::downward_messages(id)
+		}
 	}
 
 	impl fg_primitives::GrandpaApi<Block> for Runtime {
@@ -700,6 +717,20 @@ sp_api::impl_runtime_apis! {
 
 		fn current_epoch_start() -> babe_primitives::SlotNumber {
 			Babe::current_epoch_start()
+		}
+
+		fn generate_key_ownership_proof(
+			_slot_number: babe_primitives::SlotNumber,
+			_authority_id: babe_primitives::AuthorityId,
+		) -> Option<babe_primitives::OpaqueKeyOwnershipProof> {
+			None
+		}
+
+		fn submit_report_equivocation_unsigned_extrinsic(
+			_equivocation_proof: babe_primitives::EquivocationProof<<Block as BlockT>::Header>,
+			_key_owner_proof: babe_primitives::OpaqueKeyOwnershipProof,
+		) -> Option<()> {
+			None
 		}
 	}
 

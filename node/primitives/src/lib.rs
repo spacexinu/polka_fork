@@ -20,16 +20,16 @@
 //! not shared between the node and the runtime. This crate builds on top of the primitives defined
 //! there.
 
-use runtime_primitives::traits::AppVerify;
-use polkadot_primitives::Hash;
-use polkadot_primitives::parachain::{
-	AbridgedCandidateReceipt, CandidateReceipt, SigningContext, ValidatorSignature,
-	ValidatorIndex, ValidatorId,
+use parity_scale_codec::{Decode, Encode};
+use polkadot_primitives::{Hash,
+	parachain::{
+		AbridgedCandidateReceipt, CandidateReceipt, CompactStatement,
+		EncodeAs, Signed,
+	}
 };
-use parity_scale_codec::{Encode, Decode};
 
 /// A statement, where the candidate receipt is included in the `Seconded` variant.
-#[derive(Debug, Clone, PartialEq, Encode, Decode)]
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode)]
 pub enum Statement {
 	/// A statement that a validator seconds a candidate.
 	#[codec(index = "1")]
@@ -43,55 +43,31 @@ pub enum Statement {
 }
 
 impl Statement {
-	/// Get the signing payload of the statement.
-	pub fn signing_payload(&self, context: &SigningContext) -> Vec<u8> {
-		// convert to fully hash-based payload.
-		let statement = match *self {
-			Statement::Seconded(ref c) => polkadot_primitives::parachain::Statement::Candidate(c.hash()),
-			Statement::Valid(hash) => polkadot_primitives::parachain::Statement::Valid(hash),
-			Statement::Invalid(hash) => polkadot_primitives::parachain::Statement::Invalid(hash),
-		};
+	pub fn to_compact(&self) -> CompactStatement {
+		match *self {
+			Statement::Seconded(ref c) => CompactStatement::Candidate(c.hash()),
+			Statement::Valid(hash) => CompactStatement::Valid(hash),
+			Statement::Invalid(hash) => CompactStatement::Invalid(hash),
+		}
+	}
+}
 
-		statement.signing_payload(context)
+impl EncodeAs<CompactStatement> for Statement {
+	fn encode_as(&self) -> Vec<u8> {
+		self.to_compact().encode()
 	}
 }
 
 /// A statement, the corresponding signature, and the index of the sender.
 ///
 /// Signing context and validator set should be apparent from context.
-#[derive(Debug, Clone, PartialEq, Encode, Decode)]
-pub struct SignedStatement {
-	/// The statement signed.
-	pub statement: Statement,
-	/// The signature of the validator.
-	pub signature: ValidatorSignature,
-	/// The index in the validator set of the signing validator. Which validator set should
-	/// be apparent from context.
-	pub sender: ValidatorIndex,
-}
-
-impl SignedStatement {
-	/// Check the signature on a statement. Provide a list of validators to index into
-	/// and the context in which the statement is presumably signed.
-	///
-	/// Returns an error if out of bounds or the signature is invalid. Otherwise, returns Ok.
-	pub fn check_signature(
-		&self,
-		validators: &[ValidatorId],
-		signing_context: &SigningContext,
-	) -> Result<(), ()> {
-		let validator = validators.get(self.sender as usize).ok_or(())?;
-		let payload = self.statement.signing_payload(signing_context);
-
-		if self.signature.verify(&payload[..], validator) {
-			Ok(())
-		} else {
-			Err(())
-		}
-	}
-}
+///
+/// This statement is "full" in the sense that the `Seconded` variant includes the candidate receipt.
+/// Only the compact `SignedStatement` is suitable for submission to the chain.
+pub type SignedFullStatement = Signed<Statement, CompactStatement>;
 
 /// A misbehaviour report.
+#[derive(Debug)]
 pub enum MisbehaviorReport {
 	/// These validator nodes disagree on this candidate's validity, please figure it out
 	///
@@ -101,9 +77,35 @@ pub enum MisbehaviorReport {
 	/// this message should be dispatched with all of them, in arbitrary order.
 	///
 	/// This variant is also used when our own validity checks disagree with others'.
-	CandidateValidityDisagreement(CandidateReceipt, Vec<SignedStatement>),
+	CandidateValidityDisagreement(CandidateReceipt, Vec<SignedFullStatement>),
 	/// I've noticed a peer contradicting itself about a particular candidate
-	SelfContradiction(CandidateReceipt, SignedStatement, SignedStatement),
+	SelfContradiction(CandidateReceipt, SignedFullStatement, SignedFullStatement),
 	/// This peer has seconded more than one parachain candidate for this relay parent head
-	DoubleVote(CandidateReceipt, SignedStatement, SignedStatement),
+	DoubleVote(CandidateReceipt, SignedFullStatement, SignedFullStatement),
+}
+
+/// A unique identifier for a network protocol.
+pub type ProtocolId = [u8; 4];
+
+/// A succinct representation of a peer's view. This consists of a bounded amount of chain heads.
+///
+/// Up to `N` (5?) chain heads.
+#[derive(Default, Debug, Clone, PartialEq, Eq, Encode, Decode)]
+pub struct View(pub Vec<Hash>);
+
+impl View {
+	/// Returns an iterator of the hashes present in `Self` but not in `other`.
+	pub fn difference<'a>(&'a self, other: &'a View) -> impl Iterator<Item = &'a Hash> + 'a {
+		self.0.iter().filter(move |h| !other.contains(h))
+	}
+
+	/// An iterator containing hashes present in both `Self` and in `other`.
+	pub fn intersection<'a>(&'a self, other: &'a View) -> impl Iterator<Item = &'a Hash> + 'a {
+		self.0.iter().filter(move |h| other.contains(h))
+	}
+
+	/// Whether the view contains a given hash.
+	pub fn contains(&self, hash: &Hash) -> bool {
+		self.0.contains(hash)
+	}
 }

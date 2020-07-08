@@ -19,8 +19,7 @@ use log::info;
 use service::{IdentifyVariant, self};
 #[cfg(feature = "service-rewr")]
 use service_new::{IdentifyVariant, self as service};
-use sc_executor::NativeExecutionDispatch;
-use sc_cli::{SubstrateCli, Result};
+use sc_cli::{CliConfiguration, SubstrateCli, Result, RuntimeVersion, Role};
 use crate::cli::{Cli, Subcommand};
 
 fn get_exec_name() -> Option<String> {
@@ -31,19 +30,19 @@ fn get_exec_name() -> Option<String> {
 }
 
 impl SubstrateCli for Cli {
-	fn impl_name() -> &'static str { "Parity Polkadot" }
+	fn impl_name() -> String { "Parity Polkadot".into() }
 
-	fn impl_version() -> &'static str { env!("SUBSTRATE_CLI_IMPL_VERSION") }
+	fn impl_version() -> String { env!("SUBSTRATE_CLI_IMPL_VERSION").into() }
 
-	fn description() -> &'static str { env!("CARGO_PKG_DESCRIPTION") }
+	fn description() -> String { env!("CARGO_PKG_DESCRIPTION").into() }
 
-	fn author() -> &'static str { env!("CARGO_PKG_AUTHORS") }
+	fn author() -> String { env!("CARGO_PKG_AUTHORS").into() }
 
-	fn support_url() -> &'static str { "https://github.com/paritytech/polkadot/issues/new" }
+	fn support_url() -> String { "https://github.com/paritytech/polkadot/issues/new".into() }
 
 	fn copyright_start_year() -> i32 { 2017 }
 
-	fn executable_name() -> &'static str { "polkadot" }
+	fn executable_name() -> String { "polkadot".into() }
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
 		let id = if id == "" {
@@ -74,6 +73,16 @@ impl SubstrateCli for Cli {
 			},
 			path => Box::new(service::PolkadotChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		})
+	}
+
+	fn native_runtime_version(spec: &Box<dyn service::ChainSpec>) -> &'static RuntimeVersion {
+		if spec.is_kusama() {
+			&service::kusama_runtime::VERSION
+		} else if spec.is_westend() {
+			&service::westend_runtime::VERSION
+		} else {
+			&service::polkadot_runtime::VERSION
+		}
 	}
 }
 
@@ -116,59 +125,44 @@ pub fn run() -> Result<()> {
 				info!("     KUSAMA FOUNDATION      ");
 				info!("----------------------------");
 
-				runtime.run_node(
-					|config| {
-						service::kusama_new_light(config)
-					},
-					|config| {
-						service::kusama_new_full(
-							config,
-							None,
-							None,
-							authority_discovery_enabled,
-							6000,
-							grandpa_pause,
-							None,
-						).map(|(s, _, _)| s)
-					},
-					service::KusamaExecutor::native_version().runtime_version
-				)
+				runtime.run_node_until_exit(|config| match config.role {
+					Role::Light => service::kusama_new_light(config)
+						.map(|(components, _)| components),
+					_ => service::kusama_new_full(
+						config,
+						None,
+						None,
+						authority_discovery_enabled,
+						6000,
+						grandpa_pause,
+					).map(|(components, _, _)| components)
+				})
 			} else if chain_spec.is_westend() {
-				runtime.run_node(
-					|config| {
-						service::westend_new_light(config)
-					},
-					|config| {
-						service::westend_new_full(
-							config,
-							None,
-							None,
-							authority_discovery_enabled,
-							6000,
-							grandpa_pause,
-							None,
-						).map(|(s, _, _)| s)
-					},
-					service::WestendExecutor::native_version().runtime_version
-				)
+				runtime.run_node_until_exit(|config| match config.role {
+					Role::Light => service::westend_new_light(config)
+						.map(|(components, _)| components),
+					_ => service::westend_new_full(
+						config,
+						None,
+						None,
+						authority_discovery_enabled,
+						6000,
+						grandpa_pause,
+					).map(|(components, _, _)| components)
+				})
 			} else {
-				runtime.run_node(
-					|config| {
-						service::polkadot_new_light(config)
-					},
-					|config| {
-						service::polkadot_new_full(
-							config,
-							None,
-							None,
-							authority_discovery_enabled,
-							6000,
-							grandpa_pause,
-							None,
-						).map(|(s, _, _)| s)
-					},
-					service::PolkadotExecutor::native_version().runtime_version
-				)
+				runtime.run_node_until_exit(|config| match config.role {
+					Role::Light => service::polkadot_new_light(config)
+						.map(|(components, _)| components),
+					_ => service::polkadot_new_full(
+						config,
+						None,
+						None,
+						authority_discovery_enabled,
+						6000,
+						grandpa_pause,
+					).map(|(components, _, _)| components)
+				})
 			}
 		},
 		Some(Subcommand::Base(subcommand)) => {
@@ -204,7 +198,7 @@ pub fn run() -> Result<()> {
 			}
 		},
 		Some(Subcommand::ValidationWorker(cmd)) => {
-			sc_cli::init_logger("");
+			sc_cli::init_logger("", cli.run.base.log_rotation_opt()?)?;
 
 			if cfg!(feature = "browser") {
 				Err(sc_cli::Error::Input("Cannot run validation worker in browser".into()))
