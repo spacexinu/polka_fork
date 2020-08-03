@@ -40,7 +40,7 @@ Note that block authors must re-send a `ProvisionerMessage::RequestBlockAuthorsh
 
 ## Block Production
 
-When a validator is selected by BABE to author a block, it becomes a block producer. The provisioner is the subsystem best suited to choosing which specific backed candidates and availability bitfields should be assembled into the block. To engage this functionality, a `ProvisionerMessage::RequestInherentData` is sent; the response is a set of non-conflicting candidates and the appropriate bitfields. Non-conflicting generally means that there are never two distinct parachain candidates included for the same parachain.
+When a validator is selected by BABE to author a block, it becomes a block producer. The provisioner is the subsystem best suited to choosing which specific backed candidates and availability bitfields should be assembled into the block. To engage this functionality, a `ProvisionerMessage::RequestInherentData` is sent; the response is a set of non-conflicting candidates and the appropriate bitfields. Non-conflicting means that there are never two distinct parachain candidates included for the same parachain and that new parachain candidates cannot be included until the previous one either gets declared available or expired.
 
 One might ask: given `ProvisionerMessage::RequestInherentData`, what's the point of `ProvisionerMessage::RequestBlockAuthorshipData`? The answer is that the block authorship data includes more information than is present in the inherent data; disputes, for example.
 
@@ -50,8 +50,12 @@ The subsystem should maintain a set of handles to Block Authorship Provisioning 
 
 ### On Overseer Signal
 
-- `StartWork`: spawn a Block Authorship Provisioning Job with the given relay parent, storing a bidirectional channel with that job.
-- `StopWork`: terminate the Block Authorship Provisioning Job for the given relay parent, if any.
+- `ActiveLeavesUpdate`:
+	- For each `activated` head:
+		- spawn a Block Authorship Provisioning Job with the given relay parent, storing a bidirectional channel with that job.
+	- For each `deactivated` head:
+		- terminate the Block Authorship Provisioning Job for the given relay parent, if any.
+- `Conclude`: Forward `Conclude` to all jobs, waiting a small amount of time for them to join, and then hard-exiting.
 
 ### On `ProvisionerMessage`
 

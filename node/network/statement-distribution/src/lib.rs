@@ -21,7 +21,7 @@
 
 use polkadot_subsystem::{
 	Subsystem, SubsystemResult, SubsystemContext, SpawnedSubsystem,
-	FromOverseer, OverseerSignal,
+	ActiveLeavesUpdate, FromOverseer, OverseerSignal,
 };
 use polkadot_subsystem::messages::{
 	AllMessages, NetworkBridgeMessage, NetworkBridgeEvent, StatementDistributionMessage,
@@ -29,9 +29,8 @@ use polkadot_subsystem::messages::{
 	RuntimeApiRequest,
 };
 use node_primitives::{ProtocolId, View, SignedFullStatement};
-use polkadot_primitives::Hash;
-use polkadot_primitives::parachain::{
-	CompactStatement, ValidatorIndex, ValidatorId, SigningContext, ValidatorSignature,
+use polkadot_primitives::v1::{
+	Hash, CompactStatement, ValidatorIndex, ValidatorId, SigningContext, ValidatorSignature,
 };
 use parity_scale_codec::{Encode, Decode};
 
@@ -71,7 +70,10 @@ impl<C> Subsystem<C> for StatementDistribution
 	fn start(self, ctx: C) -> SpawnedSubsystem {
 		// Swallow error because failure is fatal to the node and we log with more precision
 		// within `run`.
-		SpawnedSubsystem(run(ctx).map(|_| ()).boxed())
+		SpawnedSubsystem {
+			name: "statement-distribution-subsystem",
+			future: run(ctx).map(|_| ()).boxed(),
+		}
 	}
 }
 
@@ -838,30 +840,52 @@ async fn run(
 	loop {
 		let message = ctx.recv().await?;
 		match message {
-			FromOverseer::Signal(OverseerSignal::StartWork(relay_parent)) => {
-				let (validators, session_index) = {
-					let (val_tx, val_rx) = oneshot::channel();
-					let (session_tx, session_rx) = oneshot::channel();
+			FromOverseer::Signal(OverseerSignal::ActiveLeaves(ActiveLeavesUpdate { activated, .. })) => {
+				for relay_parent in activated {
+					let (validators, session_index) = {
+						let (val_tx, val_rx) = oneshot::channel();
+						let (session_tx, session_rx) = oneshot::channel();
 
-					let val_message = AllMessages::RuntimeApi(
-						RuntimeApiMessage::Request(relay_parent, RuntimeApiRequest::Validators(val_tx)),
-					);
-					let session_message = AllMessages::RuntimeApi(
-						RuntimeApiMessage::Request(relay_parent, RuntimeApiRequest::SigningContext(session_tx)),
-					);
+						let val_message = AllMessages::RuntimeApi(
+							RuntimeApiMessage::Request(
+								relay_parent,
+								RuntimeApiRequest::Validators(val_tx),
+							),
+						);
+						let session_message = AllMessages::RuntimeApi(
+							RuntimeApiMessage::Request(
+								relay_parent,
+								RuntimeApiRequest::SessionIndexForChild(session_tx),
+							),
+						);
 
-					ctx.send_messages(
-						std::iter::once(val_message).chain(std::iter::once(session_message))
-					).await?;
+						ctx.send_messages(
+							std::iter::once(val_message).chain(std::iter::once(session_message))
+						).await?;
 
-					(val_rx.await?, session_rx.await?.session_index)
-				};
+						match (val_rx.await?, session_rx.await?) {
+							(Ok(v), Ok(s)) => (v, s),
+							(Err(e), _) | (_, Err(e)) => {
+								log::warn!(
+									target: "statement_distribution",
+									"Failed to fetch runtime API data for active leaf: {:?}",
+									e,
+								);
 
-				active_heads.entry(relay_parent)
-					.or_insert(ActiveHeadData::new(validators, session_index));
+								// Lacking this bookkeeping might make us behave funny, although
+								// not in any slashable way. But we shouldn't take down the node
+								// on what are likely spurious runtime API errors.
+								continue;
+							}
+						}
+					};
+
+					active_heads.entry(relay_parent)
+						.or_insert(ActiveHeadData::new(validators, session_index));
+				}
 			}
-			FromOverseer::Signal(OverseerSignal::StopWork(_relay_parent)) => {
-				// do nothing - we will handle this when our view changes.
+			FromOverseer::Signal(OverseerSignal::BlockFinalized(_block_hash)) => {
+				// do nothing
 			}
 			FromOverseer::Signal(OverseerSignal::Conclude) => break,
 			FromOverseer::Communication { msg } => match msg {
@@ -891,9 +915,9 @@ mod tests {
 	use super::*;
 	use sp_keyring::Sr25519Keyring;
 	use node_primitives::Statement;
-	use polkadot_primitives::parachain::{AbridgedCandidateReceipt};
+	use polkadot_primitives::v1::CommittedCandidateReceipt;
 	use assert_matches::assert_matches;
-	use futures::executor::{self, ThreadPool};
+	use futures::executor;
 
 	#[test]
 	fn active_head_accepts_only_2_seconded_per_validator() {
@@ -911,23 +935,23 @@ mod tests {
 		};
 
 		let candidate_a = {
-			let mut c = AbridgedCandidateReceipt::default();
-			c.relay_parent = parent_hash;
-			c.parachain_index = 1.into();
+			let mut c = CommittedCandidateReceipt::default();
+			c.descriptor.relay_parent = parent_hash;
+			c.descriptor.para_id = 1.into();
 			c
 		};
 
 		let candidate_b = {
-			let mut c = AbridgedCandidateReceipt::default();
-			c.relay_parent = parent_hash;
-			c.parachain_index = 2.into();
+			let mut c = CommittedCandidateReceipt::default();
+			c.descriptor.relay_parent = parent_hash;
+			c.descriptor.para_id = 2.into();
 			c
 		};
 
 		let candidate_c = {
-			let mut c = AbridgedCandidateReceipt::default();
-			c.relay_parent = parent_hash;
-			c.parachain_index = 3.into();
+			let mut c = CommittedCandidateReceipt::default();
+			c.descriptor.relay_parent = parent_hash;
+			c.descriptor.para_id = 3.into();
 			c
 		};
 
@@ -1140,9 +1164,9 @@ mod tests {
 		let hash_c = [3; 32].into();
 
 		let candidate = {
-			let mut c = AbridgedCandidateReceipt::default();
-			c.relay_parent = hash_c;
-			c.parachain_index = 1.into();
+			let mut c = CommittedCandidateReceipt::default();
+			c.descriptor.relay_parent = hash_c;
+			c.descriptor.para_id = 1.into();
 			c
 		};
 		let candidate_hash = candidate.hash();
@@ -1210,8 +1234,8 @@ mod tests {
 			},
 		};
 
-		let pool = ThreadPool::new().unwrap();
-		let (mut ctx, mut handle) = subsystem_test::make_subsystem_context(pool);
+		let pool = sp_core::testing::TaskExecutor::new();
+		let (mut ctx, mut handle) = polkadot_subsystem::test_helpers::make_subsystem_context(pool);
 		let peer = PeerId::random();
 
 		executor::block_on(async move {
@@ -1275,9 +1299,9 @@ mod tests {
 		let hash_c = [3; 32].into();
 
 		let candidate = {
-			let mut c = AbridgedCandidateReceipt::default();
-			c.relay_parent = hash_b;
-			c.parachain_index = 1.into();
+			let mut c = CommittedCandidateReceipt::default();
+			c.descriptor.relay_parent = hash_b;
+			c.descriptor.para_id = 1.into();
 			c
 		};
 
@@ -1302,8 +1326,8 @@ mod tests {
 			(peer_c.clone(), peer_data_from_view(peer_c_view)),
 		].into_iter().collect();
 
-		let pool = ThreadPool::new().unwrap();
-		let (mut ctx, mut handle) = subsystem_test::make_subsystem_context(pool);
+		let pool = sp_core::testing::TaskExecutor::new();
+		let (mut ctx, mut handle) = polkadot_subsystem::test_helpers::make_subsystem_context(pool);
 
 		executor::block_on(async move {
 			let statement = {

@@ -34,7 +34,7 @@ use frame_support::{
 	weights::{DispatchClass, Weight},
 };
 use system::{self, ensure_root, ensure_signed};
-use primitives::parachain::{
+use primitives::v0::{
 	Id as ParaId, CollatorId, Scheduling, LOWEST_USER_ID, SwapAux, Info as ParaInfo, ActiveParas,
 	Retriable, ValidationCode, HeadData,
 };
@@ -205,7 +205,7 @@ decl_storage! {
 #[cfg(feature = "std")]
 fn build<T: Trait>(config: &GenesisConfig<T>) {
 	let mut p = config.parachains.clone();
-	p.sort_unstable_by_key(|&(ref id, _, _)| *id);
+	p.sort_by_key(|&(ref id, _, _)| *id);
 	p.dedup_by_key(|&mut (ref id, _, _)| *id);
 
 	let only_ids: Vec<ParaId> = p.iter().map(|&(ref id, _, _)| id).cloned().collect();
@@ -213,7 +213,7 @@ fn build<T: Trait>(config: &GenesisConfig<T>) {
 	Parachains::put(&only_ids);
 
 	for (id, code, genesis) in p {
-		Paras::insert(id, &primitives::parachain::PARACHAIN_INFO);
+		Paras::insert(id, &primitives::v0::PARACHAIN_INFO);
 		// no ingress -- a chain cannot be routed to until it is live.
 		<parachains::Code>::insert(&id, &code);
 		<parachains::Heads>::insert(&id, &genesis);
@@ -670,12 +670,10 @@ mod tests {
 			AccountIdConversion, Extrinsic as ExtrinsicT,
 		}, testing::{UintAuthorityId, TestXt}, KeyTypeId, Perbill, curve::PiecewiseLinear,
 	};
-	use primitives::{
-		parachain::{
-			ValidatorId, Info as ParaInfo, Scheduling, LOWEST_USER_ID, AttestedCandidate,
-			CandidateReceipt, HeadData, ValidityAttestation, CompactStatement as Statement, Chain,
-			CollatorPair, CandidateCommitments,
-		},
+	use primitives::v0::{
+		ValidatorId, Info as ParaInfo, Scheduling, LOWEST_USER_ID, AttestedCandidate,
+		CandidateReceipt, HeadData, ValidityAttestation, CompactStatement as Statement, Chain,
+		CollatorPair, CandidateCommitments,
 		Balance, BlockNumber, Header, Signature,
 	};
 	use frame_support::{
@@ -690,7 +688,7 @@ mod tests {
 	use crate::attestations;
 
 	impl_outer_origin! {
-		pub enum Origin for Test {
+		pub enum Origin for Test where system = system {
 			parachains,
 		}
 	}
@@ -747,6 +745,7 @@ mod tests {
 		type AccountData = balances::AccountData<u128>;
 		type OnNewAccount = ();
 		type OnKilledAccount = Balances;
+		type SystemWeightInfo = ();
 	}
 
 	impl<C> system::offchain::SendTransactionTypes<C> for Test where
@@ -766,6 +765,7 @@ mod tests {
 		type Event = ();
 		type ExistentialDeposit = ExistentialDeposit;
 		type AccountStore = System;
+		type WeightInfo = ();
 	}
 
 	parameter_types!{
@@ -814,6 +814,7 @@ mod tests {
 		type ValidatorId = u64;
 		type ValidatorIdOf = ();
 		type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+		type WeightInfo = ();
 	}
 
 	parameter_types! {
@@ -848,12 +849,14 @@ mod tests {
 		type UnsignedPriority = StakingUnsignedPriority;
 		type MaxIterations = ();
 		type MinSolutionScoreBump = ();
+		type WeightInfo = ();
 	}
 
 	impl timestamp::Trait for Test {
 		type Moment = u64;
 		type OnTimestampSet = ();
 		type MinimumPeriod = MinimumPeriod;
+		type WeightInfo = ();
 	}
 
 	impl session::historical::Trait for Test {
@@ -864,7 +867,7 @@ mod tests {
 	// This is needed for a custom `AccountId` type which is `u64` in testing here.
 	pub mod test_keys {
 		use sp_core::{crypto::KeyTypeId, sr25519};
-		use primitives::Signature;
+		use primitives::v0::Signature;
 
 		pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"test");
 
@@ -1067,7 +1070,7 @@ mod tests {
 			collator: collator.public(),
 			signature: pov_block_hash.using_encoded(|d| collator.sign(d)),
 			pov_block_hash,
-			global_validation: Parachains::global_validation_schedule(),
+			global_validation: Parachains::global_validation_data(),
 			local_validation: Parachains::current_local_validation_data(&id).unwrap(),
 			commitments: CandidateCommitments {
 				fees: 0,

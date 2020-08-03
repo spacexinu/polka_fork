@@ -1,4 +1,4 @@
-// Copyright 2017-2020 Parity Technologies (UK) Ltd.
+// Copyright 2020 Parity Technologies (UK) Ltd.
 // This file is part of Polkadot.
 
 // Polkadot is free software: you can redistribute it and/or modify
@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Polkadot.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Inclusion Inherent primitives define types and constants which can be imported
-//! without needing to import the entire inherent module.
+//! Runtime API implementations for Parachains.
+//!
+//! These are exposed as different modules using different sets of primitives.
+//! At the moment there is only a v1 module and it is not completely clear how migration
+//! to a v2 would be done.
 
-use inherents::InherentIdentifier;
-
-/// Unique identifier for the Inclusion Inherent
-pub const INHERENT_IDENTIFIER: InherentIdentifier = *b"inclusn0";
+pub mod v1;

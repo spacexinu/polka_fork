@@ -35,7 +35,7 @@ use sp_runtime::{
 		TransactionSource, TransactionValidityError,
 	},
 };
-use primitives::ValidityError;
+use primitives::v0::ValidityError;
 
 type CurrencyOf<T> = <<T as Trait>::VestingSchedule as VestingSchedule<<T as system::Trait>::AccountId>>::Currency;
 type BalanceOf<T> = <CurrencyOf<T> as Currency<<T as system::Trait>::AccountId>>::Balance;
@@ -646,7 +646,7 @@ mod tests {
 	use super::Call as ClaimsCall;
 
 	impl_outer_origin! {
-		pub enum Origin for Test {}
+		pub enum Origin for Test where system = system {}
 	}
 
 	impl_outer_dispatch! {
@@ -690,6 +690,7 @@ mod tests {
 		type AccountData = balances::AccountData<u64>;
 		type OnNewAccount = ();
 		type OnKilledAccount = Balances;
+		type SystemWeightInfo = ();
 	}
 
 	parameter_types! {
@@ -704,6 +705,7 @@ mod tests {
 		type DustRemoval = ();
 		type ExistentialDeposit = ExistentialDeposit;
 		type AccountStore = System;
+		type WeightInfo = ();
 	}
 
 	impl vesting::Trait for Test {
@@ -711,6 +713,7 @@ mod tests {
 		type Currency = Balances;
 		type BlockNumberToBalance = Identity;
 		type MinVestedTransfer = MinVestedTransfer;
+		type WeightInfo = ();
 	}
 
 	parameter_types!{

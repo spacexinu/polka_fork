@@ -20,7 +20,7 @@
 
 use std::sync::Arc;
 
-use polkadot_primitives::{Block, BlockNumber, AccountId, Nonce, Balance, Hash};
+use polkadot_primitives::v0::{Block, BlockNumber, AccountId, Nonce, Balance, Hash};
 use sp_api::ProvideRuntimeApi;
 use txpool_api::TransactionPool;
 use sp_blockchain::{HeaderBackend, HeaderMetadata, Error as BlockChainError};
@@ -28,8 +28,8 @@ use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
 use sc_client_api::light::{Fetcher, RemoteBlockchain};
 use sc_consensus_babe::Epoch;
-use sc_rpc::DenyUnsafe;
 use sp_block_builder::BlockBuilder;
+pub use sc_rpc::DenyUnsafe;
 
 /// A type representing all RPC extensions.
 pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;

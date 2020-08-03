@@ -29,7 +29,7 @@ use frame_support::{
 use keyring::AccountKeyring;
 use polkadot_runtime::constants::currency::*;
 use polkadot_runtime::{self, Runtime};
-use primitives::AccountId;
+use primitives::v0::AccountId;
 use runtime_common::MaximumBlockWeight;
 
 use democracy::Call as DemocracyCall;
@@ -49,29 +49,6 @@ fn sanity_check_weight_per_time_constants_are_as_expected() {
 	assert_eq!(WEIGHT_PER_MILLIS, WEIGHT_PER_SECOND / 1000);
 	assert_eq!(WEIGHT_PER_MICROS, WEIGHT_PER_MILLIS / 1000);
 	assert_eq!(WEIGHT_PER_NANOS, WEIGHT_PER_MICROS / 1000);
-}
-
-#[test]
-fn weight_of_balances_transfer_is_correct() {
-	// #[weight = T::DbWeight::get().reads_writes(1, 1) + 70_000_000]
-	let expected_weight = DbWeight::get().read + DbWeight::get().write + 70_000_000;
-
-	let weight = polkadot_runtime::BalancesCall::transfer::<Runtime>(Default::default(), Default::default())
-		.get_dispatch_info()
-		.weight;
-	assert_eq!(weight, expected_weight);
-}
-
-#[test]
-fn weight_of_balances_transfer_keep_alive_is_correct() {
-	// #[weight = T::DbWeight::get().reads_writes(1, 1) + 50_000_000]
-	let expected_weight = DbWeight::get().read + DbWeight::get().write + 50_000_000;
-
-	let weight = polkadot_runtime::BalancesCall::transfer_keep_alive::<Runtime>(Default::default(), Default::default())
-		.get_dispatch_info()
-		.weight;
-
-	assert_eq!(weight, expected_weight);
 }
 
 #[test]
