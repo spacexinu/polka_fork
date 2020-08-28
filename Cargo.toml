@@ -14,6 +14,9 @@ futures = "0.3.4"
 service = { package = "polkadot-service", path = "service" }
 parity-util-mem = { version = "*", default-features = false, features = ["jemalloc-global"] }
 
+[target.'cfg(any(target_arch="x86_64", target_arch="x64"))'.dependencies]
+cli = { package = "polkadot-cli", path = "cli", features = ["wasmtime"] }
+
 [dev-dependencies]
 assert_cmd = "0.12"
 nix = "0.17"
