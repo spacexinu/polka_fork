@@ -65,13 +65,23 @@ impl SubstrateCli for Cli {
 			"westend-dev" => Box::new(service::chain_spec::westend_development_config()?),
 			"westend-local" => Box::new(service::chain_spec::westend_local_testnet_config()?),
 			"westend-staging" => Box::new(service::chain_spec::westend_staging_testnet_config()?),
-			path if self.run.force_kusama => {
-				Box::new(service::KusamaChainSpec::from_json_file(std::path::PathBuf::from(path))?)
+			path => {
+				let path = std::path::PathBuf::from(path);
+
+				let starts_with = |prefix: &str| {
+					path.file_name().map(|f| f.to_str().map(|s| s.starts_with(&prefix))).flatten().unwrap_or(false)
+				};
+
+				// When `force_*` is given or the file name starts with the name of one of the known chains,
+				// we use the chain spec for the specific chain.
+				if self.run.force_kusama || starts_with("kusama") {
+					Box::new(service::KusamaChainSpec::from_json_file(path)?)
+				} else if self.run.force_westend || starts_with("westend") {
+					Box::new(service::WestendChainSpec::from_json_file(path)?)
+				} else {
+					Box::new(service::PolkadotChainSpec::from_json_file(path)?)
+				}
 			},
-			path if self.run.force_westend => {
-				Box::new(service::WestendChainSpec::from_json_file(std::path::PathBuf::from(path))?)
-			},
-			path => Box::new(service::PolkadotChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		})
 	}
 
@@ -86,23 +96,23 @@ impl SubstrateCli for Cli {
 	}
 }
 
+fn set_default_ss58_version(spec: &Box<dyn service::ChainSpec>) {
+	use sp_core::crypto::Ss58AddressFormat;
+
+	let ss58_version = if spec.is_kusama() {
+		Ss58AddressFormat::KusamaAccount
+	} else if spec.is_westend() {
+		Ss58AddressFormat::SubstrateAccount
+	} else {
+		Ss58AddressFormat::PolkadotAccount
+	};
+
+	sp_core::crypto::set_default_ss58_version(ss58_version);
+}
+
 /// Parses polkadot specific CLI arguments and run the service.
 pub fn run() -> Result<()> {
 	let cli = Cli::from_args();
-
-	fn set_default_ss58_version(spec: &Box<dyn service::ChainSpec>) {
-		use sp_core::crypto::Ss58AddressFormat;
-
-		let ss58_version = if spec.is_kusama() {
-			Ss58AddressFormat::KusamaAccount
-		} else if spec.is_westend() {
-			Ss58AddressFormat::SubstrateAccount
-		} else {
-			Ss58AddressFormat::PolkadotAccount
-		};
-
-		sp_core::crypto::set_default_ss58_version(ss58_version);
-	};
 
 	match &cli.subcommand {
 		None => {
@@ -111,7 +121,7 @@ pub fn run() -> Result<()> {
 
 			set_default_ss58_version(chain_spec);
 
-			let authority_discovery_disabled = cli.run.authority_discovery_disabled;
+			let authority_discovery_enabled = cli.run.authority_discovery_enabled;
 			let grandpa_pause = if cli.run.grandpa_pause.is_empty() {
 				None
 			} else {
@@ -128,48 +138,80 @@ pub fn run() -> Result<()> {
 
 			runner.run_node_until_exit(|config| {
 				let role = config.role.clone();
-				let builder = service::NodeBuilder::new(config);
 
 				match role {
-					Role::Light => builder.build_light().map(|(task_manager, _)| task_manager),
-					_ => builder.build_full(
+					Role::Light => service::build_light(config).map(|(task_manager, _)| task_manager),
+					_ => service::build_full(
+						config,
 						None,
-						None,
-						authority_discovery_disabled,
-						6000,
+						authority_discovery_enabled,
 						grandpa_pause,
-					),
+					).map(|r| r.0),
 				}
 			})
 		},
-		Some(Subcommand::Base(subcommand)) => {
-			let runner = cli.create_runner(subcommand)?;
+		Some(Subcommand::BuildSpec(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
+		},
+		Some(Subcommand::CheckBlock(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
 			let chain_spec = &runner.config().chain_spec;
 
 			set_default_ss58_version(chain_spec);
 
-			if chain_spec.is_kusama() {
-				runner.run_subcommand(subcommand, |config|
-					service::new_chain_ops::<
-						service::kusama_runtime::RuntimeApi,
-						service::KusamaExecutor,
-					>(config)
-				)
-			} else if chain_spec.is_westend() {
-				runner.run_subcommand(subcommand, |config|
-					service::new_chain_ops::<
-						service::westend_runtime::RuntimeApi,
-						service::WestendExecutor,
-					>(config)
-				)
-			} else {
-				runner.run_subcommand(subcommand, |config|
-					service::new_chain_ops::<
-						service::polkadot_runtime::RuntimeApi,
-						service::PolkadotExecutor,
-					>(config)
-				)
-			}
+			runner.async_run(|mut config| {
+				let (client, _, import_queue, task_manager) = service::new_chain_ops(&mut config)?;
+				Ok((cmd.run(client, import_queue), task_manager))
+			})
+		},
+		Some(Subcommand::ExportBlocks(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			let chain_spec = &runner.config().chain_spec;
+
+			set_default_ss58_version(chain_spec);
+
+			runner.async_run(|mut config| {
+				let (client, _, _, task_manager) = service::new_chain_ops(&mut config)?;
+				Ok((cmd.run(client, config.database), task_manager))
+			})
+		},
+		Some(Subcommand::ExportState(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			let chain_spec = &runner.config().chain_spec;
+
+			set_default_ss58_version(chain_spec);
+
+			runner.async_run(|mut config| {
+				let (client, _, _, task_manager) = service::new_chain_ops(&mut config)?;
+				Ok((cmd.run(client, config.chain_spec), task_manager))
+			})
+		},
+		Some(Subcommand::ImportBlocks(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			let chain_spec = &runner.config().chain_spec;
+
+			set_default_ss58_version(chain_spec);
+
+			runner.async_run(|mut config| {
+				let (client, _, import_queue, task_manager) = service::new_chain_ops(&mut config)?;
+				Ok((cmd.run(client, import_queue), task_manager))
+			})
+		},
+		Some(Subcommand::PurgeChain(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.sync_run(|config| cmd.run(config.database))
+		},
+		Some(Subcommand::Revert(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			let chain_spec = &runner.config().chain_spec;
+
+			set_default_ss58_version(chain_spec);
+
+			runner.async_run(|mut config| {
+				let (client, backend, _, task_manager) = service::new_chain_ops(&mut config)?;
+				Ok((cmd.run(client, backend), task_manager))
+			})
 		},
 		Some(Subcommand::ValidationWorker(cmd)) => {
 			sc_cli::init_logger("");
@@ -188,19 +230,9 @@ pub fn run() -> Result<()> {
 
 			set_default_ss58_version(chain_spec);
 
-			if chain_spec.is_kusama() {
-				runner.sync_run(|config| {
-					cmd.run::<service::kusama_runtime::Block, service::KusamaExecutor>(config)
-				})
-			} else if chain_spec.is_westend() {
-				runner.sync_run(|config| {
-					cmd.run::<service::westend_runtime::Block, service::WestendExecutor>(config)
-				})
-			} else {
-				runner.sync_run(|config| {
-					cmd.run::<service::polkadot_runtime::Block, service::PolkadotExecutor>(config)
-				})
-			}
+			runner.sync_run(|config| {
+				cmd.run::<service::kusama_runtime::Block, service::KusamaExecutor>(config)
+			})
 		},
 	}
 }

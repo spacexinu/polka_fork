@@ -26,7 +26,7 @@ Note that there is no mechanism in place which forces a block author to include 
 
 The dispute inherent is similar to a misbehavior report in that it is an attestation of misbehavior on the part of a validator or group of validators. Unlike a misbehavior report, it is not self-contained: resolution requires coordinated action by several validators. The canonical example of a dispute inherent involves an approval checker discovering that a set of validators has improperly approved an invalid parachain block: resolving this requires the entire validator set to re-validate the block, so that the minority can be slashed.
 
-Dispute resolution is complex and is explained in substantially more detail [here](../../runtime/validity.md).
+Dispute resolution is complex and is explained in substantially more detail [here](../../runtime/disputes.md).
 
 > TODO: The provisioner is responsible for selecting remote disputes to replay. Let's figure out the details.
 
@@ -40,7 +40,54 @@ Note that block authors must re-send a `ProvisionerMessage::RequestBlockAuthorsh
 
 ## Block Production
 
-When a validator is selected by BABE to author a block, it becomes a block producer. The provisioner is the subsystem best suited to choosing which specific backed candidates and availability bitfields should be assembled into the block. To engage this functionality, a `ProvisionerMessage::RequestInherentData` is sent; the response is a set of non-conflicting candidates and the appropriate bitfields. Non-conflicting means that there are never two distinct parachain candidates included for the same parachain and that new parachain candidates cannot be included until the previous one either gets declared available or expired.
+When a validator is selected by BABE to author a block, it becomes a block producer. The provisioner is the subsystem best suited to choosing which specific backed candidates and availability bitfields should be assembled into the block. To engage this functionality, a `ProvisionerMessage::RequestInherentData` is sent; the response is a set of non-conflicting candidates and the appropriate bitfields. Non-conflicting means that there are never two distinct parachain candidates included for the same parachain and that new parachain candidates cannot be backed until the previous one either gets declared available or expired.
+
+### Bitfield Selection
+
+Our goal with respect to bitfields is simple: maximize availability. However, it's not quite as simple as always including all bitfields; there are constraints which still need to be met:
+
+- We cannot choose more than one bitfield per validator.
+- Each bitfield must correspond to an occupied core.
+
+Beyond that, a semi-arbitrary selection policy is fine. In order to meet the goal of maximizing availability, a heuristic of picking the bitfield with the greatest number of 1 bits set in the event of conflict is useful.
+
+### Candidate Selection
+
+The goal of candidate selection is to determine which cores are free, and then to the degree possible, pick a candidate appropriate to each free core.
+
+To determine availability:
+
+- Get the list of core states from the runtime API
+- For each core state:
+  - On `CoreState::Scheduled`, then we can make an `OccupiedCoreAssumption::Free`.
+  - On `CoreState::Occupied`, then we may be able to make an assumption:
+    - If the bitfields indicate availability and there is a scheduled `next_up_on_available`, then we can make an `OccupiedCoreAssumption::Included`.
+    - If the bitfields do not indicate availability, and there is a scheduled `next_up_on_time_out`, and `occupied_core.time_out_at == block_number_under_production`, then we can make an `OccupiedCoreAssumption::TimedOut`.
+  - If we did not make an `OccupiedCoreAssumption`, then continue on to the next core.
+  - Now compute the core's `validation_data_hash`: get the `PersistedValidationData` from the runtime, given the known `ParaId` and `OccupiedCoreAssumption`;
+  - Find an appropriate candidate for the core.
+    - There are two constraints: `backed_candidate.candidate.descriptor.para_id == scheduled_core.para_id && candidate.candidate.descriptor.validation_data_hash == computed_validation_data_hash`.
+    - In the event that more than one candidate meets the constraints, selection between the candidates is arbitrary. However, not more than one candidate can be selected per core.
+
+The end result of this process is a vector of `BackedCandidate`s, sorted in order of their core index.
+
+### Determining Bitfield Availability
+
+An occupied core has a `CoreAvailability` bitfield. We also have a list of `SignedAvailabilityBitfield`s. We need to determine from these whether or not a core at a particular index has become available.
+
+The key insight required is that `CoreAvailability` is transverse to the `SignedAvailabilityBitfield`s: if we conceptualize the list of bitfields as many rows, each bit of which is its own column, then `CoreAvailability` for a given core index is the vertical slice of bits in the set at that index.
+
+To compute bitfield availability, then:
+
+- Start with a copy of `OccupiedCore.availability`
+- For each bitfield in the list of `SignedAvailabilityBitfield`s:
+  - Get the bitfield's `validator_index`
+  - Update the availability. Conceptually, assuming bit vectors: `availability[validator_index] |= bitfield[core_idx]`
+- Availability has a 2/3 threshold. Therefore: `3 * availability.count_ones() >= 2 * availability.len()`
+
+### Notes
+
+See also: [Scheduler Module: Availability Cores](../../runtime/scheduler.md#availability-cores).
 
 One might ask: given `ProvisionerMessage::RequestInherentData`, what's the point of `ProvisionerMessage::RequestBlockAuthorshipData`? The answer is that the block authorship data includes more information than is present in the inherent data; disputes, for example.
 
@@ -51,10 +98,10 @@ The subsystem should maintain a set of handles to Block Authorship Provisioning 
 ### On Overseer Signal
 
 - `ActiveLeavesUpdate`:
-	- For each `activated` head:
-		- spawn a Block Authorship Provisioning Job with the given relay parent, storing a bidirectional channel with that job.
-	- For each `deactivated` head:
-		- terminate the Block Authorship Provisioning Job for the given relay parent, if any.
+  - For each `activated` head:
+    - spawn a Block Authorship Provisioning Job with the given relay parent, storing a bidirectional channel with that job.
+  - For each `deactivated` head:
+    - terminate the Block Authorship Provisioning Job for the given relay parent, if any.
 - `Conclude`: Forward `Conclude` to all jobs, waiting a small amount of time for them to join, and then hard-exiting.
 
 ### On `ProvisionerMessage`

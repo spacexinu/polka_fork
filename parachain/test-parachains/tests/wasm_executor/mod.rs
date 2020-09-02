@@ -19,7 +19,7 @@
 use crate::adder;
 use parachain::{
 	primitives::{BlockData, ValidationParams},
-	wasm_executor::EXECUTION_TIMEOUT_SEC,
+	wasm_executor::{ValidationError, InvalidCandidate, EXECUTION_TIMEOUT_SEC},
 };
 
 #[test]
@@ -31,16 +31,14 @@ fn terminates_on_timeout() {
 		ValidationParams {
 			block_data: BlockData(Vec::new()),
 			parent_head: Default::default(),
-			max_code_size: 1024,
-			max_head_data_size: 1024,
 			relay_chain_height: 1,
-			code_upgrade_allowed: None,
+			hrmp_mqc_heads: Vec::new(),
 		},
 		parachain::wasm_executor::ExecutionMode::RemoteTest(&pool),
 		sp_core::testing::TaskExecutor::new(),
 	);
 	match result {
-		Err(parachain::wasm_executor::Error::Timeout) => {},
+		Err(ValidationError::InvalidCandidate(InvalidCandidate::Timeout)) => {},
 		r => panic!("{:?}", r),
 	}
 
@@ -61,10 +59,8 @@ fn parallel_execution() {
 		ValidationParams {
 			block_data: BlockData(Vec::new()),
 			parent_head: Default::default(),
-			max_code_size: 1024,
-			max_head_data_size: 1024,
 			relay_chain_height: 1,
-			code_upgrade_allowed: None,
+			hrmp_mqc_heads: Vec::new(),
 		},
 		parachain::wasm_executor::ExecutionMode::RemoteTest(&pool2),
 		sp_core::testing::TaskExecutor::new(),
@@ -74,10 +70,8 @@ fn parallel_execution() {
 		ValidationParams {
 			block_data: BlockData(Vec::new()),
 			parent_head: Default::default(),
-			max_code_size: 1024,
-			max_head_data_size: 1024,
 			relay_chain_height: 1,
-			code_upgrade_allowed: None,
+			hrmp_mqc_heads: Vec::new(),
 		},
 		parachain::wasm_executor::ExecutionMode::RemoteTest(&pool),
 		sp_core::testing::TaskExecutor::new(),

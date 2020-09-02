@@ -33,6 +33,7 @@ use polkadot_subsystem::DummySubsystem;
 use polkadot_node_core_proposer::ProposerFactory;
 use sp_trie::PrefixedMemoryDB;
 use sp_core::traits::SpawnNamed;
+use sc_client_api::ExecutorProvider;
 pub use service::{
 	Role, PruningMode, TransactionPoolOptions, Error, RuntimeGenesis,
 	TFullClient, TLightClient, TFullBackend, TLightBackend, TFullCallExecutor, TLightCallExecutor,
@@ -84,7 +85,7 @@ pub trait RuntimeApiCollection:
 	+ babe_primitives::BabeApi<Block>
 	+ grandpa_primitives::GrandpaApi<Block>
 	+ sp_block_builder::BlockBuilder<Block>
-	+ system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
+	+ frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
 	+ pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
 	+ sp_api::Metadata<Block>
 	+ sp_offchain::OffchainWorkerApi<Block>
@@ -102,7 +103,7 @@ where
 	+ babe_primitives::BabeApi<Block>
 	+ grandpa_primitives::GrandpaApi<Block>
 	+ sp_block_builder::BlockBuilder<Block>
-	+ system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
+	+ frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
 	+ pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
 	+ sp_api::Metadata<Block>
 	+ sp_offchain::OffchainWorkerApi<Block>
@@ -157,7 +158,7 @@ fn new_partial<RuntimeApi, Executor>(config: &mut Configuration) -> Result<
 		consensus_common::DefaultImportQueue<Block, FullClient<RuntimeApi, Executor>>,
 		sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi, Executor>>,
 		(
-			impl Fn(polkadot_rpc::DenyUnsafe) -> polkadot_rpc::RpcExtension,
+			impl Fn(polkadot_rpc::DenyUnsafe, polkadot_rpc::SubscriptionManager) -> polkadot_rpc::RpcExtension,
 			(
 				babe::BabeBlockImport<
 					Block, FullClient<RuntimeApi, Executor>, FullGrandpaBlockImport<RuntimeApi, Executor>
@@ -225,8 +226,10 @@ fn new_partial<RuntimeApi, Executor>(config: &mut Configuration) -> Result<
 		inherent_data_providers.clone(),
 		&task_manager.spawn_handle(),
 		config.prometheus_registry(),
+		consensus_common::CanAuthorWithNativeVersion::new(client.executor().clone()),
 	)?;
 
+	let justification_stream = grandpa_link.justification_stream();
 	let shared_authority_set = grandpa_link.shared_authority_set().clone();
 	let shared_voter_state = grandpa::SharedVoterState::empty();
 
@@ -242,7 +245,7 @@ fn new_partial<RuntimeApi, Executor>(config: &mut Configuration) -> Result<
 		let transaction_pool = transaction_pool.clone();
 		let select_chain = select_chain.clone();
 
-		move |deny_unsafe| -> polkadot_rpc::RpcExtension {
+		move |deny_unsafe, subscriptions| -> polkadot_rpc::RpcExtension {
 			let deps = polkadot_rpc::FullDeps {
 				client: client.clone(),
 				pool: transaction_pool.clone(),
@@ -256,6 +259,8 @@ fn new_partial<RuntimeApi, Executor>(config: &mut Configuration) -> Result<
 				grandpa: polkadot_rpc::GrandpaDeps {
 					shared_voter_state: shared_voter_state.clone(),
 					shared_authority_set: shared_authority_set.clone(),
+					justification_stream: justification_stream.clone(),
+					subscriptions,
 				},
 			};
 
@@ -272,6 +277,7 @@ fn new_partial<RuntimeApi, Executor>(config: &mut Configuration) -> Result<
 
 fn real_overseer<S: SpawnNamed>(
 	leaves: impl IntoIterator<Item = BlockInfo>,
+	prometheus_registry: Option<&Registry>,
 	s: S,
 ) -> Result<(Overseer<S>, OverseerHandler), ServiceError> {
 	let all_subsystems = AllSubsystems {
@@ -287,10 +293,15 @@ fn real_overseer<S: SpawnNamed>(
 		runtime_api: DummySubsystem,
 		availability_store: DummySubsystem,
 		network_bridge: DummySubsystem,
+		chain_api: DummySubsystem,
+		collation_generation: DummySubsystem,
+		collator_protocol: DummySubsystem,
 	};
+
 	Overseer::new(
 		leaves,
 		all_subsystems,
+		prometheus_registry,
 		s,
 	).map_err(|e| ServiceError::Other(format!("Failed to create an Overseer: {:?}", e)))
 }
@@ -300,7 +311,7 @@ fn new_full<RuntimeApi, Executor>(
 	mut config: Configuration,
 	collating_for: Option<(CollatorId, ParaId)>,
 	_max_block_data_size: Option<u64>,
-	_authority_discovery_disabled: bool,
+	_authority_discovery_enabled: bool,
 	_slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
 ) -> Result<(
@@ -313,7 +324,6 @@ fn new_full<RuntimeApi, Executor>(
 		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
 		Executor: NativeExecutionDispatch + 'static,
 {
-	use sc_client_api::ExecutorProvider;
 	use sp_core::traits::BareCryptoStorePtr;
 
 	let is_collator = collating_for.is_some();
@@ -334,7 +344,7 @@ fn new_full<RuntimeApi, Executor>(
 	let finality_proof_provider =
 		GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
 
-	let (network, network_status_sinks, system_rpc_tx) =
+	let (network, network_status_sinks, system_rpc_tx, network_starter) =
 		service::build_network(service::BuildNetworkParams {
 			config: &config,
 			client: client.clone(),
@@ -392,7 +402,7 @@ fn new_full<RuntimeApi, Executor>(
 		})
 		.collect();
 
-	let (overseer, handler) = real_overseer(leaves, spawner)?;
+	let (overseer, handler) = real_overseer(leaves, prometheus_registry.as_ref(), spawner)?;
 	let handler_clone = handler.clone();
 
 	task_manager.spawn_essential_handle().spawn_blocking("overseer", Box::pin(async move {
@@ -495,7 +505,7 @@ fn new_full<RuntimeApi, Executor>(
 			inherent_data_providers: inherent_data_providers.clone(),
 			telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
 			voting_rule,
-			prometheus_registry: prometheus_registry,
+			prometheus_registry,
 			shared_voter_state,
 		};
 
@@ -511,6 +521,8 @@ fn new_full<RuntimeApi, Executor>(
 		)?;
 	}
 
+	network_starter.start_network();
+
 	Ok((task_manager, client))
 }
 
@@ -524,7 +536,7 @@ fn new_light<Runtime, Dispatch>(mut config: Configuration) -> Result<TaskManager
 		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<LightBackend, Block>>,
 		Dispatch: NativeExecutionDispatch + 'static,
 {
-	crate::set_prometheus_registry(&mut config)?;
+	set_prometheus_registry(&mut config)?;
 	use sc_client_api::backend::RemoteBackend;
 
 	let (client, backend, keystore, mut task_manager, on_demand) =
@@ -568,12 +580,13 @@ fn new_light<Runtime, Dispatch>(mut config: Configuration) -> Result<TaskManager
 		inherent_data_providers.clone(),
 		&task_manager.spawn_handle(),
 		config.prometheus_registry(),
+		consensus_common::NeverCanAuthor,
 	)?;
 
 	let finality_proof_provider =
 		GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
 
-	let (network, network_status_sinks, system_rpc_tx) =
+	let (network, network_status_sinks, system_rpc_tx, network_starter) =
 		service::build_network(service::BuildNetworkParams {
 			config: &config,
 			client: client.clone(),
@@ -611,12 +624,14 @@ fn new_light<Runtime, Dispatch>(mut config: Configuration) -> Result<TaskManager
 		system_rpc_tx,
 	})?;
 
+	network_starter.start_network();
+
 	Ok(task_manager)
 }
 
 /// Builds a new object suitable for chain operations.
 #[cfg(feature = "full-node")]
-pub fn new_chain_ops<Runtime, Dispatch>(mut config: Configuration) -> Result<
+pub fn new_chain_ops<Runtime, Dispatch>(mut config: &mut Configuration) -> Result<
 	(
 		Arc<FullClient<Runtime, Dispatch>>,
 		Arc<FullBackend>,
@@ -633,7 +648,7 @@ where
 {
 	config.keystore = service::config::KeystoreConfig::InMemory;
 	let service::PartialComponents { client, backend, import_queue, task_manager, .. }
-		= new_partial::<Runtime, Dispatch>(&mut config)?;
+		= new_partial::<Runtime, Dispatch>(config)?;
 	Ok((client, backend, import_queue, task_manager))
 }
 
@@ -643,7 +658,7 @@ pub fn polkadot_new_full(
 	config: Configuration,
 	collating_for: Option<(CollatorId, ParaId)>,
 	max_block_data_size: Option<u64>,
-	authority_discovery_disabled: bool,
+	authority_discovery_enabled: bool,
 	slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
 )
@@ -661,7 +676,7 @@ pub fn polkadot_new_full(
 		config,
 		collating_for,
 		max_block_data_size,
-		authority_discovery_disabled,
+		authority_discovery_enabled,
 		slot_duration,
 		grandpa_pause,
 	)?;
@@ -675,7 +690,7 @@ pub fn kusama_new_full(
 	config: Configuration,
 	collating_for: Option<(CollatorId, ParaId)>,
 	max_block_data_size: Option<u64>,
-	authority_discovery_disabled: bool,
+	authority_discovery_enabled: bool,
 	slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
 ) -> Result<(
@@ -693,7 +708,7 @@ pub fn kusama_new_full(
 		config,
 		collating_for,
 		max_block_data_size,
-		authority_discovery_disabled,
+		authority_discovery_enabled,
 		slot_duration,
 		grandpa_pause,
 	)?;
@@ -707,7 +722,7 @@ pub fn westend_new_full(
 	config: Configuration,
 	collating_for: Option<(CollatorId, ParaId)>,
 	max_block_data_size: Option<u64>,
-	authority_discovery_disabled: bool,
+	authority_discovery_enabled: bool,
 	slot_duration: u64,
 	grandpa_pause: Option<(u32, u32)>,
 )
@@ -725,7 +740,7 @@ pub fn westend_new_full(
 		config,
 		collating_for,
 		max_block_data_size,
-		authority_discovery_disabled,
+		authority_discovery_enabled,
 		slot_duration,
 		grandpa_pause,
 	)?;
