@@ -124,7 +124,7 @@ impl ValidationPool {
 
 /// Validation worker process entry point. Runs a loop waiting for candidates to validate
 /// and sends back results via shared memory.
-pub fn run_worker(mem_id: &str) -> Result<(), String> {
+pub fn run_worker(mem_id: &str, stop_when_stdin_closed: bool) -> Result<(), String> {
 	let mut memory = match SharedMem::open(mem_id) {
 		Ok(memory) => memory,
 		Err(e) => {
@@ -137,14 +137,16 @@ pub fn run_worker(mem_id: &str) -> Result<(), String> {
 	let task_executor = TaskExecutor::new()?;
 	// spawn parent monitor thread
 	let watch_exit = exit.clone();
-	std::thread::spawn(move || {
-		use std::io::Read;
-		let mut in_data = Vec::new();
-		// pipe terminates when parent process exits
-		std::io::stdin().read_to_end(&mut in_data).ok();
-		debug!("{} Parent process is dead. Exiting", process::id());
-		exit.store(true, atomic::Ordering::Relaxed);
-	});
+	if stop_when_stdin_closed {
+		std::thread::spawn(move || {
+			use std::io::Read;
+			let mut in_data = Vec::new();
+			// pipe terminates when parent process exits
+			std::io::stdin().read_to_end(&mut in_data).ok();
+			debug!("{} Parent process is dead. Exiting", process::id());
+			exit.store(true, atomic::Ordering::Relaxed);
+		});
+	}
 
 	memory.set(Event::WorkerReady as usize, EventState::Signaled)
 		.map_err(|e| format!("{} Error setting shared event: {:?}", process::id(), e))?;
@@ -282,7 +284,7 @@ impl ValidationHost {
 		match execution_mode {
 			ValidationExecutionMode::InProcess => {
 				let mem_id = memory.get_os_path().to_string();
-				self.worker_thread = Some(std::thread::spawn(move || run_worker(mem_id.as_str())));
+				self.worker_thread = Some(std::thread::spawn(move || run_worker(mem_id.as_str(), false)));
 			},
 			ValidationExecutionMode::ExternalProcessSelfHost => run_worker_process(
 				env::current_exe()?,
