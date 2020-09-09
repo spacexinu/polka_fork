@@ -414,7 +414,10 @@ pub fn new_full<RuntimeApi, Executor>(
 			keystore: keystore.clone(),
 			max_block_data_size,
 			validation_execution_mode: if test {
-				ValidationExecutionMode::InProcess
+				ValidationExecutionMode::ExternalProcessCustomHost {
+					binary: std::env::current_exe().unwrap(),
+					args: ["--nocapture", "validation_worker"].iter().map(|x| x.to_string()).collect(),
+				}
 			} else {
 				ValidationExecutionMode::ExternalProcessSelfHost
 			},
