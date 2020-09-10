@@ -195,7 +195,7 @@ pub fn run() -> Result<()> {
 				Err(sc_cli::Error::Input("Cannot run validation worker in browser".into()))
 			} else {
 				#[cfg(all(not(feature = "browser"), not(feature = "service-rewr")))]
-				service::run_validation_worker(&cmd.mem_id, true)?;
+				service::run_validation_worker(&cmd.mem_id)?;
 				Ok(())
 			}
 		},
