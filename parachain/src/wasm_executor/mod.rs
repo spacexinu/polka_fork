@@ -141,7 +141,7 @@ pub fn validate_candidate(
 		},
 		#[cfg(not(any(target_os = "android", target_os = "unknown")))]
 		ExecutionMode::Remote(pool) => {
-			pool.validate_candidate(validation_code, params)
+			pool.validate_candidate(validation_code, params, spawner)
 		},
 		#[cfg(any(target_os = "android", target_os = "unknown"))]
 		ExecutionMode::Remote(_pool) =>

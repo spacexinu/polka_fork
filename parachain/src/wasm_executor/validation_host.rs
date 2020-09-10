@@ -110,7 +110,12 @@ impl ValidationPool {
 		&self,
 		validation_code: &[u8],
 		params: ValidationParams,
+		spawner: impl SpawnNamed + 'static,
 	) -> Result<ValidationResult, ValidationError> {
+		if matches!(self.execution_mode, ValidationExecutionMode::InProcess) {
+			return validate_candidate_internal(validation_code, &params.encode(), spawner);
+		}
+
 		for host in self.hosts.iter() {
 			if let Some(mut host) = host.try_lock() {
 				return host.validate_candidate(validation_code, params, self.execution_mode.clone());
