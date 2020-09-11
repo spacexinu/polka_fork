@@ -38,6 +38,7 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 	fn execute_xcm(origin: MultiLocation, msg: Xcm) -> XcmResult {
 		let (mut holding, effects) = match (origin.clone(), msg) {
 			(origin, Xcm::RelayedFrom { superorigin, inner }) => {
+				println!("Match: Relayed From");
 				// We ensure that it doesn't contain any `Parent` Junctions which would imply a privilege escalation.
 				let mut new_origin = origin;
 				for j in superorigin.into_iter() {
@@ -47,6 +48,7 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 				return Self::execute_xcm(new_origin, (*inner).try_into()?)
 			}
 			(origin, Xcm::WithdrawAsset { assets, effects }) => {
+				println!("Match: Withdraw Asset");
 				// Take `assets` from the origin account (on-chain) and place in holding.
 				let mut holding = Assets::default();
 				for asset in assets {
@@ -56,16 +58,20 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 				(holding, effects)
 			}
 			(origin, Xcm::ReserveAssetCredit { assets, effects }) => {
+				println!("Match: Reserve Asset Credit");
 				// check whether we trust origin to be our reserve location for this asset.
 				if assets.iter().all(|asset| Config::IsReserve::filter_asset_location(asset, &origin)) {
 					// We only trust the origin to send us assets that they identify as their
 					// sovereign assets.
+					println!("Assets::from : {:?}", assets);
 					(Assets::from(assets), effects)
 				} else {
+					println!("Reserve Asset Credit Error");
 					Err(())?
 				}
 			}
 			(origin, Xcm::TeleportAsset { assets, effects }) => {
+				println!("Match: Teleport Asset");
 				// check whether we trust origin to teleport this asset to us via config trait.
 				if assets.iter().all(|asset| Config::IsTeleporter::filter_asset_location(asset, &origin)) {
 					// We only trust the origin to send us assets that they identify as their
@@ -76,6 +82,7 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 				}
 			}
 			(origin, Xcm::Transact { origin_type, call }) => {
+				println!("Match: Transact");
 				// We assume that the Relay-chain is allowed to use transact on this parachain.
 
 				// TODO: Weight fees should be paid.
@@ -90,14 +97,19 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 				return Ok(());
 			}
 			(origin, Xcm::RelayToParachain { id, inner }) => {
+				println!("Match: Relay To Parachain");
 				let msg = Xcm::RelayedFrom { superorigin: origin, inner }.into();
 				return Config::XcmSender::send_xcm(Junction::Parachain { id }.into(), msg)
 			},
 			(origin, Xcm::ReserveAssetTransfer { mut assets, dest, effects }) => {
+				println!("Match: Reserve Asset Transfer: {:?}, {:?}", dest, effects);
 				for asset in assets.iter_mut() {
+					println!("Transfer Asset Started: {:?}", asset);
 					*asset = Config::AssetTransactor::transfer_asset(asset, &origin, &dest)?;
+					println!("Transfer Asset Finished: {:?}", asset);
 				}
 				let msg = Xcm::ReserveAssetCredit { assets, effects }.into();
+				println!("Sending Reserve Asset Credit: {:?}", msg);
 				return Config::XcmSender::send_xcm(dest, msg)
 			},
 			_ => Err(())?,	// Unhandled XCM message.
@@ -107,6 +119,7 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 		//   including depositing fees for effects from holding account.
 
 		for effect in effects.into_iter() {
+			println!("Executing Effect: {:?}, {:?}, {:?}", origin, holding, effect);
 			let _ = Self::execute_effects(&origin, &mut holding, effect)?;
 		}
 
@@ -118,8 +131,10 @@ impl<Config: config::Config> ExecuteXcm for XcmExecutor<Config> {
 
 impl<Config: config::Config> XcmExecutor<Config> {
 	fn execute_effects(_origin: &MultiLocation, holding: &mut Assets, effect: Ai) -> XcmResult {
+		println!("Starting XCM Executor");
 		match effect {
 			Ai::DepositAsset { assets, dest } => {
+				println!("Match: AI Deposit Asset: {:?}, {:?}", assets, dest);
 				let deposited = holding.saturating_take(assets);
 				for asset in deposited.into_assets_iter() {
 					Config::AssetTransactor::deposit_asset(&asset, &dest)?;
@@ -127,16 +142,19 @@ impl<Config: config::Config> XcmExecutor<Config> {
 				Ok(())
 			},
 			Ai::InitiateReserveTransfer { assets, reserve, dest, effects} => {
+				println!("Match: AI Initiate Reserve Transfer: {:?}, {:?}, {:?}, {:?}", assets, reserve, dest, effects);
 				let transferred = holding.saturating_take(assets);
 				let assets = transferred.into_assets_iter().collect();
 				Config::XcmSender::send_xcm(reserve, Xcm::ReserveAssetTransfer { assets, dest, effects })
 			}
 			Ai::InitiateTeleport { assets, dest, effects} => {
+				println!("Match: AI Initiate Teleport: {:?}, {:?}, {:?}", assets, dest, effects);
 				let transferred = holding.saturating_take(assets);
 				let assets = transferred.into_assets_iter().collect();
 				Config::XcmSender::send_xcm(dest, Xcm::TeleportAsset { assets, effects })
 			}
 			Ai::QueryHolding { query_id, dest, assets } => {
+				println!("Match: AI Query Holding: {:?}, {:?}, {:?}", query_id, dest, assets);
 				let assets = holding.min(assets.iter()).into_assets_iter().collect();
 				Config::XcmSender::send_xcm(dest, Xcm::Balances { query_id, assets })
 			}

@@ -1,0 +1,194 @@
+{
+	"MultiOrigin": {
+		"_enum": {
+			"Native": null,
+			"SovereignAccount": null,
+			"Superuser": null
+		}
+	},
+	"MultiNetwork": {
+		"_enum": {
+			"Any": null,
+			"Named": "Vec<u8>",
+			"Polkadot": null,
+			"Kusama": null
+		}
+	},
+	"AccountId32Junction": {
+		"network": "MultiNetwork",
+		"id": "AccountId"
+	},
+	"AccountIndex64Junction": {
+		"network": "MultiNetwork",
+		"index": "Compact<u64>"
+	},
+	"AccountKey20Junction": {
+		"network": "MultiNetwork",
+		"index": "[u8; 20]"
+	},
+	"Junction": {
+		"_enum": {
+			"Parent": null,
+			"Parachain": "Compact<u32>",
+			"OpaqueRemark": "Vec<u8>",
+			"AccountId32": "AccountId32Junction",
+			"AccountIndex64": "AccountIndex64Junction",
+			"AccountKey20": "AccountKey20Junction",
+			"PalletInstance": "u8",
+			"GeneralIndex": "Compact<u128>",
+			"GeneralKey": "Vec<u8>"
+		}
+	},
+	"MultiLocation": {
+		"_enum": {
+			"Null": null,
+			"X1": "Junction",
+			"X2": "(Junction, Junction)",
+			"X3": "(Junction, Junction, Junction)",
+			"X4": "(Junction, Junction, Junction, Junction)"
+		}
+	},
+	"VersionedMultiLocation": {
+		"_enum": {
+			"V0": "MultiLocation"
+		}
+	},
+	"AssetInstance": {
+		"_enum": {
+			"Undefined": null,
+			"Index8": "u8",
+			"Index16": "Compact<u16>",
+			"Index32": "Compact<u32>",
+			"Index64": "Compact<u64>",
+			"Index128": "Compact<u128>",
+			"Array4": "[u8; 4]",
+			"Array8": "[u8; 8]",
+			"Array16": "[u8; 16]",
+			"Array32": "[u8; 32]",
+			"Blob": "Vec<u8>"
+		}
+	},
+	"AbstractFungibleMultiAsset": {
+		"id": "Vec<u8>",
+		"instance": "Compact<u128>"
+	},
+	"AbstractNonFungibleMultiAsset": {
+		"class": "Vec<u8>",
+		"instance": "AssetInstance"
+	},
+	"ConcreteFungibleMultiAsset": {
+		"id": "MultiLocation",
+		"amount": "Compact<u128>"
+	},
+	"ConcreteNonFungibleMultiAsset": {
+		"class": "MultiLocation",
+		"instance": "AssetInstance"
+	},
+	"MultiAsset": {
+		"_enum": {
+			"None": null,
+			"All": null,
+			"AllFungible": null,
+			"AllNonFungible": null,
+			"AllAbstractFungible": "Vec<u8>",
+			"AllAbstractNonFungible": "Vec<u8>",
+			"AllConcreteFungible": "MultiLocation",
+			"AllConcreteNonFungible": "MultiLocation",
+			"AbstractFungible": "AbstractFungibleMultiAsset",
+			"AbstractNonFungible": "AbstractNonFungibleMultiAsset",
+			"ConcreteFungible": "ConcreteFungibleMultiAsset",
+			"ConcreteNonFungible": "ConcreteNonFungibleMultiAsset"
+		}
+	},
+	"VersionedMultiAsset": {
+		"_enum": {
+			"V0": "MultiAsset"
+		}
+	},
+	"DepositAssetAi": {
+		"assets": "Vec<MultiAsset>",
+		"dest": "MultiLocation"
+	},
+	"ExchangeAssetAi": {
+		"give": "Vec<MultiAsset>",
+		"receive": "Vec<MultiAsset>"
+	},
+	"InitiateReserveTransferAi": {
+		"assets": "Vec<MultiAsset>",
+		"reserve": "MultiLocation",
+		"dest": "MultiLocation",
+		"effects": "Vec<Ai>"
+	},
+	"InitiateTeleportAi": {
+		"assets": "Vec<MultiAsset>",
+		"dest": "Multilocation",
+		"effects": "Vec<Ai>"
+	},
+	"QueryHoldingAi": {
+		"query_id": "Compact<u64>",
+		"dest": "MultiLocation",
+		"assets": "Vec<MultiAsset>"
+	},
+	"Ai": {
+		"_enum": {
+			"Null": null,
+			"DepositAsset": "DepositAssetAi",
+			"ExchangeAsset": "ExchangeAssetAi",
+			"InitiateReserveTransfer": "InitiateReserveTransferAi",
+			"InitiateTeleport": "InitiateTeleportAi",
+			"QueryHolding": "QueryHoldingAi"
+		}
+	},
+	"WithdrawAssetXcm": {
+		"assets": "Vec<MultiAsset>",
+		"effects": "Vec<Ai>"
+	},
+	"ReserveAssetTransferXcm": {
+		"assets": "Vec<MultiAsset>",
+		"dest": "MultiLocation",
+		"effects": "Vec<Ai>"
+	},
+	"ReserveAssetCreditXcm": {
+		"assets": "Vec<MultiAsset>",
+		"effects": "Vec<Ai>"
+	},
+	"TeleportAssetXcm": {
+		"assets": "Vec<MultiAsset>",
+		"effects": "Vec<Ai>"
+	},
+	"BalancesXcm": {
+		"query_id": "Compact<u64>",
+		"assets": "Vec<MultiAsset>"
+	},
+	"TransactXcm": {
+		"origin_type": "MultiOrigin",
+		"call": "Vec<u8>"
+	},
+	"RelayToParachainXcm": {
+		"id": "u32",
+		"inner": "VersionedXcm"
+	},
+	"RelayedFromXcm": {
+		"superorigin": "MultiLocation",
+		"inner": "VersionedXcm"
+	},
+	"Xcm": {
+		"_enum": {
+			"WithdrawAsset": "WithdrawAssetXcm",
+			"ReserveAssetTransfer": "ReserveAssetTransferXcm",
+			"ReserveAssetCredit": "ReserveAssetCreditXcm",
+			"TeleportAsset": "TeleportAssetXcm",
+			"Balances": "BalancesXcm",
+			"Transact": "TransactXcm",
+			"RelayToParachain": "RelayToParachainXcm",
+			"RelayedFrom": "RelayedFromXcm"
+		}
+	},
+	"VersionedXcm": {
+		"_enum" : {
+			"V0": "Xcm"
+		}
+	},
+	"XcmError": "()",
+	"XcmResult": "()"
+}

@@ -595,6 +595,7 @@ decl_module! {
 		/// Provide candidate receipts for parachains, in ascending order by id.
 		#[weight = (1_000_000_000, DispatchClass::Mandatory)]
 		pub fn set_heads(origin, heads: Vec<AttestedCandidate>) -> DispatchResult {
+			println!("Start Set Heads");
 			ensure_none(origin)?;
 			ensure!(!<DidUpdate>::exists(), Error::<T>::TooManyHeadUpdates);
 
@@ -610,6 +611,7 @@ decl_module! {
 			if !active_parachains.is_empty() {
 				// perform integrity checks before writing to storage.
 				{
+					println!("Entered Active Parachains");
 					let mut last_id = None;
 
 					let mut iter = active_parachains.iter();
@@ -629,6 +631,7 @@ decl_module! {
 							ensure!(required_collator == &head.candidate.collator, Error::<T>::InvalidCollator);
 						}
 
+						println!("Checking Upward Messages");
 						Self::check_upward_messages(
 							id,
 							&head.candidate.commitments.upward_messages,
@@ -662,6 +665,7 @@ decl_module! {
 				// note: we dispatch new messages _after_ the call to `check_candidates`
 				// which deducts any fees. if that were not the case, an upward message
 				// could be dispatched and spend money that invalidated a candidate.
+				println!("Dispatching Upward Messages");
 				Self::dispatch_upward_messages(
 					MAX_QUEUE_COUNT,
 					WATERMARK_QUEUE_SIZE,
@@ -950,12 +954,15 @@ impl<T: Trait> Module<T> {
 
 	/// Dispatch some messages from a parachain.
 	fn dispatch_message(from: ParaId, data: &[u8]) {
+		println!("Enter Dispatch Message: {:?}, {:?}", from, data);
 		use sp_std::convert::TryFrom;
 		let origin: MultiLocation = Junction::Parachain { id: from.into() }.into();
 		match VersionedXcm::decode(&mut &data[..]).map(Xcm::try_from) {
 			Ok(Ok(xcm)) => {
+				println!("MATCH: OK XCM... executing...");
 				// TODO: handle error.
-				let _ = T::XcmExecutive::execute_xcm(origin.clone(), xcm);
+				let result = T::XcmExecutive::execute_xcm(origin.clone(), xcm);
+				println!("Xcm Result: {:?}", result);
 			},
 			Ok(Err(_)) => (),	// Unsupported XCM version.
 			Err(_) => (),		// Bad format (can't decode).
@@ -969,6 +976,7 @@ impl<T: Trait> Module<T> {
 		max_queue_count: usize,
 		watermark_queue_size: usize,
 	) -> DispatchResult {
+		println!("Check Upward Message: {:?}, {:?}", id, upward_messages);
 		// Either there are no more messages to add...
 		if !upward_messages.is_empty() {
 			let (count, size) = <RelayDispatchQueueSize>::get(id);
@@ -1071,6 +1079,7 @@ impl<T: Trait> Module<T> {
 			drained_count += 1;
 
 			let (count, size) = <RelayDispatchQueueSize>::get(id);
+			println!("Relay Dispatch Queue Size: {:?}, {:?}", count, size);
 			let count = count as usize;
 			let size = size as usize;
 			if dispatched_count == 0 || (
@@ -1082,6 +1091,7 @@ impl<T: Trait> Module<T> {
 					RelayDispatchQueueSize::remove(id);
 					let messages = RelayDispatchQueue::take(id);
 					for data in messages.into_iter() {
+						println!("Dispatching Message: {:?}, {:?}", id, data);
 						dispatch_message(*id, &data);
 					}
 					dispatched_count += count;

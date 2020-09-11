@@ -31,24 +31,34 @@ impl<
 	Matcher: MatchesFungible<Currency::Balance>,
 	AccountIdConverter: LocationConversion<AccountId>,
 	Currency: frame_support::traits::Currency<AccountId>,
-	AccountId,	// can't get away without it since Currency is generic over it.
+	AccountId: std::fmt::Debug,	// can't get away without it since Currency is generic over it.
 > TransactAsset for CurrencyAdapter<Currency, Matcher, AccountIdConverter, AccountId> {
 
 	fn deposit_asset(what: &MultiAsset, who: &MultiLocation) -> Result {
+		println!("Deposit Asset Started");
 		// Check we handle this asset.
 		let amount = Matcher::matches_fungible(&what).ok_or(())?.saturated_into();
+		println!("Amount: {:?}", amount);
 		let who = AccountIdConverter::from_location(who).ok_or(())?;
+		println!("Who: {:?}", who);
 		let balance_amount = amount.try_into().map_err(|_| ())?;
+		println!("Balance Amount: {:?}", balance_amount);
 		let _imbalance = Currency::deposit_creating(&who, balance_amount);
+		println!("Deposit Success");
 		Ok(())
 	}
 
 	fn withdraw_asset(what: &MultiAsset, who: &MultiLocation) -> result::Result<MultiAsset, Error> {
+		println!("Withdraw Asset Started");
 		// Check we handle this asset.
 		let amount = Matcher::matches_fungible(&what).ok_or(())?.saturated_into();
+		println!("Amount: {:?}", amount);
 		let who = AccountIdConverter::from_location(who).ok_or(())?;
+		println!("Who: {:?}", who);
 		let balance_amount = amount.try_into().map_err(|_| ())?;
+		println!("Balance Amount: {:?}", balance_amount);
 		Currency::withdraw(&who, balance_amount, WithdrawReason::Transfer.into(), AllowDeath).map_err(|_| ())?;
+		println!("Withdraw Success");
 		Ok(what.clone())
 	}
 }
