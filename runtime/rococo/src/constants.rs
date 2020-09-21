@@ -31,7 +31,7 @@ pub mod currency {
 /// Time and blocks.
 pub mod time {
 	use primitives::v0::{Moment, BlockNumber};
-	pub const MILLISECS_PER_BLOCK: Moment = 1000;
+	pub const MILLISECS_PER_BLOCK: Moment = 3000;
 	pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
 	pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 1 * HOURS;
 
