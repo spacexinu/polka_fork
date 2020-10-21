@@ -54,6 +54,8 @@
 //!             ..................................................................
 //! ```
 
+#![feature(type_name_of_val)]
+
 use std::fmt::Debug;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -303,7 +305,7 @@ impl<M: Send + 'static> SubsystemContext for OverseerSubsystemContext<M> {
 	}
 
 	async fn recv(&mut self) -> SubsystemResult<FromOverseer<M>> {
-		self.rx.next().await.ok_or(SubsystemError)
+		self.rx.next().await.ok_or(SubsystemError::MpscRecv("OverseerSubsystemContext"))
 	}
 
 	async fn spawn(&mut self, name: &'static str, s: Pin<Box<dyn Future<Output = ()> + Send>>)
@@ -398,7 +400,7 @@ pub struct Overseer<S> {
 	s: S,
 
 	/// Here we keep handles to spawned subsystems to be notified when they terminate.
-	running_subsystems: FuturesUnordered<BoxFuture<'static, ()>>,
+	running_subsystems: FuturesUnordered<BoxFuture<'static, &'static str>>,
 
 	/// Gather running subsystms' outbound streams into one.
 	running_subsystems_rx: StreamUnordered<mpsc::Receiver<ToOverseer>>,
@@ -1289,7 +1291,10 @@ where
 			self.on_head_activated(&hash);
 		}
 
-		self.broadcast_signal(OverseerSignal::ActiveLeaves(update)).await?;
+		self.broadcast_signal(OverseerSignal::ActiveLeaves(update)).await.map_err(|err| {
+			log::error!(target: LOG_TARGET, "broadcast initial active leaves update err: {:?}", err);
+			err
+		})?;
 
 		loop {
 			while let Poll::Ready(Some(msg)) = poll!(&mut self.events_rx.next()) {
@@ -1298,14 +1303,21 @@ where
 						self.route_message(msg).await;
 					}
 					Event::Stop => {
+						log::info!(target: LOG_TARGET, "received Stop signal");
 						self.stop().await;
 						return Ok(());
 					}
 					Event::BlockImported(block) => {
-						self.block_imported(block).await?;
+						self.block_imported(block).await.map_err(|err| {
+							log::error!(target: LOG_TARGET, "block_imported err: {:?}", err);
+							err
+						})?;
 					}
 					Event::BlockFinalized(block) => {
-						self.block_finalized(block).await?;
+						self.block_finalized(block).await.map_err(|err| {
+							log::error!(target: LOG_TARGET, "block_finalized err: {:?}", err);
+							err
+						})?;
 					}
 					Event::ExternalRequest(request) => {
 						self.handle_external_request(request);
@@ -1331,7 +1343,7 @@ where
 			if let Poll::Ready(Some(finished)) = poll!(self.running_subsystems.next()) {
 				log::error!(target: LOG_TARGET, "Subsystem finished unexpectedly {:?}", finished);
 				self.stop().await;
-				return Err(SubsystemError);
+				return Err(SubsystemError::Other(format!("Subsystem finished unexpectedly: {:?}", finished)));
 			}
 
 			// Looks like nothing is left to be polled, let's take a break.
@@ -1393,63 +1405,108 @@ where
 
 	async fn broadcast_signal(&mut self, signal: OverseerSignal) -> SubsystemResult<()> {
 		if let Some(ref mut s) = self.candidate_validation_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "candidate_validation_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.candidate_backing_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "candidate_backing_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.candidate_selection_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "candidate_selection_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.statement_distribution_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "statement_distribution_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.availability_distribution_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "availability_distribution_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.bitfield_distribution_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "bitfield_distribution_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.bitfield_signing_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "bitfield_signing_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.provisioner_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "provisioner_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.pov_distribution_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "pov_distribution_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.runtime_api_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "runtime_api_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.availability_store_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "availability_store_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.network_bridge_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "network_bridge_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.chain_api_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "chain_api_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.collator_protocol_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "collator_protocol_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		if let Some(ref mut s) = self.collation_generation_subsystem.instance {
-			s.tx.send(FromOverseer::Signal(signal.clone())).await?;
+			s.tx.send(FromOverseer::Signal(signal.clone())).await.map_err(|err| {
+				log::error!(target: LOG_TARGET, "collation_generation_subsystem ({}) send err: {:?}", std::any::type_name_of_val(s), err);
+				err
+			})?;
 		}
 
 		Ok(())
@@ -1586,7 +1643,7 @@ where
 
 fn spawn<S: SpawnNamed, M: Send + 'static>(
 	spawner: &mut S,
-	futures: &mut FuturesUnordered<BoxFuture<'static, ()>>,
+	futures: &mut FuturesUnordered<BoxFuture<'static, &'static str>>,
 	streams: &mut StreamUnordered<mpsc::Receiver<ToOverseer>>,
 	s: impl Subsystem<OverseerSubsystemContext<M>>,
 ) -> SubsystemResult<OverseenSubsystem<M>> {
@@ -1605,7 +1662,7 @@ fn spawn<S: SpawnNamed, M: Send + 'static>(
 	spawner.spawn(name, fut);
 
 	streams.push(from_rx);
-	futures.push(Box::pin(rx.map(|_| ())));
+	futures.push(Box::pin(rx.map(|_| std::any::type_name::<M>())));
 
 	let instance = Some(SubsystemInstance {
 		tx: to_tx,

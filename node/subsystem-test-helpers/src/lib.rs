@@ -169,7 +169,7 @@ impl<M: Send + 'static, S: SpawnNamed + Send + 'static> SubsystemContext
 	}
 
 	async fn recv(&mut self) -> SubsystemResult<FromOverseer<M>> {
-		self.rx.next().await.ok_or(SubsystemError)
+		self.rx.next().await.ok_or(SubsystemError::MpscRecv("TestSubsystemContext"))
 	}
 
 	async fn spawn(

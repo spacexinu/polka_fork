@@ -112,36 +112,20 @@ pub enum FromOverseer<M> {
 ///   * Subsystems dying when they are not expected to
 ///   * Subsystems not dying when they are told to die
 ///   * etc.
-#[derive(Debug, PartialEq, Eq)]
-pub struct SubsystemError;
-
-impl From<mpsc::SendError> for SubsystemError {
-	fn from(_: mpsc::SendError) -> Self {
-		Self
-	}
-}
-
-impl From<oneshot::Canceled> for SubsystemError {
-	fn from(_: oneshot::Canceled) -> Self {
-		Self
-	}
-}
-
-impl From<futures::task::SpawnError> for SubsystemError {
-	fn from(_: futures::task::SpawnError) -> Self {
-		Self
-	}
+#[derive(Debug, derive_more::From)]
+pub enum SubsystemError {
+	MpscSend(mpsc::SendError),
+	#[from(ignore)]
+	MpscRecv(&'static str),
+	OneshotCanceled(oneshot::Canceled),
+	Spawn(futures::task::SpawnError),
+	Prometheus(substrate_prometheus_endpoint::PrometheusError),
+	Other(String),
 }
 
 impl From<std::convert::Infallible> for SubsystemError {
 	fn from(e: std::convert::Infallible) -> Self {
 		match e {}
-	}
-}
-
-impl From<substrate_prometheus_endpoint::PrometheusError> for SubsystemError {
-	fn from(_: substrate_prometheus_endpoint::PrometheusError) -> Self {
-		Self
 	}
 }
 

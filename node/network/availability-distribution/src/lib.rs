@@ -728,7 +728,10 @@ impl AvailabilityDistributionSubsystem {
 		// work: process incoming messages from the overseer.
 		let mut state = ProtocolState::default();
 		loop {
-			let message = ctx.recv().await.map_err::<Error, _>(Into::into)?;
+			let message = ctx.recv().await.map_err::<Error, _>(Into::into).map_err(|err| {
+				log::info!(target: TARGET, "recv message from overseer");
+				err
+			})?;
 			match message {
 				FromOverseer::Communication {
 					msg: AvailabilityDistributionMessage::NetworkBridgeUpdateV1(event),
