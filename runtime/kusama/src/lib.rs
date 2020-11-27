@@ -79,6 +79,9 @@ pub use pallet_balances::Call as BalancesCall;
 pub mod constants;
 use constants::{time::*, currency::*, fee::*};
 
+// Kusama <-> Polkadot messages.
+pub mod polkadot_messages;
+
 // Weights used in the runtime.
 mod weights;
 
@@ -911,6 +914,35 @@ impl pallet_bridge_call_dispatch::Trait<PolkadotCallDispatchInstance> for Runtim
 	type TargetChainSignature = Signature;
 }
 
+parameter_types! {
+	// TODO: this affects weight of confirmations delivery call
+	pub const MaxMessagesToPruneAtOnce: bp_message_lane::MessageNonce = 8;
+	pub const MaxUnconfirmedMessagesAtInboundLane: bp_message_lane::MessageNonce =
+		bp_kusama::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+}
+
+type PolkadotMessageLaneInstance = pallet_message_lane::Instance1;
+impl pallet_message_lane::Trait<PolkadotMessageLaneInstance> for Runtime {
+	type Event = Event;
+	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
+	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;
+
+	type OutboundPayload = crate::polkadot_messages::ToPolkadotMessagePayload;
+	type OutboundMessageFee = Balance;
+
+	type InboundPayload = crate::polkadot_messages::FromPolkadotMessagePayload;
+	type InboundMessageFee = bp_polkadot::Balance;
+	type InboundRelayer = bp_polkadot::AccountId;
+
+	type TargetHeaderChain = crate::polkadot_messages::Polkadot;
+	type LaneMessageVerifier = crate::polkadot_messages::ToPolkadotMessageVerifier;
+	type MessageDeliveryAndDispatchPayment =
+		pallet_message_lane::instant_payments::InstantCurrencyPayments<AccountId, pallet_balances::Module<Runtime>>;
+
+	type SourceHeaderChain = crate::polkadot_messages::Polkadot;
+	type MessageDispatch = crate::polkadot_messages::FromPolkadotMessageDispatch;
+}
+
 construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
@@ -977,6 +1009,7 @@ construct_runtime! {
 		// Polkadot bridge module. Late addition.
 		PolkadotBridge: pallet_substrate_bridge::{Module, Call, Storage, Config<T>} = 35,
 		PolkadotBridgeCallDispatch: pallet_bridge_call_dispatch::<Instance1>::{Module, Event<T>} = 36,
+		PolkadotMessageLane: pallet_message_lane::<Instance1>::{Module, Call, Event<T>} = 37,
 	}
 }
 
