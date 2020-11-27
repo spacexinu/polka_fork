@@ -73,7 +73,11 @@ primitives = { package = "polkadot-primitives", path = "../../primitives", defau
 
 bp-kusama = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
 bp-message-lane = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
+bp-polkadot = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
+bp-runtime = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
+bridge-runtime-common = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
 pallet-bridge-call-dispatch = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
+pallet-message-lane = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
 pallet-substrate-bridge = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
 
 [dev-dependencies]
@@ -146,7 +150,11 @@ std = [
 	"pallet-utility/std",
 	"bp-kusama/std",
 	"bp-message-lane/std",
+	"bp-polkadot/std",
+	"bp-runtime/std",
+	"bridge-runtime-common/std",
 	"pallet-bridge-call-dispatch/std",
+	"pallet-message-lane/std",
 	"pallet-substrate-bridge/std",
 ]
 runtime-benchmarks = [

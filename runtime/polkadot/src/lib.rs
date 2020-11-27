@@ -80,6 +80,9 @@ pub mod constants;
 use constants::{time::*, currency::*, fee::*};
 use frame_support::traits::InstanceFilter;
 
+// Polkadot <-> Kusama messages.
+pub mod kusama_messages;
+
 // Weights used in the runtime.
 mod weights;
 
@@ -124,7 +127,8 @@ impl Filter<Call> for BaseFilter {
 			Call::Session(_) | Call::Grandpa(_) | Call::ImOnline(_) |
 			Call::AuthorityDiscovery(_) |
 			Call::Utility(_) | Call::Claims(_) | Call::Vesting(_) |
-			Call::Identity(_) | Call::Proxy(_) | Call::Multisig(_) | Call::KusamaBridge(_)
+			Call::Identity(_) | Call::Proxy(_) | Call::Multisig(_) |
+			Call::KusamaBridge(_) | Call::KusamaMessageLane(_)
 			=> true,
 		}
 	}
@@ -916,6 +920,35 @@ impl pallet_bridge_call_dispatch::Trait<KusamaCallDispatchInstance> for Runtime 
 	type TargetChainSignature = Signature;
 }
 
+parameter_types! {
+	// TODO: this affects weight of confirmations delivery call
+	pub const MaxMessagesToPruneAtOnce: bp_message_lane::MessageNonce = 8;
+	pub const MaxUnconfirmedMessagesAtInboundLane: bp_message_lane::MessageNonce =
+		bp_polkadot::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+}
+
+type KusamaMessageLaneInstance = pallet_message_lane::Instance1;
+impl pallet_message_lane::Trait<KusamaMessageLaneInstance> for Runtime {
+	type Event = Event;
+	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
+	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;
+
+	type OutboundPayload = crate::kusama_messages::ToKusamaMessagePayload;
+	type OutboundMessageFee = Balance;
+
+	type InboundPayload = crate::kusama_messages::FromKusamaMessagePayload;
+	type InboundMessageFee = bp_kusama::Balance;
+	type InboundRelayer = bp_kusama::AccountId;
+
+	type TargetHeaderChain = crate::kusama_messages::Kusama;
+	type LaneMessageVerifier = crate::kusama_messages::ToKusamaMessageVerifier;
+	type MessageDeliveryAndDispatchPayment =
+		pallet_message_lane::instant_payments::InstantCurrencyPayments<AccountId, pallet_balances::Module<Runtime>>;
+
+	type SourceHeaderChain = crate::kusama_messages::Kusama;
+	type MessageDispatch = crate::kusama_messages::FromKusamaMessageDispatch;
+}
+
 construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
@@ -972,6 +1005,7 @@ construct_runtime! {
 		// Kusama bridge module. Late addition.
 		KusamaBridge: pallet_substrate_bridge::{Module, Call, Storage, Config<T>} = 34,
 		KusamaBridgeCallDispatch: pallet_bridge_call_dispatch::<Instance1>::{Module, Event<T>} = 35,
+		KusamaMessageLane: pallet_message_lane::<Instance1>::{Module, Call, Event<T>} = 36,
 	}
 }
 

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Everything required to serve Kusama <-> Polkadot message lanes.
+//! Everything required to serve Polkadot <-> Kusama message lanes.
 
 use crate::Runtime;
 
@@ -23,7 +23,7 @@ use bp_message_lane::{
 	target_chain::{ProvedMessages, SourceHeaderChain},
 	InboundLaneData, LaneId, Message, MessageNonce,
 };
-use bp_runtime::{InstanceId, POLKADOT_BRIDGE_INSTANCE};
+use bp_runtime::{InstanceId, KUSAMA_BRIDGE_INSTANCE};
 use bridge_runtime_common::messages::{self, ChainWithMessageLanes, MessageBridge};
 use frame_support::{
 	weights::{Weight, WeightToFeePolynomial},
@@ -31,65 +31,65 @@ use frame_support::{
 };
 use sp_core::storage::StorageKey;
 
-/// Storage key of the Kusama -> Polkadot message in the runtime storage.
+/// Storage key of the Polkadot -> Kusama message in the runtime storage.
 pub fn message_key(lane: &LaneId, nonce: MessageNonce) -> StorageKey {
-	pallet_message_lane::storage_keys::message_key::<Runtime, <Kusama as ChainWithMessageLanes>::MessageLaneInstance>(
+	pallet_message_lane::storage_keys::message_key::<Runtime, <Polkadot as ChainWithMessageLanes>::MessageLaneInstance>(
 		lane, nonce,
 	)
 }
 
-/// Storage key of the Kusama -> Polkadot message lane state in the runtime storage.
+/// Storage key of the Polkadot -> Kusama message lane state in the runtime storage.
 pub fn outbound_lane_data_key(lane: &LaneId) -> StorageKey {
-	pallet_message_lane::storage_keys::outbound_lane_data_key::<<Kusama as ChainWithMessageLanes>::MessageLaneInstance>(
+	pallet_message_lane::storage_keys::outbound_lane_data_key::<<Polkadot as ChainWithMessageLanes>::MessageLaneInstance>(
 		lane,
 	)
 }
 
-/// Storage key of the Polkadot -> Kusama message lane state in the runtime storage.
+/// Storage key of the Kusama -> Polkadot message lane state in the runtime storage.
 pub fn inbound_lane_data_key(lane: &LaneId) -> StorageKey {
 	pallet_message_lane::storage_keys::inbound_lane_data_key::<
 		Runtime,
-		<Kusama as ChainWithMessageLanes>::MessageLaneInstance,
+		<Polkadot as ChainWithMessageLanes>::MessageLaneInstance,
 	>(lane)
 }
 
-/// Message payload for Kusama -> Polkadot messages.
-pub type ToPolkadotMessagePayload = messages::source::FromThisChainMessagePayload<WithPolkadotMessageBridge>;
-
-/// Message verifier for Kusama -> Polkadot messages.
-pub type ToPolkadotMessageVerifier = messages::source::FromThisChainMessageVerifier<WithPolkadotMessageBridge>;
-
 /// Message payload for Polkadot -> Kusama messages.
-pub type FromPolkadotMessagePayload = messages::target::FromBridgedChainMessagePayload<WithPolkadotMessageBridge>;
+pub type ToKusamaMessagePayload = messages::source::FromThisChainMessagePayload<WithKusamaMessageBridge>;
 
-/// Messages proof for Polkadot -> Kusama messages.
-type FromPolkadotMessagesProof = messages::target::FromBridgedChainMessagesProof<WithPolkadotMessageBridge>;
+/// Message verifier for Polkadot -> Kusama messages.
+pub type ToKusamaMessageVerifier = messages::source::FromThisChainMessageVerifier<WithKusamaMessageBridge>;
 
-/// Messages delivery proof for Kusama -> Polkadot messages.
-type ToPolkadotMessagesDeliveryProof = messages::source::FromBridgedChainMessagesDeliveryProof<WithPolkadotMessageBridge>;
+/// Message payload for Kusama -> Polkadot messages.
+pub type FromKusamaMessagePayload = messages::target::FromBridgedChainMessagePayload<WithKusamaMessageBridge>;
 
-/// Call-dispatch based message dispatch for Polkadot -> Kusama messages.
-pub type FromPolkadotMessageDispatch = messages::target::FromBridgedChainMessageDispatch<
-	WithPolkadotMessageBridge,
+/// Messages proof for Kusama -> Polkadot messages.
+type FromKusamaMessagesProof = messages::target::FromBridgedChainMessagesProof<WithKusamaMessageBridge>;
+
+/// Messages delivery proof for Polkadot -> Kusama messages.
+type ToKusamaMessagesDeliveryProof = messages::source::FromBridgedChainMessagesDeliveryProof<WithKusamaMessageBridge>;
+
+/// Call-dispatch based message dispatch for Kusama -> Polkadot messages.
+pub type FromKusamaMessageDispatch = messages::target::FromBridgedChainMessageDispatch<
+	WithKusamaMessageBridge,
 	crate::Runtime,
-	crate::PolkadotCallDispatchInstance,
+	crate::KusamaCallDispatchInstance,
 >;
 
-/// Kusama <-> Polkadot message bridge.
+/// Polkadot <-> Kusama message bridge.
 #[derive(RuntimeDebug, Clone, Copy)]
-pub struct WithPolkadotMessageBridge;
+pub struct WithKusamaMessageBridge;
 
-impl MessageBridge for WithPolkadotMessageBridge {
-	const INSTANCE: InstanceId = POLKADOT_BRIDGE_INSTANCE;
+impl MessageBridge for WithKusamaMessageBridge {
+	const INSTANCE: InstanceId = KUSAMA_BRIDGE_INSTANCE;
 
 	const RELAYER_FEE_PERCENT: u32 = 10;
 
-	type ThisChain = Kusama;
-	type BridgedChain = Polkadot;
+	type ThisChain = Polkadot;
+	type BridgedChain = Kusama;
 
 	fn maximal_dispatch_weight_of_message_on_bridged_chain() -> Weight {
 		// we don't want to relay too large messages + keep reserve for future upgrades
-		bp_polkadot::MAXIMUM_EXTRINSIC_WEIGHT / 2
+		bp_kusama::MAXIMUM_EXTRINSIC_WEIGHT / 2
 	}
 
 	fn weight_of_delivery_transaction() -> Weight {
@@ -108,21 +108,21 @@ impl MessageBridge for WithPolkadotMessageBridge {
 		<crate::Runtime as pallet_transaction_payment::Trait>::WeightToFee::calc(&weight)
 	}
 
-	fn bridged_weight_to_bridged_balance(weight: Weight) -> bp_polkadot::Balance {
+	fn bridged_weight_to_bridged_balance(weight: Weight) -> bp_kusama::Balance {
 		// we use same weights schema is used in both chains
 		<crate::Runtime as pallet_transaction_payment::Trait>::WeightToFee::calc(&weight)
 	}
 
-	fn this_balance_to_bridged_balance(this_balance: crate::Balance) -> bp_polkadot::Balance {
+	fn this_balance_to_bridged_balance(this_balance: crate::Balance) -> bp_kusama::Balance {
 		this_balance // TODO: get from storage???
 	}
 }
 
-/// Kusama chain from message lane point of view.
+/// Polkadot chain from message lane point of view.
 #[derive(RuntimeDebug, Clone, Copy)]
-pub struct Kusama;
+pub struct Polkadot;
 
-impl messages::ChainWithMessageLanes for Kusama {
+impl messages::ChainWithMessageLanes for Polkadot {
 	type Hash = crate::Hash;
 	type AccountId = crate::AccountId;
 	type Signer = crate::AccountPublic;
@@ -131,33 +131,33 @@ impl messages::ChainWithMessageLanes for Kusama {
 	type Weight = Weight;
 	type Balance = crate::Balance;
 
-	type MessageLaneInstance = crate::PolkadotMessageLaneInstance;
+	type MessageLaneInstance = crate::KusamaMessageLaneInstance;
 }
 
-/// Polkadot chain from message lane point of view.
+/// Kusama chain from message lane point of view.
 #[derive(RuntimeDebug, Clone, Copy)]
-pub struct Polkadot;
+pub struct Kusama;
 
-impl messages::ChainWithMessageLanes for Polkadot {
-	type Hash = bp_polkadot::Hash;
-	type AccountId = bp_polkadot::AccountId;
-	type Signer = bp_polkadot::AccountPublic;
-	type Signature = bp_polkadot::Signature;
+impl messages::ChainWithMessageLanes for Kusama {
+	type Hash = bp_kusama::Hash;
+	type AccountId = bp_kusama::AccountId;
+	type Signer = bp_kusama::AccountPublic;
+	type Signature = bp_kusama::Signature;
 	type Call = (); // unknown to us
 	type Weight = Weight;
-	type Balance = bp_polkadot::Balance;
+	type Balance = bp_kusama::Balance;
 
 	// this is also Instance1, but since it is instance in the other runtime, let's not use alias
 	type MessageLaneInstance = pallet_message_lane::Instance1;
 }
 
-impl TargetHeaderChain<ToPolkadotMessagePayload, bp_polkadot::AccountId> for Polkadot {
+impl TargetHeaderChain<ToKusamaMessagePayload, bp_kusama::AccountId> for Kusama {
 	type Error = &'static str;
-	type MessagesDeliveryProof = ToPolkadotMessagesDeliveryProof;
+	type MessagesDeliveryProof = ToKusamaMessagesDeliveryProof;
 
-	fn verify_message(payload: &ToPolkadotMessagePayload) -> Result<(), Self::Error> {
+	fn verify_message(payload: &ToKusamaMessagePayload) -> Result<(), Self::Error> {
 		// TODO: should check that the declared weight is at least BasicExtrinsicWeight + Per-byte weight
-		if payload.weight > WithPolkadotMessageBridge::maximal_dispatch_weight_of_message_on_bridged_chain() {
+		if payload.weight > WithKusamaMessageBridge::maximal_dispatch_weight_of_message_on_bridged_chain() {
 			return Err("Too large weight declared");
 		}
 
@@ -167,17 +167,17 @@ impl TargetHeaderChain<ToPolkadotMessagePayload, bp_polkadot::AccountId> for Pol
 	fn verify_messages_delivery_proof(
 		proof: Self::MessagesDeliveryProof,
 	) -> Result<(LaneId, InboundLaneData<crate::AccountId>), Self::Error> {
-		messages::source::verify_messages_delivery_proof::<WithPolkadotMessageBridge, Runtime>(proof)
+		messages::source::verify_messages_delivery_proof::<WithKusamaMessageBridge, Runtime>(proof)
 	}
 }
 
-impl SourceHeaderChain<bp_polkadot::Balance> for Polkadot {
+impl SourceHeaderChain<bp_kusama::Balance> for Kusama {
 	type Error = &'static str;
-	type MessagesProof = FromPolkadotMessagesProof;
+	type MessagesProof = FromKusamaMessagesProof;
 
 	fn verify_messages_proof(
 		proof: Self::MessagesProof,
-	) -> Result<ProvedMessages<Message<bp_polkadot::Balance>>, Self::Error> {
-		messages::target::verify_messages_proof::<WithPolkadotMessageBridge, Runtime>(proof)
+	) -> Result<ProvedMessages<Message<bp_kusama::Balance>>, Self::Error> {
+		messages::target::verify_messages_proof::<WithKusamaMessageBridge, Runtime>(proof)
 	}
 }
