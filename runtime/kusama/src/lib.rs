@@ -1287,6 +1287,64 @@ sp_api::impl_runtime_apis! {
 		}
 	}
 
+	impl bp_polkadot::PolkadotHeaderApi<Block> for Runtime {
+		fn best_blocks() -> Vec<(bp_polkadot::BlockNumber, bp_polkadot::Hash)> {
+			PolkadotBridge::best_headers()
+		}
+
+		fn finalized_block() -> (bp_polkadot::BlockNumber, bp_polkadot::Hash) {
+			let header = PolkadotBridge::best_finalized();
+			(header.number, header.hash())
+		}
+
+		fn incomplete_headers() -> Vec<(bp_polkadot::BlockNumber, bp_polkadot::Hash)> {
+			PolkadotBridge::require_justifications()
+		}
+
+		fn is_known_block(hash: bp_polkadot::Hash) -> bool {
+			PolkadotBridge::is_known_header(hash)
+		}
+
+		fn is_finalized_block(hash: bp_polkadot::Hash) -> bool {
+			PolkadotBridge::is_finalized_header(hash)
+		}
+	}
+
+	impl bp_polkadot::ToPolkadotOutboundLaneApi<Block> for Runtime {
+		fn messages_dispatch_weight(
+			lane: bp_message_lane::LaneId,
+			begin: bp_message_lane::MessageNonce,
+			end: bp_message_lane::MessageNonce,
+		) -> Vec<(bp_message_lane::MessageNonce, Weight)> {
+			(begin..=end).filter_map(|nonce| {
+				let encoded_payload = PolkadotMessageLane::outbound_message_payload(lane, nonce)?;
+				let decoded_payload = polkadot_messages::ToPolkadotMessagePayload::decode(
+					&mut &encoded_payload[..]
+				).ok()?;
+				Some((nonce, decoded_payload.weight))
+			})
+			.collect()
+		}
+
+		fn latest_received_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			PolkadotMessageLane::outbound_latest_received_nonce(lane)
+		}
+
+		fn latest_generated_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			PolkadotMessageLane::outbound_latest_generated_nonce(lane)
+		}
+	}
+
+	impl bp_polkadot::FromPolkadotInboundLaneApi<Block> for Runtime {
+		fn latest_received_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			PolkadotMessageLane::inbound_latest_received_nonce(lane)
+		}
+
+		fn latest_confirmed_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			PolkadotMessageLane::inbound_latest_confirmed_nonce(lane)
+		}
+	}
+
 	#[cfg(feature = "runtime-benchmarks")]
 	impl frame_benchmarking::Benchmark<Block> for Runtime {
 		fn dispatch_benchmark(

@@ -578,7 +578,7 @@ dependencies = [
 [[package]]
 name = "bp-kusama"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-message-lane",
  "bp-runtime",
@@ -592,7 +592,7 @@ dependencies = [
 [[package]]
 name = "bp-message-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-runtime",
  "parity-scale-codec",
@@ -601,7 +601,7 @@ dependencies = [
 [[package]]
 name = "bp-message-lane"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -611,7 +611,7 @@ dependencies = [
 [[package]]
 name = "bp-polkadot"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-message-lane",
  "bp-runtime",
@@ -625,7 +625,7 @@ dependencies = [
 [[package]]
 name = "bp-runtime"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "frame-support",
  "num-traits 0.2.12",
@@ -638,7 +638,7 @@ dependencies = [
 [[package]]
 name = "bridge-runtime-common"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-message-dispatch",
  "bp-message-lane",
@@ -3926,7 +3926,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-call-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-message-dispatch",
  "bp-runtime",
@@ -4074,7 +4074,7 @@ dependencies = [
 [[package]]
 name = "pallet-message-lane"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-message-lane",
  "bp-runtime",
@@ -4298,7 +4298,7 @@ dependencies = [
 [[package]]
 name = "pallet-substrate-bridge"
 version = "0.1.0"
-source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#19103e262fd38b1a16a2b5a17f174a2b4445c002"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#4f1b73e6c13a2350b200d5a4b80d484529996982"
 dependencies = [
  "bp-runtime",
  "finality-grandpa",

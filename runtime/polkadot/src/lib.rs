@@ -1283,6 +1283,64 @@ sp_api::impl_runtime_apis! {
 		}
 	}
 
+	impl bp_kusama::KusamaHeaderApi<Block> for Runtime {
+		fn best_blocks() -> Vec<(bp_kusama::BlockNumber, bp_kusama::Hash)> {
+			KusamaBridge::best_headers()
+		}
+
+		fn finalized_block() -> (bp_kusama::BlockNumber, bp_kusama::Hash) {
+			let header = KusamaBridge::best_finalized();
+			(header.number, header.hash())
+		}
+
+		fn incomplete_headers() -> Vec<(bp_kusama::BlockNumber, bp_kusama::Hash)> {
+			KusamaBridge::require_justifications()
+		}
+
+		fn is_known_block(hash: bp_kusama::Hash) -> bool {
+			KusamaBridge::is_known_header(hash)
+		}
+
+		fn is_finalized_block(hash: bp_kusama::Hash) -> bool {
+			KusamaBridge::is_finalized_header(hash)
+		}
+	}
+
+	impl bp_kusama::ToKusamaOutboundLaneApi<Block> for Runtime {
+		fn messages_dispatch_weight(
+			lane: bp_message_lane::LaneId,
+			begin: bp_message_lane::MessageNonce,
+			end: bp_message_lane::MessageNonce,
+		) -> Vec<(bp_message_lane::MessageNonce, Weight)> {
+			(begin..=end).filter_map(|nonce| {
+				let encoded_payload = KusamaMessageLane::outbound_message_payload(lane, nonce)?;
+				let decoded_payload = kusama_messages::ToKusamaMessagePayload::decode(
+					&mut &encoded_payload[..]
+				).ok()?;
+				Some((nonce, decoded_payload.weight))
+			})
+			.collect()
+		}
+
+		fn latest_received_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			KusamaMessageLane::outbound_latest_received_nonce(lane)
+		}
+
+		fn latest_generated_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			KusamaMessageLane::outbound_latest_generated_nonce(lane)
+		}
+	}
+
+	impl bp_kusama::FromKusamaInboundLaneApi<Block> for Runtime {
+		fn latest_received_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			KusamaMessageLane::inbound_latest_received_nonce(lane)
+		}
+
+		fn latest_confirmed_nonce(lane: bp_message_lane::LaneId) -> bp_message_lane::MessageNonce {
+			KusamaMessageLane::inbound_latest_confirmed_nonce(lane)
+		}
+	}
+
 	#[cfg(feature = "runtime-benchmarks")]
 	impl frame_benchmarking::Benchmark<Block> for Runtime {
 		fn dispatch_benchmark(
