@@ -34,7 +34,7 @@ use sp_std::collections::btree_map::BTreeMap;
 use sp_core::u32_trait::{_1, _2, _3, _4, _5};
 use parity_scale_codec::{Encode, Decode};
 use primitives::v1::{
-	AccountId, AccountIndex, Balance, BlockNumber, CandidateEvent, CommittedCandidateReceipt,
+	AccountId, AccountIndex, AccountPublic, Balance, BlockNumber, CandidateEvent, CommittedCandidateReceipt,
 	CoreState, GroupRotationInfo, Hash, Id, Moment, Nonce, OccupiedCoreAssumption,
 	PersistedValidationData, Signature, ValidationCode, ValidationData, ValidatorId, ValidatorIndex,
 	InboundDownwardMessage, InboundHrmpMessage,
@@ -905,6 +905,17 @@ impl pallet_substrate_bridge::Trait for Runtime {
 	type BridgedChain = bp_kusama::Kusama;
 }
 
+type KusamaCallDispatchInstance = pallet_bridge_call_dispatch::Instance1;
+impl pallet_bridge_call_dispatch::Trait<KusamaCallDispatchInstance> for Runtime {
+	type Call = Call;
+	type Event = Event;
+	type MessageId = (bp_message_lane::LaneId, bp_message_lane::MessageNonce);
+	// Kusama is using the same signature scheme as Polkadot.
+	type SourceChainAccountPublic = AccountPublic;
+	type TargetChainAccountPublic = AccountPublic;
+	type TargetChainSignature = Signature;
+}
+
 construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
@@ -960,6 +971,7 @@ construct_runtime! {
 
 		// Kusama bridge module. Late addition.
 		KusamaBridge: pallet_substrate_bridge::{Module, Call, Storage, Config<T>} = 34,
+		KusamaBridgeCallDispatch: pallet_bridge_call_dispatch::<Instance1>::{Module, Event<T>} = 35,
 	}
 }
 

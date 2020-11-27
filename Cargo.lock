@@ -589,6 +589,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "bp-message-dispatch"
+version = "0.1.0"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#fd792f34a0e103fc3940e763d4494b1619a757e0"
+dependencies = [
+ "bp-runtime",
+ "parity-scale-codec",
+]
+
+[[package]]
+name = "bp-message-lane"
+version = "0.1.0"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#fd792f34a0e103fc3940e763d4494b1619a757e0"
+dependencies = [
+ "frame-support",
+ "parity-scale-codec",
+ "sp-std",
+]
+
+[[package]]
 name = "bp-polkadot"
 version = "0.1.0"
 source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#fd792f34a0e103fc3940e763d4494b1619a757e0"
@@ -2633,6 +2652,7 @@ name = "kusama-runtime"
 version = "0.8.26"
 dependencies = [
  "bitvec",
+ "bp-message-lane",
  "bp-polkadot",
  "frame-benchmarking",
  "frame-executive",
@@ -2647,6 +2667,7 @@ dependencies = [
  "pallet-authorship",
  "pallet-babe",
  "pallet-balances",
+ "pallet-bridge-call-dispatch",
  "pallet-collective",
  "pallet-democracy",
  "pallet-elections-phragmen",
@@ -3874,6 +3895,20 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "serde",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-bridge-call-dispatch"
+version = "0.1.0"
+source = "git+https://github.com/svyatonik/parity-bridges-common.git?branch=polkadot-integration#fd792f34a0e103fc3940e763d4494b1619a757e0"
+dependencies = [
+ "bp-message-dispatch",
+ "bp-runtime",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
  "sp-runtime",
  "sp-std",
 ]
@@ -5338,6 +5373,7 @@ version = "0.8.26"
 dependencies = [
  "bitvec",
  "bp-kusama",
+ "bp-message-lane",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
@@ -5351,6 +5387,7 @@ dependencies = [
  "pallet-authorship",
  "pallet-babe",
  "pallet-balances",
+ "pallet-bridge-call-dispatch",
  "pallet-collective",
  "pallet-democracy",
  "pallet-elections-phragmen",
@@ -9535,7 +9572,7 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bfd5b7557925ce778ff9b9ef90e3ade34c524b5ff10e239c69a42d546d2af56"
 dependencies = [
- "rand 0.5.6",
+ "rand 0.3.23",
 ]
 
 [[package]]
