@@ -896,6 +896,10 @@ impl frame_support::traits::OnRuntimeUpgrade for CustomOnRuntimeUpgrade {
 	}
 }
 
+impl pallet_substrate_bridge::Trait for Runtime {
+	type BridgedChain = bp_polkadot::Polkadot;
+}
+
 construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
@@ -958,6 +962,9 @@ construct_runtime! {
 
 		// Multisig module. Late addition.
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 31,
+
+		// Polkadot bridge module. Late addition.
+		PolkadotBridge: pallet_substrate_bridge::{Module, Call, Storage, Config<T>} = 35,
 	}
 }
 

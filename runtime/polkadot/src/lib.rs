@@ -124,7 +124,7 @@ impl Filter<Call> for BaseFilter {
 			Call::Session(_) | Call::Grandpa(_) | Call::ImOnline(_) |
 			Call::AuthorityDiscovery(_) |
 			Call::Utility(_) | Call::Claims(_) | Call::Vesting(_) |
-			Call::Identity(_) | Call::Proxy(_) | Call::Multisig(_)
+			Call::Identity(_) | Call::Proxy(_) | Call::Multisig(_) | Call::KusamaBridge(_)
 			=> true,
 		}
 	}
@@ -901,6 +901,10 @@ impl frame_support::traits::OnRuntimeUpgrade for CustomOnRuntimeUpgrade {
 	}
 }
 
+impl pallet_substrate_bridge::Trait for Runtime {
+	type BridgedChain = bp_kusama::Kusama;
+}
+
 construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
@@ -953,6 +957,9 @@ construct_runtime! {
 
 		// Multisig dispatch. Late addition.
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 30,
+
+		// Kusama bridge module. Late addition.
+		KusamaBridge: pallet_substrate_bridge::{Module, Call, Storage, Config<T>} = 34,
 	}
 }
 

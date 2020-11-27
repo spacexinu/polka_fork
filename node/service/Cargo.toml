@@ -94,6 +94,9 @@ polkadot-node-core-runtime-api = { path = "../core/runtime-api", optional = true
 polkadot-pov-distribution = { path = "../network/pov-distribution", optional = true }
 polkadot-statement-distribution = { path = "../network/statement-distribution", optional = true }
 
+# Bridges
+pallet-substrate-bridge = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration" }
+
 [dev-dependencies]
 polkadot-test-client = { path = "../test/client" }
 env_logger = "0.8.2"

@@ -73,6 +73,9 @@ hex-literal = { version = "0.3.1", optional = true }
 runtime-common = { package = "polkadot-runtime-common", path = "../common", default-features = false }
 primitives = { package = "polkadot-primitives", path = "../../primitives", default-features = false }
 
+bp-polkadot = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
+pallet-substrate-bridge = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration", default-features = false }
+
 [dev-dependencies]
 hex-literal = "0.3.1"
 libsecp256k1 = "0.3.5"
@@ -144,6 +147,8 @@ std = [
 	"sp-session/std",
 	"pallet-randomness-collective-flip/std",
 	"runtime-common/std",
+	"bp-polkadot/std",
+	"pallet-substrate-bridge/std",
 ]
 runtime-benchmarks = [
 	"runtime-common/runtime-benchmarks",
