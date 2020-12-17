@@ -1122,26 +1122,32 @@ impl pallet_substrate_bridge::Config for Runtime {
 type PolkadotCallDispatchInstance = pallet_bridge_call_dispatch::Instance1;
 impl pallet_bridge_call_dispatch::Config<PolkadotCallDispatchInstance> for Runtime {
 	type Call = Call;
-	type Event = Event;
 	type MessageId = (bp_message_lane::LaneId, bp_message_lane::MessageNonce);
-	// Polkadot is using the same signature scheme as Kusama.
-	type SourceChainAccountPublic = AccountPublic;
+	type Event = Event;
+	type SourceChainAccountId = bp_polkadot::AccountId;
 	type TargetChainAccountPublic = AccountPublic;
 	type TargetChainSignature = Signature;
+	type AccountIdConverter = bp_kusama::AccountIdConverter;
 }
 
 parameter_types! {
 	// TODO: this affects weight of confirmations delivery call
 	pub const MaxMessagesToPruneAtOnce: bp_message_lane::MessageNonce = 8;
+	pub const MaxUnrewardedRelayerEntriesAtInboundLane: bp_message_lane::MessageNonce =
+		bp_polkadot::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
 	pub const MaxUnconfirmedMessagesAtInboundLane: bp_message_lane::MessageNonce =
 		bp_kusama::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+	pub const MaxMessagesInDeliveryTransaction: bp_message_lane::MessageNonce =
+		bp_kusama::MAX_MESSAGES_IN_DELIVERY_TRANSACTION;
 }
 
 type PolkadotMessageLaneInstance = pallet_message_lane::Instance1;
 impl pallet_message_lane::Config<PolkadotMessageLaneInstance> for Runtime {
 	type Event = Event;
 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
+	type MaxUnrewardedRelayerEntriesAtInboundLane = MaxUnrewardedRelayerEntriesAtInboundLane;
 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;
+	type MaxMessagesInDeliveryTransaction = MaxMessagesInDeliveryTransaction;
 
 	type OutboundPayload = crate::polkadot_messages::ToPolkadotMessagePayload;
 	type OutboundMessageFee = Balance;
@@ -1149,6 +1155,8 @@ impl pallet_message_lane::Config<PolkadotMessageLaneInstance> for Runtime {
 	type InboundPayload = crate::polkadot_messages::FromPolkadotMessagePayload;
 	type InboundMessageFee = bp_polkadot::Balance;
 	type InboundRelayer = bp_polkadot::AccountId;
+
+	type AccountIdConverter = bp_polkadot::AccountIdConverter;
 
 	type TargetHeaderChain = crate::polkadot_messages::Polkadot;
 	type LaneMessageVerifier = crate::polkadot_messages::ToPolkadotMessageVerifier;

@@ -908,24 +908,30 @@ impl pallet_bridge_call_dispatch::Config<KusamaCallDispatchInstance> for Runtime
 	type Call = Call;
 	type Event = Event;
 	type MessageId = (bp_message_lane::LaneId, bp_message_lane::MessageNonce);
-	// Kusama is using the same signature scheme as Polkadot.
-	type SourceChainAccountPublic = AccountPublic;
+	type SourceChainAccountId = bp_kusama::AccountId;
 	type TargetChainAccountPublic = AccountPublic;
 	type TargetChainSignature = Signature;
+	type AccountIdConverter = bp_polkadot::AccountIdConverter;
 }
 
 parameter_types! {
 	// TODO: this affects weight of confirmations delivery call
 	pub const MaxMessagesToPruneAtOnce: bp_message_lane::MessageNonce = 8;
+	pub const MaxUnrewardedRelayerEntriesAtInboundLane: bp_message_lane::MessageNonce =
+		bp_kusama::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;
 	pub const MaxUnconfirmedMessagesAtInboundLane: bp_message_lane::MessageNonce =
 		bp_polkadot::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
+	pub const MaxMessagesInDeliveryTransaction: bp_message_lane::MessageNonce =
+		bp_polkadot::MAX_MESSAGES_IN_DELIVERY_TRANSACTION;
 }
 
 type KusamaMessageLaneInstance = pallet_message_lane::Instance1;
 impl pallet_message_lane::Config<KusamaMessageLaneInstance> for Runtime {
 	type Event = Event;
 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
+	type MaxUnrewardedRelayerEntriesAtInboundLane = MaxUnrewardedRelayerEntriesAtInboundLane;
 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;
+	type MaxMessagesInDeliveryTransaction = MaxMessagesInDeliveryTransaction;
 
 	type OutboundPayload = crate::kusama_messages::ToKusamaMessagePayload;
 	type OutboundMessageFee = Balance;
@@ -933,6 +939,8 @@ impl pallet_message_lane::Config<KusamaMessageLaneInstance> for Runtime {
 	type InboundPayload = crate::kusama_messages::FromKusamaMessagePayload;
 	type InboundMessageFee = bp_kusama::Balance;
 	type InboundRelayer = bp_kusama::AccountId;
+
+	type AccountIdConverter = bp_polkadot::AccountIdConverter;
 
 	type TargetHeaderChain = crate::kusama_messages::Kusama;
 	type LaneMessageVerifier = crate::kusama_messages::ToKusamaMessageVerifier;
