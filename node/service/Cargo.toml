@@ -92,7 +92,7 @@ polkadot-pov-distribution = { path = "../network/pov-distribution", optional = t
 polkadot-statement-distribution = { path = "../network/statement-distribution", optional = true }
 
 # Bridges
-pallet-substrate-bridge = { git = "https://github.com/svyatonik/parity-bridges-common.git", branch = "polkadot-integration" }
+pallet-substrate-bridge = { git = "https://github.com/paritytech/parity-bridges-common.git", branch = "hc-update-polkadot-fork" }
 
 [dev-dependencies]
 polkadot-test-client = { path = "../test/client" }
