@@ -1115,12 +1115,12 @@ impl frame_support::traits::OnRuntimeUpgrade for CustomOnRuntimeUpgrade {
 	}
 }
 
-impl pallet_substrate_bridge::Trait for Runtime {
+impl pallet_substrate_bridge::Config for Runtime {
 	type BridgedChain = bp_polkadot::Polkadot;
 }
 
 type PolkadotCallDispatchInstance = pallet_bridge_call_dispatch::Instance1;
-impl pallet_bridge_call_dispatch::Trait<PolkadotCallDispatchInstance> for Runtime {
+impl pallet_bridge_call_dispatch::Config<PolkadotCallDispatchInstance> for Runtime {
 	type Call = Call;
 	type Event = Event;
 	type MessageId = (bp_message_lane::LaneId, bp_message_lane::MessageNonce);
@@ -1138,7 +1138,7 @@ parameter_types! {
 }
 
 type PolkadotMessageLaneInstance = pallet_message_lane::Instance1;
-impl pallet_message_lane::Trait<PolkadotMessageLaneInstance> for Runtime {
+impl pallet_message_lane::Config<PolkadotMessageLaneInstance> for Runtime {
 	type Event = Event;
 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;

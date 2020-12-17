@@ -105,12 +105,12 @@ impl MessageBridge for WithPolkadotMessageBridge {
 	}
 
 	fn this_weight_to_this_balance(weight: Weight) -> crate::Balance {
-		<crate::Runtime as pallet_transaction_payment::Trait>::WeightToFee::calc(&weight)
+		<crate::Runtime as pallet_transaction_payment::Config>::WeightToFee::calc(&weight)
 	}
 
 	fn bridged_weight_to_bridged_balance(weight: Weight) -> bp_polkadot::Balance {
 		// we use same weights schema is used in both chains
-		<crate::Runtime as pallet_transaction_payment::Trait>::WeightToFee::calc(&weight)
+		<crate::Runtime as pallet_transaction_payment::Config>::WeightToFee::calc(&weight)
 	}
 
 	fn this_balance_to_bridged_balance(this_balance: crate::Balance) -> bp_polkadot::Balance {

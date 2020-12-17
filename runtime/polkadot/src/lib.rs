@@ -899,12 +899,12 @@ impl frame_support::traits::OnRuntimeUpgrade for CustomOnRuntimeUpgrade {
 	}
 }
 
-impl pallet_substrate_bridge::Trait for Runtime {
+impl pallet_substrate_bridge::Config for Runtime {
 	type BridgedChain = bp_kusama::Kusama;
 }
 
 type KusamaCallDispatchInstance = pallet_bridge_call_dispatch::Instance1;
-impl pallet_bridge_call_dispatch::Trait<KusamaCallDispatchInstance> for Runtime {
+impl pallet_bridge_call_dispatch::Config<KusamaCallDispatchInstance> for Runtime {
 	type Call = Call;
 	type Event = Event;
 	type MessageId = (bp_message_lane::LaneId, bp_message_lane::MessageNonce);
@@ -922,7 +922,7 @@ parameter_types! {
 }
 
 type KusamaMessageLaneInstance = pallet_message_lane::Instance1;
-impl pallet_message_lane::Trait<KusamaMessageLaneInstance> for Runtime {
+impl pallet_message_lane::Config<KusamaMessageLaneInstance> for Runtime {
 	type Event = Event;
 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;
