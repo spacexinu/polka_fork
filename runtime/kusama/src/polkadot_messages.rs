@@ -30,6 +30,7 @@ use frame_support::{
 	RuntimeDebug,
 };
 use sp_core::storage::StorageKey;
+use sp_std::{convert::TryFrom, ops::RangeInclusive};
 
 /// Storage key of the Kusama -> Polkadot message in the runtime storage.
 pub fn message_key(lane: &LaneId, nonce: MessageNonce) -> StorageKey {
@@ -87,9 +88,19 @@ impl MessageBridge for WithPolkadotMessageBridge {
 	type ThisChain = Kusama;
 	type BridgedChain = Polkadot;
 
-	fn maximal_dispatch_weight_of_message_on_bridged_chain() -> Weight {
+	fn maximal_extrinsic_size_on_target_chain() -> u32 {
+		bp_polkadot::max_extrinsic_size()
+	}
+
+	fn weight_limits_of_message_on_bridged_chain(message_payload: &[u8]) -> RangeInclusive<Weight> {
 		// we don't want to relay too large messages + keep reserve for future upgrades
-		bp_polkadot::MAXIMUM_EXTRINSIC_WEIGHT / 2
+		let upper_limit = bp_polkadot::max_extrinsic_weight() / 2;
+
+		// given Millau chain parameters (`TransactionByteFee`, `WeightToFee`, `FeeMultiplierUpdate`),
+		// the minimal weight of the message may be computed as message.length()
+		let lower_limit = Weight::try_from(message_payload.len()).unwrap_or(Weight::MAX);
+
+		lower_limit..=upper_limit
 	}
 
 	fn weight_of_delivery_transaction() -> Weight {
@@ -104,16 +115,16 @@ impl MessageBridge for WithPolkadotMessageBridge {
 		0 // TODO: https://github.com/paritytech/parity-bridges-common/issues/391
 	}
 
-	fn this_weight_to_this_balance(weight: Weight) -> crate::Balance {
+	fn this_weight_to_this_balance(weight: Weight) -> bp_kusama::Balance {
 		<crate::Runtime as pallet_transaction_payment::Config>::WeightToFee::calc(&weight)
 	}
 
 	fn bridged_weight_to_bridged_balance(weight: Weight) -> bp_polkadot::Balance {
-		// we use same weights schema is used in both chains
-		<crate::Runtime as pallet_transaction_payment::Config>::WeightToFee::calc(&weight)
+		// we're using the same weights in both chains now
+		<crate::Runtime as pallet_transaction_payment::Config>::WeightToFee::calc(&weight) as _
 	}
 
-	fn this_balance_to_bridged_balance(this_balance: crate::Balance) -> bp_polkadot::Balance {
+	fn this_balance_to_bridged_balance(this_balance: bp_kusama::Balance) -> bp_polkadot::Balance {
 		this_balance // TODO: get from storage???
 	}
 }
@@ -153,15 +164,14 @@ impl messages::ChainWithMessageLanes for Polkadot {
 
 impl TargetHeaderChain<ToPolkadotMessagePayload, bp_polkadot::AccountId> for Polkadot {
 	type Error = &'static str;
+	// The proof is:
+	// - hash of the header this proof has been created with;
+	// - the storage proof of one or several keys;
+	// - id of the lane we prove state of.
 	type MessagesDeliveryProof = ToPolkadotMessagesDeliveryProof;
 
 	fn verify_message(payload: &ToPolkadotMessagePayload) -> Result<(), Self::Error> {
-		// TODO: should check that the declared weight is at least BasicExtrinsicWeight + Per-byte weight
-		if payload.weight > WithPolkadotMessageBridge::maximal_dispatch_weight_of_message_on_bridged_chain() {
-			return Err("Too large weight declared");
-		}
-
-		Ok(())
+		messages::source::verify_chain_message::<WithPolkadotMessageBridge>(payload)
 	}
 
 	fn verify_messages_delivery_proof(
@@ -177,7 +187,8 @@ impl SourceHeaderChain<bp_polkadot::Balance> for Polkadot {
 
 	fn verify_messages_proof(
 		proof: Self::MessagesProof,
+		max_messages: MessageNonce,
 	) -> Result<ProvedMessages<Message<bp_polkadot::Balance>>, Self::Error> {
-		messages::target::verify_messages_proof::<WithPolkadotMessageBridge, Runtime>(proof)
+		messages::target::verify_messages_proof::<WithPolkadotMessageBridge, Runtime>(proof, max_messages)
 	}
 }

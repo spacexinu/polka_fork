@@ -554,11 +554,12 @@ dependencies = [
 [[package]]
 name = "bp-kusama"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-message-lane",
  "bp-runtime",
  "frame-support",
+ "frame-system",
  "sp-api",
  "sp-core",
  "sp-runtime",
@@ -568,7 +569,7 @@ dependencies = [
 [[package]]
 name = "bp-message-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-runtime",
  "parity-scale-codec",
@@ -577,7 +578,7 @@ dependencies = [
 [[package]]
 name = "bp-message-lane"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -588,11 +589,12 @@ dependencies = [
 [[package]]
 name = "bp-polkadot"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-message-lane",
  "bp-runtime",
  "frame-support",
+ "frame-system",
  "sp-api",
  "sp-core",
  "sp-runtime",
@@ -602,7 +604,7 @@ dependencies = [
 [[package]]
 name = "bp-runtime"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "frame-support",
  "num-traits 0.2.12",
@@ -616,7 +618,7 @@ dependencies = [
 [[package]]
 name = "bridge-runtime-common"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-message-dispatch",
  "bp-message-lane",
@@ -3973,7 +3975,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-call-dispatch"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-message-dispatch",
  "bp-runtime",
@@ -4122,7 +4124,7 @@ dependencies = [
 [[package]]
 name = "pallet-message-lane"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-message-lane",
  "bp-runtime",
@@ -4347,7 +4349,7 @@ dependencies = [
 [[package]]
 name = "pallet-substrate-bridge"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#762b71870ba4d9c6da696a52e9e3fa99b49352f0"
+source = "git+https://github.com/paritytech/parity-bridges-common.git?branch=hc-update-polkadot-fork#584fa7b45491eb0ca130325edd77be8e0bdf81c3"
 dependencies = [
  "bp-runtime",
  "finality-grandpa",
