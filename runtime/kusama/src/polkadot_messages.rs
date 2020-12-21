@@ -26,9 +26,10 @@ use bp_message_lane::{
 use bp_runtime::{InstanceId, POLKADOT_BRIDGE_INSTANCE};
 use bridge_runtime_common::messages::{self, ChainWithMessageLanes, MessageBridge};
 use frame_support::{
-	weights::{Weight, WeightToFeePolynomial},
+	weights::{Weight, WeightToFeePolynomial, DispatchClass},
 	RuntimeDebug,
 };
+use runtime_common::{BlockWeights, BlockLength};
 use sp_core::storage::StorageKey;
 use sp_std::{convert::TryFrom, ops::RangeInclusive};
 
@@ -89,12 +90,16 @@ impl MessageBridge for WithPolkadotMessageBridge {
 	type BridgedChain = Polkadot;
 
 	fn maximal_extrinsic_size_on_target_chain() -> u32 {
-		bp_polkadot::max_extrinsic_size()
+		*BlockLength::get().max.get(DispatchClass::Normal)
 	}
 
 	fn weight_limits_of_message_on_bridged_chain(message_payload: &[u8]) -> RangeInclusive<Weight> {
 		// we don't want to relay too large messages + keep reserve for future upgrades
-		let upper_limit = bp_polkadot::max_extrinsic_weight() / 2;
+		let max_extrinsic_weight = BlockWeights::get()
+			.get(DispatchClass::Normal)
+			.max_extrinsic
+			.unwrap_or(Weight::MAX);
+		let upper_limit = max_extrinsic_weight / 2;
 
 		// given Millau chain parameters (`TransactionByteFee`, `WeightToFee`, `FeeMultiplierUpdate`),
 		// the minimal weight of the message may be computed as message.length()
