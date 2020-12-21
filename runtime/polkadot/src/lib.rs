@@ -1313,13 +1313,13 @@ sp_api::impl_runtime_apis! {
 			lane: bp_message_lane::LaneId,
 			begin: bp_message_lane::MessageNonce,
 			end: bp_message_lane::MessageNonce,
-		) -> Vec<(bp_message_lane::MessageNonce, Weight)> {
+		) -> Vec<(bp_message_lane::MessageNonce, Weight, u32)> {
 			(begin..=end).filter_map(|nonce| {
 				let encoded_payload = KusamaMessageLane::outbound_message_payload(lane, nonce)?;
 				let decoded_payload = kusama_messages::ToKusamaMessagePayload::decode(
 					&mut &encoded_payload[..]
 				).ok()?;
-				Some((nonce, decoded_payload.weight))
+				Some((nonce, decoded_payload.weight, encoded_payload.len() as _))
 			})
 			.collect()
 		}
