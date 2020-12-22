@@ -1144,10 +1144,11 @@ parameter_types! {
 type PolkadotMessageLaneInstance = pallet_message_lane::Instance1;
 impl pallet_message_lane::Config<PolkadotMessageLaneInstance> for Runtime {
 	type Event = Event;
+	// TODO: Will need to be updated once Kusama benchmarks are run
+	type WeightInfo = ();
 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;
 	type MaxUnrewardedRelayerEntriesAtInboundLane = MaxUnrewardedRelayerEntriesAtInboundLane;
 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;
-	type MaxMessagesInDeliveryTransaction = MaxMessagesInDeliveryTransaction;
 
 	type OutboundPayload = crate::polkadot_messages::ToPolkadotMessagePayload;
 	type OutboundMessageFee = Balance;
