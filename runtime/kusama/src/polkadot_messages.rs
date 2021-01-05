@@ -129,8 +129,9 @@ impl MessageBridge for WithPolkadotMessageBridge {
 		<crate::Runtime as pallet_transaction_payment::Config>::WeightToFee::calc(&weight) as _
 	}
 
-	fn this_balance_to_bridged_balance(this_balance: bp_kusama::Balance) -> bp_polkadot::Balance {
-		this_balance // TODO: get from storage???
+	fn bridged_balance_to_this_balance(bridged_balance: bp_polkadot::Balance) -> bp_kusama::Balance {
+		// 1:1 conversion that will probably change in the future
+		bridged_balance as _
 	}
 }
 
