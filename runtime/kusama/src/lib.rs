@@ -127,6 +127,7 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
 	pub const Version: RuntimeVersion = VERSION;
+	pub const SS58Prefix: u8 = 2;
 }
 
 impl frame_system::Config for Runtime {
@@ -151,6 +152,7 @@ impl frame_system::Config for Runtime {
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = weights::frame_system::WeightInfo<Runtime>;
+	type SS58Prefix = SS58Prefix;
 }
 
 parameter_types! {
@@ -712,6 +714,7 @@ impl claims::Config for Runtime {
 	type VestingSchedule = Vesting;
 	type Prefix = Prefix;
 	type MoveClaimOrigin = pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>;
+	type WeightInfo = weights::runtime_common_claims::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -974,6 +977,7 @@ parameter_types! {
 		bp_kusama::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	pub const MaxMessagesInDeliveryTransaction: bp_message_lane::MessageNonce =
 		bp_kusama::MAX_MESSAGES_IN_DELIVERY_TRANSACTION;
+	pub RootAccountForPayments: Option<AccountId> = Some(Treasury::account_id());
 }
 
 type PolkadotMessageLaneInstance = pallet_message_lane::Instance1;
@@ -996,8 +1000,11 @@ impl pallet_message_lane::Config<PolkadotMessageLaneInstance> for Runtime {
 
 	type TargetHeaderChain = crate::polkadot_messages::Polkadot;
 	type LaneMessageVerifier = crate::polkadot_messages::ToPolkadotMessageVerifier;
-	type MessageDeliveryAndDispatchPayment =
-		pallet_message_lane::instant_payments::InstantCurrencyPayments<AccountId, pallet_balances::Module<Runtime>>;
+	type MessageDeliveryAndDispatchPayment = pallet_message_lane::instant_payments::InstantCurrencyPayments<
+		Self,
+		pallet_balances::Module<Runtime>,
+		RootAccountForPayments,
+	>;
 
 	type SourceHeaderChain = crate::polkadot_messages::Polkadot;
 	type MessageDispatch = crate::polkadot_messages::FromPolkadotMessageDispatch;
@@ -1300,6 +1307,10 @@ sp_api::impl_runtime_apis! {
 			Babe::current_epoch()
 		}
 
+		fn next_epoch() -> babe_primitives::Epoch {
+			Babe::next_epoch()
+		}
+
 		fn generate_key_ownership_proof(
 			_slot_number: babe_primitives::SlotNumber,
 			authority_id: babe_primitives::AuthorityId,
@@ -1450,7 +1461,7 @@ sp_api::impl_runtime_apis! {
 			let mut batches = Vec::<BenchmarkBatch>::new();
 			let params = (&config, &whitelist);
 			// Polkadot
-			add_benchmark!(params, batches, claims, Claims);
+			add_benchmark!(params, batches, runtime_common::claims, Claims);
 			// Substrate
 			add_benchmark!(params, batches, pallet_balances, Balances);
 			add_benchmark!(params, batches, pallet_bounties, Bounties);
