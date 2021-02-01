@@ -23,11 +23,11 @@ polkadot-node-jaeger = { path = "../jaeger" }
 polkadot-primitives = { path = "../../primitives" }
 metered-channel = { path = "../metered-channel"}
 
-sc-network = { git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
-sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
-sp-keystore = { git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
-substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
+sc-network = { git = "https://github.com/paritytech/substrate", branch = "ser-tmp-rococo-v1" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "ser-tmp-rococo-v1" }
+sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "ser-tmp-rococo-v1" }
+sp-keystore = { git = "https://github.com/paritytech/substrate", branch = "ser-tmp-rococo-v1" }
+substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate", branch = "ser-tmp-rococo-v1" }
 
 [dev-dependencies]
 assert_matches = "1.4.0"
