@@ -607,7 +607,7 @@ impl CandidateBackingJob {
 
 		tracing::debug!(
 			target: LOG_TARGET,
-			candidate_hash = %candidate_hash,
+			candidate_hash = ?candidate_hash,
 			candidate_receipt = ?candidate,
 			"Validate and second candidate",
 		);
@@ -693,7 +693,7 @@ impl CandidateBackingJob {
 				{
 					tracing::debug!(
 						target: LOG_TARGET,
-						candidate_hash = %candidate_hash,
+						candidate_hash = ?candidate_hash,
 						"Candidate backed",
 					);
 
@@ -797,7 +797,7 @@ impl CandidateBackingJob {
 
 		tracing::debug!(
 			target: LOG_TARGET,
-			candidate_hash = %candidate_hash,
+			candidate_hash = ?candidate_hash,
 			candidate_receipt = ?candidate,
 			"Kicking off validation",
 		);
