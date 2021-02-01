@@ -276,6 +276,17 @@ async fn distribute_collation(
 		return Ok(());
 	}
 
+	tracing::debug!(
+		target: LOG_TARGET,
+		para_id = ?id,
+		?current_validators,
+		?next_validators,
+		?our_core,
+		?num_cores,
+		?relay_parent,
+		"connect to validators",
+	);
+
 	// Issue a discovery request for the validators of the current group and the next group.
 	connect_to_validators(ctx, relay_parent, state, current_validators.union(&next_validators).cloned().collect()).await?;
 
@@ -393,7 +404,18 @@ async fn advertise_collation(
 		.map(|g| g.should_advertise_to(&peer))
 		.unwrap_or(false);
 
-	if !state.collations.contains_key(&relay_parent) || !should_advertise {
+	let has_collation = state.collations.contains_key(&relay_parent);
+
+	tracing::debug!(
+        target: LOG_TARGET,
+        ?peer_id,
+		?relay_parent,
+		?should_advertise,
+		?has_collation,
+        "advertise collation",
+    );
+
+	if !has_collation || !should_advertise {
 		return;
 	}
 
@@ -631,7 +653,20 @@ async fn handle_validator_connected(
 		false
 	};
 
-	if advertise && state.peer_interested_in_leaf(&peer_id, &relay_parent) {
+	let interested = state.peer_interested_in_leaf(&peer_id, &relay_parent);
+
+	tracing::debug!(
+		target: LOG_TARGET,
+		?peer_id,
+		?validator_id,
+		?relay_parent,
+		?not_declared,
+		?advertise,
+		?interested,
+		"validator connected",
+	);
+
+	if advertise && interested {
 		advertise_collation(ctx, state, relay_parent, peer_id).await;
 	}
 }
@@ -654,6 +689,11 @@ async fn handle_network_msg(
 			handle_peer_view_change(ctx, state, peer_id, view).await;
 		}
 		PeerDisconnected(peer_id) => {
+			tracing::debug!(
+				target: LOG_TARGET,
+				?peer_id,
+				"peer disconnected",
+			);
 			state.peer_views.remove(&peer_id);
 			state.declared_at.remove(&peer_id);
 		}
