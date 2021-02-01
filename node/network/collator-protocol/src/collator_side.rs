@@ -408,7 +408,7 @@ async fn advertise_collation(
 
 	tracing::debug!(
         target: LOG_TARGET,
-        ?peer_id,
+        peer_id = ?peer,
 		?relay_parent,
 		?should_advertise,
 		?has_collation,
@@ -657,7 +657,7 @@ async fn handle_validator_connected(
 
 	tracing::debug!(
 		target: LOG_TARGET,
-		?peer_id,
+		peer_id = ?peer_id,
 		?validator_id,
 		?relay_parent,
 		?not_declared,
@@ -691,7 +691,7 @@ async fn handle_network_msg(
 		PeerDisconnected(peer_id) => {
 			tracing::debug!(
 				target: LOG_TARGET,
-				?peer_id,
+				peer_id = ?peer_id,
 				"peer disconnected",
 			);
 			state.peer_views.remove(&peer_id);
