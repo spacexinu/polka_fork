@@ -438,7 +438,7 @@ where
 				tracing::trace!(
 					target: LOG_TARGET,
 					%chunk_index,
-					?candidate_hash,
+					%candidate_hash,
 					"Retrieved chunk from message vault",
 				);
 				message.clone()
@@ -446,7 +446,7 @@ where
 				tracing::trace!(
 					target: LOG_TARGET,
 					%chunk_index,
-					?candidate_hash,
+					%candidate_hash,
 					"Retrieved chunk from availability storage",
 				);
 
@@ -462,7 +462,7 @@ where
 				tracing::error!(
 					target: LOG_TARGET,
 					%chunk_index,
-					?candidate_hash,
+					%candidate_hash,
 					"Availability store reported that we have the availability data, but we could not retrieve a chunk of it!",
 				);
 				continue;
