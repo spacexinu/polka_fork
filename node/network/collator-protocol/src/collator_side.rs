@@ -640,7 +640,7 @@ async fn handle_validator_connected(
 ) {
 	let not_declared = state.declared_at.insert(peer_id.clone());
 
-	if not_declared {
+	if not_declared || true {
 		declare(ctx, state, peer_id.clone()).await;
 	}
 
