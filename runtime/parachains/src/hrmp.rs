@@ -1232,7 +1232,6 @@ mod tests {
 		Paras::schedule_para_initialize(
 			id,
 			crate::paras::ParaGenesisArgs {
-				parachain: true,
 				genesis_head: vec![1].into(),
 				validation_code: vec![1].into(),
 			},

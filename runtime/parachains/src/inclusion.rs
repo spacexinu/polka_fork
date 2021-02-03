@@ -651,7 +651,7 @@ impl<T: Config> Module<T> {
 		receipt: CommittedCandidateReceipt<T::Hash>,
 		backers: BitVec<BitOrderLsb0, u8>,
 		availability_votes: BitVec<BitOrderLsb0, u8>,
-	) -> Weight {
+	) {
 		let plain = receipt.to_plain();
 		let commitments = receipt.commitments;
 		let config = <configuration::Module<T>>::config();
@@ -666,10 +666,8 @@ impl<T: Config> Module<T> {
 			.map(|(i, _)| i as _)
 		);
 
-		// initial weight is config read.
-		let mut weight = T::DbWeight::get().reads_writes(1, 0);
 		if let Some(new_code) = commitments.new_validation_code {
-			weight += <paras::Module<T>>::schedule_code_upgrade(
+			<paras::Module<T>>::schedule_code_upgrade(
 				receipt.descriptor.para_id,
 				new_code,
 				relay_parent_number + config.validation_upgrade_delay,
@@ -677,19 +675,19 @@ impl<T: Config> Module<T> {
 		}
 
 		// enact the messaging facet of the candidate.
-		weight += <dmp::Module<T>>::prune_dmq(
+		<dmp::Module<T>>::prune_dmq(
 			receipt.descriptor.para_id,
 			commitments.processed_downward_messages,
 		);
-		weight += <ump::Module<T>>::enact_upward_messages(
+		<ump::Module<T>>::enact_upward_messages(
 			receipt.descriptor.para_id,
 			commitments.upward_messages,
 		);
-		weight += <hrmp::Module<T>>::prune_hrmp(
+		<hrmp::Module<T>>::prune_hrmp(
 			receipt.descriptor.para_id,
 			T::BlockNumber::from(commitments.hrmp_watermark),
 		);
-		weight += <hrmp::Module<T>>::queue_outbound_hrmp(
+		<hrmp::Module<T>>::queue_outbound_hrmp(
 			receipt.descriptor.para_id,
 			commitments.horizontal_messages,
 		);
@@ -698,7 +696,7 @@ impl<T: Config> Module<T> {
 			Event::<T>::CandidateIncluded(plain, commitments.head_data.clone())
 		);
 
-		weight + <paras::Module<T>>::note_new_head(
+		<paras::Module<T>>::note_new_head(
 			receipt.descriptor.para_id,
 			commitments.head_data,
 			relay_parent_number,
@@ -924,11 +922,15 @@ mod tests {
 	fn genesis_config(paras: Vec<(ParaId, bool)>) -> MockGenesisConfig {
 		MockGenesisConfig {
 			paras: paras::GenesisConfig {
-				paras: paras.into_iter().map(|(id, is_chain)| (id, ParaGenesisArgs {
-					genesis_head: Vec::new().into(),
-					validation_code: Vec::new().into(),
-					parachain: is_chain,
-				})).collect(),
+				paras: paras.into_iter().map(|(id, is_parachain)|
+				(
+					id,
+					ParaGenesisArgs {
+						genesis_head: Vec::new().into(),
+						validation_code: Vec::new().into(),
+					},
+					is_parachain
+				)).collect(),
 				..Default::default()
 			},
 			configuration: configuration::GenesisConfig {

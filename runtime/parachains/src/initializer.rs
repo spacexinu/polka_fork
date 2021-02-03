@@ -125,9 +125,9 @@ decl_module! {
 			// - DMP
 			// - UMP
 			// - HRMP
-			let total_weight = configuration::Module::<T>::initializer_initialize(now) +
-				paras::Module::<T>::initializer_initialize(now) +
-				scheduler::Module::<T>::initializer_initialize(now) +
+			let mut total_weight = configuration::Module::<T>::initializer_initialize(now);
+			paras::Module::<T>::initializer_initialize(now);
+			total_weight = total_weight + scheduler::Module::<T>::initializer_initialize(now) +
 				inclusion::Module::<T>::initializer_initialize(now) +
 				session_info::Module::<T>::initializer_initialize(now) +
 				dmp::Module::<T>::initializer_initialize(now) +

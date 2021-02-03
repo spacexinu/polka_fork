@@ -819,7 +819,6 @@ mod tests {
 			Paras::schedule_para_initialize(thread_id, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: false,
 			});
 
 			assert!(!Paras::is_parathread(thread_id));
@@ -898,7 +897,6 @@ mod tests {
 			Paras::schedule_para_initialize(thread_id, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: false,
 			});
 
 			assert!(!Paras::is_parathread(thread_id));
@@ -938,19 +936,16 @@ mod tests {
 				Paras::schedule_para_initialize(thread_a, ParaGenesisArgs {
 					genesis_head: Vec::new().into(),
 					validation_code: Vec::new().into(),
-					parachain: false,
 				});
 
 				Paras::schedule_para_initialize(thread_b, ParaGenesisArgs {
 					genesis_head: Vec::new().into(),
 					validation_code: Vec::new().into(),
-					parachain: false,
 				});
 
 				Paras::schedule_para_initialize(thread_c, ParaGenesisArgs {
 					genesis_head: Vec::new().into(),
 					validation_code: Vec::new().into(),
-					parachain: false,
 				});
 			}
 
@@ -1044,12 +1039,10 @@ mod tests {
 			Paras::schedule_para_initialize(chain_a, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: true,
 			});
 			Paras::schedule_para_initialize(chain_b, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: true,
 			});
 
 			run_to_block(1, |number| match number {
@@ -1110,17 +1103,14 @@ mod tests {
 			Paras::schedule_para_initialize(chain_a, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: true,
 			});
 			Paras::schedule_para_initialize(chain_b, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: true,
 			});
 			Paras::schedule_para_initialize(chain_c, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: false,
 			});
 
 			run_to_block(1, |number| match number {
@@ -1173,7 +1163,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1288,7 +1277,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1445,7 +1433,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1555,7 +1542,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1633,7 +1619,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1698,7 +1683,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1801,7 +1785,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1882,7 +1865,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -1969,7 +1951,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -2032,7 +2013,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
@@ -2096,12 +2076,10 @@ mod tests {
 			Paras::schedule_para_initialize(chain_a, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: true,
 			});
 			Paras::schedule_para_initialize(chain_b, ParaGenesisArgs {
 				genesis_head: Vec::new().into(),
 				validation_code: Vec::new().into(),
-				parachain: true,
 			});
 
 			run_to_block(1, |number| match number {
@@ -2182,7 +2160,6 @@ mod tests {
 		let schedule_blank_para = |id, is_chain| Paras::schedule_para_initialize(id, ParaGenesisArgs {
 			genesis_head: Vec::new().into(),
 			validation_code: Vec::new().into(),
-			parachain: is_chain,
 		});
 
 		new_test_ext(genesis_config).execute_with(|| {
