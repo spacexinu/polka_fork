@@ -209,7 +209,15 @@ struct State {
 impl State {
 	/// Returns `true` if the given `peer` is interested in the leaf that is represented by `relay_parent`.
 	fn peer_interested_in_leaf(&self, peer: &PeerId, relay_parent: &Hash) -> bool {
-		self.peer_views.get(peer).map(|v| v.contains(relay_parent)).unwrap_or(false)
+		let result = self.peer_views.get(peer).map(|v| v.contains(relay_parent)).unwrap_or(false);
+		tracing::debug!(
+			target: LOG_TARGET,
+			peer_id = ?peer,
+			relay_parent = ?relay_parent,
+			view = ?self.peer_views.get(peer),
+			"peer_interested_in_leaf",
+		);
+		result
 	}
 }
 
@@ -619,6 +627,15 @@ async fn handle_peer_view_change(
 	let current = state.peer_views.entry(peer_id.clone()).or_default();
 
 	let added: Vec<Hash> = view.difference(&*current).cloned().collect();
+
+	tracing::debug!(
+		target: LOG_TARGET,
+		peer_id = ?peer_id,
+		new_view = ?view,
+		current_view = ?current,
+		added = ?added,
+		"handle_peer_view_change",
+	);
 
 	*current = view;
 
