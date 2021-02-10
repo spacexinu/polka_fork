@@ -232,6 +232,8 @@ decl_storage! {
 
 /// Swap the existence of two items, provided by value, within an ordered list.
 ///
+/// `ids` must be sorted, and the order is maintained.
+///
 /// If neither item exists, or if both items exist this will do nothing. If exactly one of the
 /// items exists, then it will be removed and the other inserted.
 fn swap_ordered_existence<T: PartialOrd + Ord + Copy>(ids: &mut [T], one: T, other: T) {
@@ -328,6 +330,13 @@ decl_module! {
 
 		fn deposit_event() = default;
 
+		fn integrity_test() {
+			// defensive: we do divide by zero as well in the code so this should be safe. This is
+			// mainly to denote the panic-prone `%`.
+			assert!(!T::LeasePeriod::get().is_zero(), "Lease period cannot be zero.");
+			assert!(!T::EndingPeriod::get().is_zero(), "Ending period cannot be zero.");
+		}
+
 		fn on_initialize(n: T::BlockNumber) -> Weight {
 			let lease_period = T::LeasePeriod::get();
 			let lease_period_index: LeasePeriodOf<T> = (n / lease_period).into();
@@ -342,6 +351,7 @@ decl_module! {
 					winning_ranges,
 				);
 			}
+
 			// If we're beginning a new lease period then handle that, too.
 			if (n % lease_period).is_zero() {
 				Self::manage_lease_period_start(lease_period_index);
@@ -463,6 +473,9 @@ decl_module! {
 
 		/// Set the deploy information for a successful bid to deploy a new parachain.
 		///
+		/// Essentially replaced an [`Onboarding`] entry of a parachain from
+		/// [`IncomingParachain::Unset`] to [`IncomingParachain::Fixed`], if not already fixed.
+		///
 		/// - `origin` must be the successful bidder account.
 		/// - `sub` is the sub-bidder ID of the bidder.
 		/// - `para_id` is the parachain ID allotted to the winning bidder.
@@ -505,9 +518,11 @@ decl_module! {
 		///
 		/// This may be called before or after the beginning of the parachain's first lease period.
 		/// If called before then the parachain will become active at the first block of its
-		/// starting lease period. If after, then it will become active immediately after this call.
+		/// starting lease period, and and the [`OnBoarding`] entry is updated to
+		/// [`IncomingParachain::Deploy`]. If after, then it will become active immediately after
+		/// this call, and the [`OnBoarding`] of the parachain is removed.
 		///
-		/// - `_origin` is irrelevant.
+		/// - `_origin` is irrelevant. Anyone with the preimage can submit.
 		/// - `para_id` is the parachain ID whose code will be elaborated.
 		/// - `code` is the preimage of the registered `code_hash` of `para_id`.
 		#[weight = 5_000_000_000]
@@ -518,20 +533,19 @@ decl_module! {
 		) -> DispatchResult {
 			let (starts, details) = <Onboarding<T>>::get(&para_id)
 				.ok_or(Error::<T>::ParaNotOnboarding)?;
-			if let IncomingParachain::Fixed{code_hash, code_size, initial_head_data} = details {
+			if let IncomingParachain::Fixed { code_hash, code_size, initial_head_data } = details {
 				ensure!(code.0.len() as u32 == code_size, Error::<T>::InvalidCode);
 				ensure!(<T as frame_system::Config>::Hashing::hash(&code.0) == code_hash, Error::<T>::InvalidCode);
 
 				if starts > Self::lease_period_index() {
 					// Hasn't yet begun. Replace the on-boarding entry with the new information.
-					let item = (starts, IncomingParachain::Deploy{code, initial_head_data});
+					let item = (starts, IncomingParachain::Deploy { code, initial_head_data });
 					<Onboarding<T>>::insert(&para_id, item);
 				} else {
 					// Should have already begun. Remove the on-boarding entry and register the
 					// parachain for its immediate start.
 					<Onboarding<T>>::remove(&para_id);
-					let _ = T::Parachains::
-						register_para(para_id, true, code, initial_head_data);
+					let _ = T::Parachains::register_para(para_id, true, code, initial_head_data);
 				}
 
 				Ok(())
@@ -571,27 +585,29 @@ impl<T: Config> Module<T> {
 		(<frame_system::Module<T>>::block_number() / T::LeasePeriod::get()).into()
 	}
 
-	/// Some when the auction's end is known (with the end block number). None if it is unknown.
+	/// `Some` when the auction's end is known (with the end block number). None if it is unknown.
 	/// If `Some` then the block number must be at most the previous block and at least the
 	/// previous block minus `T::EndingPeriod::get()`.
 	///
 	/// This mutates the state, cleaning up `AuctionInfo` and `Winning` in the case of an auction
-	/// ending. An immediately subsequent call with the same argument will always return `None`.
+	/// ending.
+	///
+	/// An immediately subsequent call with the same argument will always return `None`.
 	fn check_auction_end(now: T::BlockNumber) -> Option<(WinningData<T>, LeasePeriodOf<T>)> {
 		if let Some((lease_period_index, early_end)) = <AuctionInfo<T>>::get() {
 			let ending_period = T::EndingPeriod::get();
 			if early_end + ending_period == now {
-				// Just ended!
-				let offset = T::BlockNumber::decode(&mut T::Randomness::random_seed().as_ref())
+				// Just ended! determine the previous offset of winners that we're going to pick.
+				let random_offset = T::BlockNumber::decode(&mut T::Randomness::random_seed().as_ref())
 					.expect("secure hashes always bigger than block numbers; qed") % ending_period;
-				let res = <Winning<T>>::get(offset).unwrap_or_default();
+				let winner = <Winning<T>>::get(random_offset).unwrap_or_default();
 				let mut i = T::BlockNumber::zero();
 				while i < ending_period {
 					<Winning<T>>::remove(i);
 					i += One::one();
 				}
 				<AuctionInfo<T>>::kill();
-				return Some((res, lease_period_index))
+				return Some((winner, lease_period_index))
 			}
 		}
 		None
@@ -631,8 +647,12 @@ impl<T: Config> Module<T> {
 						&bidder.who,
 						amount,
 						WithdrawReasons::FEE,
-						ExistenceRequirement::AllowDeath
+						ExistenceRequirement::AllowDeath,
 					).is_err() {
+						frame_support::debug::warn!(
+							"failed to withdraw the deposit for parachain {:?}",
+							para_id,
+						);
 						continue;
 					}
 
@@ -642,8 +662,8 @@ impl<T: Config> Module<T> {
 						if let Err(pos) = ids.binary_search(&para_id) {
 							ids.insert(pos, para_id)
 						} else {
-							// This can't happen as it's a winner being newly
-							// deployed and thus the para_id shouldn't already be being managed.
+							// This can't happen as it's a winner being newly deployed and thus the
+							// para_id shouldn't already be being managed.
 						}
 					);
 					Self::deposit_event(RawEvent::WonDeploy(bidder.clone(), range, para_id, amount));
@@ -668,8 +688,12 @@ impl<T: Config> Module<T> {
 							&para_id.into_account(),
 							additional,
 							WithdrawReasons::FEE,
-							ExistenceRequirement::AllowDeath
+							ExistenceRequirement::AllowDeath,
 						).is_err() {
+							frame_support::debug::warn!(
+								"failed to withdraw the deposit for parachain {:?}",
+								para_id,
+							);
 							continue;
 						}
 						additional
@@ -693,8 +717,7 @@ impl<T: Config> Module<T> {
 				// ID. We need to ensure that it features in `Deposits` to prevent it from being
 				// reaped too early (any managed parachain whose `Deposits` set runs low will be
 				// removed).
-				let pair = range.as_pair();
-				let pair = (pair.0 as usize + offset, pair.1 as usize + offset);
+				let pair = range.as_pair_with_offset(offset);
 				<Deposits<T>>::mutate(para_id, |d| {
 					// Left-pad with zeroes as necessary.
 					if d.len() < pair.0 {
@@ -774,7 +797,7 @@ impl<T: Config> Module<T> {
 
 		// Deploy any new chains that are due to be commissioned.
 		for para_id in <OnboardQueue<T>>::take(lease_period_index) {
-			if let Some((_, IncomingParachain::Deploy{code, initial_head_data}))
+			if let Some((_, IncomingParachain::Deploy { code, initial_head_data }))
 				= <Onboarding<T>>::get(&para_id)
 			{
 				// The chain's deployment data is set; go ahead and register it, and remove the
@@ -784,6 +807,8 @@ impl<T: Config> Module<T> {
 				// ^^ not much we can do if it fails for some reason.
 				<Onboarding<T>>::remove(para_id)
 			}
+			// Else, if the parachain is not `Deploy` yet, the call to
+			// [`Module::elaborate_deploy_data`] register the parachain
 		}
 	}
 
@@ -844,17 +869,14 @@ impl<T: Config> Module<T> {
 				<ReservedAmounts<T>>::get(&bidder).unwrap_or_default() + deposit_held;
 			// If these don't already cover the bid...
 			if let Some(additional) = amount.checked_sub(&already_reserved) {
-				// ...then reserve some more funds from their account, failing if there's not
-				// enough funds.
-				T::Currency::reserve(&bidder.funding_account(), additional)?;
+				// ...then reserve some more funds from their account, failing if there's not enough
+				// funds.
+				let funding_account = bidder.funding_account();
+				T::Currency::reserve(&funding_account, additional)?;
 				// ...and record the amount reserved.
 				<ReservedAmounts<T>>::insert(&bidder, amount);
 
-				Self::deposit_event(RawEvent::Reserved(
-					bidder.funding_account(),
-					additional,
-					amount
-				));
+				Self::deposit_event(RawEvent::Reserved(funding_account, additional, amount));
 			}
 
 			// Return any funds reserved for the previous winner if they no longer have any active
@@ -944,21 +966,12 @@ mod tests {
 	use sp_core::H256;
 	use sp_runtime::traits::{BlakeTwo256, Hash, IdentityLookup};
 	use frame_support::{
-		impl_outer_origin, parameter_types, assert_ok, assert_noop,
+		parameter_types, assert_ok, assert_noop,
 		traits::{OnInitialize, OnFinalize}
 	};
 	use pallet_balances;
 	use primitives::v1::{BlockNumber, Header, Id as ParaId};
 
-	impl_outer_origin! {
-		pub enum Origin for Test {}
-	}
-
-	// For testing the module, we construct most of a mock runtime. This means
-	// first constructing a configuration type (`Test`) which `impl`s each of the
-	// configuration traits of modules we want to use.
-	#[derive(Clone, Eq, PartialEq)]
-	pub struct Test;
 	parameter_types! {
 		pub const BlockHashCount: u32 = 250;
 	}
@@ -968,7 +981,7 @@ mod tests {
 		type BlockLength = ();
 		type DbWeight = ();
 		type Origin = Origin;
-		type Call = ();
+		type Call = Call;
 		type Index = u64;
 		type BlockNumber = BlockNumber;
 		type Hash = H256;
@@ -1041,6 +1054,7 @@ mod tests {
 				Ok(())
 			})
 		}
+
 		fn deregister_para(id: ParaId) -> DispatchResult {
 			PARACHAINS.with(|p| {
 				if !p.borrow().contains_key(&id.into()) {
@@ -1074,10 +1088,22 @@ mod tests {
 		type Randomness = RandomnessCollectiveFlip;
 	}
 
-	type System = frame_system::Module<Test>;
-	type Balances = pallet_balances::Module<Test>;
-	type Slots = Module<Test>;
-	type RandomnessCollectiveFlip = pallet_randomness_collective_flip::Module<Test>;
+	type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
+	type Block = frame_system::mocking::MockBlock<Test>;
+
+	use crate::slots as pallet_slots;
+	frame_support::construct_runtime!(
+		pub enum Test where
+			Block = Block,
+			NodeBlock = Block,
+			UncheckedExtrinsic = UncheckedExtrinsic,
+		{
+			System: frame_system::{Module, Call, Config, Storage, Event<T>},
+			Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+			RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Storage},
+			Slots: pallet_slots::{Module, Call, Storage, Event<T>},
+		}
+	);
 
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mock up.
@@ -1129,6 +1155,22 @@ mod tests {
 			assert_eq!(Slots::is_in_progress(), true);
 			assert_eq!(Slots::is_ending(System::block_number()), None);
 		});
+	}
+
+	#[test]
+	fn can_auction_current_lease_period_midway_through() {
+		new_test_ext().execute_with(|| {
+			run_to_block(2 * LeasePeriod::get());
+			assert_eq!(Slots::lease_period_index(), 2);
+
+			// we're now halfway into lease period 2...
+			run_to_block(2 * LeasePeriod::get() + LeasePeriod::get() / 2);
+			assert_eq!(Slots::lease_period_index(), 2);
+
+			// ...and can still start an auction for lease period 2.
+			assert_ok!(Slots::new_auction(Origin::root(), 5, 2));
+			assert_eq!(Slots::auction_counter(), 1);
+		})
 	}
 
 	#[test]
@@ -1290,7 +1332,7 @@ mod tests {
 			assert_eq!(Balances::free_balance(2), 20);
 			assert_eq!(
 				Slots::winning(0).unwrap()[SlotRange::ZeroThree as u8 as usize],
-				Some((Bidder::New(NewBidder{who: 1, sub: 0}), 5))
+				Some((Bidder::New(NewBidder { who: 1, sub: 0 }), 5))
 			);
 		});
 	}
@@ -1333,6 +1375,7 @@ mod tests {
 			assert_ok!(Slots::bid(Origin::signed(1), 0, 1, 2, 2, 1));
 			assert_noop!(
 				Slots::bid(Origin::signed(1), 0, 1, 3, 3, 1),
+				// No over lap with (1, 2) or (2, 2)
 				Error::<Test>::NonIntersectingRange
 			);
 		});

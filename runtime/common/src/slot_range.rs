@@ -59,6 +59,11 @@ impl std::fmt::Debug for SlotRange {
 }
 
 impl SlotRange {
+	/// Generate a slot range given:
+	///
+	/// - `initial`: the "lease period index" of the beginning of the auction of interest.
+	/// - `first`: the (absolute) beginning lease period index.
+	/// - `last`: the (absolute) ending lease period index.
 	pub fn new_bounded<
 		Index: Add<Output=Index> + CheckedSub + Copy + Ord + From<u32> + TryInto<u32>
 	>(
@@ -70,10 +75,12 @@ impl SlotRange {
 			return Err("Invalid range for this auction")
 		}
 		let count: u32 = last.checked_sub(&first)
+			// defensive only: `last >= first` is ensured.
 			.ok_or("range ends before it begins")?
 			.try_into()
 			.map_err(|_| "range too big")?;
 		let first: u32 = first.checked_sub(&initial)
+			// defensive only: `first >= initial` is ensured.
 			.ok_or("range begins too early")?
 			.try_into()
 			.map_err(|_| "start too far")?;
@@ -91,12 +98,20 @@ impl SlotRange {
 				2 => Some(SlotRange::OneThree),
 				_ => None
 			},
-			2 => match count { 0 => Some(SlotRange::TwoTwo), 1 => Some(SlotRange::TwoThree), _ => None },
-			3 => match count { 0 => Some(SlotRange::ThreeThree), _ => None },
+			2 => match count {
+				0 => Some(SlotRange::TwoTwo),
+				1 => Some(SlotRange::TwoThree),
+				_ => None
+			},
+			3 => match count {
+				0 => Some(SlotRange::ThreeThree),
+				_ => None
+			},
 			_ => return Err("range begins too late"),
 		}.ok_or("range ends too late")
 	}
 
+	/// Represent self as a pair of u8s.
 	pub fn as_pair(&self) -> (u8, u8) {
 		match self {
 			SlotRange::ZeroZero => (0, 0),
@@ -112,15 +127,25 @@ impl SlotRange {
 		}
 	}
 
+	/// Represent self as a pair of `usize`, applied to an offset.
+	pub fn as_pair_with_offset(&self, offset: usize) -> (usize, usize) {
+		let (a, b) = self.as_pair();
+		(a as usize + offset, b as usize + offset)
+	}
+
+	/// Returns `true` if `self` intersects with `other`.
 	pub fn intersects(&self, other: SlotRange) -> bool {
 		let a = self.as_pair();
 		let b = other.as_pair();
+		dbg!(a, b);
 		b.0 <= a.1 && a.0 <= b.1
-//		== !(b.0 > a.1 || a.0 > b.1)
 	}
 
+	/// Returns the length of this range.
 	pub fn len(&self) -> usize {
 		match self {
+			// let (start, end) = self.as_pair();
+			// end.saturating_sub(start) + 1;
 			SlotRange::ZeroZero => 1,
 			SlotRange::ZeroOne => 2,
 			SlotRange::ZeroTwo => 3,
