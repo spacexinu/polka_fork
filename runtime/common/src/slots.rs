@@ -282,8 +282,8 @@ decl_event!(
 		/// [bidder, range, parachain_id, amount]
 		WonDeploy(NewBidder<AccountId>, SlotRange, ParaId, Balance),
 		/// An existing parachain won the right to continue.
-		/// First balance is the extra amount reseved. Second is the total amount reserved.
-		/// [parachain_id, range, extra_reseved, total_amount]
+		/// First balance is the extra amount reserved. Second is the total amount reserved.
+		/// [parachain_id, range, extra_reserved, total_amount]
 		WonRenewal(ParaId, SlotRange, Balance, Balance),
 		/// Funds were reserved for a winning bid. First balance is the extra amount reserved.
 		/// Second is the total. [bidder, extra_reserved, total_amount]
@@ -380,6 +380,10 @@ decl_module! {
 		/// This can only happen when there isn't already an auction in progress and may only be
 		/// called by the root origin. Accepts the `duration` of this auction and the
 		/// `lease_period_index` of the initial lease period of the four that are to be auctioned.
+		///
+		/// <weight>
+		/// O(1)
+		/// </weight>
 		#[weight = (100_000_000, DispatchClass::Operational)]
 		pub fn new_auction(origin,
 			#[compact] duration: T::BlockNumber,
@@ -424,7 +428,7 @@ decl_module! {
 			#[compact] amount: BalanceOf<T>
 		) {
 			let who = ensure_signed(origin)?;
-			let bidder = Bidder::New(NewBidder{who: who.clone(), sub});
+			let bidder = Bidder::New(NewBidder { who: who.clone(), sub });
 			Self::handle_bid(bidder, auction_index, first_slot, last_slot, amount)?;
 		}
 
@@ -843,7 +847,7 @@ impl<T: Config> Module<T> {
 			.or_else(|| offset.checked_sub(&One::one()).and_then(<Winning<T>>::get))
 			.unwrap_or_default();
 		// If this bid beat the previous winner of our range.
-		if current_winning[range_index].as_ref().map_or(true, |last| amount > last.1) {
+		if current_winning[range_index].as_ref().map_or(true, |winner| amount > winner.1) {
 			// This must overlap with all existing ranges that we're winning on or it's invalid.
 			ensure!(current_winning.iter()
 				.enumerate()
@@ -891,15 +895,18 @@ impl<T: Config> Module<T> {
 					// Previous bidder is no longer winning any ranges: unreserve their funds.
 					if let Some(amount) = <ReservedAmounts<T>>::take(&who) {
 						// It really should be reserved; there's not much we can do here on fail.
-						let _ = T::Currency::unreserve(&who.funding_account(), amount);
+						let _leftover = T::Currency::unreserve(&who.funding_account(), amount);
+						debug_assert!(_leftover.is_zero());
 
 						Self::deposit_event(RawEvent::Unreserved(who.funding_account(), amount));
 					}
 				}
 			}
+
 			// Update the range winner.
 			<Winning<T>>::insert(offset, &current_winning);
 		}
+
 		Ok(())
 	}
 
@@ -1107,7 +1114,7 @@ mod tests {
 
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mock up.
-	fn new_test_ext() -> sp_io::TestExternalities {
+	pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
 		let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 		pallet_balances::GenesisConfig::<Test>{
 			balances: vec![(1, 10), (2, 20), (3, 30), (4, 40), (5, 50), (6, 60)],
@@ -1794,4 +1801,61 @@ mod tests {
 			assert!(Slots::elaborate_deploy_data(Origin::signed(0), 0.into(), code.into()).is_err());
 		});
 	}
+}
+
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking {
+	use super::*;
+	use frame_system::RawOrigin;
+	use frame_benchmarking::{benchmarks, account};
+
+	const SEED: u32 = 0;
+	type Slots<T> = crate::slots::Module<T>;
+
+	fn create_auction(duration) {
+		assert!(!<Slots<T>>::is_in_progress());
+		let duration = T::LeasePeriod::get() / 4u32.into();
+		let start_period = <Slots<T>>::lease_period_index();
+		assert_ok!(<Slots<T>>::create_auction(RawOrigin::Root, duration, start_period));
+	}
+
+	benchmarks! {
+		new_auction {
+			let start_period = <Slots<T>>::lease_period_index();
+			// auction for 1/4th of the time lease period.
+			let duration = T::LeasePeriod::get() / 4u32.into();
+			assert!(!<Slots<T>>::is_in_progress());
+		} : _(RawOrigin::Root, duration ,start_period)
+		verify {
+			assert!(<Slots<T>>::is_in_progress())
+		}
+
+		bid {
+			// only iteration on all other winning slots to check if overlap exists, which is a loop
+			// bounded by 10.
+			// Existing bidder has an extra storage read and an iteration over all existing deposits
+			// (in-memory).
+			// Bidding more will need additional reserve ops.
+		} : {} verify {}
+		bid_renew {} : {} verify {}
+		set_offboarding {} : {} verify {}
+		fix_deploy_data {} : {} verify {}
+		elaborate_deploy_data {} : {} verify {}
+		on_initialize {} : {} verify {}
+	}
+
+	#[cfg(test)]
+	mod tests {
+		use super::*;
+		use crate::slots::tests::{new_test_ext, Test};
+		use frame_support::assert_ok;
+
+		#[test]
+		fn test_benchmarks() {
+			new_test_ext().execute_with(|| {
+				assert_ok!(test_benchmark_new_auction::<Test>());
+			});
+		}
+	}
+
 }
