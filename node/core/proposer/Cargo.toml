@@ -11,14 +11,14 @@ tracing = "0.1.22"
 polkadot-node-subsystem = { path = "../../subsystem" }
 polkadot-overseer = { path = "../../overseer" }
 polkadot-primitives = { path = "../../../primitives" }
-sc-basic-authorship = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-block-builder = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "master" }
-prometheus-endpoint = { package = "substrate-prometheus-endpoint", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-basic-authorship = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sc-block-builder = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
+prometheus-endpoint = { package = "substrate-prometheus-endpoint", git = "https://github.com/paritytech/substrate", branch = "state-tracing-rpc" }
