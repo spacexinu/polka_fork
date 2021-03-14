@@ -2130,4 +2130,102 @@ mod tests {
 		});
 	}
 
+	#[test]
+	fn real_world_situation() {
+		let mut host_config = default_config();
+		host_config.group_rotation_frequency = 100;
+		host_config.parathread_cores = 0;
+
+		let genesis_config = MockGenesisConfig {
+			configuration: crate::configuration::GenesisConfig {
+				config: host_config.clone(),
+				..Default::default()
+			},
+			..Default::default()
+		};
+
+		let chain_0 = ParaId::from(30);
+		let chain_1 = ParaId::from(100);
+		let chain_2 = ParaId::from(107);
+		let chain_3 = ParaId::from(110);
+		let chain_4 = ParaId::from(120);
+		let chain_5 = ParaId::from(188);
+		let chain_6 = ParaId::from(666);
+		let chain_7 = ParaId::from(5000);
+		let chain_8 = ParaId::from(7777);
+		let chain_9 = ParaId::from(82406);
+
+		new_test_ext(genesis_config).execute_with(|| {
+
+			schedule_blank_para(chain_0, true);
+			schedule_blank_para(chain_1, true);
+			schedule_blank_para(chain_2, true);
+			schedule_blank_para(chain_3, true);
+			schedule_blank_para(chain_4, true);
+			schedule_blank_para(chain_5, true);
+			schedule_blank_para(chain_6, true);
+			schedule_blank_para(chain_7, true);
+			schedule_blank_para(chain_8, true);
+			schedule_blank_para(chain_9, true);
+
+			let validators: Vec<_> = [
+				"5G6EeaCGqyBfTQo96bW2BQrbF6ooSnsTf58e5enBVRuWwfd9",
+				"5F9FsRjpecP9GonktmtFL3kjqNAMKjHVFjyjRdTPa4hbQRZA",
+				"5CAC278tFCHAeHYqE51FTWYxHmeLcENSS1RG77EFRTvPZMJT",
+				"5EPgWPLJSArQAzkERL77m1fhuqAcgfsqWdXbgtypAwUv3Eh5",
+				"5HGNdZFvEGuf8AN7WnteqUYw22Lkt1huj81P356eoCMPkQWT",
+				"5FWEQ5hzazh7fFmYFBM9RYnJQW98hqs5Q5cZXuwMZoaWp4Nc",
+				"5CP6oGfwqbEfML8efqm1tCZsUgRsJztp9L8ZkEUxA16W8PPz",
+				"5E5BnMH43md2FSzmMPhxpkD5AHpsRCSLnye63MMBHdHpJgRM",
+				"5FUMV6vNVPNteWTbJSECYYrjA4WNKzpJCz5bZKwHSPKpUuYM",
+				"5FtAGDZYJKXkhVhAxCQrXmaP7EE2mGbBMfmKDHjfYDgq2BiU",
+				"5DATUU2VntfB6sHaVsYXwVPd3yvVZR58tw7JD7NkfRVLozyY",
+				"5EUNaBpX9mJgcmLQHyG5Pkms6tbDiKuLbeTEJS924Js9cA1N",
+				"5EPEWRecy2ApL5n18n3aHyU1956zXTRqaJpzDa9DoqiggNwF",
+				"5DABVkjsrMuKmXPxNCL4dbC4fPWdEz2bBzEzw5nJe8JQs5sp",
+				"5CfXt6C1uRoFuY6Q9uyMoM46QjJnm3g4vzF7hFt9gZ1p7U4p",
+				"5FEsT2YgSf7r1kxSnzJc8oLhzWb4QT5hMVKTE73JcDVRMYb9",
+				"5Ew11QH8CiKdnJuH1VvXCmzXKEy2nxvBifh121hcF2aWbZTq",
+				"5FJ3NCtsMREErox2pVagK2KywRDe3jqiHr2GYsD83zqrgGj2",
+				"5Gx6YeNhynqn8qkda9QKpc9S7oDr4sBrfAu516d3sPpEt26F",
+				"5CmLCFeSurRXXtwMmLcVo7sdJ9EqDguvJbuCYDcHkr3cpqyE",
+				"5CwonDCKzgnCn1PJpr6rnMLPxf8oRdYtnnnArSA7PsiWzMZw",
+				"5CRq9coht6LjrEHBr4JqcCkWek1ieP2wXf9FMi8e7AFm9Vw7",
+			].iter().map(|s| {
+				use sp_core::crypto::{Ss58Codec, AccountId32, Public};
+
+				let a = AccountId32::from_string(s).unwrap();
+				ValidatorId::from_slice(a.as_ref())
+			}).collect();
+
+
+			run_to_block(1, |number| match number {
+				1 => Some(SessionChangeNotification {
+					new_config: host_config.clone(),
+					validators: validators.clone(),
+					..Default::default()
+				}),
+				_ => None,
+			});
+
+			let validator_groups = Scheduler::validator_groups();
+
+			let mut new_cores = vec![None; 10];
+			[].iter().for_each(|&i: &usize| new_cores[i] = Some(CoreOccupied::Parachain));
+			AvailabilityCores::set(new_cores);
+
+			println!("{} validators on {} cores", validators.len(), validator_groups.len());
+
+			println!("{:?}", Scheduler::validator_groups());
+
+			SessionStartBlock::<crate::mock::Test>::set(38421);
+			let now = 38675;
+
+			Scheduler::clear();
+			Scheduler::schedule(Vec::new(), now);
+
+			let scheduled = Scheduler::scheduled();
+			println!("{} scheduled: {:?}", scheduled.len(), scheduled)
+		});
+	}
 }
