@@ -25,38 +25,38 @@ polkadot-test-runtime = { path = "../../../runtime/test-runtime" }
 polkadot-runtime-parachains = { path = "../../../runtime/parachains" }
 
 # Substrate dependencies
-sp-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-babe = { package = "sc-consensus-babe", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-babe-primitives = { package = "sp-consensus-babe", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-consensus_common = { package = "sp-consensus", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-grandpa = { package = "sc-finality-grandpa", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-grandpa_primitives = { package = "sp-finality-grandpa", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-inherents = { package = "sp-inherents", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-pallet-staking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-chain-spec = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-executor = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-tracing = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-service = { package = "sc-service", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1", default-features = false }
-sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-substrate-test-client = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
+sp-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+babe = { package = "sc-consensus-babe", git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+babe-primitives = { package = "sp-consensus-babe", git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+consensus_common = { package = "sp-consensus", git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+frame-system = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+grandpa = { package = "sc-finality-grandpa", git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+grandpa_primitives = { package = "sp-finality-grandpa", git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+inherents = { package = "sp-inherents", git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+pallet-staking = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-chain-spec = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-cli = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-network = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-tracing = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+service = { package = "sc-service", git = "https://github.com/paritytech/substrate", branch = "slash-burnin", default-features = false }
+sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
+substrate-test-client = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
 
 [dev-dependencies]
-pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1", default-features = false }
+pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin", default-features = false }
 serde_json = "1.0.61"
-substrate-test-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
+substrate-test-utils = { git = "https://github.com/paritytech/substrate", branch = "slash-burnin" }
 tokio = { version = "0.2", features = ["macros"] }
