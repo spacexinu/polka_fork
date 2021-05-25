@@ -19,7 +19,8 @@ use std::collections::hash_map::Entry;
 use std::time::{Duration, Instant};
 use always_assert::never;
 use futures::{
-	channel::oneshot, future::{BoxFuture, Either, Fuse, FusedFuture}, FutureExt, StreamExt,
+	channel::oneshot, future::{BoxFuture, Fuse, FusedFuture}, FutureExt, StreamExt,
+	stream::FuturesUnordered, select,
 };
 use futures_timer::Delay;
 
@@ -36,18 +37,16 @@ use polkadot_node_network_protocol::{
 	OurView, PeerId, UnifiedReputationChange as Rep, View,
 };
 use polkadot_node_primitives::{SignedFullStatement, Statement, PoV};
-use polkadot_node_subsystem_util::metrics::{self, prometheus};
+use polkadot_node_subsystem_util::{TimeoutExt, metrics::{self, prometheus}};
 use polkadot_primitives::v1::{CandidateReceipt, CollatorId, Hash, Id as ParaId};
 use polkadot_subsystem::{
 	jaeger,
 	messages::{
-		AllMessages, CandidateSelectionMessage, CollatorProtocolMessage, IfDisconnected,
-		NetworkBridgeEvent, NetworkBridgeMessage,
+		AllMessages, CollatorProtocolMessage, IfDisconnected,
+		NetworkBridgeEvent, NetworkBridgeMessage, CandidateBackingMessage,
 	},
 	FromOverseer, OverseerSignal, PerLeafSpan, SubsystemContext, SubsystemSender,
 };
-
-use crate::error::Fatal;
 
 use super::{modify_reputation, Result, LOG_TARGET};
 
@@ -230,7 +229,9 @@ impl PeerData {
 			_ if !our_view.contains(&on_relay_parent) => Err(AdvertisementError::OutOfOurView),
 			PeerState::Collating(ref mut state) => {
 				if state.advertisements.insert(on_relay_parent) {
+					println!("\n\n {:?} \n\n", state.last_active);
 					state.last_active = Instant::now();
+					println!("\n\n {:?} \n\n", state.last_active);
 					Ok((state.collator_id.clone(), state.para_id.clone()))
 				} else {
 					Err(AdvertisementError::Duplicate)
@@ -463,6 +464,9 @@ struct State {
 
 	/// Span per relay parent.
 	span_per_relay_parent: HashMap<Hash, PerLeafSpan>,
+
+	/// Keep track of all fetch collation requests
+	collations: FuturesUnordered<BoxFuture<'static, Option<std::result::Result<(CandidateReceipt, PoV), oneshot::Canceled>>>>,
 }
 
 // O(n) search for collator ID by iterating through the peers map. This should be fast enough
@@ -500,7 +504,6 @@ where
 		None => return,
 		Some(p) => p,
 	};
-
 	if state.peer_data.get(&peer_id).map_or(false, |d| d.has_advertised(&relay_parent)) {
 		request_collation(ctx, state, relay_parent, para_id, peer_id, tx).await;
 	}
@@ -555,14 +558,7 @@ async fn notify_collation_seconded(
 	}
 
 	if let Some(peer_id) = collator_peer_id(peer_data, &id) {
-		let wire_message = protocol_v1::CollatorProtocolMessage::CollationSeconded(relay_parent, statement.into());
-
-		ctx.send_message(AllMessages::NetworkBridge(
-			NetworkBridgeMessage::SendCollationMessage(
-				vec![peer_id],
-				protocol_v1::CollationProtocol::CollatorProtocol(wire_message),
-			)
-		)).await;
+		modify_reputation(ctx, peer_id, BENEFIT_NOTIFY_GOOD).await;
 	}
 }
 
@@ -655,26 +651,6 @@ where
 	).await;
 }
 
-/// Notify `CandidateSelectionSubsystem` that a collation has been advertised.
-#[tracing::instrument(level = "trace", skip(ctx), fields(subsystem = LOG_TARGET))]
-async fn notify_candidate_selection<Context>(
-	ctx: &mut Context,
-	collator: CollatorId,
-	relay_parent: Hash,
-	para_id: ParaId,
-)
-where
-	Context: SubsystemContext<Message = CollatorProtocolMessage>
-{
-	ctx.send_message(AllMessages::CandidateSelection(
-		CandidateSelectionMessage::Collation(
-			relay_parent,
-			para_id,
-			collator,
-		)
-	)).await;
-}
-
 /// Networking message has been received.
 #[tracing::instrument(level = "trace", skip(ctx, state), fields(subsystem = LOG_TARGET))]
 async fn process_incoming_peer_message<Context>(
@@ -739,7 +715,6 @@ where
 		}
 		AdvertiseCollation(relay_parent) => {
 			let _span = state.span_per_relay_parent.get(&relay_parent).map(|s| s.child("advertise-collation"));
-
 			if !state.view.contains(&relay_parent) {
 				tracing::debug!(
 					target: LOG_TARGET,
@@ -769,8 +744,16 @@ where
 						?relay_parent,
 						"Received advertise collation",
 					);
+					let (tx, rx) = oneshot::channel::<(
+						CandidateReceipt,
+						PoV,
+					)>();
 
-					notify_candidate_selection(ctx, collator_id, relay_parent, para_id).await;
+					fetch_collation(ctx, state, relay_parent, collator_id, para_id, tx).await;
+					let future = async move {
+						rx.timeout(Duration::new(2, 200)).await
+					};
+					state.collations.push(Box::pin(future));
 				}
 				Err(e) => {
 					tracing::debug!(
@@ -960,6 +943,8 @@ where
 				"CollationFetchingRequest message is not expected on the validator side of the protocol",
 			);
 		}
+		// TODO Ladi
+		_ => {},
 	}
 }
 
@@ -990,6 +975,7 @@ pub(crate) async fn run<Context>(
 
 	let mut state = State {
 		metrics,
+
 		..Default::default()
 	};
 
@@ -1001,42 +987,37 @@ pub(crate) async fn run<Context>(
 	futures::pin_mut!(next_inactivity_stream);
 
 	loop {
-		let res = {
-			let s = futures::future::select(ctx.recv().fuse(), next_inactivity_stream.next().fuse());
-
-			if let Poll::Ready(res) = futures::poll!(s) {
-				Some(match res {
-					Either::Left((msg, _)) => Either::Left(msg.map_err(Fatal::SubsystemReceive)?),
-					Either::Right((_, _)) => Either::Right(()),
-				})
-			} else {
-				None
-			}
-		};
-
-		match res {
-			Some(Either::Left(msg)) => {
-				tracing::trace!(target: LOG_TARGET, msg = ?msg, "received a message");
-
-				match msg {
-					Communication { msg } => process_msg(
-						&mut ctx,
-						&keystore,
-						msg,
-						&mut state,
-					).await,
-					Signal(BlockFinalized(..)) => {}
-					Signal(ActiveLeaves(_)) => {}
-					Signal(Conclude) => { break }
+		select! {
+			res = ctx.recv().fuse() => {
+				match res {
+					Ok(Communication { msg }) => {
+						tracing::trace!(target: LOG_TARGET, msg = ?msg, "received a message");
+						process_msg(
+							&mut ctx,
+							&keystore,
+							msg,
+							&mut state,
+						).await;
+					}
+					Ok(Signal(Conclude)) => break,
+					_ => panic!{},
 				}
-
-				continue
 			}
-			Some(Either::Right(())) => {
+			_ = next_inactivity_stream.next() => {
 				disconnect_inactive_peers(&mut ctx, &eviction_policy, &state.peer_data).await;
-				continue
 			}
-			None => {}
+			res = state.collations.next() => {
+				if let Some(Some(Ok((candidate_receipt, pov)))) = res {
+					ctx.send_message(
+						CandidateBackingMessage::Second(
+							candidate_receipt.descriptor.relay_parent,
+							candidate_receipt,
+							pov,
+						).into()
+					).await;
+				}
+			}
+			
 		}
 
 		let mut retained_requested = HashSet::new();
@@ -1051,7 +1032,6 @@ pub(crate) async fn run<Context>(
 			}
 		}
 		state.requested_collations.retain(|k, _| retained_requested.contains(k));
-		futures::pending!();
 	}
 	Ok(())
 }
@@ -1169,7 +1149,6 @@ where
 					candidate_hash = ?receipt.hash(),
 					"Received collation",
 				);
-
 				// Actual sending:
 				let _span = jaeger::Span::new(&pov, "received-collation");
 				let (mut tx, _) = oneshot::channel();
@@ -1505,16 +1484,20 @@ mod tests {
 
 			assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
+				AllMessages::NetworkBridge(NetworkBridgeMessage::SendRequests(reqs, IfDisconnected::ImmediateError)
 			) => {
-				assert_eq!(relay_parent, test_state.relay_parent);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, pair.public());
+				let req = reqs.into_iter().next()
+					.expect("There should be exactly one request");
+				match req {
+					Requests::CollationFetching(req) => {
+						let payload = req.payload;
+						assert_eq!(payload.relay_parent, test_state.relay_parent);
+						assert_eq!(payload.para_id, test_state.chain_ids[0]);
+					}
+					_ => panic!("Unexpected request"),
+				}
 			});
+
 			virtual_overseer
 		});
 	}
@@ -1677,9 +1660,9 @@ mod tests {
 
 	// A test scenario that takes the following steps
 	//  - Two collators connect, declare themselves and advertise a collation relevant to
-	//    our view.
+	//	our view.
 	//  - This results subsystem acting upon these advertisements and issuing two messages to
-	//    the CandidateBacking subsystem.
+	//	the CandidateBacking subsystem.
 	//  - CandidateBacking requests both of the collations.
 	//  - Collation protocol requests these collations.
 	//  - The collations are sent to it.
@@ -1767,19 +1750,6 @@ mod tests {
 				)
 			).await;
 
-			assert_matches!(
-				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
-			) => {
-				assert_eq!(relay_parent, test_state.relay_parent);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, test_state.collators[0].public());
-			});
-
 			overseer_send(
 				&mut virtual_overseer,
 				CollatorProtocolMessage::NetworkBridgeUpdateV1(
@@ -1789,43 +1759,6 @@ mod tests {
 							test_state.relay_parent,
 						)
 					)
-				)
-			).await;
-
-			assert_matches!(
-				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
-			) => {
-				assert_eq!(relay_parent, test_state.relay_parent);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, test_state.collators[1].public());
-			});
-
-			let (tx_0, rx_0) = oneshot::channel();
-
-			overseer_send(
-				&mut virtual_overseer,
-				CollatorProtocolMessage::FetchCollation(
-					test_state.relay_parent,
-					test_state.collators[0].public(),
-					test_state.chain_ids[0],
-					tx_0,
-				)
-			).await;
-
-			let (tx_1, rx_1) = oneshot::channel();
-
-			overseer_send(
-				&mut virtual_overseer,
-				CollatorProtocolMessage::FetchCollation(
-					test_state.relay_parent,
-					test_state.collators[1].public(),
-					test_state.chain_ids[0],
-					tx_1,
 				)
 			).await;
 
@@ -1888,11 +1821,6 @@ mod tests {
 				).encode()
 			)).expect("Sending response should succeed");
 
-			let collation_0 = rx_0.await.unwrap();
-			let collation_1 = rx_1.await.unwrap();
-
-			assert_eq!(collation_0.0, candidate_a);
-			assert_eq!(collation_1.0, candidate_b);
 			virtual_overseer
 		});
 	}
@@ -1958,20 +1886,35 @@ mod tests {
 				)
 			).await;
 
-			assert_matches!(
+			let _ = assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
+				AllMessages::NetworkBridge(NetworkBridgeMessage::SendRequests(reqs, IfDisconnected::ImmediateError)
 			) => {
-				assert_eq!(relay_parent, test_state.relay_parent);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, pair.public());
+				let req = reqs.into_iter().next()
+					.expect("There should be exactly one request");
+				match req {
+					Requests::CollationFetching(req) => {
+						let payload = req.payload;
+						assert_eq!(payload.relay_parent, test_state.relay_parent);
+						assert_eq!(payload.para_id, test_state.chain_ids[0]);
+						req.pending_response
+					}
+					_ => panic!("Unexpected request"),
+				}
 			});
 
-			Delay::new(ACTIVITY_TIMEOUT * 2).await;
+			Delay::new(ACTIVITY_TIMEOUT * 3).await;
+
+			assert_matches!(
+				overseer_recv(&mut virtual_overseer).await,
+				AllMessages::NetworkBridge(NetworkBridgeMessage::ReportPeer(
+					peer,
+					rep,
+				)) => {
+					assert_eq!(peer, peer_b);
+					assert_eq!(rep, COST_REQUEST_TIMED_OUT);
+				}
+			);
 
 			assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,
@@ -2057,15 +2000,18 @@ mod tests {
 
 			assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
+				AllMessages::NetworkBridge(NetworkBridgeMessage::SendRequests(reqs, IfDisconnected::ImmediateError)
 			) => {
-				assert_eq!(relay_parent, test_state.relay_parent);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, pair.public());
+				let req = reqs.into_iter().next()
+					.expect("There should be exactly one request");
+				match req {
+					Requests::CollationFetching(req) => {
+						let payload = req.payload;
+						assert_eq!(payload.relay_parent, hash_a);
+						assert_eq!(payload.para_id, test_state.chain_ids[0]);
+					}
+					_ => panic!("Unexpected request"),
+				}
 			});
 
 			Delay::new(ACTIVITY_TIMEOUT * 2 / 3).await;
@@ -2084,15 +2030,29 @@ mod tests {
 
 			assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
+				AllMessages::NetworkBridge(NetworkBridgeMessage::ReportPeer(
+					peer,
+					rep,
+				)) => {
+					assert_eq!(peer, peer_b);
+					assert_eq!(rep, COST_REQUEST_TIMED_OUT);
+				}
+			);
+
+			assert_matches!(
+				overseer_recv(&mut virtual_overseer).await,
+				AllMessages::NetworkBridge(NetworkBridgeMessage::SendRequests(reqs, IfDisconnected::ImmediateError)
 			) => {
-				assert_eq!(relay_parent, hash_b);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, pair.public());
+				let req = reqs.into_iter().next()
+					.expect("There should be exactly one request");
+				match req {
+					Requests::CollationFetching(req) => {
+						let payload = req.payload;
+						assert_eq!(payload.relay_parent, hash_b);
+						assert_eq!(payload.para_id, test_state.chain_ids[0]);
+					}
+					_ => panic!("Unexpected request"),
+				}
 			});
 
 			Delay::new(ACTIVITY_TIMEOUT * 2 / 3).await;
@@ -2111,18 +2071,43 @@ mod tests {
 
 			assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,
-				AllMessages::CandidateSelection(CandidateSelectionMessage::Collation(
-					relay_parent,
-					para_id,
-					collator,
-				)
+				AllMessages::NetworkBridge(NetworkBridgeMessage::ReportPeer(
+					peer,
+					rep,
+				)) => {
+					assert_eq!(peer, peer_b);
+					assert_eq!(rep, COST_REQUEST_TIMED_OUT);
+				}
+			);
+
+			assert_matches!(
+				overseer_recv(&mut virtual_overseer).await,
+				AllMessages::NetworkBridge(NetworkBridgeMessage::SendRequests(reqs, IfDisconnected::ImmediateError)
 			) => {
-				assert_eq!(relay_parent, hash_c);
-				assert_eq!(para_id, test_state.chain_ids[0]);
-				assert_eq!(collator, pair.public());
+				let req = reqs.into_iter().next()
+					.expect("There should be exactly one request");
+				match req {
+					Requests::CollationFetching(req) => {
+						let payload = req.payload;
+						assert_eq!(payload.relay_parent, hash_c);
+						assert_eq!(payload.para_id, test_state.chain_ids[0]);
+					}
+					_ => panic!("Unexpected request"),
+				}
 			});
 
 			Delay::new(ACTIVITY_TIMEOUT * 3 / 2).await;
+
+			assert_matches!(
+				overseer_recv(&mut virtual_overseer).await,
+				AllMessages::NetworkBridge(NetworkBridgeMessage::ReportPeer(
+					peer,
+					rep,
+				)) => {
+					assert_eq!(peer, peer_b);
+					assert_eq!(rep, COST_REQUEST_TIMED_OUT);
+				}
+			);
 
 			assert_matches!(
 				overseer_recv(&mut virtual_overseer).await,

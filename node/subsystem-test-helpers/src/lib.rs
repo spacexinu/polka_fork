@@ -362,7 +362,6 @@ mod tests {
 	use super::*;
 	use polkadot_overseer::{Overseer, HeadSupportsParachains, AllSubsystems};
 	use futures::executor::block_on;
-	use polkadot_node_subsystem::messages::CandidateSelectionMessage;
 	use polkadot_primitives::v1::Hash;
 
 	struct AlwaysSupportsParachains;
@@ -385,7 +384,7 @@ mod tests {
 
 		spawner.spawn("overseer", overseer.run().then(|_| async { () }).boxed());
 
-		block_on(handler.send_msg(CandidateSelectionMessage::Invalid(Default::default(), Default::default())));
-		assert!(matches!(block_on(rx.into_future()).0.unwrap(), CandidateSelectionMessage::Invalid(_, _)));
+		block_on(handler.send_msg(CollatorProtocolMessage::Invalid(Default::default(), Default::default())));
+		assert!(matches!(block_on(rx.into_future()).0.unwrap(), CollatorProtocolMessage::Invalid(_, _)));
 	}
 }

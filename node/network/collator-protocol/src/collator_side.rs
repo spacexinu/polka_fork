@@ -646,6 +646,7 @@ async fn process_msg(
 				}
 			}
 		}
+		_ => {},
 	}
 
 	Ok(())

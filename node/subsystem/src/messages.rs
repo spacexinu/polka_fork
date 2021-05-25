@@ -64,37 +64,6 @@ pub trait BoundToRelayParent {
 	fn relay_parent(&self) -> Hash;
 }
 
-/// Messages received by the Candidate Selection subsystem.
-#[derive(Debug)]
-pub enum CandidateSelectionMessage {
-	/// A candidate collation can be fetched from a collator and should be considered for seconding.
-	Collation(Hash, ParaId, CollatorId),
-	/// We recommended a particular candidate to be seconded, but it was invalid; penalize the collator.
-	///
-	/// The hash is the relay parent.
-	Invalid(Hash, CandidateReceipt),
-	/// The candidate we recommended to be seconded was validated successfully.
-	///
-	/// The hash is the relay parent.
-	Seconded(Hash, SignedFullStatement),
-}
-
-impl BoundToRelayParent for CandidateSelectionMessage {
-	fn relay_parent(&self) -> Hash {
-		match self {
-			Self::Collation(hash, ..) => *hash,
-			Self::Invalid(hash, _) => *hash,
-			Self::Seconded(hash, _) => *hash,
-		}
-	}
-}
-
-impl Default for CandidateSelectionMessage {
-	fn default() -> Self {
-		CandidateSelectionMessage::Invalid(Default::default(), Default::default())
-	}
-}
-
 /// Messages received by the Candidate Backing subsystem.
 #[derive(Debug)]
 pub enum CandidateBackingMessage {
@@ -205,7 +174,17 @@ pub enum CollatorProtocolMessage {
 	#[from]
 	NetworkBridgeUpdateV1(NetworkBridgeEvent<protocol_v1::CollatorProtocolMessage>),
 	/// Incoming network request for a collation.
-	CollationFetchingRequest(IncomingRequest<req_res_v1::CollationFetchingRequest>)
+	CollationFetchingRequest(IncomingRequest<req_res_v1::CollationFetchingRequest>),
+    /// A candidate collation can be fetched from a collator and should be considered for seconding.
+	Collation(Hash, ParaId, CollatorId),
+	/// We recommended a particular candidate to be seconded, but it was invalid; penalize the collator.
+	///
+	/// The hash is the relay parent.
+	Invalid(Hash, CandidateReceipt),
+	/// The candidate we recommended to be seconded was validated successfully.
+	///
+	/// The hash is the relay parent.
+	Seconded(Hash, SignedFullStatement),
 }
 
 /// Messages received by the network bridge subsystem.
@@ -688,9 +667,6 @@ pub enum AllMessages {
 	/// Message for the candidate backing subsystem.
 	#[skip]
 	CandidateBacking(CandidateBackingMessage),
-	/// Message for the candidate selection subsystem.
-	#[skip]
-	CandidateSelection(CandidateSelectionMessage),
 	/// Message for the Chain API subsystem.
 	#[skip]
 	ChainApi(ChainApiMessage),
