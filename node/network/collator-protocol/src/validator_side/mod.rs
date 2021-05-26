@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Polkadot.  If not, see <http://www.gnu.org/licenses/>.
 
+//! The Validator Side of the Collator Protocol implements specific logic around managing collator
+//! connections in order to ensure that resources are freed up as the relay chain makes progress.
+
 mod peer_slots;
 
 use std::{collections::{HashMap, HashSet}, sync::Arc, task::Poll};
@@ -50,19 +53,10 @@ use polkadot_subsystem::{
 	FromOverseer, OverseerSignal, PerLeafSpan, SubsystemContext, SubsystemSender,
 };
 
-use super::{modify_reputation, Result, LOG_TARGET};
+use crate::error::Fatal;
 
-const COST_UNEXPECTED_MESSAGE: Rep = Rep::CostMinor("An unexpected message");
-/// Message could not be decoded properly.
-const COST_CORRUPTED_MESSAGE: Rep = Rep::CostMinor("Message was corrupt");
-/// Network errors that originated at the remote host should have same cost as timeout.
-const COST_NETWORK_ERROR: Rep = Rep::CostMinor("Some network error");
-const COST_REQUEST_TIMED_OUT: Rep = Rep::CostMinor("A collation request has timed out");
-const COST_INVALID_SIGNATURE: Rep = Rep::Malicious("Invalid network message signature");
-const COST_REPORT_BAD: Rep = Rep::Malicious("A collator was reported by another subsystem");
-const COST_WRONG_PARA: Rep = Rep::Malicious("A collator provided a collation for the wrong para");
-const COST_UNNEEDED_COLLATOR: Rep = Rep::CostMinor("An unneeded collator connected");
-const BENEFIT_NOTIFY_GOOD: Rep = Rep::BenefitMinor("A collator was noted good by another subsystem");
+use peer_slots::{PeerSlots, FitnessEvent, Reservoir, PeerData};
+use super::{Result, LOG_TARGET};
 
 // How often to check all peers with activity.
 #[cfg(not(test))]
@@ -71,6 +65,7 @@ const ACTIVITY_POLL: Duration = Duration::from_secs(1);
 #[cfg(test)]
 const ACTIVITY_POLL: Duration = Duration::from_millis(10);
 
+// Specific Metrics around the Validator Side of the Collator Protocol
 #[derive(Clone, Default)]
 pub struct Metrics(Option<MetricsInner>);
 
@@ -90,7 +85,9 @@ impl Metrics {
 	}
 
 	/// Provide a timer for `handle_collation_request_result` which observes on drop.
-	fn time_handle_collation_request_result(&self) -> Option<metrics::prometheus::prometheus::HistogramTimer> {
+	fn time_handle_collation_request_result(
+		&self
+	) -> Option<metrics::prometheus::prometheus::HistogramTimer> {
 		self.0.as_ref().map(|metrics| metrics.handle_collation_request_result.start_timer())
 	}
 
@@ -163,296 +160,14 @@ struct PerRequest {
 	span: Option<jaeger::Span>,
 }
 
-struct CollatingPeerState {
-	collator_id: CollatorId,
-	para_id: ParaId,
-	// Advertised relay parents.
-	advertisements: HashSet<Hash>,
-	last_active: Instant,
-}
-
-enum PeerState {
-	// The peer has connected at the given instant.
-	Connected(Instant),
-	// Thepe
-	Collating(CollatingPeerState),
-}
-
-#[derive(Debug)]
-enum AdvertisementError {
-	Duplicate,
-	OutOfOurView,
-	UndeclaredCollator,
-}
-
-struct PeerData {
-	view: View,
-	state: PeerState,
-}
-
-impl PeerData {
-	fn new(view: View) -> Self {
-		PeerData {
-			view,
-			state: PeerState::Connected(Instant::now()),
-		}
-	}
-
-	/// Update the view, clearing all advertisements that are no longer in the
-	/// current view.
-	fn update_view(&mut self, new_view: View) {
-		let old_view = std::mem::replace(&mut self.view, new_view);
-		if let PeerState::Collating(ref mut peer_state) = self.state {
-			for removed in old_view.difference(&self.view) {
-				let _ = peer_state.advertisements.remove(&removed);
-			}
-		}
-	}
-
-	/// Prune old advertisements relative to our view.
-	fn prune_old_advertisements(&mut self, our_view: &View) {
-		if let PeerState::Collating(ref mut peer_state) = self.state {
-			peer_state.advertisements.retain(|a| our_view.contains(a));
-		}
-	}
-
-	/// Note an advertisement by the collator. Returns `true` if the advertisement was imported
-	/// successfully. Fails if the advertisement is duplicate, out of view, or the peer has not
-	/// declared itself a collator.
-	fn insert_advertisement(
-		&mut self,
-		on_relay_parent: Hash,
-		our_view: &View,
-	)
-		-> std::result::Result<(CollatorId, ParaId), AdvertisementError>
-	{
-		match self.state {
-			PeerState::Connected(_) => Err(AdvertisementError::UndeclaredCollator),
-			_ if !our_view.contains(&on_relay_parent) => Err(AdvertisementError::OutOfOurView),
-			PeerState::Collating(ref mut state) => {
-				if state.advertisements.insert(on_relay_parent) {
-					println!("\n\n {:?} \n\n", state.last_active);
-					state.last_active = Instant::now();
-					println!("\n\n {:?} \n\n", state.last_active);
-					Ok((state.collator_id.clone(), state.para_id.clone()))
-				} else {
-					Err(AdvertisementError::Duplicate)
-				}
-			}
-		}
-	}
-
-	/// Whether a peer is collating.
-	fn is_collating(&self) -> bool {
-		match self.state {
-			PeerState::Connected(_) => false,
-			PeerState::Collating(_) => true,
-		}
-	}
-
-	/// Note that a peer is now collating with the given collator and para ids.
-	///
-	/// This will overwrite any previous call to `set_collating` and should only be called
-	/// if `is_collating` is false.
-	fn set_collating(&mut self, collator_id: CollatorId, para_id: ParaId) {
-		self.state = PeerState::Collating(CollatingPeerState {
-			collator_id,
-			para_id,
-			advertisements: HashSet::new(),
-			last_active: Instant::now(),
-		});
-	}
-
-	fn collator_id(&self) -> Option<&CollatorId> {
-		match self.state {
-			PeerState::Connected(_) => None,
-			PeerState::Collating(ref state) => Some(&state.collator_id),
-		}
-	}
-
-	fn collating_para(&self) -> Option<ParaId> {
-		match self.state {
-			PeerState::Connected(_) => None,
-			PeerState::Collating(ref state) => Some(state.para_id),
-		}
-	}
-
-	/// Whether the peer has advertised the given collation.
-	fn has_advertised(&self, relay_parent: &Hash) -> bool {
-		match self.state {
-			PeerState::Connected(_) => false,
-			PeerState::Collating(ref state) => state.advertisements.contains(relay_parent),
-		}
-	}
-
-	/// Whether the peer is now inactive according to the current instant and the eviction policy.
-	fn is_inactive(&self, now: Instant, policy: &crate::CollatorEvictionPolicy) -> bool {
-		match self.state {
-			PeerState::Connected(connected_at) => connected_at + policy.undeclared < now,
-			PeerState::Collating(ref state) => state.last_active + policy.inactive_collator < now,
-		}
-	}
-}
-
-impl Default for PeerData {
-	fn default() -> Self {
-		PeerData::new(Default::default())
-	}
-}
-
-struct GroupAssignments {
-	current: Option<ParaId>,
-	next: Option<ParaId>,
-}
-
-#[derive(Default)]
-struct ActiveParas {
-	relay_parent_assignments: HashMap<Hash, GroupAssignments>,
-	current_assignments: HashMap<ParaId, usize>,
-	next_assignments: HashMap<ParaId, usize>
-}
-
-impl ActiveParas {
-	async fn assign_incoming(
-		&mut self,
-		sender: &mut impl SubsystemSender,
-		keystore: &SyncCryptoStorePtr,
-		new_relay_parents: impl IntoIterator<Item = Hash>,
-	) {
-		for relay_parent in new_relay_parents {
-			let mv = polkadot_node_subsystem_util::request_validators(relay_parent, sender)
-				.await
-				.await
-				.ok()
-				.map(|x| x.ok())
-				.flatten();
-
-			let mg = polkadot_node_subsystem_util::request_validator_groups(relay_parent, sender)
-				.await
-				.await
-				.ok()
-				.map(|x| x.ok())
-				.flatten();
-
-
-			let mc = polkadot_node_subsystem_util::request_availability_cores(relay_parent, sender)
-				.await
-				.await
-				.ok()
-				.map(|x| x.ok())
-				.flatten();
-
-			let (validators, groups, rotation_info, cores) = match (mv, mg, mc) {
-				(Some(v), Some((g, r)), Some(c)) => (v, g, r, c),
-				_ => {
-					tracing::debug!(
-						target: LOG_TARGET,
-						relay_parent = ?relay_parent,
-						"Failed to query runtime API for relay-parent",
-					);
-
-					continue
-				}
-			};
-
-			let (para_now, para_next) = match polkadot_node_subsystem_util
-				::signing_key_and_index(&validators, keystore)
-				.await
-				.and_then(|(_, index)| polkadot_node_subsystem_util::find_validator_group(
-					&groups,
-					index,
-				))
-			{
-				Some(group) => {
-					let next_rotation_info = rotation_info.bump_rotation();
-
-					let core_now = rotation_info.core_for_group(group, cores.len());
-					let core_next = next_rotation_info.core_for_group(group, cores.len());
-
-					(
-						cores.get(core_now.0 as usize).and_then(|c| c.para_id()),
-						cores.get(core_next.0 as usize).and_then(|c| c.para_id()),
-					)
-				}
-				None => {
-					tracing::trace!(
-						target: LOG_TARGET,
-						relay_parent = ?relay_parent,
-						"Not a validator",
-					);
-
-					continue
-				}
-			};
-
-			// This code won't work well, if at all for parathreads. For parathreads we'll
-			// have to be aware of which core the parathread claim is going to be multiplexed
-			// onto. The parathread claim will also have a known collator, and we should always
-			// allow an incoming connection from that collator. If not even connecting to them
-			// directly.
-			//
-			// However, this'll work fine for parachains, as each parachain gets a dedicated
-			// core.
-			if let Some(para_now) = para_now {
-				*self.current_assignments.entry(para_now).or_default() += 1;
-			}
-
-			if let Some(para_next) = para_next {
-				*self.next_assignments.entry(para_next).or_default() += 1;
-			}
-
-			self.relay_parent_assignments.insert(
-				relay_parent,
-				GroupAssignments { current: para_now, next: para_next },
-			);
-		}
-	}
-
-	fn remove_outgoing(
-		&mut self,
-		old_relay_parents: impl IntoIterator<Item = Hash>,
-	) {
-		for old_relay_parent in old_relay_parents {
-			if let Some(assignments) = self.relay_parent_assignments.remove(&old_relay_parent) {
-				let GroupAssignments { current, next } = assignments;
-
-				if let Some(cur) = current {
-					if let Entry::Occupied(mut occupied) = self.current_assignments.entry(cur) {
-						*occupied.get_mut() -= 1;
-						if *occupied.get() == 0 {
-							occupied.remove_entry();
-						}
-					}
-				}
-
-				if let Some(next) = next {
-					if let Entry::Occupied(mut occupied) = self.next_assignments.entry(next) {
-						*occupied.get_mut() -= 1;
-						if *occupied.get() == 0 {
-							occupied.remove_entry();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	fn is_current_or_next(&self, id: ParaId) -> bool {
-		self.current_assignments.contains_key(&id) || self.next_assignments.contains_key(&id)
-	}
-}
-
 /// All state relevant for the validator side of the protocol lives here.
 #[derive(Default)]
 struct State {
 	/// Our own view.
 	view: OurView,
 
-	/// Active paras based on our view. We only accept collators from these paras.
-	active_paras: ActiveParas,
-
 	/// Track all active collators and their data.
-	peer_data: HashMap<PeerId, PeerData>,
+	peer_slots: PeerSlots,
 
 	/// The collations we have requested by relay parent and para id.
 	///
@@ -489,6 +204,19 @@ async fn disconnect_peer(ctx: &mut impl SubsystemContext, peer_id: PeerId) {
 	).await
 }
 
+fn peer_collator_id(
+	peer_data: &Reservoir,
+	peer_id: &PeerId,
+) -> Option<CollatorId> {
+	if let Some(peer_data) = peer_data.get(peer_id) {
+		if let Some(collator_id) = peer_data.collator_id() {
+			return Some(collator_id.clone());
+		}
+	}
+
+	None
+}
+
 /// Another subsystem has requested to fetch collations on a particular leaf for some para.
 #[tracing::instrument(level = "trace", skip(ctx, state, tx), fields(subsystem = LOG_TARGET))]
 async fn fetch_collation<Context>(
@@ -502,42 +230,17 @@ async fn fetch_collation<Context>(
 where
 	Context: SubsystemContext<Message = CollatorProtocolMessage>
 {
-	let peer_id = match collator_peer_id(&state.peer_data, &collator_id) {
+	let peer_id = match collator_peer_id(&state.peer_slots.peer_data, &collator_id) {
 		None => return,
 		Some(p) => p,
 	};
-	if state.peer_data.get(&peer_id).map_or(false, |d| d.has_advertised(&relay_parent)) {
+	if state
+		.peer_slots
+		.peer_data
+		.get(&peer_id)
+		.map_or(false, |d| d.has_advertised(&relay_parent))
+	{
 		request_collation(ctx, state, relay_parent, para_id, peer_id, tx).await;
-	}
-}
-
-/// Report a collator for some malicious actions.
-#[tracing::instrument(level = "trace", skip(ctx, peer_data), fields(subsystem = LOG_TARGET))]
-async fn report_collator<Context>(
-	ctx: &mut Context,
-	peer_data: &HashMap<PeerId, PeerData>,
-	id: CollatorId,
-)
-where
-	Context: SubsystemContext<Message = CollatorProtocolMessage>
-{
-	if let Some(peer_id) = collator_peer_id(peer_data, &id) {
-		modify_reputation(ctx, peer_id, COST_REPORT_BAD).await;
-	}
-}
-
-/// Some other subsystem has reported a collator as a good one, bump reputation.
-#[tracing::instrument(level = "trace", skip(ctx, peer_data), fields(subsystem = LOG_TARGET))]
-async fn note_good_collation<Context>(
-	ctx: &mut Context,
-	peer_data: &HashMap<PeerId, PeerData>,
-	id: CollatorId,
-)
-where
-	Context: SubsystemContext<Message = CollatorProtocolMessage>
-{
-	if let Some(peer_id) = collator_peer_id(peer_data, &id) {
-		modify_reputation(ctx, peer_id, BENEFIT_NOTIFY_GOOD).await;
 	}
 }
 
@@ -545,7 +248,7 @@ where
 #[tracing::instrument(level = "trace", skip(ctx, peer_data), fields(subsystem = LOG_TARGET))]
 async fn notify_collation_seconded(
 	ctx: &mut impl SubsystemContext<Message = CollatorProtocolMessage>,
-	peer_data: &HashMap<PeerId, PeerData>,
+	peer_data: &Reservoir,
 	id: CollatorId,
 	relay_parent: Hash,
 	statement: SignedFullStatement,
@@ -560,7 +263,17 @@ async fn notify_collation_seconded(
 	}
 
 	if let Some(peer_id) = collator_peer_id(peer_data, &id) {
-		modify_reputation(ctx, peer_id, BENEFIT_NOTIFY_GOOD).await;
+		let wire_message = protocol_v1::CollatorProtocolMessage::CollationSeconded(
+			relay_parent,
+			statement.into()
+		);
+
+		ctx.send_message(AllMessages::NetworkBridge(
+			NetworkBridgeMessage::SendCollationMessage(
+				vec![peer_id],
+				protocol_v1::CollationProtocol::CollatorProtocol(wire_message),
+			)
+		)).await;
 	}
 }
 
@@ -573,7 +286,7 @@ async fn handle_peer_view_change(
 	peer_id: PeerId,
 	view: View,
 ) -> Result<()> {
-	let peer_data = state.peer_data.entry(peer_id.clone()).or_default();
+	let peer_data = state.peer_slots.peer_data.entry(peer_id.clone()).or_insert(PeerData::new(Default::default(), state.peer_slots.peers.len()));
 
 	peer_data.update_view(view);
 	state.requested_collations
@@ -669,30 +382,50 @@ where
 
 	match msg {
 		Declare(collator_id, para_id, signature) => {
-			if collator_peer_id(&state.peer_data, &collator_id).is_some() {
-				modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
-				return
+			if collator_peer_id(&state.peer_slots.peer_data, &collator_id).is_some() {
+				return peer_slots::insert_event(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					&collator_id,
+					FitnessEvent::Unexpected
+				).await;
 			}
 
-			let peer_data = match state.peer_data.get_mut(&origin) {
+			let peer_data = match state.peer_slots.peer_data.get_mut(&origin) {
 				Some(p) => p,
 				None => {
-					modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
-					return
+					return peer_slots::insert_event(
+						ctx,
+						&mut state.peer_slots,
+						&origin,
+						&collator_id,
+						FitnessEvent::Unexpected
+					).await;
 				}
 			};
 
 			if peer_data.is_collating() {
-				modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
-				return
+				return peer_slots::insert_event(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					&collator_id,
+					FitnessEvent::Unexpected,
+				).await;
 			}
 
 			if !signature.verify(&*protocol_v1::declare_signature_payload(&origin), &collator_id) {
-				modify_reputation(ctx, origin, COST_INVALID_SIGNATURE).await;
-				return
+				return peer_slots::insert_event(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					&collator_id,
+					FitnessEvent::SigError,
+				).await;
 			}
 
-			if state.active_paras.is_current_or_next(para_id) {
+			if state.peer_slots.active_paras.is_current_or_next(para_id) {
 				tracing::debug!(
 					target: LOG_TARGET,
 					peer_id = ?origin,
@@ -701,7 +434,7 @@ where
 					"Declared as collator for current or next para",
 				);
 
-				peer_data.set_collating(collator_id, para_id);
+				peer_data.set_collating(&collator_id, &para_id);
 			} else {
 				tracing::debug!(
 					target: LOG_TARGET,
@@ -710,13 +443,31 @@ where
 					?para_id,
 					"Declared as collator for unneeded para",
 				);
-
-				modify_reputation(ctx, origin.clone(), COST_UNNEEDED_COLLATOR).await;
+				peer_slots::insert_event(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					&collator_id,
+					FitnessEvent::Superfluous,
+				).await;
 				disconnect_peer(ctx, origin).await;
+				return;
+			}
+
+			state.peer_slots.insert_collator(&collator_id);
+			// Sample the peer's connection into the reservoir
+			for stale_peer_id in
+				peer_slots::sample_connection(&mut state.peer_slots, &origin).into_iter()
+			{
+				disconnect_peer(ctx, stale_peer_id).await;
 			}
 		}
 		AdvertiseCollation(relay_parent) => {
-			let _span = state.span_per_relay_parent.get(&relay_parent).map(|s| s.child("advertise-collation"));
+			let _span = state
+				.span_per_relay_parent
+				.get(&relay_parent)
+				.map(|s| s.child("advertise-collation"));
+
 			if !state.view.contains(&relay_parent) {
 				tracing::debug!(
 					target: LOG_TARGET,
@@ -725,14 +476,22 @@ where
 					"Advertise collation out of view",
 				);
 
-				modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
-				return;
+				return insert_event_by_peer_id(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					FitnessEvent::Unexpected
+				).await;
 			}
 
-			let peer_data = match state.peer_data.get_mut(&origin) {
+			let peer_data = match state.peer_slots.peer_data.get_mut(&origin) {
 				None => {
-					modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
-					return;
+					return insert_event_by_peer_id(
+						ctx,
+						&mut state.peer_slots,
+						&origin,
+						FitnessEvent::Unexpected
+					).await;
 				}
 				Some(p) => p,
 			};
@@ -766,7 +525,12 @@ where
 						"Invalid advertisement",
 					);
 
-					modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
+					return insert_event_by_peer_id(
+						ctx,
+						&mut state.peer_slots,
+						&origin,
+						FitnessEvent::Unexpected,
+					).await;
 				}
 			}
 		}
@@ -776,7 +540,12 @@ where
 				peer_id = ?origin,
 				"Unexpected `CollationSeconded` message, decreasing reputation",
 			);
-			modify_reputation(ctx, origin, COST_UNEXPECTED_MESSAGE).await;
+			return insert_event_by_peer_id(
+				ctx,
+				&mut state.peer_slots,
+				&origin,
+				FitnessEvent::Unexpected,
+			).await;
 		}
 	}
 }
@@ -827,22 +596,23 @@ async fn handle_our_view_change(
 		state.span_per_relay_parent.remove(&removed);
 	}
 
-	state.active_paras.assign_incoming(ctx.sender(), keystore, added).await;
-	state.active_paras.remove_outgoing(removed);
+	// Assign incoming and remove outgoing RelayParents.
+	peer_slots::cycle_para(
+		ctx.sender(),
+		&mut state.peer_slots.active_paras,
+		keystore,
+		added,
+		removed
+	).await;
 
-	for (peer_id, peer_data) in state.peer_data.iter_mut() {
-		peer_data.prune_old_advertisements(&state.view);
-
-		// Disconnect peers who are not relevant to our current or next para.
-		//
-		// If the peer hasn't declared yet, they will be disconnected if they do not
-		// declare.
-		if let Some(para_id) = peer_data.collating_para() {
-			if !state.active_paras.is_current_or_next(para_id) {
-				disconnect_peer(ctx, peer_id.clone()).await;
-			}
-		}
+	// Prune advertisements and move outdated peers to stale peers.
+	for peer_id in peer_slots::handle_view_change(&mut state.peer_slots, &state.view).iter() {
+		disconnect_peer(ctx, *peer_id).await;
 	}
+
+	// Reset sample to ensure that new incoming connections for viable collators are ensured to be
+	// uniformly randomly sampled whenever their parachain becomes assigned.
+	state.peer_slots.reset_sample();
 
 	Ok(())
 }
@@ -862,12 +632,12 @@ where
 
 	match bridge_message {
 		PeerConnected(peer_id, _role, _) => {
-			state.peer_data.entry(peer_id).or_default();
-			state.metrics.note_collator_peer_count(state.peer_data.len());
+			peer_slots::handle_connection(&mut state.peer_slots, peer_id);
+			state.metrics.note_collator_peer_count(state.peer_slots.peer_data.len());
 		},
 		PeerDisconnected(peer_id) => {
-			state.peer_data.remove(&peer_id);
-			state.metrics.note_collator_peer_count(state.peer_data.len());
+			state.peer_slots.peer_data.remove(&peer_id);
+			state.metrics.note_collator_peer_count(state.peer_slots.peer_data.len());
 		},
 		PeerViewChange(peer_id, view) => {
 			handle_peer_view_change(state, peer_id, view).await?;
@@ -913,17 +683,43 @@ where
 			);
 		}
 		FetchCollation(relay_parent, collator_id, para_id, tx) => {
-			let _span = state.span_per_relay_parent.get(&relay_parent).map(|s| s.child("fetch-collation"));
+			let _span = state
+				.span_per_relay_parent
+				.get(&relay_parent)
+				.map(|s| s.child("fetch-collation"));
 			fetch_collation(ctx, state, relay_parent, collator_id, para_id, tx).await;
 		}
-		ReportCollator(id) => {
-			report_collator(ctx, &state.peer_data, id).await;
+		ReportCollator(collator_id) => {
+			if let Some(origin) = collator_peer_id(&state.peer_slots.peer_data, &collator_id) {
+				peer_slots::insert_event(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					&collator_id,
+					FitnessEvent::ReportBad
+				).await;
+			}
 		}
-		NoteGoodCollation(id) => {
-			note_good_collation(ctx, &state.peer_data, id).await;
+		NoteGoodCollation(collator_id) => {
+			if let Some(origin) = collator_peer_id(&state.peer_slots.peer_data, &collator_id) {
+				peer_slots::insert_event(
+					ctx,
+					&mut state.peer_slots,
+					&origin,
+					&collator_id,
+					FitnessEvent::NotifyGood
+				).await;
+			}
 		}
-		NotifyCollationSeconded(id, relay_parent, statement) => {
-			notify_collation_seconded(ctx, &state.peer_data, id, relay_parent, statement).await;
+		NotifyCollationSeconded(collator_id, relay_parent, statement) => {
+			/// Notify a collator that its collation got seconded.
+			notify_collation_seconded(
+				ctx,
+				&state.peer_slots.peer_data,
+				collator_id,
+				relay_parent,
+				statement
+			).await;
 		}
 		NetworkBridgeUpdateV1(event) => {
 			if let Err(e) = handle_network_msg(
@@ -1006,7 +802,7 @@ pub(crate) async fn run<Context>(
 				}
 			}
 			_ = next_inactivity_stream.next() => {
-				disconnect_inactive_peers(&mut ctx, &eviction_policy, &state.peer_data).await;
+				disconnect_inactive_peers(&mut ctx, &eviction_policy, &state.peer_slots.peer_data).await;
 			}
 			res = state.collations.next() => {
 				if let Some(Some(Ok((candidate_receipt, pov)))) = res {
@@ -1023,16 +819,23 @@ pub(crate) async fn run<Context>(
 		}
 
 		let mut retained_requested = HashSet::new();
+		let mut peer_fitness = Vec::new();
 		for ((hash, para_id, peer_id), per_req) in state.requested_collations.iter_mut() {
 			// Despite the await, this won't block on the response itself.
-			let finished = poll_collation_response(
-				&mut ctx, &state.metrics, &state.span_per_relay_parent,
+			if let Some(event) = poll_collation_response(
+				&state.metrics, &state.span_per_relay_parent,
 				hash, para_id, peer_id, per_req
-			).await;
-			if !finished {
+			).await {
+				peer_fitness.push((peer_id.clone(), event));
+			} else {
 				retained_requested.insert((*hash, *para_id, *peer_id));
 			}
 		}
+
+		for (peer_id, event) in peer_fitness.into_iter() {
+			insert_event_by_peer_id(&mut ctx, &mut state.peer_slots, &peer_id, event).await;
+		}
+
 		state.requested_collations.retain(|k, _| retained_requested.contains(k));
 	}
 	Ok(())
@@ -1060,26 +863,23 @@ async fn disconnect_inactive_peers(
 /// forwarding proper responses to the requester.
 ///
 /// Returns: `true` if `from_collator` future was ready.
-async fn poll_collation_response<Context>(
-	ctx: &mut Context,
+async fn poll_collation_response(
 	metrics: &Metrics,
 	spans: &HashMap<Hash, PerLeafSpan>,
 	hash: &Hash,
 	para_id: &ParaId,
 	peer_id: &PeerId,
 	per_req: &mut PerRequest
-)
--> bool
-where
-	Context: SubsystemContext
-{
+) -> Option<FitnessEvent> {
 	if never!(per_req.from_collator.is_terminated()) {
 		tracing::error!(
 			target: LOG_TARGET,
 			"We remove pending responses once received, this should not happen."
 		);
-		return true
+		return None;
 	}
+
+	let mut out = None;
 
 	if let Poll::Ready(response) = futures::poll!(&mut per_req.from_collator) {
 		let _span = spans.get(&hash)
@@ -1099,7 +899,7 @@ where
 					err = ?err,
 					"Collator provided response that could not be decoded"
 				);
-				modify_reputation(ctx, *peer_id, COST_CORRUPTED_MESSAGE).await;
+				out = Some(FitnessEvent::Corrupted);
 			}
 			Err(RequestError::NetworkError(err)) => {
 				tracing::warn!(
@@ -1114,7 +914,7 @@ where
 				// sensbile. In theory this could be exploited, by DoSing this node,
 				// which would result in reduced reputation for proper nodes, but the
 				// same can happen for penalities on timeouts, which we also have.
-				modify_reputation(ctx, *peer_id, COST_NETWORK_ERROR).await;
+				out = Some(FitnessEvent::NetworkError);
 			}
 			Err(RequestError::Canceled(_)) => {
 				tracing::warn!(
@@ -1128,7 +928,7 @@ where
 				// sensbile. In theory this could be exploited, by DoSing this node,
 				// which would result in reduced reputation for proper nodes, but the
 				// same can happen for penalities on timeouts, which we also have.
-				modify_reputation(ctx, *peer_id, COST_REQUEST_TIMED_OUT).await;
+				out = Some(FitnessEvent::Timeout);
 			}
 			Ok(CollationFetchingResponse::Collation(receipt, _))
 				if receipt.descriptor().para_id != *para_id =>
@@ -1140,8 +940,7 @@ where
 					peer_id = ?peer_id,
 					"Got wrong para ID for requested collation."
 				);
-
-				modify_reputation(ctx, *peer_id, COST_WRONG_PARA).await;
+				out = Some(FitnessEvent::ParaError);
 			}
 			Ok(CollationFetchingResponse::Collation(receipt, pov)) => {
 				tracing::debug!(
@@ -1173,9 +972,21 @@ where
 		};
 		metrics.on_request(metrics_result);
 		per_req.span.as_mut().map(|s| s.add_string_tag("success", success));
-		true
-	} else {
-		false
+	}
+
+	out
+}
+
+async fn insert_event_by_peer_id<Context>(
+	ctx: &mut Context,
+	peer_slots: &mut PeerSlots,
+	peer_id: &PeerId,
+	event: FitnessEvent,
+) where
+	Context: SubsystemContext<Message = CollatorProtocolMessage>,
+{
+	if let Some(collator_id) = peer_collator_id(&peer_slots.peer_data, peer_id) {
+		peer_slots::insert_event(ctx, peer_slots, peer_id, &collator_id, event).await;
 	}
 }
 
@@ -1202,7 +1013,10 @@ mod tests {
 	use polkadot_node_network_protocol::{our_view, ObservedRole,
 		request_response::Requests
 	};
-
+	use super::peer_slots::{
+		BENEFIT_NOTIFY_GOOD, COST_INVALID_SIGNATURE, COST_REPORT_BAD, COST_UNNEEDED_COLLATOR,
+		COST_REQUEST_TIMED_OUT,
+	};
 	const ACTIVITY_TIMEOUT: Duration = Duration::from_millis(50);
 	const DECLARE_TIMEOUT: Duration = Duration::from_millis(25);
 
