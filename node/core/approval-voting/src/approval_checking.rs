@@ -938,47 +938,47 @@ mod tests {
 			},
 		);
 	}
-}
 
-#[test]
-fn depth_0_covering_not_treated_as_such() {
-	let state = State {
-		assignments: 0,
-		depth: 0,
-		covered: 0,
-		covering: 10,
-		uncovered: 0,
-		next_no_show: None,
-	};
-
-	assert_eq!(
-		state.output(0, 10, 10, 20),
-		RequiredTranches::Pending {
-			considered: 0,
+	#[test]
+	fn depth_0_covering_not_treated_as_such() {
+		let state = State {
+			assignments: 0,
+			depth: 0,
+			covered: 0,
+			covering: 10,
+			uncovered: 0,
 			next_no_show: None,
-			maximum_broadcast: DelayTranche::max_value(),
-			clock_drift: 0,
-		},
-	);
-}
+		};
 
-#[test]
-fn depth_0_issued_as_exact_even_when_all() {
-	let state = State {
-		assignments: 10,
-		depth: 0,
-		covered: 0,
-		covering: 0,
-		uncovered: 0,
-		next_no_show: None,
-	};
+		assert_eq!(
+			state.output(0, 10, 10, 20),
+			RequiredTranches::Pending {
+				considered: 0,
+				next_no_show: None,
+				maximum_broadcast: DelayTranche::max_value(),
+				clock_drift: 0,
+			},
+		);
+	}
 
-	assert_eq!(
-		state.output(0, 10, 10, 20),
-		RequiredTranches::Exact {
-			needed: 0,
-			tolerated_missing: 0,
+	#[test]
+	fn depth_0_issued_as_exact_even_when_all() {
+		let state = State {
+			assignments: 10,
+			depth: 0,
+			covered: 0,
+			covering: 0,
+			uncovered: 0,
 			next_no_show: None,
-		},
-	);
+		};
+
+		assert_eq!(
+			state.output(0, 10, 10, 20),
+			RequiredTranches::Exact {
+				needed: 0,
+				tolerated_missing: 0,
+				next_no_show: None,
+			},
+		);
+	}
 }
