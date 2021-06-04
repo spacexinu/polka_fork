@@ -609,31 +609,6 @@ async fn run<C>(
 
 	let db_writer = &*subsystem.db;
 
-	{
-		use std::fs::File;
-		use std::io::Write;
-
-		let mut dump = File::create("bad_block_dump.txt").unwrap();
-
-		{
-			let raw_hex: &str = "352a00511425e8e70a6d8aa5c54825cc038e7954c78b04a65f77a5ad0700dcc0";
-			let raw: Vec<u8> = hex::decode(raw_hex).unwrap();
-			let h = Hash::from_slice(&raw[..]);
-			let candidate_entry = state.db.load_candidate_entry(&CandidateHash(h)).unwrap().unwrap();
-
-			let _ = write!(dump, "Candidate: {:?}", candidate_entry);
-		}
-
-		{
-			let raw_hex: &str = "7126251cb4c38bb982f8bed80b3ac8293ec7ef8c0d5e707dde0908ad23399663";
-			let raw: Vec<u8> = hex::decode(raw_hex).unwrap();
-			let h = Hash::from_slice(&raw[..]);
-			let block_entry = state.db.load_block_entry(&h).unwrap().unwrap();
-
-			let _ = write!(dump, "Block: {:?}", block_entry);
-		}
-	}
-
 	loop {
 		let actions = futures::select! {
 			(tick, woken_block, woken_candidate) = wakeups.next(&*state.clock).fuse() => {
