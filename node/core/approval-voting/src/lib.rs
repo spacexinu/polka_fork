@@ -1257,7 +1257,22 @@ fn schedule_wakeup_action(
 ) -> Option<Action> {
 	let maybe_action = match required_tranches {
 		_ if approval_entry.is_approved() => None,
-		RequiredTranches::All => None,
+		RequiredTranches::All => {
+			// Note that a transition to 'all' can be required as the result of two state-transitions.
+			// 1. A new no-show.
+			// 2. A new assignment.
+			//
+			// When a new no-show happens, we should have already scheduled a wakeup in anticipation of the
+			// no-show and will trigger our assignment accordingly.
+			//
+			// When a new assignment happens, we do not need to schedule anything new as the state was
+			// previously either `Exact` or `Some`, and we already had a wakeup scheduled for the next
+			// no-show.
+			//
+			// Therefore there is already an existing wakeup, and the processing of that wakeup will
+			// trigger any assignment as necessary.
+			None
+		}
 		RequiredTranches::Exact { next_no_show, .. } => next_no_show.map(|tick| Action::ScheduleWakeup {
 			block_hash,
 			block_number,
