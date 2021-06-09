@@ -295,13 +295,32 @@ pub fn run() -> Result<()> {
 					cmd.run::<
 						service::kusama_runtime::Block,
 						service::KusamaExecutor,
-					>(config).map_err(Error::SubstrateCli),
-					task_manager
-				))
-				// NOTE: we fetch only the block number from the block type, the chance of disparity
-				// between kusama's and polkadot's block number is small enough to overlook this.
+					>(config).map_err(Error::SubstrateCli), task_manager))
+				})
+			}
+
+			#[cfg(feature = "westend-native")]
+			if chain_spec.is_westend() {
+				return runner.async_run(|config| {
+					Ok((cmd.run::<
+						service::westend_runtime::Block,
+						service::WestendExecutor,
+					>(config).map_err(Error::SubstrateCli), task_manager))
+				})
+			}
+			// else we assume it is polkadot.
+			runner.async_run(|config| {
+				Ok((cmd.run::<
+					service::polkadot_runtime::Block,
+					service::PolkadotExecutor,
+				>(config).map_err(Error::SubstrateCli), task_manager))
 			})
-		}
+		},
+		#[cfg(not(feature = "try-runtime"))]
+		Some(Subcommand::TryRuntime) => {
+			Err(Error::Other("TryRuntime wasn't enabled when building the node. \
+				You can enable it with `--features try-runtime`.".into()).into())
+		},
 	}?;
 	Ok(())
 }
