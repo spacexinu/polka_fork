@@ -481,7 +481,7 @@ dependencies = [
 [[package]]
 name = "beefy-gadget"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#ae585702ade6b452ca60a40aed4ac4223643b8e2"
+source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#de95d195ce508925c0e7818325e313b348d055a3"
 dependencies = [
  "beefy-primitives",
  "futures 0.3.15",
@@ -509,7 +509,7 @@ dependencies = [
 [[package]]
 name = "beefy-gadget-rpc"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#ae585702ade6b452ca60a40aed4ac4223643b8e2"
+source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#de95d195ce508925c0e7818325e313b348d055a3"
 dependencies = [
  "beefy-gadget",
  "beefy-primitives",
@@ -530,7 +530,7 @@ dependencies = [
 [[package]]
 name = "beefy-primitives"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#ae585702ade6b452ca60a40aed4ac4223643b8e2"
+source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#de95d195ce508925c0e7818325e313b348d055a3"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -4625,7 +4625,7 @@ dependencies = [
 [[package]]
 name = "pallet-beefy"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#ae585702ade6b452ca60a40aed4ac4223643b8e2"
+source = "git+https://github.com/paritytech/grandpa-bridge-gadget?branch=rh-v0.9.5-missing-companions#de95d195ce508925c0e7818325e313b348d055a3"
 dependencies = [
  "beefy-primitives",
  "frame-support",
@@ -11011,7 +11011,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.3.23",
+ "rand 0.7.3",
  "static_assertions",
 ]
 
