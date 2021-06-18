@@ -23,12 +23,12 @@ bp-test-utils = { path = "../../primitives/test-utils" }
 
 # Substrate Dependencies
 
-frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
-sp-trie = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.5" }
+frame-support = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+frame-system = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
+sp-trie = { git = "https://github.com/paritytech/substrate", branch = "rh-v0.9.5-missing-companions" }
