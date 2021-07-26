@@ -6,16 +6,16 @@ edition = "2018"
 
 [dependencies]
 # substrate primitives
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "bkchr-statemine-fix" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "bkchr-statemine-fix" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "bkchr-statemine-fix" }
 
 # frame pallets
-system = { package = "frame-system", git = "https://github.com/paritytech/substrate", branch = "master" }
-balances = { package = "pallet-balances", git = "https://github.com/paritytech/substrate", branch = "master" }
+system = { package = "frame-system", git = "https://github.com/paritytech/substrate", branch = "bkchr-statemine-fix" }
+balances = { package = "pallet-balances", git = "https://github.com/paritytech/substrate", branch = "bkchr-statemine-fix" }
 
 # substrate client libs
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "bkchr-statemine-fix" }
 
 # polkadot deps
 polkadot-simnet = { path = "../common" }
