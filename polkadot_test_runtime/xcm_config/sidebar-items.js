@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DoNothingRouter",""],["DummyAssetTransactor",""],["DummyWeightTrader",""],["InvertNothing",""],["OurNetwork",""],["XcmConfig",""]],"type":[["Barrier",""],["LocalOriginToLocation","Type to convert an `Origin` type value into a `MultiLocation` value which represents an interior location of this chain."]]});

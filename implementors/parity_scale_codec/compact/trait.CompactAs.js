@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["polkadot_parachain"] = [{"text":"impl CompactAs for <a class=\"struct\" href=\"polkadot_parachain/primitives/struct.Id.html\" title=\"struct polkadot_parachain::primitives::Id\">Id</a>","synthetic":false,"types":["polkadot_parachain::primitives::Id"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

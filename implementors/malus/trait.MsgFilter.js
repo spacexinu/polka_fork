@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["malus_variant_a"] = [{"text":"impl <a class=\"trait\" href=\"malus/trait.MsgFilter.html\" title=\"trait malus::MsgFilter\">MsgFilter</a> for <a class=\"struct\" href=\"malus_variant_a/struct.Skippy.html\" title=\"struct malus_variant_a::Skippy\">Skippy</a>","synthetic":false,"types":["malus_variant_a::Skippy"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

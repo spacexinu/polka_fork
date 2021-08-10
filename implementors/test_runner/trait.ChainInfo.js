@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["polkadot_simnet"] = [{"text":"impl ChainInfo for <a class=\"struct\" href=\"polkadot_simnet/struct.PolkadotChainInfo.html\" title=\"struct polkadot_simnet::PolkadotChainInfo\">PolkadotChainInfo</a>","synthetic":false,"types":["polkadot_simnet::PolkadotChainInfo"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

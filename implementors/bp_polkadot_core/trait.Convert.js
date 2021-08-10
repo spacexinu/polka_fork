@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["bp_polkadot_core"] = [{"text":"impl <a class=\"trait\" href=\"bp_polkadot_core/trait.Convert.html\" title=\"trait bp_polkadot_core::Convert\">Convert</a>&lt;H256, &lt;&lt;MultiSignature as Verify&gt;::Signer as IdentifyAccount&gt;::AccountId&gt; for <a class=\"struct\" href=\"bp_polkadot_core/struct.AccountIdConverter.html\" title=\"struct bp_polkadot_core::AccountIdConverter\">AccountIdConverter</a>","synthetic":false,"types":["bp_polkadot_core::AccountIdConverter"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

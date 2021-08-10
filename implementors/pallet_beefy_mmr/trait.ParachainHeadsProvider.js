@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["rococo_runtime"] = [{"text":"impl ParachainHeadsProvider for <a class=\"struct\" href=\"rococo_runtime/struct.ParasProvider.html\" title=\"struct rococo_runtime::ParasProvider\">ParasProvider</a>","synthetic":false,"types":["rococo_runtime::ParasProvider"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

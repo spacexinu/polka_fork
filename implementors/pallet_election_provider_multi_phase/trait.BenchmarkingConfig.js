@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["polkadot_runtime_common"] = [{"text":"impl BenchmarkingConfig for <a class=\"struct\" href=\"polkadot_runtime_common/elections/struct.BenchmarkConfig.html\" title=\"struct polkadot_runtime_common::elections::BenchmarkConfig\">BenchmarkConfig</a>","synthetic":false,"types":["polkadot_runtime_common::elections::BenchmarkConfig"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

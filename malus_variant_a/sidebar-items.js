@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["main",""]],"struct":[["BehaveMaleficient","Generates an overseer that exposes bad behavior."],["Skippy","Silly example, just drop every second outgoing message."]]});

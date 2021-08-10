@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Collator","The collator of the adder parachain."]]});

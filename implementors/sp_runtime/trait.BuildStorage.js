@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["polkadot_service"] = [{"text":"impl BuildStorage for <a class=\"struct\" href=\"polkadot_service/chain_spec/struct.RococoGenesisExt.html\" title=\"struct polkadot_service::chain_spec::RococoGenesisExt\">RococoGenesisExt</a>","synthetic":false,"types":["polkadot_service::chain_spec::RococoGenesisExt"]}];
+implementors["rococo_runtime"] = [{"text":"impl BuildStorage for <a class=\"struct\" href=\"rococo_runtime/struct.GenesisConfig.html\" title=\"struct rococo_runtime::GenesisConfig\">GenesisConfig</a>","synthetic":false,"types":["rococo_runtime::GenesisConfig"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

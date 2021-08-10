@@ -1,0 +1,5 @@
+(function() {var implementors = {};
+implementors["polkadot_test_runtime"] = [{"text":"impl Config for <a class=\"struct\" href=\"polkadot_test_runtime/struct.Runtime.html\" title=\"struct polkadot_test_runtime::Runtime\">Runtime</a>","synthetic":false,"types":["polkadot_test_runtime::Runtime"]}];
+implementors["rococo_runtime"] = [{"text":"impl Config for <a class=\"struct\" href=\"rococo_runtime/struct.Runtime.html\" title=\"struct rococo_runtime::Runtime\">Runtime</a>","synthetic":false,"types":["rococo_runtime::Runtime"]}];
+implementors["westend_runtime"] = [{"text":"impl Config for <a class=\"struct\" href=\"westend_runtime/struct.Runtime.html\" title=\"struct westend_runtime::Runtime\">Runtime</a>","synthetic":false,"types":["westend_runtime::Runtime"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["SIGNER_ACCOUNT_WILL_EXIST",""]],"fn":[["get_account_info",""],["read_signer_uri","Read the signer account’s URI from the given `path`."]],"struct":[["Signer","Some information about the signer. Redundant at this point, but makes life easier."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_storage","Get the storage item."],["get_storage_map_frame_v2",""],["get_storage_value_frame_v2",""],["rpc","Make the rpc request, returning `Ret`."],["rpc_decode","Make the rpc request, decode the outcome into `Dec`. Don’t use for storage, it will fail for non-existent storage items."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["WASM_BINARY",""],["WASM_BINARY_BLOATY",""]],"fn":[["wasm_binary_unwrap","Wasm binary unwrapped. If built with `BUILD_DUMMY_WASM_BINARY`, the function panics."]]});

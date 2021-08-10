@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["rococo_runtime"] = [{"text":"impl Randomness&lt;H256, <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.u32.html\">u32</a>&gt; for <a class=\"struct\" href=\"rococo_runtime/struct.ParentHashRandomness.html\" title=\"struct rococo_runtime::ParentHashRandomness\">ParentHashRandomness</a>","synthetic":false,"types":["rococo_runtime::ParentHashRandomness"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["make_ferdie_keystore","Get mock keystore with `Ferdie` key."]]});

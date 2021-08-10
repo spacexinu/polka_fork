@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["kusama_runtime"] = [{"text":"impl EraPayout&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.u128.html\">u128</a>&gt; for <a class=\"struct\" href=\"kusama_runtime/struct.EraPayout.html\" title=\"struct kusama_runtime::EraPayout\">EraPayout</a>","synthetic":false,"types":["kusama_runtime::EraPayout"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

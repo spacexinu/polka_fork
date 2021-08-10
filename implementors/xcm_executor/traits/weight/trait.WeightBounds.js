@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["xcm_builder"] = [{"text":"impl&lt;T:&nbsp;Get&lt;Weight&gt;, C:&nbsp;Decode + GetDispatchInfo&gt; <a class=\"trait\" href=\"xcm_executor/traits/weight/trait.WeightBounds.html\" title=\"trait xcm_executor::traits::weight::WeightBounds\">WeightBounds</a>&lt;C&gt; for <a class=\"struct\" href=\"xcm_builder/struct.FixedWeightBounds.html\" title=\"struct xcm_builder::FixedWeightBounds\">FixedWeightBounds</a>&lt;T, C&gt;","synthetic":false,"types":["xcm_builder::weight::FixedWeightBounds"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
