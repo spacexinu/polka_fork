@@ -418,7 +418,7 @@
 <span class="kw">mod</span> <span class="ident">multi_location</span>;
 <span class="kw">mod</span> <span class="ident">order</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::v1</span>::{<span class="ident">Response</span> <span class="kw">as</span> <span class="ident">Response1</span>, <span class="ident">Xcm</span> <span class="kw">as</span> <span class="ident">Xcm1</span>};
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::v1</span>::{<span class="ident">MultiLocation</span> <span class="kw">as</span> <span class="ident">MultiLocation1</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">Response1</span>, <span class="ident">Xcm</span> <span class="kw">as</span> <span class="ident">Xcm1</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">junction</span>::{<span class="ident">BodyId</span>, <span class="ident">BodyPart</span>, <span class="ident">Junction</span>, <span class="ident">NetworkId</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">multi_asset</span>::{<span class="ident">AssetInstance</span>, <span class="ident">MultiAsset</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">multi_location::MultiLocation</span>::{<span class="self">self</span>, <span class="kw-2">*</span>};
@@ -764,7 +764,7 @@
 			<span class="ident">Xcm1::Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span>: <span class="ident">call</span>.<span class="ident">into</span>() },
 			<span class="ident">Xcm1::RelayedFrom</span> { <span class="ident">who</span>, <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelayedFrom</span> {
-				<span class="ident">who</span>: <span class="ident">who</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+				<span class="ident">who</span>: <span class="ident">MultiLocation1</span> { <span class="ident">interior</span>: <span class="ident">who</span>, <span class="ident">parents</span>: <span class="number">0</span> }.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 				<span class="ident">message</span>: <span class="ident">alloc::boxed::Box::new</span>((<span class="kw-2">*</span><span class="ident">message</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>),
 			},
 		})

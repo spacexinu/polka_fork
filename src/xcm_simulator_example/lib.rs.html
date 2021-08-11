@@ -324,7 +324,7 @@
 		);
 		<span class="ident">Relay::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">RelayChainPalletXcm::send_xcm</span>(
-				<span class="ident">Here</span>.<span class="ident">into</span>(),
+				<span class="ident">Here</span>,
 				<span class="ident">Parachain</span>(<span class="number">1</span>).<span class="ident">into</span>(),
 				<span class="ident">Transact</span> {
 					<span class="ident">origin_type</span>: <span class="ident">OriginKind::SovereignAccount</span>,
@@ -351,7 +351,7 @@
 		);
 		<span class="ident">ParaA::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(
-				<span class="ident">Here</span>.<span class="ident">into</span>(),
+				<span class="ident">Here</span>,
 				<span class="ident">Parent</span>.<span class="ident">into</span>(),
 				<span class="ident">Transact</span> {
 					<span class="ident">origin_type</span>: <span class="ident">OriginKind::SovereignAccount</span>,
@@ -378,7 +378,7 @@
 		);
 		<span class="ident">ParaA::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(
-				<span class="ident">Here</span>.<span class="ident">into</span>(),
+				<span class="ident">Here</span>,
 				<span class="ident">MultiLocation::new</span>(<span class="number">1</span>, <span class="ident">X1</span>(<span class="ident">Parachain</span>(<span class="number">2</span>))),
 				<span class="ident">Transact</span> {
 					<span class="ident">origin_type</span>: <span class="ident">OriginKind::SovereignAccount</span>,

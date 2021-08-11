@@ -366,7 +366,7 @@
 	<span class="kw">fn</span> <span class="ident">reverse_ref</span>(<span class="ident">what</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">AssetId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">MultiLocation</span>, ()<span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">location</span> <span class="op">=</span> <span class="ident">Prefix::get</span>();
 		<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">ConvertAssetId::reverse_ref</span>(<span class="ident">what</span>)<span class="question-mark">?</span>;
-		<span class="ident">location</span>.<span class="ident">push_interior</span>(<span class="ident">Junction::GeneralIndex</span>(<span class="ident">id</span>))<span class="question-mark">?</span>;
+		<span class="ident">location</span>.<span class="ident">push_interior</span>(<span class="ident">Junction::GeneralIndex</span>(<span class="ident">id</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(<span class="ident">location</span>)
 	}
 }

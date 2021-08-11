@@ -381,9 +381,6 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Cumulus.</span>
@@ -654,14 +651,11 @@
 	<span class="doccomment">/// A message to indicate that the embedded XCM is actually arriving on behalf of some consensus</span>
 	<span class="doccomment">/// location within the origin.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Safety: `who` must be an interior location of the context. This basically means that no `Parent`</span>
-	<span class="doccomment">/// junctions are allowed in it. This should be verified at the time of XCM execution.</span>
-	<span class="doccomment">///</span>
 	<span class="doccomment">/// Kind: *Instruction*</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">10</span>)]</span>
-	<span class="ident">RelayedFrom</span> { <span class="ident">who</span>: <span class="ident">MultiLocation</span>, <span class="ident">message</span>: <span class="ident">alloc::boxed::Box</span><span class="op">&lt;</span><span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> },
+	<span class="ident">RelayedFrom</span> { <span class="ident">who</span>: <span class="ident">Junctions</span>, <span class="ident">message</span>: <span class="ident">alloc::boxed::Box</span><span class="op">&lt;</span><span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> },
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
@@ -762,7 +756,7 @@
 			<span class="ident">Xcm0::Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span>: <span class="ident">call</span>.<span class="ident">into</span>() },
 			<span class="ident">Xcm0::RelayedFrom</span> { <span class="ident">who</span>, <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelayedFrom</span> {
-				<span class="ident">who</span>: <span class="ident">who</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+				<span class="ident">who</span>: <span class="ident">MultiLocation::try_from</span>(<span class="ident">who</span>)<span class="question-mark">?</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 				<span class="ident">message</span>: <span class="ident">alloc::boxed::Box::new</span>((<span class="kw-2">*</span><span class="ident">message</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>),
 			},
 		})

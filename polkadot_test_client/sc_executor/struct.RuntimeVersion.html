@@ -12,8 +12,9 @@
 }</pre></div><div class="docblock"><p>Runtime version.
 This should not be thought of as classic Semver (major/minor/tiny).
 This triplet have different semantics and mis-interpretation could cause problems.
-In particular: bug fixes should result in an increment of <code>spec_version</code> and possibly <code>authoring_version</code>,
-absolutely not <code>impl_version</code> since they change the semantics of the runtime.</p>
+In particular: bug fixes should result in an increment of <code>spec_version</code> and possibly
+<code>authoring_version</code>, absolutely not <code>impl_version</code> since they change the semantics of the
+runtime.</p>
 </div><h2 id="fields" class="fields small-section-header">
                        Fields<a href="#fields" class="anchor"></a></h2><span id="structfield.spec_name" class="structfield small-section-header"><a href="#structfield.spec_name" class="anchor field"></a><code>spec_name: RuntimeString</code></span><div class="docblock"><p>Identifies the different Substrate runtimes. There’ll be at least polkadot and node.
 A different on-chain spec_name to that of the native runtime would normally result
@@ -38,9 +39,9 @@ would result in only the <code>impl_version</code> changing.</p>
 </div><span id="structfield.transaction_version" class="structfield small-section-header"><a href="#structfield.transaction_version" class="anchor field"></a><code>transaction_version: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code></span><div class="docblock"><p>All existing dispatches are fully compatible when this number doesn’t change. If this
 number changes, then <code>spec_version</code> must change, also.</p>
 <p>This number must change when an existing dispatchable (module ID, dispatch ID) is changed,
-either through an alteration in its user-level semantics, a parameter added/removed/changed,
-a dispatchable being removed, a module being removed, or a dispatchable/module changing its
-index.</p>
+either through an alteration in its user-level semantics, a parameter
+added/removed/changed, a dispatchable being removed, a module being removed, or a
+dispatchable/module changing its index.</p>
 <p>It need <em>not</em> change when a new module is added or when a dispatchable is added.</p>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><h3 id="impl" class="impl"><code class="in-band">impl <a class="struct" href="struct.RuntimeVersion.html" title="struct polkadot_test_client::sc_executor::RuntimeVersion">RuntimeVersion</a></code><a href="#impl" class="anchor"></a></h3></summary><div class="impl-items"><h4 id="method.can_call_with" class="method"><code>pub fn <a href="#method.can_call_with" class="fnname">can_call_with</a>(&amp;self, other: &amp;<a class="struct" href="struct.RuntimeVersion.html" title="struct polkadot_test_client::sc_executor::RuntimeVersion">RuntimeVersion</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a href="#method.can_call_with" class="anchor"></a></h4><div class="docblock"><p>Check if this version matches other version for calling into runtime.</p>
 </div><h4 id="method.has_api_with" class="method"><code>pub fn <a href="#method.has_api_with" class="fnname">has_api_with</a>&lt;P&gt;(&amp;self, id: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 8]</a>, predicate: P) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a> <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;P: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a href="#method.has_api_with" class="anchor"></a></h4><div class="docblock"><p>Check if the given api with <code>api_id</code> is implemented and the version passes the given

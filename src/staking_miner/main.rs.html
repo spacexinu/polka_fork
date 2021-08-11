@@ -568,7 +568,7 @@
 			<span class="kw">mod</span> <span class="ident">private</span> {
 				<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 				<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">create_uxt_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runtime</span><span class="op">&gt;</span>](
-					<span class="ident">raw_solution</span>: <span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::CompactOf</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+					<span class="ident">raw_solution</span>: <span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::SolutionOf</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 					<span class="ident">witness</span>: <span class="ident">u32</span>,
 					<span class="ident">signer</span>: <span class="kw">crate</span><span class="ident">::signer::Signer</span>,
 					<span class="ident">nonce</span>: <span class="kw">crate</span><span class="ident">::prelude::Index</span>,
@@ -837,7 +837,7 @@
 	<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ext</span>,
 	<span class="ident">iterations</span>: <span class="ident">usize</span>,
 	<span class="ident">do_feasibility</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::CompactOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">u32</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::SolutionOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">u32</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
 	<span class="ident">ext</span>.<span class="ident">execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 		<span class="kw">let</span> (<span class="ident">solution</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="op">&lt;</span><span class="ident">EPM::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::mine_solution</span>(<span class="ident">iterations</span>)<span class="question-mark">?</span>;
 		<span class="kw">if</span> <span class="ident">do_feasibility</span> {

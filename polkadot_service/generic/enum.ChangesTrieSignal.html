@@ -10,12 +10,11 @@
 <p>The block that emits this signal will contain changes trie (CT) that covers
 blocks range [BEGIN; current block], where BEGIN is (order matters):</p>
 <ul>
-<li>LAST_TOP_LEVEL_DIGEST_BLOCK+1 if top level digest CT has ever been created
-using current configuration AND the last top level digest CT has been created
-at block LAST_TOP_LEVEL_DIGEST_BLOCK;</li>
-<li>LAST_CONFIGURATION_CHANGE_BLOCK+1 if there has been CT configuration change
-before and the last configuration change happened at block
-LAST_CONFIGURATION_CHANGE_BLOCK;</li>
+<li>LAST_TOP_LEVEL_DIGEST_BLOCK+1 if top level digest CT has ever been created using current
+configuration AND the last top level digest CT has been created at block
+LAST_TOP_LEVEL_DIGEST_BLOCK;</li>
+<li>LAST_CONFIGURATION_CHANGE_BLOCK+1 if there has been CT configuration change before and
+the last configuration change happened at block LAST_CONFIGURATION_CHANGE_BLOCK;</li>
 <li>1 otherwise.</li>
 </ul>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><h3 id="impl" class="impl"><code class="in-band">impl <a class="enum" href="enum.ChangesTrieSignal.html" title="enum polkadot_service::generic::ChangesTrieSignal">ChangesTrieSignal</a></code><a href="#impl" class="anchor"></a></h3></summary><div class="impl-items"><h4 id="method.as_new_configuration" class="method"><code>pub fn <a href="#method.as_new_configuration" class="fnname">as_new_configuration</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;ChangesTrieConfiguration&gt;&gt;</code><a href="#method.as_new_configuration" class="anchor"></a></h4><div class="docblock"><p>Try to cast this signal to NewConfiguration.</p>

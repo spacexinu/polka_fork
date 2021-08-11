@@ -19,9 +19,10 @@ of the transfer, the account will be reaped.</p>
 <p>The dispatch origin for this call must be <code>Signed</code> by the transactor.</p>
 <h1 id="" class="section-header"><a href="#"><weight></a></h1>
 <ul>
-<li>Dependent on arguments but not critical, given proper implementations for
-input config types. See related functions below.</li>
-<li>It contains a limited number of reads and writes internally and no complex computation.</li>
+<li>Dependent on arguments but not critical, given proper implementations for input config
+types. See related functions below.</li>
+<li>It contains a limited number of reads and writes internally and no complex
+computation.</li>
 </ul>
 <p>Related functions:</p>
 <ul>
@@ -29,8 +30,8 @@ input config types. See related functions below.</li>
 <li>Transferring balances to accounts that did not exist before will cause
 <code>T::OnNewAccount::on_new_account</code> to be called.</li>
 <li>Removing enough funds from an account will trigger <code>T::DustRemoval::on_unbalanced</code>.</li>
-<li><code>transfer_keep_alive</code> works the same way as <code>transfer</code>, but has an additional
-check that the transfer will not kill the origin account.</li>
+<li><code>transfer_keep_alive</code> works the same way as <code>transfer</code>, but has an additional check
+that the transfer will not kill the origin account.</li>
 </ul>
 <hr />
 <ul>
@@ -63,8 +64,8 @@ it will reset the account nonce (<code>frame_system::AccountNonce</code>).</p>
 specified.</p>
 <h1 id="-4" class="section-header"><a href="#-4"><weight></a></h1>
 <ul>
-<li>Same as transfer, but additional read and write because the source account is
-not assumed to be in the overlay.</li>
+<li>Same as transfer, but additional read and write because the source account is not
+assumed to be in the overlay.</li>
 </ul>
 <h1 id="-5" class="section-header"><a href="#-5"></weight></a></h1></div><div id="variant.transfer_keep_alive" class="variant small-section-header"><a href="#variant.transfer_keep_alive" class="anchor field"></a><code>transfer_keep_alive(&lt;&lt;T as Config&gt;::Lookup as StaticLookup&gt;::Source,&nbsp;&lt;T as Config&lt;I&gt;&gt;::Balance)</code></div><div class="docblock"><p>Same as the <a href="struct.Pallet.html#method.transfer"><code>transfer</code></a> call, but with a check that the transfer will not kill the
 origin account.</p>
@@ -88,7 +89,7 @@ deposits, etc…</p>
 <li><code>keep_alive</code>: A boolean to determine if the <code>transfer_all</code> operation should send all
 of the funds the account has, causing the sender account to be killed (false), or
 transfer everything except at least the existential deposit, which will guarantee to
-keep the sender account alive (true).<h1 id="-7" class="section-header"><a href="#-7"><weight></a></h1></li>
+keep the sender account alive (true). # <weight></li>
 <li>O(1). Just like transfer, but reading the user’s transferable balance first.
 #</weight></li>
 </ul>

@@ -18,8 +18,8 @@ and connect to them if they support the same chain.</p>
 <a href="https://tools.ietf.org/html/rfc1918">RFC1918</a>). Irrelevant for addresses that have
 been passed in <a href="struct.NetworkConfiguration.html#structfield.boot_nodes" title="NetworkConfiguration::boot_nodes"><code>NetworkConfiguration::boot_nodes</code></a>.</p>
 </div><span id="variant.Normal.field.wasm_external_transport" class="variant small-section-header"><a href="#variant.Normal.field.wasm_external_transport" class="anchor field"></a><code>wasm_external_transport:&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.ExtTransport.html" title="struct polkadot_node_network_protocol::request_response::network::ExtTransport">ExtTransport</a>&gt;</code></span><div class="docblock"><p>Optional external implementation of a libp2p transport. Used in WASM contexts where we
-need some binding between the networking provided by the operating system or environment
-and libp2p.</p>
+need some binding between the networking provided by the operating system or
+environment and libp2p.</p>
 <p>This parameter exists whatever the target platform is, but it is expected to be set to
 <code>Some</code> only when compiling for WASM.</p>
 </div></div></div></details><div id="variant.MemoryOnly" class="variant small-section-header"><a href="#variant.MemoryOnly" class="anchor field"></a><code>MemoryOnly</code></div><div class="docblock"><p>Only allow connections within the same process.

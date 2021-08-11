@@ -1323,6 +1323,17 @@
 <span id="1320">1320</span>
 <span id="1321">1321</span>
 <span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Cumulus.</span>
@@ -1475,53 +1486,36 @@
 		(<span class="ident">multilocation</span>, <span class="ident">last</span>)
 	}
 
-	<span class="doccomment">/// Mutates `self`, suffixing its interior junctions with `new`. Returns `Err` in case of overflow.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_interior</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Junctions::Here</span>;
-		<span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">interior</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>);
-		<span class="kw">match</span> <span class="ident">n</span>.<span class="ident">pushed_with</span>(<span class="ident">new</span>) {
-			<span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="self">self</span>.<span class="ident">interior</span> <span class="op">=</span> <span class="ident">result</span>;
-				<span class="prelude-val">Ok</span>(())
-			},
-			<span class="prelude-val">Err</span>(<span class="ident">old</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="self">self</span>.<span class="ident">interior</span> <span class="op">=</span> <span class="ident">old</span>;
-				<span class="prelude-val">Err</span>(())
-			},
-		}
+	<span class="doccomment">/// Mutates `self`, suffixing its interior junctions with `new`. Returns `Err` with `new` in</span>
+	<span class="doccomment">/// case of overflow.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_interior</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), <span class="ident">Junction</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">push</span>(<span class="ident">new</span>)
 	}
 
-	<span class="doccomment">/// Mutates `self`, prefixing its interior junctions with `new`. Returns `Err` in case of overflow.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_front_interior</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Junctions::Here</span>;
-		<span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">interior</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>);
-		<span class="kw">match</span> <span class="ident">n</span>.<span class="ident">pushed_front_with</span>(<span class="ident">new</span>) {
-			<span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="self">self</span>.<span class="ident">interior</span> <span class="op">=</span> <span class="ident">result</span>;
-				<span class="prelude-val">Ok</span>(())
-			},
-			<span class="prelude-val">Err</span>(<span class="ident">old</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="self">self</span>.<span class="ident">interior</span> <span class="op">=</span> <span class="ident">old</span>;
-				<span class="prelude-val">Err</span>(())
-			},
-		}
+	<span class="doccomment">/// Mutates `self`, prefixing its interior junctions with `new`. Returns `Err` with `new` in</span>
+	<span class="doccomment">/// case of overflow.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_front_interior</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), <span class="ident">Junction</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">push_front</span>(<span class="ident">new</span>)
 	}
 
-	<span class="doccomment">/// Consumes `self` and returns a `MultiLocation` suffixed with `new`, or an `Err` with the original value of</span>
+	<span class="doccomment">/// Consumes `self` and returns a `MultiLocation` suffixed with `new`, or an `Err` with theoriginal value of</span>
 	<span class="doccomment">/// `self` in case of overflow.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_with_interior</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_with_interior</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, (<span class="self">Self</span>, <span class="ident">Junction</span>)<span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">pushed_with</span>(<span class="ident">new</span>) {
 			<span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MultiLocation</span> { <span class="ident">interior</span>: <span class="ident">i</span>, <span class="ident">parents</span>: <span class="self">self</span>.<span class="ident">parents</span> }),
-			<span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">MultiLocation</span> { <span class="ident">interior</span>: <span class="ident">i</span>, <span class="ident">parents</span>: <span class="self">self</span>.<span class="ident">parents</span> }),
+			<span class="prelude-val">Err</span>((<span class="ident">i</span>, <span class="ident">j</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">MultiLocation</span> { <span class="ident">interior</span>: <span class="ident">i</span>, <span class="ident">parents</span>: <span class="self">self</span>.<span class="ident">parents</span> }, <span class="ident">j</span>)),
 		}
 	}
 
 	<span class="doccomment">/// Consumes `self` and returns a `MultiLocation` prefixed with `new`, or an `Err` with the original value of</span>
 	<span class="doccomment">/// `self` in case of overflow.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_front_with_interior</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_front_with_interior</span>(
+		<span class="self">self</span>,
+		<span class="ident">new</span>: <span class="ident">Junction</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, (<span class="self">Self</span>, <span class="ident">Junction</span>)<span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">pushed_front_with</span>(<span class="ident">new</span>) {
 			<span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MultiLocation</span> { <span class="ident">interior</span>: <span class="ident">i</span>, <span class="ident">parents</span>: <span class="self">self</span>.<span class="ident">parents</span> }),
-			<span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">MultiLocation</span> { <span class="ident">interior</span>: <span class="ident">i</span>, <span class="ident">parents</span>: <span class="self">self</span>.<span class="ident">parents</span> }),
+			<span class="prelude-val">Err</span>((<span class="ident">i</span>, <span class="ident">j</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">MultiLocation</span> { <span class="ident">interior</span>: <span class="ident">i</span>, <span class="ident">parents</span>: <span class="self">self</span>.<span class="ident">parents</span> }, <span class="ident">j</span>)),
 		}
 	}
 
@@ -1585,8 +1579,7 @@
 		<span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">match_and_split</span>(<span class="kw-2">&amp;</span><span class="ident">prefix</span>.<span class="ident">interior</span>)
 	}
 
-	<span class="doccomment">/// Mutate `self` so that it is suffixed with `suffix`. The correct normalized form is returned,</span>
-	<span class="doccomment">/// removing any internal [Non-Parent, `Parent`]  combinations.</span>
+	<span class="doccomment">/// Mutate `self` so that it is suffixed with `suffix`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Does not modify `self` and returns `Err` with `suffix` in case of overflow.</span>
 	<span class="doccomment">///</span>
@@ -1594,22 +1587,19 @@
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// # use xcm::v1::{Junctions::*, Junction::*, MultiLocation};</span>
 	<span class="doccomment">/// # fn main() {</span>
-	<span class="doccomment">/// let mut m = MultiLocation::new(1, X2(Parachain(21), OnlyChild));</span>
-	<span class="doccomment">/// assert_eq!(m.append_with(MultiLocation::new(1, X1(PalletInstance(3)))), Ok(()));</span>
+	<span class="doccomment">/// let mut m = MultiLocation::new(1, X1(Parachain(21)));</span>
+	<span class="doccomment">/// assert_eq!(m.append_with(X1(PalletInstance(3))), Ok(()));</span>
 	<span class="doccomment">/// assert_eq!(m, MultiLocation::new(1, X2(Parachain(21), PalletInstance(3))));</span>
 	<span class="doccomment">/// # }</span>
 	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_with</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">suffix</span>: <span class="ident">MultiLocation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MultiLocation</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">suffix</span>;
-		<span class="ident">core::mem::swap</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">prefix</span>);
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">prepend_with</span>(<span class="ident">prefix</span>) {
-			<span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-			<span class="prelude-val">Err</span>(<span class="ident">prefix</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">prefix</span>;
-				<span class="ident">core::mem::swap</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">suffix</span>);
-				<span class="prelude-val">Err</span>(<span class="ident">suffix</span>)
-			},
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_with</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">suffix</span>: <span class="ident">Junctions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Junctions</span><span class="op">&gt;</span> {
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">len</span>().<span class="ident">saturating_add</span>(<span class="ident">suffix</span>.<span class="ident">len</span>()) <span class="op">&gt;</span> <span class="ident">MAX_JUNCTIONS</span> {
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">suffix</span>)
 		}
+		<span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">suffix</span>.<span class="ident">into_iter</span>() {
+			<span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">push</span>(<span class="ident">j</span>).<span class="ident">expect</span>(<span class="string">&quot;Already checked the sum of the len()s; qed&quot;</span>)
+		}
+		<span class="prelude-val">Ok</span>(())
 	}
 
 	<span class="doccomment">/// Mutate `self` so that it is prefixed with `prefix`.</span>
@@ -2093,9 +2083,41 @@
 		<span class="ident">tail</span>
 	}
 
-	<span class="doccomment">/// Consumes `self` and returns a `Junctions` suffixed with `new`, or an `Err` with the original value of</span>
-	<span class="doccomment">/// `self` in case of overflow.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_with</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// Mutates `self` to be appended with `new` or returns an `Err` with `new` if would overflow.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), <span class="ident">Junction</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dummy</span> <span class="op">=</span> <span class="ident">Junctions::Here</span>;
+		<span class="ident">mem::swap</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dummy</span>);
+		<span class="kw">match</span> <span class="ident">dummy</span>.<span class="ident">pushed_with</span>(<span class="ident">new</span>) {
+			<span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">s</span>;
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="prelude-val">Err</span>((<span class="ident">s</span>, <span class="ident">j</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">s</span>;
+				<span class="prelude-val">Err</span>(<span class="ident">j</span>)
+			},
+		}
+	}
+
+	<span class="doccomment">/// Mutates `self` to be prepended with `new` or returns an `Err` with `new` if would overflow.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), <span class="ident">Junction</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dummy</span> <span class="op">=</span> <span class="ident">Junctions::Here</span>;
+		<span class="ident">mem::swap</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dummy</span>);
+		<span class="kw">match</span> <span class="ident">dummy</span>.<span class="ident">pushed_front_with</span>(<span class="ident">new</span>) {
+			<span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">s</span>;
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="prelude-val">Err</span>((<span class="ident">s</span>, <span class="ident">j</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">s</span>;
+				<span class="prelude-val">Err</span>(<span class="ident">j</span>)
+			},
+		}
+	}
+
+	<span class="doccomment">/// Consumes `self` and returns a `Junctions` suffixed with `new`, or an `Err` with the</span>
+	<span class="doccomment">/// original value of `self` and `new` in case of overflow.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_with</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, (<span class="self">Self</span>, <span class="ident">Junction</span>)<span class="op">&gt;</span> {
 		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
 			<span class="ident">Junctions::Here</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X1</span>(<span class="ident">new</span>),
 			<span class="ident">Junctions::X1</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X2</span>(<span class="ident">a</span>, <span class="ident">new</span>),
@@ -2105,13 +2127,13 @@
 			<span class="ident">Junctions::X5</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X6</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">new</span>),
 			<span class="ident">Junctions::X6</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X7</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>, <span class="ident">new</span>),
 			<span class="ident">Junctions::X7</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>, <span class="ident">g</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X8</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>, <span class="ident">g</span>, <span class="ident">new</span>),
-			<span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>)<span class="question-mark">?</span>,
+			<span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">s</span>, <span class="ident">new</span>))<span class="question-mark">?</span>,
 		})
 	}
 
-	<span class="doccomment">/// Consumes `self` and returns a `Junctions` prefixed with `new`, or an `Err` with the original value of</span>
-	<span class="doccomment">/// `self` in case of overflow.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_front_with</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// Consumes `self` and returns a `Junctions` prefixed with `new`, or an `Err` with the</span>
+	<span class="doccomment">/// original value of `self` and `new` in case of overflow.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pushed_front_with</span>(<span class="self">self</span>, <span class="ident">new</span>: <span class="ident">Junction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, (<span class="self">Self</span>, <span class="ident">Junction</span>)<span class="op">&gt;</span> {
 		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
 			<span class="ident">Junctions::Here</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X1</span>(<span class="ident">new</span>),
 			<span class="ident">Junctions::X1</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X2</span>(<span class="ident">new</span>, <span class="ident">a</span>),
@@ -2121,7 +2143,7 @@
 			<span class="ident">Junctions::X5</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X6</span>(<span class="ident">new</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>),
 			<span class="ident">Junctions::X6</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X7</span>(<span class="ident">new</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>),
 			<span class="ident">Junctions::X7</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>, <span class="ident">g</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Junctions::X8</span>(<span class="ident">new</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">f</span>, <span class="ident">g</span>),
-			<span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>)<span class="question-mark">?</span>,
+			<span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">s</span>, <span class="ident">new</span>))<span class="question-mark">?</span>,
 		})
 	}
 
@@ -2571,7 +2593,7 @@
 	<span class="kw">fn</span> <span class="ident">append_with_works</span>() {
 		<span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">AccountIndex64</span> { <span class="ident">network</span>: <span class="ident">Any</span>, <span class="ident">index</span>: <span class="number">23</span> };
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="number">1</span>, <span class="ident">interior</span>: <span class="ident">X1</span>(<span class="ident">Parachain</span>(<span class="number">42</span>)) };
-		<span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">append_with</span>(<span class="ident">MultiLocation::from</span>(<span class="ident">X2</span>(<span class="ident">PalletInstance</span>(<span class="number">3</span>), <span class="ident">acc</span>.<span class="ident">clone</span>()))), <span class="prelude-val">Ok</span>(()));
+		<span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">append_with</span>(<span class="ident">X2</span>(<span class="ident">PalletInstance</span>(<span class="number">3</span>), <span class="ident">acc</span>.<span class="ident">clone</span>())), <span class="prelude-val">Ok</span>(()));
 		<span class="macro">assert_eq!</span>(
 			<span class="ident">m</span>,
 			<span class="ident">MultiLocation</span> {
@@ -2582,12 +2604,12 @@
 
 		<span class="comment">// cannot append to create overly long multilocation</span>
 		<span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">AccountIndex64</span> { <span class="ident">network</span>: <span class="ident">Any</span>, <span class="ident">index</span>: <span class="number">23</span> };
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">MultiLocation</span> {
+		<span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">MultiLocation</span> {
 			<span class="ident">parents</span>: <span class="number">254</span>,
 			<span class="ident">interior</span>: <span class="ident">X5</span>(<span class="ident">Parachain</span>(<span class="number">42</span>), <span class="ident">OnlyChild</span>, <span class="ident">OnlyChild</span>, <span class="ident">OnlyChild</span>, <span class="ident">OnlyChild</span>),
 		};
-		<span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">MultiLocation::from</span>(<span class="ident">X4</span>(<span class="ident">PalletInstance</span>(<span class="number">3</span>), <span class="ident">acc</span>.<span class="ident">clone</span>(), <span class="ident">OnlyChild</span>, <span class="ident">OnlyChild</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">append_with</span>(<span class="ident">suffix</span>.<span class="ident">clone</span>()), <span class="prelude-val">Err</span>(<span class="ident">suffix</span>));
+		<span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">X4</span>(<span class="ident">PalletInstance</span>(<span class="number">3</span>), <span class="ident">acc</span>.<span class="ident">clone</span>(), <span class="ident">OnlyChild</span>, <span class="ident">OnlyChild</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">clone</span>().<span class="ident">append_with</span>(<span class="ident">suffix</span>.<span class="ident">clone</span>()), <span class="prelude-val">Err</span>(<span class="ident">suffix</span>));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>

@@ -39,8 +39,8 @@ valid.</p>
 </div><span id="structfield.metrics_registry" class="structfield small-section-header"><a href="#structfield.metrics_registry" class="anchor field"></a><code>metrics_registry: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;Registry&gt;</code></span><div class="docblock"><p>Registry for recording prometheus metrics to.</p>
 </div><span id="structfield.block_request_protocol_config" class="structfield small-section-header"><a href="#structfield.block_request_protocol_config" class="anchor field"></a><code>block_request_protocol_config: <a class="struct" href="../struct.RequestResponseConfig.html" title="struct polkadot_node_network_protocol::request_response::RequestResponseConfig">ProtocolConfig</a></code></span><div class="docblock"><p>Request response configuration for the block request protocol.</p>
 <p><a href="../struct.RequestResponseConfig.html#structfield.name" title="RequestResponseConfig::name"><code>RequestResponseConfig::name</code></a> is used to tag outgoing block requests with the correct
-protocol name. In addition all of <a href="../struct.RequestResponseConfig.html" title="RequestResponseConfig"><code>RequestResponseConfig</code></a> is used to handle incoming block
-requests, if enabled.</p>
+protocol name. In addition all of <a href="../struct.RequestResponseConfig.html" title="RequestResponseConfig"><code>RequestResponseConfig</code></a> is used to handle incoming
+block requests, if enabled.</p>
 <p>Can be constructed either via [<code>crate::block_request_handler::generate_protocol_config</code>]
 allowing outgoing but not incoming requests, or constructed via
 [<code>crate::block_request_handler::BlockRequestHandler::new</code>] allowing both outgoing and
