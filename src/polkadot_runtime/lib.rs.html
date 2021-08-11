@@ -1693,6 +1693,13 @@
 <span id="1690">1690</span>
 <span id="1691">1691</span>
 <span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2046,11 +2053,10 @@
 
 	<span class="comment">// signed config</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedMaxSubmissions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">16</span>;
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">1</span>, <span class="number">0</span>);
-	<span class="comment">// A typical solution occupies within an order of magnitude of 50kb.</span>
-	<span class="comment">// This formula is currently adjusted such that a typical solution will spend an amount equal</span>
-	<span class="comment">// to the base deposit for every 50 kb.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositByte</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">1</span>, <span class="number">0</span>) <span class="op">/</span> (<span class="number">50</span> <span class="op">*</span> <span class="number">1024</span>);
+	<span class="comment">// 40 DOTs fixed deposit..</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">2</span>, <span class="number">0</span>);
+	<span class="comment">// 0.01 DOT per KB of solution data.</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositByte</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">0</span>, <span class="number">10</span>) <span class="op">/</span> <span class="number">1024</span>;
 	<span class="comment">// Each good submission will get 1 DOT as reward</span>
 	<span class="kw">pub</span> <span class="ident">SignedRewardBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="number">1</span> <span class="op">*</span> <span class="ident">UNITS</span>;
 	<span class="comment">// fallback: emergency phase.</span>
@@ -3245,7 +3251,7 @@
 	<span class="kw">use</span> <span class="ident">pallet_transaction_payment::Multiplier</span>;
 	<span class="kw">use</span> <span class="ident">parity_scale_codec::Encode</span>;
 	<span class="kw">use</span> <span class="ident">separator::Separatable</span>;
-	<span class="kw">use</span> <span class="ident">sp_runtime::FixedPointNumber</span>;
+	<span class="kw">use</span> <span class="ident">sp_runtime</span>::{<span class="ident">assert_eq_error_rate</span>, <span class="ident">FixedPointNumber</span>};
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">payout_weight_portion</span>() {
@@ -3369,6 +3375,14 @@
 
 		<span class="macro">println!</span>(<span class="string">&quot;can support {} nominators to yield a weight of {}&quot;</span>, <span class="ident">active</span>, <span class="ident">weight_with</span>(<span class="ident">active</span>));
 		<span class="macro">assert!</span>(<span class="ident">active</span> <span class="op">&gt;</span> <span class="ident">target_voters</span>, <span class="string">&quot;we need to reevaluate the weight of the election system&quot;</span>);
+	}
+
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">signed_deposit_is_sensible</span>() {
+		<span class="comment">// ensure this number does not change, or that it is checked after each change.</span>
+		<span class="comment">// a 1 MB solution should take (40 + 10) DOTs of deposit.</span>
+		<span class="kw">let</span> <span class="ident">deposit</span> <span class="op">=</span> <span class="ident">SignedDepositBase::get</span>() <span class="op">+</span> (<span class="ident">SignedDepositByte::get</span>() <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>);
+		<span class="macro">assert_eq_error_rate!</span>(<span class="ident">deposit</span>, <span class="number">50</span> <span class="op">*</span> <span class="ident">DOLLARS</span>, <span class="ident">DOLLARS</span>);
 	}
 }
 

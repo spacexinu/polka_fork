@@ -1488,9 +1488,6 @@
 <span id="1485">1485</span>
 <span id="1486">1486</span>
 <span id="1487">1487</span>
-<span id="1488">1488</span>
-<span id="1489">1489</span>
-<span id="1490">1490</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1825,11 +1822,8 @@
 
 	<span class="comment">// signed config</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedMaxSubmissions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">128</span>;
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">1</span>, <span class="number">0</span>);
-	<span class="comment">// A typical solution occupies within an order of magnitude of 50kb.</span>
-	<span class="comment">// This formula is currently adjusted such that a typical solution will spend an amount equal</span>
-	<span class="comment">// to the base deposit for every 50 kb.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositByte</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">1</span>, <span class="number">0</span>) <span class="op">/</span> (<span class="number">50</span> <span class="op">*</span> <span class="number">1024</span>);
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">2</span>, <span class="number">0</span>);
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositByte</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">0</span>, <span class="number">10</span>) <span class="op">/</span> <span class="number">1024</span>;
 	<span class="comment">// Each good submission will get 1 WND as reward</span>
 	<span class="kw">pub</span> <span class="ident">SignedRewardBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="number">1</span> <span class="op">*</span> <span class="ident">UNITS</span>;
 	<span class="comment">// fallback: emergency phase.</span>
