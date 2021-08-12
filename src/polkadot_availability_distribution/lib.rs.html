@@ -154,6 +154,34 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -175,6 +203,7 @@
 
 <span class="kw">use</span> <span class="ident">sp_keystore::SyncCryptoStorePtr</span>;
 
+<span class="kw">use</span> <span class="ident">polkadot_node_network_protocol::request_response</span>::{<span class="ident">v1</span>, <span class="ident">IncomingRequestReceiver</span>};
 <span class="kw">use</span> <span class="ident">polkadot_subsystem</span>::{
 	<span class="ident">messages::AvailabilityDistributionMessage</span>, <span class="ident">overseer</span>, <span class="ident">FromOverseer</span>, <span class="ident">OverseerSignal</span>,
 	<span class="ident">SpawnedSubsystem</span>, <span class="ident">SubsystemContext</span>, <span class="ident">SubsystemError</span>,
@@ -195,7 +224,7 @@
 
 <span class="doccomment">/// Responding to erasure chunk requests:</span>
 <span class="kw">mod</span> <span class="ident">responder</span>;
-<span class="kw">use</span> <span class="ident">responder</span>::{<span class="ident">answer_chunk_request_log</span>, <span class="ident">answer_pov_request_log</span>};
+<span class="kw">use</span> <span class="ident">responder</span>::{<span class="ident">run_chunk_receiver</span>, <span class="ident">run_pov_receiver</span>};
 
 <span class="kw">mod</span> <span class="ident">metrics</span>;
 <span class="doccomment">/// Prometheus `Metrics` for availability distribution.</span>
@@ -210,8 +239,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AvailabilityDistributionSubsystem</span> {
 	<span class="doccomment">/// Easy and efficient runtime access for this subsystem.</span>
 	<span class="ident">runtime</span>: <span class="ident">RuntimeInfo</span>,
+	<span class="doccomment">/// Receivers to receive messages from.</span>
+	<span class="ident">recvs</span>: <span class="ident">IncomingRequestReceivers</span>,
 	<span class="doccomment">/// Prometheus metrics.</span>
 	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+}
+
+<span class="doccomment">/// Receivers to be passed into availability distribution.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IncomingRequestReceivers</span> {
+	<span class="doccomment">/// Receiver for incoming PoV requests.</span>
+	<span class="kw">pub</span> <span class="ident">pov_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">v1::PoVFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// Receiver for incoming availability chunk requests.</span>
+	<span class="kw">pub</span> <span class="ident">chunk_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">v1::ChunkFetchingRequest</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">overseer::Subsystem</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AvailabilityDistributionSubsystem</span>
@@ -231,18 +270,41 @@
 
 <span class="kw">impl</span> <span class="ident">AvailabilityDistributionSubsystem</span> {
 	<span class="doccomment">/// Create a new instance of the availability distribution.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">keystore</span>: <span class="ident">SyncCryptoStorePtr</span>, <span class="ident">metrics</span>: <span class="ident">Metrics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+		<span class="ident">keystore</span>: <span class="ident">SyncCryptoStorePtr</span>,
+		<span class="ident">recvs</span>: <span class="ident">IncomingRequestReceivers</span>,
+		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">RuntimeInfo::new</span>(<span class="prelude-val">Some</span>(<span class="ident">keystore</span>));
-		<span class="self">Self</span> { <span class="ident">runtime</span>, <span class="ident">metrics</span> }
+		<span class="self">Self</span> { <span class="ident">runtime</span>, <span class="ident">recvs</span>, <span class="ident">metrics</span> }
 	}
 
 	<span class="doccomment">/// Start processing work as passed on from the Overseer.</span>
-	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span>
+	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">AvailabilityDistributionMessage</span><span class="op">&gt;</span>,
 		<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">AvailabilityDistributionMessage</span><span class="op">&gt;</span>,
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">requester</span> <span class="op">=</span> <span class="ident">Requester::new</span>(<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">clone</span>()).<span class="ident">fuse</span>();
+		<span class="kw">let</span> <span class="self">Self</span> { <span class="kw-2">mut</span> <span class="ident">runtime</span>, <span class="ident">recvs</span>, <span class="ident">metrics</span> } <span class="op">=</span> <span class="self">self</span>;
+
+		<span class="kw">let</span> <span class="ident">IncomingRequestReceivers</span> { <span class="ident">pov_req_receiver</span>, <span class="ident">chunk_req_receiver</span> } <span class="op">=</span> <span class="ident">recvs</span>;
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">requester</span> <span class="op">=</span> <span class="ident">Requester::new</span>(<span class="ident">metrics</span>.<span class="ident">clone</span>()).<span class="ident">fuse</span>();
+
+		{
+			<span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">sender</span>().<span class="ident">clone</span>();
+			<span class="ident">ctx</span>.<span class="ident">spawn</span>(
+				<span class="string">&quot;pov-receiver&quot;</span>,
+				<span class="ident">run_pov_receiver</span>(<span class="ident">sender</span>.<span class="ident">clone</span>(), <span class="ident">pov_req_receiver</span>, <span class="ident">metrics</span>.<span class="ident">clone</span>()).<span class="ident">boxed</span>(),
+			)
+			.<span class="ident">map_err</span>(<span class="ident">Fatal::SpawnTask</span>)<span class="question-mark">?</span>;
+
+			<span class="ident">ctx</span>.<span class="ident">spawn</span>(
+				<span class="string">&quot;chunk-receiver&quot;</span>,
+				<span class="ident">run_chunk_receiver</span>(<span class="ident">sender</span>, <span class="ident">chunk_req_receiver</span>, <span class="ident">metrics</span>.<span class="ident">clone</span>()).<span class="ident">boxed</span>(),
+			)
+			.<span class="ident">map_err</span>(<span class="ident">Fatal::SpawnTask</span>)<span class="question-mark">?</span>;
+		}
+
 		<span class="kw">loop</span> {
 			<span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> {
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subsystem_next</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">recv</span>().<span class="ident">fuse</span>();
@@ -267,19 +329,13 @@
 					<span class="ident">log_error</span>(
 						<span class="ident">requester</span>
 							.<span class="ident">get_mut</span>()
-							.<span class="ident">update_fetching_heads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">runtime</span>, <span class="ident">update</span>)
+							.<span class="ident">update_fetching_heads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">runtime</span>, <span class="ident">update</span>)
 							.<span class="kw">await</span>,
 						<span class="string">&quot;Error in Requester::update_fetching_heads&quot;</span>,
 					)<span class="question-mark">?</span>;
 				},
 				<span class="ident">FromOverseer::Signal</span>(<span class="ident">OverseerSignal::BlockFinalized</span>(..)) <span class="op">=</span><span class="op">&gt;</span> {},
 				<span class="ident">FromOverseer::Signal</span>(<span class="ident">OverseerSignal::Conclude</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
-				<span class="ident">FromOverseer::Communication</span> {
-					<span class="ident">msg</span>: <span class="ident">AvailabilityDistributionMessage::ChunkFetchingRequest</span>(<span class="ident">req</span>),
-				} <span class="op">=</span><span class="op">&gt;</span> <span class="ident">answer_chunk_request_log</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">req</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metrics</span>).<span class="kw">await</span>,
-				<span class="ident">FromOverseer::Communication</span> {
-					<span class="ident">msg</span>: <span class="ident">AvailabilityDistributionMessage::PoVFetchingRequest</span>(<span class="ident">req</span>),
-				} <span class="op">=</span><span class="op">&gt;</span> <span class="ident">answer_pov_request_log</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">req</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metrics</span>).<span class="kw">await</span>,
 				<span class="ident">FromOverseer::Communication</span> {
 					<span class="ident">msg</span>:
 						<span class="ident">AvailabilityDistributionMessage::FetchPoV</span> {
@@ -293,7 +349,7 @@
 					<span class="ident">log_error</span>(
 						<span class="ident">pov_requester::fetch_pov</span>(
 							<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>,
-							<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">runtime</span>,
+							<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">runtime</span>,
 							<span class="ident">relay_parent</span>,
 							<span class="ident">from_validator</span>,
 							<span class="ident">candidate_hash</span>,

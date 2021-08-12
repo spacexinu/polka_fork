@@ -1045,6 +1045,37 @@
 <span id="1042">1042</span>
 <span id="1043">1043</span>
 <span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1068,15 +1099,17 @@
 	<span class="ident">time::Duration</span>,
 };
 
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel::oneshot</span>, <span class="ident">select</span>, <span class="ident">stream::FuturesUnordered</span>, <span class="ident">Future</span>, <span class="ident">FutureExt</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::{
+	<span class="ident">channel::oneshot</span>, <span class="ident">pin_mut</span>, <span class="ident">select</span>, <span class="ident">stream::FuturesUnordered</span>, <span class="ident">Future</span>, <span class="ident">FutureExt</span>, <span class="ident">StreamExt</span>,
+};
 <span class="kw">use</span> <span class="ident">sp_core::Pair</span>;
 
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol</span>::{
 	<span class="ident">peer_set::PeerSet</span>,
 	<span class="ident">request_response</span>::{
-		<span class="ident">request::OutgoingResponse</span>,
-		<span class="ident">v1</span>::{<span class="ident">CollationFetchingRequest</span>, <span class="ident">CollationFetchingResponse</span>},
-		<span class="ident">IncomingRequest</span>,
+		<span class="ident">incoming</span>::{<span class="self">self</span>, <span class="ident">OutgoingResponse</span>},
+		<span class="ident">v1</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">request_v1</span>, <span class="ident">CollationFetchingRequest</span>, <span class="ident">CollationFetchingResponse</span>},
+		<span class="ident">IncomingRequest</span>, <span class="ident">IncomingRequestReceiver</span>,
 	},
 	<span class="ident">v1</span> <span class="kw">as</span> <span class="ident">protocol_v1</span>, <span class="ident">OurView</span>, <span class="ident">PeerId</span>, <span class="ident">UnifiedReputationChange</span> <span class="kw">as</span> <span class="ident">Rep</span>, <span class="ident">View</span>,
 };
@@ -1097,11 +1130,12 @@
 };
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="prelude-ty">Result</span>, <span class="ident">LOG_TARGET</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>::{<span class="ident">log_error</span>, <span class="ident">Fatal</span>, <span class="ident">NonFatal</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>::{<span class="ident">log_error</span>, <span class="ident">Fatal</span>, <span class="ident">FatalResult</span>, <span class="ident">NonFatal</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 
+<span class="kw">const</span> <span class="ident">COST_INVALID_REQUEST</span>: <span class="ident">Rep</span> <span class="op">=</span> <span class="ident">Rep::CostMajor</span>(<span class="string">&quot;Peer sent unparsable request&quot;</span>);
 <span class="kw">const</span> <span class="ident">COST_UNEXPECTED_MESSAGE</span>: <span class="ident">Rep</span> <span class="op">=</span> <span class="ident">Rep::CostMinor</span>(<span class="string">&quot;An unexpected message&quot;</span>);
 <span class="kw">const</span> <span class="ident">COST_APPARENT_FLOOD</span>: <span class="ident">Rep</span> <span class="op">=</span>
 	<span class="ident">Rep::CostMinor</span>(<span class="string">&quot;Message received when previous one was still being processed&quot;</span>);
@@ -1732,74 +1766,6 @@
 				);
 			}
 		},
-		<span class="ident">CollationFetchingRequest</span>(<span class="ident">incoming</span>) <span class="op">=</span><span class="op">&gt;</span> {
-			<span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">state</span>
-				.<span class="ident">span_per_relay_parent</span>
-				.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>)
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">child</span>(<span class="string">&quot;request-collation&quot;</span>));
-			<span class="kw">match</span> <span class="ident">state</span>.<span class="ident">collating_on</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">our_para_id</span>) <span class="op">=</span><span class="op">&gt;</span>
-					<span class="kw">if</span> <span class="ident">our_para_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">para_id</span> {
-						<span class="kw">let</span> (<span class="ident">receipt</span>, <span class="ident">pov</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">collation</span>) <span class="op">=</span>
-							<span class="ident">state</span>.<span class="ident">collations</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>)
-						{
-							<span class="ident">collation</span>.<span class="ident">status</span>.<span class="ident">advance_to_requested</span>();
-							(<span class="ident">collation</span>.<span class="ident">receipt</span>.<span class="ident">clone</span>(), <span class="ident">collation</span>.<span class="ident">pov</span>.<span class="ident">clone</span>())
-						} <span class="kw">else</span> {
-							<span class="macro">tracing::warn!</span>(
-								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-								<span class="ident">relay_parent</span> <span class="op">=</span> <span class="op">%</span><span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>,
-								<span class="string">&quot;received a `RequestCollation` for a relay parent we don&#39;t have collation stored.&quot;</span>,
-							);
-
-							<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
-						};
-
-						<span class="ident">state</span>.<span class="ident">metrics</span>.<span class="ident">on_collation_sent_requested</span>();
-
-						<span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">_span</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">child</span>(<span class="string">&quot;sending&quot;</span>));
-
-						<span class="kw">let</span> <span class="ident">waiting</span> <span class="op">=</span> <span class="ident">state</span>
-							.<span class="ident">waiting_collation_fetches</span>
-							.<span class="ident">entry</span>(<span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>)
-							.<span class="ident">or_default</span>();
-
-						<span class="kw">if</span> <span class="op">!</span><span class="ident">waiting</span>.<span class="ident">waiting_peers</span>.<span class="ident">insert</span>(<span class="ident">incoming</span>.<span class="ident">peer</span>) {
-							<span class="macro">tracing::debug!</span>(
-								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-								<span class="string">&quot;Dropping incoming request as peer has a request in flight already.&quot;</span>
-							);
-							<span class="ident">ctx</span>.<span class="ident">send_message</span>(<span class="ident">NetworkBridgeMessage::ReportPeer</span>(
-								<span class="ident">incoming</span>.<span class="ident">peer</span>,
-								<span class="ident">COST_APPARENT_FLOOD</span>,
-							))
-							.<span class="kw">await</span>;
-							<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
-						}
-
-						<span class="kw">if</span> <span class="ident">waiting</span>.<span class="ident">collation_fetch_active</span> {
-							<span class="ident">waiting</span>.<span class="ident">waiting</span>.<span class="ident">push_back</span>(<span class="ident">incoming</span>);
-						} <span class="kw">else</span> {
-							<span class="ident">waiting</span>.<span class="ident">collation_fetch_active</span> <span class="op">=</span> <span class="bool-val">true</span>;
-							<span class="ident">send_collation</span>(<span class="ident">state</span>, <span class="ident">incoming</span>, <span class="ident">receipt</span>, <span class="ident">pov</span>).<span class="kw">await</span>;
-						}
-					} <span class="kw">else</span> {
-						<span class="macro">tracing::warn!</span>(
-							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-							<span class="ident">for_para_id</span> <span class="op">=</span> <span class="op">%</span><span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">para_id</span>,
-							<span class="ident">our_para_id</span> <span class="op">=</span> <span class="op">%</span><span class="ident">our_para_id</span>,
-							<span class="string">&quot;received a `CollationFetchingRequest` for unexpected para_id&quot;</span>,
-						);
-					},
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="macro">tracing::warn!</span>(
-						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-						<span class="ident">for_para_id</span> <span class="op">=</span> <span class="op">%</span><span class="ident">incoming</span>.<span class="ident">payload</span>.<span class="ident">para_id</span>,
-						<span class="string">&quot;received a `RequestCollation` while not collating on any para&quot;</span>,
-					);
-				},
-			}
-		},
 		<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
 	}
 
@@ -1923,6 +1889,80 @@
 	<span class="prelude-val">Ok</span>(())
 }
 
+<span class="doccomment">/// Process an incoming network request for a collation.</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_incoming_request</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(
+	<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
+	<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>,
+	<span class="ident">req</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">request_v1::CollationFetchingRequest</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CollatorProtocolMessage</span><span class="op">&gt;</span>,
+	<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CollatorProtocolMessage</span><span class="op">&gt;</span>,
+{
+	<span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">state</span>
+		.<span class="ident">span_per_relay_parent</span>
+		.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>)
+		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">child</span>(<span class="string">&quot;request-collation&quot;</span>));
+
+	<span class="kw">match</span> <span class="ident">state</span>.<span class="ident">collating_on</span> {
+		<span class="prelude-val">Some</span>(<span class="ident">our_para_id</span>) <span class="kw">if</span> <span class="ident">our_para_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">para_id</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="kw">let</span> (<span class="ident">receipt</span>, <span class="ident">pov</span>) <span class="op">=</span>
+				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">collation</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">collations</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>) {
+					<span class="ident">collation</span>.<span class="ident">status</span>.<span class="ident">advance_to_requested</span>();
+					(<span class="ident">collation</span>.<span class="ident">receipt</span>.<span class="ident">clone</span>(), <span class="ident">collation</span>.<span class="ident">pov</span>.<span class="ident">clone</span>())
+				} <span class="kw">else</span> {
+					<span class="macro">tracing::warn!</span>(
+						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+						<span class="ident">relay_parent</span> <span class="op">=</span> <span class="op">%</span><span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>,
+						<span class="string">&quot;received a `RequestCollation` for a relay parent we don&#39;t have collation stored.&quot;</span>,
+					);
+
+					<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
+				};
+
+			<span class="ident">state</span>.<span class="ident">metrics</span>.<span class="ident">on_collation_sent_requested</span>();
+
+			<span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">_span</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">child</span>(<span class="string">&quot;sending&quot;</span>));
+
+			<span class="kw">let</span> <span class="ident">waiting</span> <span class="op">=</span>
+				<span class="ident">state</span>.<span class="ident">waiting_collation_fetches</span>.<span class="ident">entry</span>(<span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">relay_parent</span>).<span class="ident">or_default</span>();
+
+			<span class="kw">if</span> <span class="op">!</span><span class="ident">waiting</span>.<span class="ident">waiting_peers</span>.<span class="ident">insert</span>(<span class="ident">req</span>.<span class="ident">peer</span>) {
+				<span class="macro">tracing::debug!</span>(
+					<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+					<span class="string">&quot;Dropping incoming request as peer has a request in flight already.&quot;</span>
+				);
+				<span class="ident">ctx</span>.<span class="ident">send_message</span>(<span class="ident">NetworkBridgeMessage::ReportPeer</span>(<span class="ident">req</span>.<span class="ident">peer</span>, <span class="ident">COST_APPARENT_FLOOD</span>))
+					.<span class="kw">await</span>;
+				<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
+			}
+
+			<span class="kw">if</span> <span class="ident">waiting</span>.<span class="ident">collation_fetch_active</span> {
+				<span class="ident">waiting</span>.<span class="ident">waiting</span>.<span class="ident">push_back</span>(<span class="ident">req</span>);
+			} <span class="kw">else</span> {
+				<span class="ident">waiting</span>.<span class="ident">collation_fetch_active</span> <span class="op">=</span> <span class="bool-val">true</span>;
+				<span class="ident">send_collation</span>(<span class="ident">state</span>, <span class="ident">req</span>, <span class="ident">receipt</span>, <span class="ident">pov</span>).<span class="kw">await</span>;
+			}
+		},
+		<span class="prelude-val">Some</span>(<span class="ident">our_para_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="macro">tracing::warn!</span>(
+				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+				<span class="ident">for_para_id</span> <span class="op">=</span> <span class="op">%</span><span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">para_id</span>,
+				<span class="ident">our_para_id</span> <span class="op">=</span> <span class="op">%</span><span class="ident">our_para_id</span>,
+				<span class="string">&quot;received a `CollationFetchingRequest` for unexpected para_id&quot;</span>,
+			);
+		},
+		<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="macro">tracing::warn!</span>(
+				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+				<span class="ident">for_para_id</span> <span class="op">=</span> <span class="op">%</span><span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">para_id</span>,
+				<span class="string">&quot;received a `RequestCollation` while not collating on any para&quot;</span>,
+			);
+		},
+	}
+	<span class="prelude-val">Ok</span>(())
+}
+
 <span class="doccomment">/// Our view has changed.</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_peer_view_change</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(
 	<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
@@ -2042,8 +2082,9 @@
 	<span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>,
 	<span class="ident">local_peer_id</span>: <span class="ident">PeerId</span>,
 	<span class="ident">collator_pair</span>: <span class="ident">CollatorPair</span>,
+	<span class="kw-2">mut</span> <span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::CollationFetchingRequest</span><span class="op">&gt;</span>,
 	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FatalResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CollatorProtocolMessage</span><span class="op">&gt;</span>,
 	<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CollatorProtocolMessage</span><span class="op">&gt;</span>,
@@ -2054,6 +2095,8 @@
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">RuntimeInfo::new</span>(<span class="prelude-val">None</span>);
 
 	<span class="kw">loop</span> {
+		<span class="kw">let</span> <span class="ident">recv_req</span> <span class="op">=</span> <span class="ident">req_receiver</span>.<span class="ident">recv</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">COST_INVALID_REQUEST</span>]).<span class="ident">fuse</span>();
+		<span class="macro">pin_mut!</span>(<span class="ident">recv_req</span>);
 		<span class="macro">select!</span> {
 			<span class="ident">msg</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">recv</span>().<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">map_err</span>(<span class="ident">Fatal::SubsystemReceive</span>)<span class="question-mark">?</span> {
 				<span class="ident">FromOverseer::Communication</span> { <span class="ident">msg</span> } <span class="op">=</span><span class="op">&gt;</span> {
@@ -2085,6 +2128,25 @@
 					<span class="kw">let</span> <span class="ident">pov</span> <span class="op">=</span> <span class="ident">collation</span>.<span class="ident">pov</span>.<span class="ident">clone</span>();
 
 					<span class="ident">send_collation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">next</span>, <span class="ident">receipt</span>, <span class="ident">pov</span>).<span class="kw">await</span>;
+				}
+			}
+			<span class="ident">in_req</span> <span class="op">=</span> <span class="ident">recv_req</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">match</span> <span class="ident">in_req</span> {
+					<span class="prelude-val">Ok</span>(<span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="ident">log_error</span>(
+							<span class="ident">handle_incoming_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span>,
+							<span class="string">&quot;Handling incoming request&quot;</span>
+						)<span class="question-mark">?</span>;
+					}
+					<span class="prelude-val">Err</span>(<span class="ident">incoming::Error::Fatal</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">f</span>.<span class="ident">into</span>()),
+					<span class="prelude-val">Err</span>(<span class="ident">incoming::Error::NonFatal</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="macro">tracing::debug!</span>(
+							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+							<span class="question-mark">?</span><span class="ident">err</span>,
+							<span class="string">&quot;Decoding incoming request failed&quot;</span>
+						);
+						<span class="kw">continue</span>
+					}
 				}
 			}
 		}

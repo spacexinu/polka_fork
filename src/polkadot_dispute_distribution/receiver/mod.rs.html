@@ -393,11 +393,6 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -422,19 +417,20 @@
 };
 
 <span class="kw">use</span> <span class="ident">futures</span>::{
-	<span class="ident">channel</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>},
+	<span class="ident">channel::oneshot</span>,
 	<span class="ident">future</span>::{<span class="ident">poll_fn</span>, <span class="ident">BoxFuture</span>},
+	<span class="ident">pin_mut</span>,
 	<span class="ident">stream</span>::{<span class="ident">FusedStream</span>, <span class="ident">FuturesUnordered</span>, <span class="ident">StreamExt</span>},
-	<span class="ident">FutureExt</span>, <span class="ident">Stream</span>,
+	<span class="ident">Future</span>, <span class="ident">FutureExt</span>, <span class="ident">Stream</span>,
 };
 <span class="kw">use</span> <span class="ident">lru::LruCache</span>;
 
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol</span>::{
 	<span class="ident">authority_discovery::AuthorityDiscovery</span>,
 	<span class="ident">request_response</span>::{
-		<span class="ident">request</span>::{<span class="ident">OutgoingResponse</span>, <span class="ident">OutgoingResponseSender</span>},
+		<span class="ident">incoming</span>::{<span class="ident">OutgoingResponse</span>, <span class="ident">OutgoingResponseSender</span>},
 		<span class="ident">v1</span>::{<span class="ident">DisputeRequest</span>, <span class="ident">DisputeResponse</span>},
-		<span class="ident">IncomingRequest</span>,
+		<span class="ident">IncomingRequest</span>, <span class="ident">IncomingRequestReceiver</span>,
 	},
 	<span class="ident">PeerId</span>, <span class="ident">UnifiedReputationChange</span> <span class="kw">as</span> <span class="ident">Rep</span>,
 };
@@ -451,7 +447,7 @@
 };
 
 <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">use</span> <span class="self">self</span><span class="ident">::error</span>::{<span class="ident">log_error</span>, <span class="ident">Fatal</span>, <span class="ident">FatalResult</span>, <span class="ident">NonFatal</span>, <span class="ident">NonFatalResult</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="self">self</span><span class="ident">::error</span>::{<span class="ident">log_error</span>, <span class="ident">NonFatal</span>, <span class="ident">NonFatalResult</span>, <span class="prelude-ty">Result</span>};
 
 <span class="kw">const</span> <span class="ident">COST_INVALID_REQUEST</span>: <span class="ident">Rep</span> <span class="op">=</span> <span class="ident">Rep::CostMajor</span>(<span class="string">&quot;Received message could not be decoded.&quot;</span>);
 <span class="kw">const</span> <span class="ident">COST_INVALID_SIGNATURE</span>: <span class="ident">Rep</span> <span class="op">=</span> <span class="ident">Rep::Malicious</span>(<span class="string">&quot;Signatures were invalid.&quot;</span>);
@@ -473,7 +469,7 @@
 	<span class="ident">sender</span>: <span class="ident">Sender</span>,
 
 	<span class="doccomment">/// Channel to retrieve incoming requests from.</span>
-	<span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">sc_network::config::IncomingRequest</span><span class="op">&gt;</span>,
+	<span class="ident">receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">DisputeRequest</span><span class="op">&gt;</span>,
 
 	<span class="doccomment">/// Authority discovery service:</span>
 	<span class="ident">authority_discovery</span>: <span class="ident">AD</span>,
@@ -504,26 +500,27 @@
 	<span class="ident">ConfirmedImport</span>(<span class="ident">NonFatalResult</span><span class="op">&lt;</span>(<span class="ident">PeerId</span>, <span class="ident">ImportStatementsResult</span>)<span class="op">&gt;</span>),
 
 	<span class="doccomment">/// A new request has arrived and should be handled.</span>
-	<span class="ident">NewRequest</span>(<span class="ident">sc_network::config::IncomingRequest</span>),
+	<span class="ident">NewRequest</span>(<span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">DisputeRequest</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">MuxedMessage</span> {
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive</span>(
 		<span class="ident">pending_imports</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PendingImports</span>,
-		<span class="ident">pending_requests</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">sc_network::config::IncomingRequest</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FatalResult</span><span class="op">&lt;</span><span class="ident">MuxedMessage</span><span class="op">&gt;</span> {
+		<span class="ident">pending_requests</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">DisputeRequest</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MuxedMessage</span><span class="op">&gt;</span> {
 		<span class="ident">poll_fn</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> {
-			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">pending_requests</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">ctx</span>) {
-				<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">v</span> {
-					<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Fatal::RequestChannelFinished</span>),
-					<span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MuxedMessage::NewRequest</span>(<span class="ident">msg</span>)),
-				};
-				<span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">r</span>)
+			<span class="kw">let</span> <span class="ident">next_req</span> <span class="op">=</span> <span class="ident">pending_requests</span>.<span class="ident">recv</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">COST_INVALID_REQUEST</span>]);
+			<span class="macro">pin_mut!</span>(<span class="ident">next_req</span>);
+			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">next_req</span>.<span class="ident">poll</span>(<span class="ident">ctx</span>) {
+				<span class="kw">return</span> <span class="kw">match</span> <span class="ident">r</span> {
+					<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>())),
+					<span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::NewRequest</span>(<span class="ident">v</span>))),
+				}
 			}
 			<span class="comment">// In case of Ready(None) return `Pending` below - we want to wait for the next request</span>
 			<span class="comment">// in that case.</span>
 			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) <span class="op">=</span> <span class="ident">pending_imports</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">ctx</span>) {
-				<span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">MuxedMessage::ConfirmedImport</span>(<span class="ident">v</span>)))
+				<span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::ConfirmedImport</span>(<span class="ident">v</span>)))
 			}
 			<span class="ident">Poll::Pending</span>
 		})
@@ -538,7 +535,7 @@
 	<span class="doccomment">/// Create a new receiver which can be `run`.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
 		<span class="ident">sender</span>: <span class="ident">Sender</span>,
-		<span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">sc_network::config::IncomingRequest</span><span class="op">&gt;</span>,
+		<span class="ident">receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">DisputeRequest</span><span class="op">&gt;</span>,
 		<span class="ident">authority_discovery</span>: <span class="ident">AD</span>,
 		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -566,15 +563,12 @@
 		<span class="kw">loop</span> {
 			<span class="kw">match</span> <span class="ident">log_error</span>(<span class="self">self</span>.<span class="ident">run_inner</span>().<span class="kw">await</span>) {
 				<span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {},
-				<span class="prelude-val">Err</span>(<span class="ident">Fatal::RequestChannelFinished</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="prelude-val">Err</span>(<span class="ident">fatal</span>) <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="macro">tracing::debug!</span>(
 						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-						<span class="string">&quot;Incoming request stream exhausted - shutting down?&quot;</span>
+						<span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">fatal</span>,
+						<span class="string">&quot;Shutting down&quot;</span>
 					);
-					<span class="kw">return</span>
-				},
-				<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="question-mark">?</span><span class="ident">err</span>, <span class="string">&quot;Dispute receiver died.&quot;</span>);
 					<span class="kw">return</span>
 				},
 			}
@@ -585,7 +579,7 @@
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">MuxedMessage::receive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending_imports</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">receiver</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-		<span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">msg</span> {
+		<span class="kw">let</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">msg</span> {
 			<span class="comment">// We need to clean up futures, to make sure responses are sent:</span>
 			<span class="ident">MuxedMessage::ConfirmedImport</span>(<span class="ident">m_bad</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="self">self</span>.<span class="ident">ban_bad_peer</span>(<span class="ident">m_bad</span>)<span class="question-mark">?</span>;
@@ -596,24 +590,20 @@
 
 		<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">on_received_request</span>();
 
-		<span class="kw">let</span> <span class="ident">peer</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">peer</span>;
+		<span class="kw">let</span> <span class="ident">peer</span> <span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">peer</span>;
 
 		<span class="comment">// Only accept messages from validators:</span>
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">authority_discovery</span>.<span class="ident">get_authority_id_by_peer_id</span>(<span class="ident">raw</span>.<span class="ident">peer</span>).<span class="kw">await</span>.<span class="ident">is_none</span>() {
-			<span class="ident">raw</span>.<span class="ident">pending_response</span>
-				.<span class="ident">send</span>(<span class="ident">sc_network::config::OutgoingResponse</span> {
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">authority_discovery</span>.<span class="ident">get_authority_id_by_peer_id</span>(<span class="ident">peer</span>).<span class="kw">await</span>.<span class="ident">is_none</span>() {
+			<span class="ident">incoming</span>
+				.<span class="ident">send_outgoing_response</span>(<span class="ident">OutgoingResponse</span> {
 					<span class="ident">result</span>: <span class="prelude-val">Err</span>(()),
-					<span class="ident">reputation_changes</span>: <span class="macro">vec!</span>[<span class="ident">COST_NOT_A_VALIDATOR</span>.<span class="ident">into_base_rep</span>()],
+					<span class="ident">reputation_changes</span>: <span class="macro">vec!</span>[<span class="ident">COST_NOT_A_VALIDATOR</span>],
 					<span class="ident">sent_feedback</span>: <span class="prelude-val">None</span>,
 				})
 				.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">NonFatal::SendResponse</span>(<span class="ident">peer</span>))<span class="question-mark">?</span>;
 
 			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">NonFatal::NotAValidator</span>(<span class="ident">peer</span>).<span class="ident">into</span>())
 		}
-
-		<span class="kw">let</span> <span class="ident">incoming</span> <span class="op">=</span>
-			<span class="ident">IncomingRequest</span>::<span class="op">&lt;</span><span class="ident">DisputeRequest</span><span class="op">&gt;</span><span class="ident">::try_from_raw</span>(<span class="ident">raw</span>, <span class="macro">vec!</span>[<span class="ident">COST_INVALID_REQUEST</span>])
-				.<span class="ident">map_err</span>(<span class="ident">NonFatal::FromRawRequest</span>)<span class="question-mark">?</span>;
 
 		<span class="comment">// Immediately drop requests from peers that already have requests in flight or have</span>
 		<span class="comment">// been banned recently (flood protection):</span>

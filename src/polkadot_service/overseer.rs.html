@@ -285,6 +285,23 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -303,12 +320,13 @@
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AuthorityDiscoveryApi</span>, <span class="ident">Block</span>, <span class="ident">Error</span>, <span class="ident">Hash</span>, <span class="ident">IsCollator</span>, <span class="ident">Registry</span>, <span class="ident">SpawnNamed</span>};
-<span class="kw">use</span> <span class="ident">polkadot_network_bridge::RequestMultiplexer</span>;
+<span class="kw">use</span> <span class="ident">polkadot_availability_distribution::IncomingRequestReceivers</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_core_approval_voting::Config</span> <span class="kw">as</span> <span class="ident">ApprovalVotingConfig</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_core_av_store::Config</span> <span class="kw">as</span> <span class="ident">AvailabilityConfig</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_core_candidate_validation::Config</span> <span class="kw">as</span> <span class="ident">CandidateValidationConfig</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_core_chain_selection::Config</span> <span class="kw">as</span> <span class="ident">ChainSelectionConfig</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_core_dispute_coordinator::Config</span> <span class="kw">as</span> <span class="ident">DisputeCoordinatorConfig</span>;
+<span class="kw">use</span> <span class="ident">polkadot_node_network_protocol::request_response</span>::{<span class="ident">v1</span> <span class="kw">as</span> <span class="ident">request_v1</span>, <span class="ident">IncomingRequestReceiver</span>};
 <span class="kw">use</span> <span class="ident">polkadot_overseer</span>::{<span class="ident">AllSubsystems</span>, <span class="ident">BlockInfo</span>, <span class="ident">Overseer</span>, <span class="ident">OverseerHandle</span>};
 <span class="kw">use</span> <span class="ident">polkadot_primitives::v1::ParachainHost</span>;
 <span class="kw">use</span> <span class="ident">sc_authority_discovery::Service</span> <span class="kw">as</span> <span class="ident">AuthorityDiscoveryService</span>;
@@ -360,8 +378,14 @@
 	<span class="kw">pub</span> <span class="ident">network_service</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sc_network::NetworkService</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Hash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Underlying authority discovery service.</span>
 	<span class="kw">pub</span> <span class="ident">authority_discovery_service</span>: <span class="ident">AuthorityDiscoveryService</span>,
-	<span class="doccomment">/// A multiplexer to arbitrate incoming `IncomingRequest`s from the network.</span>
-	<span class="kw">pub</span> <span class="ident">request_multiplexer</span>: <span class="ident">RequestMultiplexer</span>,
+	<span class="doccomment">/// POV request receiver</span>
+	<span class="kw">pub</span> <span class="ident">pov_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::PoVFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">chunk_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::ChunkFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">collation_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::CollationFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">available_data_req_receiver</span>:
+		<span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">statement_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::StatementFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">dispute_req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::DisputeRequest</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Prometheus registry, commonly used for production systems, less so for test.</span>
 	<span class="kw">pub</span> <span class="ident">registry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Registry</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Task spawner to be used throughout the overseer and the APIs it provides.</span>
@@ -391,7 +415,12 @@
 		<span class="ident">parachains_db</span>,
 		<span class="ident">network_service</span>,
 		<span class="ident">authority_discovery_service</span>,
-		<span class="ident">request_multiplexer</span>,
+		<span class="ident">pov_req_receiver</span>,
+		<span class="ident">chunk_req_receiver</span>,
+		<span class="ident">collation_req_receiver</span>,
+		<span class="ident">available_data_req_receiver</span>,
+		<span class="ident">statement_req_receiver</span>,
+		<span class="ident">dispute_req_receiver</span>,
 		<span class="ident">registry</span>,
 		<span class="ident">spawner</span>,
 		<span class="ident">is_collator</span>,
@@ -441,9 +470,12 @@
 	<span class="kw">let</span> <span class="ident">all_subsystems</span> <span class="op">=</span> <span class="ident">AllSubsystems</span> {
 		<span class="ident">availability_distribution</span>: <span class="ident">AvailabilityDistributionSubsystem::new</span>(
 			<span class="ident">keystore</span>.<span class="ident">clone</span>(),
+			<span class="ident">IncomingRequestReceivers</span> { <span class="ident">pov_req_receiver</span>, <span class="ident">chunk_req_receiver</span> },
 			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 		),
-		<span class="ident">availability_recovery</span>: <span class="ident">AvailabilityRecoverySubsystem::with_chunks_only</span>(),
+		<span class="ident">availability_recovery</span>: <span class="ident">AvailabilityRecoverySubsystem::with_chunks_only</span>(
+			<span class="ident">available_data_req_receiver</span>,
+		),
 		<span class="ident">availability_store</span>: <span class="ident">AvailabilityStoreSubsystem::new</span>(
 			<span class="ident">parachains_db</span>.<span class="ident">clone</span>(),
 			<span class="ident">availability_config</span>,
@@ -471,6 +503,7 @@
 				<span class="ident">IsCollator::Yes</span>(<span class="ident">collator_pair</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ProtocolSide::Collator</span>(
 					<span class="ident">network_service</span>.<span class="ident">local_peer_id</span>().<span class="ident">clone</span>(),
 					<span class="ident">collator_pair</span>,
+					<span class="ident">collation_req_receiver</span>,
 					<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 				),
 				<span class="ident">IsCollator::No</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ProtocolSide::Validator</span> {
@@ -484,7 +517,6 @@
 		<span class="ident">network_bridge</span>: <span class="ident">NetworkBridgeSubsystem::new</span>(
 			<span class="ident">network_service</span>.<span class="ident">clone</span>(),
 			<span class="ident">authority_discovery_service</span>.<span class="ident">clone</span>(),
-			<span class="ident">request_multiplexer</span>,
 			<span class="ident">Box::new</span>(<span class="ident">network_service</span>.<span class="ident">clone</span>()),
 			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 		),
@@ -496,6 +528,7 @@
 		),
 		<span class="ident">statement_distribution</span>: <span class="ident">StatementDistributionSubsystem::new</span>(
 			<span class="ident">keystore</span>.<span class="ident">clone</span>(),
+			<span class="ident">statement_req_receiver</span>,
 			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 		),
 		<span class="ident">approval_distribution</span>: <span class="ident">ApprovalDistributionSubsystem::new</span>(<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>),
@@ -515,6 +548,7 @@
 		<span class="ident">dispute_participation</span>: <span class="ident">DisputeParticipationSubsystem::new</span>(),
 		<span class="ident">dispute_distribution</span>: <span class="ident">DisputeDistributionSubsystem::new</span>(
 			<span class="ident">keystore</span>.<span class="ident">clone</span>(),
+			<span class="ident">dispute_req_receiver</span>,
 			<span class="ident">authority_discovery_service</span>.<span class="ident">clone</span>(),
 			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 		),

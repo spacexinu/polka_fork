@@ -255,6 +255,21 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -287,6 +302,7 @@
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol::authority_discovery::AuthorityDiscovery</span>;
 <span class="kw">use</span> <span class="ident">sp_keystore::SyncCryptoStorePtr</span>;
 
+<span class="kw">use</span> <span class="ident">polkadot_node_network_protocol::request_response</span>::{<span class="ident">incoming::IncomingRequestReceiver</span>, <span class="ident">v1</span>};
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives::DISPUTE_WINDOW</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util</span>::{<span class="ident">runtime</span>, <span class="ident">runtime::RuntimeInfo</span>};
 <span class="kw">use</span> <span class="ident">polkadot_subsystem</span>::{
@@ -361,6 +377,9 @@
 	<span class="doccomment">/// Receive messages from `SendTask`.</span>
 	<span class="ident">sender_rx</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">TaskFinish</span><span class="op">&gt;</span>,
 
+	<span class="doccomment">/// Receiver for incoming requests.</span>
+	<span class="ident">req_receiver</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">v1::DisputeRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
 	<span class="doccomment">/// Authority discovery service.</span>
 	<span class="ident">authority_discovery</span>: <span class="ident">AD</span>,
 
@@ -391,14 +410,26 @@
 	<span class="ident">AD</span>: <span class="ident">AuthorityDiscovery</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
 	<span class="doccomment">/// Create a new instance of the availability distribution.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">keystore</span>: <span class="ident">SyncCryptoStorePtr</span>, <span class="ident">authority_discovery</span>: <span class="ident">AD</span>, <span class="ident">metrics</span>: <span class="ident">Metrics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+		<span class="ident">keystore</span>: <span class="ident">SyncCryptoStorePtr</span>,
+		<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">v1::DisputeRequest</span><span class="op">&gt;</span>,
+		<span class="ident">authority_discovery</span>: <span class="ident">AD</span>,
+		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">RuntimeInfo::new_with_config</span>(<span class="ident">runtime::Config</span> {
 			<span class="ident">keystore</span>: <span class="prelude-val">Some</span>(<span class="ident">keystore</span>),
 			<span class="ident">session_cache_lru_size</span>: <span class="ident">DISPUTE_WINDOW</span> <span class="kw">as</span> <span class="ident">usize</span>,
 		});
 		<span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">sender_rx</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">1</span>);
 		<span class="kw">let</span> <span class="ident">disputes_sender</span> <span class="op">=</span> <span class="ident">DisputeSender::new</span>(<span class="ident">tx</span>, <span class="ident">metrics</span>.<span class="ident">clone</span>());
-		<span class="self">Self</span> { <span class="ident">runtime</span>, <span class="ident">disputes_sender</span>, <span class="ident">sender_rx</span>, <span class="ident">authority_discovery</span>, <span class="ident">metrics</span> }
+		<span class="self">Self</span> {
+			<span class="ident">runtime</span>,
+			<span class="ident">disputes_sender</span>,
+			<span class="ident">sender_rx</span>,
+			<span class="ident">req_receiver</span>: <span class="prelude-val">Some</span>(<span class="ident">req_receiver</span>),
+			<span class="ident">authority_discovery</span>,
+			<span class="ident">metrics</span>,
+		}
 	}
 
 	<span class="doccomment">/// Start processing work as passed on from the Overseer.</span>
@@ -409,6 +440,17 @@
 			<span class="op">+</span> <span class="ident">Sync</span>
 			<span class="op">+</span> <span class="ident">Send</span>,
 	{
+		<span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">DisputesReceiver::new</span>(
+			<span class="ident">ctx</span>.<span class="ident">sender</span>().<span class="ident">clone</span>(),
+			<span class="self">self</span>.<span class="ident">req_receiver</span>
+				.<span class="ident">take</span>()
+				.<span class="ident">expect</span>(<span class="string">&quot;Must be provided on `new` and we take ownership here. qed.&quot;</span>),
+			<span class="self">self</span>.<span class="ident">authority_discovery</span>.<span class="ident">clone</span>(),
+			<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">clone</span>(),
+		);
+		<span class="ident">ctx</span>.<span class="ident">spawn</span>(<span class="string">&quot;disputes-receiver&quot;</span>, <span class="ident">receiver</span>.<span class="ident">run</span>().<span class="ident">boxed</span>())
+			.<span class="ident">map_err</span>(<span class="ident">Fatal::SpawnTask</span>)<span class="question-mark">?</span>;
+
 		<span class="kw">loop</span> {
 			<span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">MuxedMessage::receive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">sender_rx</span>).<span class="kw">await</span>;
 			<span class="kw">match</span> <span class="ident">message</span> {
@@ -460,18 +502,6 @@
 		<span class="kw">match</span> <span class="ident">msg</span> {
 			<span class="ident">DisputeDistributionMessage::SendDispute</span>(<span class="ident">dispute_msg</span>) <span class="op">=</span><span class="op">&gt;</span>
 				<span class="self">self</span>.<span class="ident">disputes_sender</span>.<span class="ident">start_sender</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">runtime</span>, <span class="ident">dispute_msg</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-			<span class="comment">// This message will only arrive once:</span>
-			<span class="ident">DisputeDistributionMessage::DisputeSendingReceiver</span>(<span class="ident">receiver</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">DisputesReceiver::new</span>(
-					<span class="ident">ctx</span>.<span class="ident">sender</span>().<span class="ident">clone</span>(),
-					<span class="ident">receiver</span>,
-					<span class="self">self</span>.<span class="ident">authority_discovery</span>.<span class="ident">clone</span>(),
-					<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">clone</span>(),
-				);
-
-				<span class="ident">ctx</span>.<span class="ident">spawn</span>(<span class="string">&quot;disputes-receiver&quot;</span>, <span class="ident">receiver</span>.<span class="ident">run</span>().<span class="ident">boxed</span>())
-					.<span class="ident">map_err</span>(<span class="ident">Fatal::SpawnTask</span>)<span class="question-mark">?</span>;
-			},
 		}
 		<span class="prelude-val">Ok</span>(())
 	}

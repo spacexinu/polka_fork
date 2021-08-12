@@ -103,9 +103,6 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -129,33 +126,30 @@
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives::disputes::DisputeMessageCheckError</span>;
-<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util</span>::{<span class="ident">runtime</span>, <span class="ident">Fault</span>};
+<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util::runtime</span>;
 <span class="kw">use</span> <span class="ident">polkadot_subsystem::SubsystemError</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">derive_more::From</span>)]</span>
 <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span>(<span class="kw">pub</span> <span class="ident">Fault</span><span class="op">&lt;</span><span class="ident">NonFatal</span>, <span class="ident">Fatal</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">NonFatal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">NonFatal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">Fault::from_non_fatal</span>(<span class="ident">e</span>))
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Fatal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">Fatal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">Fault::from_fatal</span>(<span class="ident">f</span>))
-	}
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
+	<span class="doccomment">/// All fatal errors.</span>
+	<span class="ident">Fatal</span>(<span class="ident">Fatal</span>),
+	<span class="doccomment">/// All nonfatal/potentially recoverable errors.</span>
+	<span class="ident">NonFatal</span>(<span class="ident">NonFatal</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">runtime::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">o</span>: <span class="ident">runtime::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">Fault::from_other</span>(<span class="ident">o</span>))
+		<span class="kw">match</span> <span class="ident">o</span> {
+			<span class="ident">runtime::Error::Fatal</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Fatal</span>(<span class="ident">Fatal::Runtime</span>(<span class="ident">f</span>)),
+			<span class="ident">runtime::Error::NonFatal</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::NonFatal</span>(<span class="ident">NonFatal::Runtime</span>(<span class="ident">f</span>)),
+		}
 	}
 }
 
 <span class="doccomment">/// Fatal errors of this subsystem.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
+<span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Fatal</span> {
 	<span class="doccomment">/// Spawning a running task failed.</span>
 	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Spawning subsystem task failed&quot;</span>)]</span>

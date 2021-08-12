@@ -831,6 +831,32 @@
 <span id="828">828</span>
 <span id="829">829</span>
 <span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -860,6 +886,7 @@
 <span class="kw">use</span> <span class="ident">futures</span>::{
 	<span class="ident">channel::oneshot</span>,
 	<span class="ident">future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>, <span class="ident">RemoteHandle</span>},
+	<span class="ident">pin_mut</span>,
 	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
 	<span class="ident">stream::FuturesUnordered</span>,
 	<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
@@ -870,9 +897,10 @@
 <span class="kw">use</span> <span class="ident">polkadot_erasure_coding</span>::{<span class="ident">branch_hash</span>, <span class="ident">branches</span>, <span class="ident">obtain_chunks_v1</span>, <span class="ident">recovery_threshold</span>};
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol</span>::{
 	<span class="ident">request_response</span>::{
-		<span class="self">self</span> <span class="kw">as</span> <span class="ident">req_res</span>, <span class="ident">request::RequestError</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">Recipient</span>, <span class="ident">Requests</span>,
+		<span class="self">self</span> <span class="kw">as</span> <span class="ident">req_res</span>, <span class="ident">incoming</span>, <span class="ident">outgoing::RequestError</span>, <span class="ident">v1</span> <span class="kw">as</span> <span class="ident">request_v1</span>,
+		<span class="ident">IncomingRequestReceiver</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">Recipient</span>, <span class="ident">Requests</span>,
 	},
-	<span class="ident">IfDisconnected</span>,
+	<span class="ident">IfDisconnected</span>, <span class="ident">UnifiedReputationChange</span> <span class="kw">as</span> <span class="ident">Rep</span>,
 };
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives</span>::{<span class="ident">AvailableData</span>, <span class="ident">ErasureChunk</span>};
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util::request_session_info</span>;
@@ -902,9 +930,13 @@
 <span class="comment">// Size of the LRU cache where we keep recovered data.</span>
 <span class="kw">const</span> <span class="ident">LRU_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
 
+<span class="kw">const</span> <span class="ident">COST_INVALID_REQUEST</span>: <span class="ident">Rep</span> <span class="op">=</span> <span class="ident">Rep::CostMajor</span>(<span class="string">&quot;Peer sent unparsable request&quot;</span>);
+
 <span class="doccomment">/// The Availability Recovery Subsystem.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AvailabilityRecoverySubsystem</span> {
 	<span class="ident">fast_path</span>: <span class="ident">bool</span>,
+	<span class="doccomment">/// Receiver for available data requests.</span>
+	<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">struct</span> <span class="ident">RequestFromBackersPhase</span> {
@@ -1584,13 +1616,17 @@
 
 <span class="kw">impl</span> <span class="ident">AvailabilityRecoverySubsystem</span> {
 	<span class="doccomment">/// Create a new instance of `AvailabilityRecoverySubsystem` which starts with a fast path to request data from backers.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_fast_path</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">true</span> }
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_fast_path</span>(
+		<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">true</span>, <span class="ident">req_receiver</span> }
 	}
 
 	<span class="doccomment">/// Create a new instance of `AvailabilityRecoverySubsystem` which requests only chunks</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_chunks_only</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">false</span> }
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_chunks_only</span>(
+		<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">false</span>, <span class="ident">req_receiver</span> }
 	}
 
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubsystemResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
@@ -1599,8 +1635,11 @@
 		<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">AvailabilityRecoveryMessage</span><span class="op">&gt;</span>,
 	{
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::default</span>();
+		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">fast_path</span>, <span class="kw-2">mut</span> <span class="ident">req_receiver</span> } <span class="op">=</span> <span class="self">self</span>;
 
 		<span class="kw">loop</span> {
+			<span class="kw">let</span> <span class="ident">recv_req</span> <span class="op">=</span> <span class="ident">req_receiver</span>.<span class="ident">recv</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">COST_INVALID_REQUEST</span>]).<span class="ident">fuse</span>();
+			<span class="macro">pin_mut!</span>(<span class="ident">recv_req</span>);
 			<span class="macro">futures::select!</span> {
 				<span class="ident">v</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">recv</span>().<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="kw">match</span> <span class="ident">v</span><span class="question-mark">?</span> {
@@ -1623,7 +1662,7 @@
 										<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>,
 										<span class="ident">receipt</span>,
 										<span class="ident">session_index</span>,
-										<span class="ident">maybe_backing_group</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fast_path</span>),
+										<span class="ident">maybe_backing_group</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fast_path</span>),
 										<span class="ident">response_sender</span>,
 									).<span class="kw">await</span> {
 										<span class="macro">tracing::warn!</span>(
@@ -1633,23 +1672,36 @@
 										);
 									}
 								}
-								<span class="ident">AvailabilityRecoveryMessage::AvailableDataFetchingRequest</span>(<span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> {
-									<span class="kw">match</span> <span class="ident">query_full_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">candidate_hash</span>).<span class="kw">await</span> {
-										<span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> {
-											<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send_response</span>(<span class="ident">res</span>.<span class="ident">into</span>());
-										}
-										<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-											<span class="macro">tracing::debug!</span>(
-												<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-												<span class="ident">err</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>,
-												<span class="string">&quot;Failed to query available data.&quot;</span>,
-											);
+							}
+						}
+					}
+				}
+				<span class="ident">in_req</span> <span class="op">=</span> <span class="ident">recv_req</span> <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="kw">match</span> <span class="ident">in_req</span> {
+						<span class="prelude-val">Ok</span>(<span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="kw">match</span> <span class="ident">query_full_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">req</span>.<span class="ident">payload</span>.<span class="ident">candidate_hash</span>).<span class="kw">await</span> {
+								<span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> {
+									<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send_response</span>(<span class="ident">res</span>.<span class="ident">into</span>());
+								}
+								<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+									<span class="macro">tracing::debug!</span>(
+										<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+										<span class="ident">err</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>,
+										<span class="string">&quot;Failed to query available data.&quot;</span>,
+									);
 
-											<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send_response</span>(<span class="prelude-val">None</span>.<span class="ident">into</span>());
-										}
-									}
+									<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send_response</span>(<span class="prelude-val">None</span>.<span class="ident">into</span>());
 								}
 							}
+						}
+						<span class="prelude-val">Err</span>(<span class="ident">incoming::Error::Fatal</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SubsystemError::with_origin</span>(<span class="string">&quot;availability-recovery&quot;</span>, <span class="ident">f</span>)),
+						<span class="prelude-val">Err</span>(<span class="ident">incoming::Error::NonFatal</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="macro">tracing::debug!</span>(
+								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+								<span class="question-mark">?</span><span class="ident">err</span>,
+								<span class="string">&quot;Decoding incoming request failed&quot;</span>
+							);
+							<span class="kw">continue</span>
 						}
 					}
 				}

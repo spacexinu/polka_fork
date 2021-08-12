@@ -1325,6 +1325,19 @@
 <span id="1322">1322</span>
 <span id="1323">1323</span>
 <span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1365,7 +1378,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full-node&quot;</span>)]</span>
 <span class="kw">use</span> {
 	<span class="ident">grandpa</span>::{<span class="self">self</span>, <span class="ident">FinalityProofProvider</span> <span class="kw">as</span> <span class="ident">GrandpaFinalityProofProvider</span>},
-	<span class="ident">polkadot_network_bridge::RequestMultiplexer</span>,
 	<span class="ident">polkadot_node_core_approval_voting::Config</span> <span class="kw">as</span> <span class="ident">ApprovalVotingConfig</span>,
 	<span class="ident">polkadot_node_core_av_store::Config</span> <span class="kw">as</span> <span class="ident">AvailabilityConfig</span>,
 	<span class="ident">polkadot_node_core_av_store::Error</span> <span class="kw">as</span> <span class="ident">AvailabilityError</span>,
@@ -1960,6 +1972,8 @@
 	<span class="ident">Executor</span>: <span class="ident">NativeExecutionDispatch</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	<span class="ident">OverseerGenerator</span>: <span class="ident">OverseerGen</span>,
 {
+	<span class="kw">use</span> <span class="ident">polkadot_node_network_protocol::request_response::IncomingRequest</span>;
+
 	<span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">role</span>.<span class="ident">clone</span>();
 	<span class="kw">let</span> <span class="ident">force_authoring</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">force_authoring</span>;
 	<span class="kw">let</span> <span class="ident">backoff_authoring_blocks</span> <span class="op">=</span> {
@@ -2009,11 +2023,18 @@
 		<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">extra_sets</span>.<span class="ident">extend</span>(<span class="ident">peer_sets_info</span>(<span class="ident">is_authority</span>));
 	}
 
-	<span class="kw">let</span> <span class="ident">request_multiplexer</span> <span class="op">=</span> {
-		<span class="kw">let</span> (<span class="ident">multiplexer</span>, <span class="ident">configs</span>) <span class="op">=</span> <span class="ident">RequestMultiplexer::new</span>();
-		<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">extend</span>(<span class="ident">configs</span>);
-		<span class="ident">multiplexer</span>
-	};
+	<span class="kw">let</span> (<span class="ident">pov_req_receiver</span>, <span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">IncomingRequest::get_config_receiver</span>();
+	<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">push</span>(<span class="ident">cfg</span>);
+	<span class="kw">let</span> (<span class="ident">chunk_req_receiver</span>, <span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">IncomingRequest::get_config_receiver</span>();
+	<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">push</span>(<span class="ident">cfg</span>);
+	<span class="kw">let</span> (<span class="ident">collation_req_receiver</span>, <span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">IncomingRequest::get_config_receiver</span>();
+	<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">push</span>(<span class="ident">cfg</span>);
+	<span class="kw">let</span> (<span class="ident">available_data_req_receiver</span>, <span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">IncomingRequest::get_config_receiver</span>();
+	<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">push</span>(<span class="ident">cfg</span>);
+	<span class="kw">let</span> (<span class="ident">statement_req_receiver</span>, <span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">IncomingRequest::get_config_receiver</span>();
+	<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">push</span>(<span class="ident">cfg</span>);
+	<span class="kw">let</span> (<span class="ident">dispute_req_receiver</span>, <span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">IncomingRequest::get_config_receiver</span>();
+	<span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">request_response_protocols</span>.<span class="ident">push</span>(<span class="ident">cfg</span>);
 
 	<span class="kw">let</span> <span class="ident">warp_sync</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">grandpa::warp_proof::NetworkProvider::new</span>(
 		<span class="ident">backend</span>.<span class="ident">clone</span>(),
@@ -2152,7 +2173,12 @@
 					<span class="ident">parachains_db</span>,
 					<span class="ident">network_service</span>: <span class="ident">network</span>.<span class="ident">clone</span>(),
 					<span class="ident">authority_discovery_service</span>,
-					<span class="ident">request_multiplexer</span>,
+					<span class="ident">pov_req_receiver</span>,
+					<span class="ident">chunk_req_receiver</span>,
+					<span class="ident">collation_req_receiver</span>,
+					<span class="ident">available_data_req_receiver</span>,
+					<span class="ident">statement_req_receiver</span>,
+					<span class="ident">dispute_req_receiver</span>,
 					<span class="ident">registry</span>: <span class="ident">prometheus_registry</span>.<span class="ident">as_ref</span>(),
 					<span class="ident">spawner</span>,
 					<span class="ident">is_collator</span>,

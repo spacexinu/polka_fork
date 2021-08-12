@@ -855,37 +855,6 @@
 <span id="852">852</span>
 <span id="853">853</span>
 <span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -911,15 +880,14 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Subsystems&#39; APIs are defined separately from their implementation, leading to easier mocking.</span>
 
-<span class="kw">use</span> <span class="ident">futures::channel</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
+<span class="kw">use</span> <span class="ident">futures::channel::oneshot</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sc_network::IfDisconnected</span>;
 
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol</span>::{
-	<span class="ident">peer_set::PeerSet</span>,
-	<span class="ident">request_response</span>::{<span class="ident">request::IncomingRequest</span>, <span class="ident">v1</span> <span class="kw">as</span> <span class="ident">req_res_v1</span>, <span class="ident">Requests</span>},
-	<span class="ident">v1</span> <span class="kw">as</span> <span class="ident">protocol_v1</span>, <span class="ident">PeerId</span>, <span class="ident">UnifiedReputationChange</span>,
+	<span class="ident">peer_set::PeerSet</span>, <span class="ident">request_response::Requests</span>, <span class="ident">v1</span> <span class="kw">as</span> <span class="ident">protocol_v1</span>, <span class="ident">PeerId</span>,
+	<span class="ident">UnifiedReputationChange</span>,
 };
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives</span>::{
 	<span class="ident">approval</span>::{<span class="ident">BlockApprovalMeta</span>, <span class="ident">IndirectAssignmentCert</span>, <span class="ident">IndirectSignedApprovalVote</span>},
@@ -1054,8 +1022,6 @@
 	<span class="doccomment">/// Get a network bridge update.</span>
 	<span class="attribute">#[<span class="ident">from</span>]</span>
 	<span class="ident">NetworkBridgeUpdateV1</span>(<span class="ident">NetworkBridgeEvent</span><span class="op">&lt;</span><span class="ident">protocol_v1::CollatorProtocolMessage</span><span class="op">&gt;</span>),
-	<span class="doccomment">/// Incoming network request for a collation.</span>
-	<span class="ident">CollationFetchingRequest</span>(<span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::CollationFetchingRequest</span><span class="op">&gt;</span>),
 	<span class="doccomment">/// We recommended a particular candidate to be seconded, but it was invalid; penalize the collator.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The hash is the relay parent.</span>
@@ -1186,9 +1152,6 @@
 	<span class="doccomment">/// Tell dispute distribution to distribute an explicit dispute statement to</span>
 	<span class="doccomment">/// validators.</span>
 	<span class="ident">SendDispute</span>(<span class="ident">DisputeMessage</span>),
-
-	<span class="doccomment">/// Get receiver for receiving incoming network requests for dispute sending.</span>
-	<span class="ident">DisputeSendingReceiver</span>(<span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">sc_network::config::IncomingRequest</span><span class="op">&gt;</span>),
 }
 
 <span class="doccomment">/// Messages received by the network bridge subsystem.</span>
@@ -1269,10 +1232,6 @@
 <span class="doccomment">/// Availability Distribution Message.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AvailabilityDistributionMessage</span> {
-	<span class="doccomment">/// Incoming network request for an availability chunk.</span>
-	<span class="ident">ChunkFetchingRequest</span>(<span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::ChunkFetchingRequest</span><span class="op">&gt;</span>),
-	<span class="doccomment">/// Incoming network request for a seconded PoV.</span>
-	<span class="ident">PoVFetchingRequest</span>(<span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::PoVFetchingRequest</span><span class="op">&gt;</span>),
 	<span class="doccomment">/// Instruct availability distribution to fetch a remote PoV.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// NOTE: The result of this fetch is not yet locally validated and could be bogus.</span>
@@ -1302,9 +1261,6 @@
 		<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GroupIndex</span><span class="op">&gt;</span>, <span class="comment">// Optional backing group to request from first.</span>
 		<span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AvailableData</span>, <span class="kw">crate</span><span class="ident">::errors::RecoveryError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	),
-	<span class="doccomment">/// Incoming network request for available data.</span>
-	<span class="attribute">#[<span class="ident">from</span>]</span>
-	<span class="ident">AvailableDataFetchingRequest</span>(<span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>),
 }
 
 <span class="doccomment">/// Bitfield distribution message.</span>
@@ -1555,8 +1511,6 @@
 	<span class="doccomment">/// Event from the network bridge.</span>
 	<span class="attribute">#[<span class="ident">from</span>]</span>
 	<span class="ident">NetworkBridgeUpdateV1</span>(<span class="ident">NetworkBridgeEvent</span><span class="op">&lt;</span><span class="ident">protocol_v1::StatementDistributionMessage</span><span class="op">&gt;</span>),
-	<span class="doccomment">/// Get receiver for receiving incoming network requests for statement fetching.</span>
-	<span class="ident">StatementFetchingReceiver</span>(<span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">sc_network::config::IncomingRequest</span><span class="op">&gt;</span>),
 }
 
 <span class="doccomment">/// This data becomes intrinsics or extrinsics which should be included in a future relay chain block.</span>
@@ -1756,22 +1710,6 @@
 <span class="doccomment">/// Message to the Gossip Support subsystem.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GossipSupportMessage</span> {}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::PoVFetchingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AvailabilityDistributionMessage</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">req</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::PoVFetchingRequest</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span><span class="ident">::PoVFetchingRequest</span>(<span class="ident">req</span>)
-	}
-}
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::ChunkFetchingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AvailabilityDistributionMessage</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">req</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::ChunkFetchingRequest</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span><span class="ident">::ChunkFetchingRequest</span>(<span class="ident">req</span>)
-	}
-}
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::CollationFetchingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CollatorProtocolMessage</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">req</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">req_res_v1::CollationFetchingRequest</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span><span class="ident">::CollationFetchingRequest</span>(<span class="ident">req</span>)
-	}
-}
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_node_subsystem_types" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

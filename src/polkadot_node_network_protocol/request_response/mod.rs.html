@@ -251,6 +251,18 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -294,11 +306,14 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sc_network</span>::{<span class="ident">config</span> <span class="kw">as</span> <span class="ident">network</span>, <span class="ident">config::RequestResponseConfig</span>};
 
-<span class="doccomment">/// All requests that can be sent to the network bridge.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">request</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">request</span>::{
-	<span class="ident">IncomingRequest</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">OutgoingResult</span>, <span class="ident">Recipient</span>, <span class="ident">Requests</span>, <span class="ident">ResponseSender</span>,
-};
+<span class="doccomment">/// Everything related to handling of incoming requests.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">incoming</span>;
+<span class="doccomment">/// Everything related to handling of outgoing requests.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">outgoing</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">incoming</span>::{<span class="ident">IncomingRequest</span>, <span class="ident">IncomingRequestReceiver</span>};
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">outgoing</span>::{<span class="ident">OutgoingRequest</span>, <span class="ident">OutgoingResult</span>, <span class="ident">Recipient</span>, <span class="ident">Requests</span>, <span class="ident">ResponseSender</span>};
 
 <span class="comment">///// Multiplexer for incoming requests.</span>
 <span class="comment">// pub mod multiplexer;</span>
@@ -501,6 +516,15 @@
 			<span class="ident">Protocol::DisputeSending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;/polkadot/send_dispute/1&quot;</span>,
 		}
 	}
+}
+
+<span class="doccomment">/// Common properties of any `Request`.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IsRequest</span> {
+	<span class="doccomment">/// Each request has a corresponding `Response`.</span>
+	<span class="kw">type</span> <span class="ident">Response</span>;
+
+	<span class="doccomment">/// What protocol this `Request` implements.</span>
+	<span class="kw">const</span> <span class="ident">PROTOCOL</span>: <span class="ident">Protocol</span>;
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="polkadot_node_network_protocol" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

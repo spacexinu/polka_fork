@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["AvailabilityDistributionSubsystem","The availability distribution subsystem."],["Metrics","Availability Distribution metrics."]]});
+initSidebarItems({"struct":[["AvailabilityDistributionSubsystem","The availability distribution subsystem."],["IncomingRequestReceivers","Receivers to be passed into availability distribution."],["Metrics","Availability Distribution metrics."]]});
