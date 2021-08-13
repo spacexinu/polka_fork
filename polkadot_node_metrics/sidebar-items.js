@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["metrics","This module reexports Prometheus types and defines the [`Metrics`] trait."]],"struct":[["Metronome","Create a stream of ticks with a defined cycle duration."]]});
+initSidebarItems({"mod":[["memory_stats","Memory allocation stats tracking. Memory tracking statistics."],["metrics","This module reexports Prometheus types and defines the [`Metrics`] trait."],["metronome","Cyclic metric collection support."]]});

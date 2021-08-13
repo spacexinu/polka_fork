@@ -443,7 +443,7 @@
 <span class="doccomment">/// A struct that represents an idle worker.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This struct is supposed to be used as a token that is passed by move into a subroutine that</span>
-<span class="doccomment">/// initiates a job. If the worker dies on the duty, then the token is not returned back.</span>
+<span class="doccomment">/// initiates a job. If the worker dies on the duty, then the token is not returned.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdleWorker</span> {
 	<span class="doccomment">/// The stream to which the child process is connected.</span>

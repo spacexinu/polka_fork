@@ -278,7 +278,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">sp_runtime::RuntimeDebug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundDownwardMessage</span><span class="op">&lt;</span><span class="ident">BlockNumber</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// The block number at which this messages was put into the downward message queue.</span>
+	<span class="doccomment">/// The block number at which these messages were put into the downward message queue.</span>
 	<span class="kw">pub</span> <span class="ident">sent_at</span>: <span class="ident">BlockNumber</span>,
 	<span class="doccomment">/// The actual downward message to processes.</span>
 	<span class="kw">pub</span> <span class="ident">msg</span>: <span class="ident">DownwardMessage</span>,
