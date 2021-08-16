@@ -236,17 +236,6 @@
 <span id="233">233</span>
 <span id="234">234</span>
 <span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -269,7 +258,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::{
 	<span class="kw">super</span><span class="ident">::v0::Order</span> <span class="kw">as</span> <span class="ident">Order0</span>, <span class="ident">MultiAsset</span>, <span class="ident">MultiAssetFilter</span>, <span class="ident">MultiAssets</span>, <span class="ident">MultiLocation</span>, <span class="ident">Xcm</span>,
 };
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec::Vec</span>};
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">core</span>::{
 	<span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
 	<span class="ident">result</span>,
@@ -390,8 +379,6 @@
 	<span class="doccomment">///   any surrounding operations/orders.</span>
 	<span class="doccomment">/// - `halt_on_error`: If `true`, the execution of the `orders` and `operations` will halt on the first failure. If</span>
 	<span class="doccomment">///   `false`, then execution will continue regardless.</span>
-	<span class="doccomment">/// - `orders`: Orders to be executed with the existing Holding Register; execution of these orders happens PRIOR to</span>
-	<span class="doccomment">///   execution of the `operations`. The (shallow) weight for these must be paid for with the `weight` purchased.</span>
 	<span class="doccomment">/// - `instructions`: XCM instructions to be executed outside of the context of the current Holding Register;</span>
 	<span class="doccomment">///   execution of these instructions happens AFTER the execution of the `orders`. The (shallow) weight for these</span>
 	<span class="doccomment">///   must be paid for with the `weight` purchased.</span>
@@ -402,7 +389,6 @@
 		<span class="ident">weight</span>: <span class="ident">u64</span>,
 		<span class="ident">debt</span>: <span class="ident">u64</span>,
 		<span class="ident">halt_on_error</span>: <span class="ident">bool</span>,
-		<span class="ident">orders</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">instructions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	},
 }
@@ -429,10 +415,9 @@
 			<span class="ident">InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> },
 			<span class="ident">QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span> },
-			<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">orders</span>, <span class="ident">instructions</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">orders</span> <span class="op">=</span> <span class="ident">orders</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Order::from</span>).<span class="ident">collect</span>();
+			<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">instructions</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Xcm::from</span>).<span class="ident">collect</span>();
-				<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">orders</span>, <span class="ident">instructions</span> }
+				<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> }
 			},
 		}
 	}
@@ -482,14 +467,7 @@
 			<span class="ident">Order0::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span>
 					<span class="ident">xcm</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Xcm</span>::<span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="ident">::try_from</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-				<span class="ident">BuyExecution</span> {
-					<span class="ident">fees</span>: <span class="ident">fees</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-					<span class="ident">weight</span>,
-					<span class="ident">debt</span>,
-					<span class="ident">halt_on_error</span>,
-					<span class="ident">orders</span>: <span class="macro">vec!</span>[],
-					<span class="ident">instructions</span>,
-				}
+				<span class="ident">BuyExecution</span> { <span class="ident">fees</span>: <span class="ident">fees</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> }
 			},
 		})
 	}

@@ -403,8 +403,6 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -598,7 +596,6 @@
 							<span class="ident">weight</span>: <span class="number">0</span>,
 							<span class="ident">debt</span>: <span class="ident">dest_weight</span>,
 							<span class="ident">halt_on_error</span>: <span class="bool-val">false</span>,
-							<span class="ident">orders</span>: <span class="macro">vec!</span>[],
 							<span class="ident">instructions</span>: <span class="macro">vec!</span>[],
 						},
 						<span class="ident">DepositAsset</span> { <span class="ident">assets</span>: <span class="ident">Wild</span>(<span class="ident">All</span>), <span class="ident">max_assets</span>, <span class="ident">beneficiary</span>: <span class="kw-2">*</span><span class="ident">beneficiary</span> },
@@ -667,7 +664,6 @@
 						<span class="ident">weight</span>: <span class="number">0</span>,
 						<span class="ident">debt</span>: <span class="ident">dest_weight</span>, <span class="comment">// covers this, `TransferReserveAsset` xcm, and `DepositAsset` order.</span>
 						<span class="ident">halt_on_error</span>: <span class="bool-val">false</span>,
-						<span class="ident">orders</span>: <span class="macro">vec!</span>[],
 						<span class="ident">instructions</span>: <span class="macro">vec!</span>[],
 					},
 					<span class="ident">DepositAsset</span> { <span class="ident">assets</span>: <span class="ident">Wild</span>(<span class="ident">All</span>), <span class="ident">max_assets</span>, <span class="ident">beneficiary</span>: <span class="kw-2">*</span><span class="ident">beneficiary</span> },

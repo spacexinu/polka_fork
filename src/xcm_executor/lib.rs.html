@@ -369,13 +369,6 @@
 <span id="366">366</span>
 <span id="367">367</span>
 <span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -711,7 +704,7 @@
 					<span class="ident">Xcm::QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>: <span class="ident">Response::Assets</span>(<span class="ident">assets</span>) },
 				)<span class="question-mark">?</span>;
 			},
-			<span class="ident">Order::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">orders</span>, <span class="ident">instructions</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Order::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// pay for `weight` using up to `fees` of the holding register.</span>
 				<span class="kw">let</span> <span class="ident">purchasing_weight</span> <span class="op">=</span>
 					<span class="ident">Weight::from</span>(<span class="ident">weight</span>.<span class="ident">checked_add</span>(<span class="ident">debt</span>).<span class="ident">ok_or</span>(<span class="ident">XcmError::Overflow</span>)<span class="question-mark">?</span>);
@@ -721,13 +714,6 @@
 				<span class="ident">holding</span>.<span class="ident">subsume_assets</span>(<span class="ident">unspent</span>);
 
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining_weight</span> <span class="op">=</span> <span class="ident">weight</span>;
-				<span class="kw">for</span> <span class="ident">order</span> <span class="kw">in</span> <span class="ident">orders</span>.<span class="ident">into_iter</span>() {
-					<span class="kw">match</span> <span class="self">Self</span><span class="ident">::execute_orders</span>(<span class="ident">origin</span>, <span class="ident">holding</span>, <span class="ident">order</span>, <span class="ident">trader</span>, <span class="ident">num_recursions</span> <span class="op">+</span> <span class="number">1</span>) {
-						<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">halt_on_error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-						<span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-						<span class="prelude-val">Ok</span>(<span class="ident">surplus</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">total_surplus</span> <span class="op">+</span><span class="op">=</span> <span class="ident">surplus</span>,
-					}
-				}
 				<span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">instructions</span>.<span class="ident">into_iter</span>() {
 					<span class="kw">match</span> <span class="self">Self</span><span class="ident">::do_execute_xcm</span>(
 						<span class="ident">origin</span>.<span class="ident">clone</span>(),
