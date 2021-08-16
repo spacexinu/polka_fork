@@ -176,6 +176,9 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -265,6 +268,9 @@
 			<span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">now</span>.<span class="ident">hash</span>();
 			<span class="macro">log::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;new event at #{:?} ({:?})&quot;</span>, <span class="ident">now</span>.<span class="ident">number</span>, <span class="ident">hash</span>);
 
+			<span class="comment">// if the runtime version has changed, terminate</span>
+			<span class="kw">crate</span><span class="ident">::check_versions</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="ident">client</span>, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
 			<span class="comment">// we prefer doing this check before fetching anything into a remote-ext.</span>
 			<span class="kw">if</span> <span class="ident">ensure_signed_phase</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Block</span><span class="op">&gt;</span>(<span class="ident">client</span>, <span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">is_err</span>() {
 				<span class="macro">log::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;phase closed, not interested in this block at all.&quot;</span>);
@@ -278,7 +284,7 @@
 			<span class="comment">// this will not be a solution.</span>
 
 			<span class="comment">// grab an externalities without staking, just the election snapshot.</span>
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::create_election_ext</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Block</span><span class="op">&gt;</span>(<span class="ident">shared</span>.<span class="ident">uri</span>.<span class="ident">clone</span>(), <span class="prelude-val">Some</span>(<span class="ident">hash</span>), <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::create_election_ext</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Block</span><span class="op">&gt;</span>(<span class="ident">shared</span>.<span class="ident">uri</span>.<span class="ident">clone</span>(), <span class="prelude-val">Some</span>(<span class="ident">hash</span>), <span class="macro">vec!</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
 			<span class="kw">if</span> <span class="ident">ensure_no_previous_solution</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Block</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ext</span>, <span class="kw-2">&amp;</span><span class="ident">signer</span>.<span class="ident">account</span>).<span class="kw">await</span>.<span class="ident">is_err</span>() {
 				<span class="macro">log::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;We already have a solution in this phase, skipping.&quot;</span>);
