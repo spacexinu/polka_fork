@@ -113,6 +113,13 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -139,6 +146,10 @@
 <span class="kw">use</span> <span class="ident">xcm_executor::traits</span>::{<span class="ident">OnResponse</span>, <span class="ident">ShouldExecute</span>};
 
 <span class="doccomment">/// Execution barrier that just takes `shallow_weight` from `weight_credit`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Useful to allow XCM execution by local chain users via extrinsics.</span>
+<span class="doccomment">/// E.g. `pallet_xcm::reserve_asset_transfer` to transfer a reserve asset</span>
+<span class="doccomment">/// out of the local chain to another one.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWeightCredit</span>;
 <span class="kw">impl</span> <span class="ident">ShouldExecute</span> <span class="kw">for</span> <span class="ident">TakeWeightCredit</span> {
 	<span class="kw">fn</span> <span class="ident">should_execute</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>(
@@ -155,6 +166,9 @@
 
 <span class="doccomment">/// Allows execution from `origin` if it is contained in `T` (i.e. `T::Contains(origin)`) taking payments into</span>
 <span class="doccomment">/// account.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Only allows for `TeleportAsset`, `WithdrawAsset` and `ReserveAssetDeposit` XCMs because they are the only ones</span>
+<span class="doccomment">/// that place assets in the Holding Register to pay for execution.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AllowTopLevelPaidExecutionFrom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Contains</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ShouldExecute</span> <span class="kw">for</span> <span class="ident">AllowTopLevelPaidExecutionFrom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">should_execute</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>(

@@ -246,6 +246,100 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -270,7 +364,7 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">traits::Get</span>, <span class="ident">weights::Weight</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sp_io::TestExternalities</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">cell::RefCell</span>, <span class="ident">marker::PhantomData</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">cell::RefCell</span>, <span class="ident">collections::vec_deque::VecDeque</span>, <span class="ident">marker::PhantomData</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_core_primitives::BlockNumber</span> <span class="kw">as</span> <span class="ident">RelayBlockNumber</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_parachain::primitives</span>::{
@@ -285,9 +379,24 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xcm_executor::XcmExecutor</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TestExt</span> {
+	<span class="doccomment">/// Initialize the test environment.</span>
 	<span class="kw">fn</span> <span class="ident">new_ext</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sp_io::TestExternalities</span>;
+	<span class="doccomment">/// Resets the state of the test environment.</span>
 	<span class="kw">fn</span> <span class="ident">reset_ext</span>();
-	<span class="kw">fn</span> <span class="ident">execute_with</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">execute</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>;
+	<span class="doccomment">/// Execute code in the context of the test externalities, without automatic</span>
+	<span class="doccomment">/// message processing. All messages in the message buses can be processed</span>
+	<span class="doccomment">/// by calling `Self::dispatch_xcm_buses()`.</span>
+	<span class="kw">fn</span> <span class="ident">execute_without_dispatch</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">execute</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>;
+	<span class="doccomment">/// Process all messages in the message buses</span>
+	<span class="kw">fn</span> <span class="ident">dispatch_xcm_buses</span>();
+	<span class="doccomment">/// Execute some code in the context of the test externalities, with</span>
+	<span class="doccomment">/// automatic message processing.</span>
+	<span class="doccomment">/// Messages are dispatched once the passed closure completes.</span>
+	<span class="kw">fn</span> <span class="ident">execute_with</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">execute</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+		<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::execute_without_dispatch</span>(<span class="ident">execute</span>);
+		<span class="self">Self</span><span class="ident">::dispatch_xcm_buses</span>();
+		<span class="ident">result</span>
+	}
 }
 
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageKind</span> {
@@ -411,11 +520,29 @@
 				<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ext_name</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span>.<span class="ident">borrow_mut</span>() <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">new_ext</span>);
 			}
 
-			<span class="kw">fn</span> <span class="ident">execute_with</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">execute</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+			<span class="kw">fn</span> <span class="ident">execute_without_dispatch</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">execute</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
 				<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ext_name</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">borrow_mut</span>().<span class="ident">execute_with</span>(<span class="ident">execute</span>))
+			}
+
+			<span class="kw">fn</span> <span class="ident">dispatch_xcm_buses</span>() {
+				<span class="kw">while</span> <span class="ident">exists_messages_in_any_bus</span>() {
+					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">xcm_error</span>) <span class="op">=</span> <span class="ident">process_relay_messages</span>() {
+						<span class="macro">panic!</span>(<span class="string">&quot;Relay chain XCM execution failure: {:?}&quot;</span>, <span class="ident">xcm_error</span>);
+					}
+					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">xcm_error</span>) <span class="op">=</span> <span class="ident">process_para_messages</span>() {
+						<span class="macro">panic!</span>(<span class="string">&quot;Parachain XCM execution failure: {:?}&quot;</span>, <span class="ident">xcm_error</span>);
+					}
+				}
 			}
 		}
 	};
+}
+
+<span class="macro">thread_local!</span> {
+	<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PARA_MESSAGE_BUS</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">VecDeque</span><span class="op">&lt;</span>(<span class="ident">ParaId</span>, <span class="ident">MultiLocation</span>, <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>
+		<span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="ident">VecDeque::new</span>());
+	<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">RELAY_MESSAGE_BUS</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">VecDeque</span><span class="op">&lt;</span>(<span class="ident">MultiLocation</span>, <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>
+		<span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="ident">VecDeque::new</span>());
 }
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
@@ -430,11 +557,82 @@
 
 		<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
 			<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>() {
-				<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::TestExt</span>;
-
+				<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">TestExt</span>, <span class="ident">VecDeque</span>};
+				<span class="comment">// Reset relay chain message bus</span>
+				<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::RELAY_MESSAGE_BUS</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">replace</span>(<span class="ident">VecDeque::new</span>()));
+				<span class="comment">// Reset parachain message bus</span>
+				<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::PARA_MESSAGE_BUS</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">replace</span>(<span class="ident">VecDeque::new</span>()));
 				<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">relay_chain</span><span class="op">&gt;</span><span class="ident">::reset_ext</span>();
 				$( <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parachain</span><span class="op">&gt;</span><span class="ident">::reset_ext</span>(); )<span class="op">*</span>
 			}
+		}
+
+		<span class="doccomment">/// Check if any messages exist in either message bus</span>
+		<span class="kw">fn</span> <span class="ident">exists_messages_in_any_bus</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+			<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">RELAY_MESSAGE_BUS</span>, <span class="ident">PARA_MESSAGE_BUS</span>};
+			<span class="kw">let</span> <span class="ident">no_relay_messages_left</span> <span class="op">=</span> <span class="ident">RELAY_MESSAGE_BUS</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow</span>().<span class="ident">is_empty</span>());
+			<span class="kw">let</span> <span class="ident">no_parachain_messages_left</span> <span class="op">=</span> <span class="ident">PARA_MESSAGE_BUS</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow</span>().<span class="ident">is_empty</span>());
+			<span class="op">!</span>(<span class="ident">no_relay_messages_left</span> <span class="op">&amp;&amp;</span> <span class="ident">no_parachain_messages_left</span>)
+		}
+
+		<span class="doccomment">/// Process all messages originating from parachains.</span>
+		<span class="kw">fn</span> <span class="ident">process_para_messages</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmResult</span> {
+			<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">UmpSink</span>, <span class="ident">XcmpMessageHandlerT</span>};
+
+			<span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">para_id</span>, <span class="ident">destination</span>, <span class="ident">message</span>)) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::PARA_MESSAGE_BUS</span>.<span class="ident">with</span>(
+				<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow_mut</span>().<span class="ident">pop_front</span>()) {
+				<span class="kw">match</span> <span class="ident">destination</span>.<span class="ident">interior</span>() {
+					<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Junctions::Here</span> <span class="kw">if</span> <span class="ident">destination</span>.<span class="ident">parent_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::encode_xcm</span>(<span class="ident">message</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MessageKind::Ump</span>);
+						<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">relay_chain</span><span class="op">&gt;</span><span class="ident">::process_upward_message</span>(
+							<span class="ident">para_id</span>, <span class="kw-2">&amp;</span><span class="ident">encoded</span>[..],
+							<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Weight::max_value</span>(),
+						);
+						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>((<span class="ident">id</span>, <span class="ident">required</span>)) <span class="op">=</span> <span class="ident">r</span> {
+							<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::WeightLimitReached</span>(<span class="ident">required</span>));
+						}
+					},
+					$(
+						<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::X1</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Parachain</span>(<span class="ident">id</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">para_id</span> <span class="op">&amp;&amp;</span> <span class="ident">destination</span>.<span class="ident">parent_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::encode_xcm</span>(<span class="ident">message</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MessageKind::Xcmp</span>);
+							<span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">para_id</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">encoded</span>[..])];
+							<span class="kw">let</span> <span class="ident">_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parachain</span><span class="op">&gt;</span><span class="ident">::handle_xcmp_messages</span>(
+								<span class="ident">messages</span>.<span class="ident">into_iter</span>(),
+								<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Weight::max_value</span>(),
+							);
+						},
+					)<span class="op">*</span>
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::CannotReachDestination</span>(<span class="ident">destination</span>, <span class="ident">message</span>));
+					}
+				}
+			}
+
+			<span class="prelude-val">Ok</span>(())
+		}
+
+		<span class="doccomment">/// Process all messages originating from the relay chain.</span>
+		<span class="kw">fn</span> <span class="ident">process_relay_messages</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmResult</span> {
+			<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::DmpMessageHandlerT</span>;
+
+			<span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">destination</span>, <span class="ident">message</span>)) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::RELAY_MESSAGE_BUS</span>.<span class="ident">with</span>(
+				<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow_mut</span>().<span class="ident">pop_front</span>()) {
+				<span class="kw">match</span> <span class="ident">destination</span>.<span class="ident">interior</span>() {
+					$(
+						<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::X1</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Parachain</span>(<span class="ident">id</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">para_id</span> <span class="op">&amp;&amp;</span> <span class="ident">destination</span>.<span class="ident">parent_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::encode_xcm</span>(<span class="ident">message</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MessageKind::Dmp</span>);
+							<span class="comment">// NOTE: RelayChainBlockNumber is hard-coded to 1</span>
+							<span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="ident">encoded</span>)];
+							<span class="kw">let</span> <span class="ident">_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parachain</span><span class="op">&gt;</span><span class="ident">::handle_dmp_messages</span>(
+								<span class="ident">messages</span>.<span class="ident">into_iter</span>(), <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Weight::max_value</span>(),
+							);
+						},
+					)<span class="op">*</span>
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::SendFailed</span>(<span class="string">&quot;Only sends to children parachain.&quot;</span>)),
+				}
+			}
+
+			<span class="prelude-val">Ok</span>(())
 		}
 
 		<span class="doccomment">/// XCM router for parachain.</span>
@@ -446,21 +644,14 @@
 
 				<span class="kw">match</span> <span class="ident">destination</span>.<span class="ident">interior</span>() {
 					<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Junctions::Here</span> <span class="kw">if</span> <span class="ident">destination</span>.<span class="ident">parent_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::encode_xcm</span>(<span class="ident">message</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MessageKind::Ump</span>);
-						<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">relay_chain</span><span class="op">&gt;</span><span class="ident">::process_upward_message</span>(
-							<span class="ident">T::get</span>(), <span class="kw-2">&amp;</span><span class="ident">encoded</span>[..],
-							<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Weight::max_value</span>(),
-						);
+						<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::PARA_MESSAGE_BUS</span>.<span class="ident">with</span>(
+							<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow_mut</span>().<span class="ident">push_back</span>((<span class="ident">T::get</span>(), <span class="ident">destination</span>, <span class="ident">message</span>)));
 						<span class="prelude-val">Ok</span>(())
 					},
 					$(
 						<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::X1</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Parachain</span>(<span class="ident">id</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">para_id</span> <span class="op">&amp;&amp;</span> <span class="ident">destination</span>.<span class="ident">parent_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
-							<span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::encode_xcm</span>(<span class="ident">message</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MessageKind::Xcmp</span>);
-							<span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">T::get</span>(), <span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">encoded</span>[..])];
-							<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parachain</span><span class="op">&gt;</span><span class="ident">::handle_xcmp_messages</span>(
-								<span class="ident">messages</span>.<span class="ident">into_iter</span>(),
-								<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Weight::max_value</span>(),
-							);
+							<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::PARA_MESSAGE_BUS</span>.<span class="ident">with</span>(
+								<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow_mut</span>().<span class="ident">push_back</span>((<span class="ident">T::get</span>(), <span class="ident">destination</span>, <span class="ident">message</span>)));
 							<span class="prelude-val">Ok</span>(())
 						},
 					)<span class="op">*</span>
@@ -478,11 +669,8 @@
 				<span class="kw">match</span> <span class="ident">destination</span>.<span class="ident">interior</span>() {
 					$(
 						<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::X1</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Parachain</span>(<span class="ident">id</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">para_id</span> <span class="op">&amp;&amp;</span> <span class="ident">destination</span>.<span class="ident">parent_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
-							<span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::encode_xcm</span>(<span class="ident">message</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MessageKind::Dmp</span>);
-							<span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="ident">encoded</span>)];
-							<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parachain</span><span class="op">&gt;</span><span class="ident">::handle_dmp_messages</span>(
-								<span class="ident">messages</span>.<span class="ident">into_iter</span>(), <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Weight::max_value</span>(),
-							);
+							<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::RELAY_MESSAGE_BUS</span>.<span class="ident">with</span>(
+								<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">borrow_mut</span>().<span class="ident">push_back</span>((<span class="ident">destination</span>, <span class="ident">message</span>)));
 							<span class="prelude-val">Ok</span>(())
 						},
 					)<span class="op">*</span>

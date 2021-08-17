@@ -314,6 +314,12 @@
 <span id="311">311</span>
 <span id="312">312</span>
 <span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -483,6 +489,11 @@
 	<span class="attribute">#[<span class="ident">pallet::getter</span>(<span class="kw">fn</span> <span class="ident">parachain_id</span>)]</span>
 	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">ParachainId</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StorageValue</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">ParaId</span>, <span class="ident">ValueQuery</span><span class="op">&gt;</span>;
 
+	<span class="attribute">#[<span class="ident">pallet::storage</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::getter</span>(<span class="kw">fn</span> <span class="ident">received_dmp</span>)]</span>
+	<span class="doccomment">/// A queue of received DMP messages</span>
+	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">ReceivedDmp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StorageValue</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">T::Call</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ValueQuery</span><span class="op">&gt;</span>;
+
 	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">ParaId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParaId</span> {
 			<span class="self">Self</span><span class="ident">::parachain_id</span>()
@@ -583,7 +594,8 @@
 						<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event::UnsupportedVersion</span>(<span class="ident">id</span>));
 					},
 					<span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">x</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">T::XcmExecutor::execute_xcm</span>(<span class="ident">Parent</span>.<span class="ident">into</span>(), <span class="ident">x</span>, <span class="ident">limit</span>);
+						<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">T::XcmExecutor::execute_xcm</span>(<span class="ident">Parent</span>.<span class="ident">into</span>(), <span class="ident">x</span>.<span class="ident">clone</span>(), <span class="ident">limit</span>);
+						<span class="op">&lt;</span><span class="ident">ReceivedDmp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::append</span>(<span class="ident">x</span>);
 						<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event::ExecutedDownward</span>(<span class="ident">id</span>, <span class="ident">outcome</span>));
 					},
 				}
