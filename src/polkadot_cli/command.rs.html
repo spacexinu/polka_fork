@@ -455,11 +455,6 @@
 <span id="452">452</span>
 <span id="453">453</span>
 <span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -703,11 +698,6 @@
 		<span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">role</span>.<span class="ident">clone</span>();
 
 		<span class="kw">match</span> <span class="ident">role</span> {
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;browser&quot;</span>)]</span>
-			<span class="ident">Role::Light</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">service::build_light</span>(<span class="ident">config</span>)
-				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">task_manager</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">task_manager</span>)
-				.<span class="ident">map_err</span>(<span class="ident">Into::into</span>),
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;browser&quot;</span>))]</span>
 			<span class="ident">Role::Light</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Other</span>(<span class="string">&quot;Light client not enabled&quot;</span>.<span class="ident">into</span>())),
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">service::build_full</span>(
 				<span class="ident">config</span>,
@@ -801,7 +791,7 @@
 			<span class="ident">builder</span>.<span class="ident">with_colors</span>(<span class="bool-val">false</span>);
 			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">init</span>();
 
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;browser&quot;</span>))]</span>
+			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>)]</span>
 			{
 				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">sc_cli::Error::Input</span>(
 					<span class="string">&quot;PVF preparation workers are not supported under this platform&quot;</span>.<span class="ident">into</span>(),
@@ -809,7 +799,7 @@
 				.<span class="ident">into</span>())
 			}
 
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;browser&quot;</span>)))]</span>
+			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>))]</span>
 			{
 				<span class="ident">polkadot_node_core_pvf::prepare_worker_entrypoint</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">socket_path</span>);
 				<span class="prelude-val">Ok</span>(())
@@ -820,7 +810,7 @@
 			<span class="ident">builder</span>.<span class="ident">with_colors</span>(<span class="bool-val">false</span>);
 			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">init</span>();
 
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;browser&quot;</span>))]</span>
+			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>)]</span>
 			{
 				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">sc_cli::Error::Input</span>(
 					<span class="string">&quot;PVF execution workers are not supported under this platform&quot;</span>.<span class="ident">into</span>(),
@@ -828,7 +818,7 @@
 				.<span class="ident">into</span>())
 			}
 
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;browser&quot;</span>)))]</span>
+			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>))]</span>
 			{
 				<span class="ident">polkadot_node_core_pvf::execute_worker_entrypoint</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">socket_path</span>);
 				<span class="prelude-val">Ok</span>(())
