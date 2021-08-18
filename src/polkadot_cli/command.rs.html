@@ -455,6 +455,12 @@
 <span id="452">452</span>
 <span id="453">453</span>
 <span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -834,23 +840,29 @@
 			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kusama-native&quot;</span>)]</span>
 			<span class="kw">if</span> <span class="ident">chain_spec</span>.<span class="ident">is_kusama</span>() {
 				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">runner</span>.<span class="ident">sync_run</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-					<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::kusama_runtime::Block</span>, <span class="ident">service::KusamaExecutor</span><span class="op">&gt;</span>(<span class="ident">config</span>)
-						.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::SubstrateCli</span>(<span class="ident">e</span>))
+					<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::kusama_runtime::Block</span>, <span class="ident">service::KusamaExecutorDispatch</span><span class="op">&gt;</span>(
+						<span class="ident">config</span>,
+					)
+					.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::SubstrateCli</span>(<span class="ident">e</span>))
 				})<span class="question-mark">?</span>)
 			}
 
 			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;westend-native&quot;</span>)]</span>
 			<span class="kw">if</span> <span class="ident">chain_spec</span>.<span class="ident">is_westend</span>() {
 				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">runner</span>.<span class="ident">sync_run</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-					<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::westend_runtime::Block</span>, <span class="ident">service::WestendExecutor</span><span class="op">&gt;</span>(<span class="ident">config</span>)
-						.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::SubstrateCli</span>(<span class="ident">e</span>))
+					<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::westend_runtime::Block</span>, <span class="ident">service::WestendExecutorDispatch</span><span class="op">&gt;</span>(
+						<span class="ident">config</span>,
+					)
+					.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::SubstrateCli</span>(<span class="ident">e</span>))
 				})<span class="question-mark">?</span>)
 			}
 
 			<span class="comment">// else we assume it is polkadot.</span>
 			<span class="prelude-val">Ok</span>(<span class="ident">runner</span>.<span class="ident">sync_run</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-				<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::polkadot_runtime::Block</span>, <span class="ident">service::PolkadotExecutor</span><span class="op">&gt;</span>(<span class="ident">config</span>)
-					.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::SubstrateCli</span>(<span class="ident">e</span>))
+				<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::polkadot_runtime::Block</span>, <span class="ident">service::PolkadotExecutorDispatch</span><span class="op">&gt;</span>(
+					<span class="ident">config</span>,
+				)
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::SubstrateCli</span>(<span class="ident">e</span>))
 			})<span class="question-mark">?</span>)
 		},
 		<span class="prelude-val">Some</span>(<span class="ident">Subcommand::Key</span>(<span class="ident">cmd</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">cmd</span>.<span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="ident">cli</span>)<span class="question-mark">?</span>),
