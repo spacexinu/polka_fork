@@ -28,7 +28,7 @@ use sc_client_api::{
 use sc_consensus_babe::Epoch;
 use sc_finality_grandpa::FinalityProofProvider;
 pub use sc_rpc::{DenyUnsafe, SubscriptionTaskExecutor};
-use sc_sync_state_rpc::{SyncStateRpcApi, SyncStateRpcHandler};
+use sc_sync_state_rpc::SyncStateRpc;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
@@ -36,9 +36,10 @@ use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
 use sp_keystore::SyncCryptoStorePtr;
 use txpool_api::TransactionPool;
+use jsonrpsee::RpcModule;
 
 /// A type representing all RPC extensions.
-pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
+pub type RpcExtension = RpcModule<()>;
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {
@@ -126,13 +127,14 @@ where
 	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
 	B::State: sc_client_api::StateBackend<sp_runtime::traits::HashFor<Block>>,
 {
-	use frame_rpc_system::{FullSystem, SystemApi};
-	use pallet_mmr_rpc::{Mmr, MmrApi};
-	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use sc_consensus_babe_rpc::BabeRpcHandler;
-	use sc_finality_grandpa_rpc::{GrandpaApi, GrandpaRpcHandler};
+	use frame_rpc_system::SystemRpc;
+	use pallet_mmr_rpc::MmrRpc;
+	use pallet_transaction_payment_rpc::TransactionPaymentRpc;
+	use sc_consensus_babe_rpc::BabeRpc;
+	use sc_finality_grandpa_rpc::GrandpaRpc;
 
-	let mut io = jsonrpc_core::IoHandler::default();
+	let mut rpc_api = RpcModule::new(());
+
 	let FullDeps { client, pool, select_chain, chain_spec, deny_unsafe, babe, grandpa, beefy } =
 		deps;
 	let BabeDeps { keystore, babe_config, shared_epoch_changes } = babe;
@@ -144,40 +146,44 @@ where
 		finality_provider,
 	} = grandpa;
 
-	io.extend_with(SystemApi::to_delegate(FullSystem::new(client.clone(), pool, deny_unsafe)));
-	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
-	io.extend_with(MmrApi::to_delegate(Mmr::new(client.clone())));
-	io.extend_with(sc_consensus_babe_rpc::BabeApi::to_delegate(BabeRpcHandler::new(
+	let system = SystemRpc::new(client.clone(), pool, deny_unsafe).into_rpc_module().unwrap();
+	let payment = TransactionPaymentRpc::new(client.clone()).into_rpc_module().unwrap();
+	let mmr = MmrRpc::new(client.clone()).into_rpc_module().unwrap();
+	let babe = BabeRpc::new(
 		client.clone(),
 		shared_epoch_changes.clone(),
 		keystore,
 		babe_config,
 		select_chain,
 		deny_unsafe,
-	)));
-	io.extend_with(GrandpaApi::to_delegate(GrandpaRpcHandler::new(
+	).into_rpc_module().unwrap();
+	let grandpa = GrandpaRpc::new(
 		shared_authority_set.clone(),
 		shared_voter_state,
 		justification_stream,
 		subscription_executor,
 		finality_provider,
-	)));
-	io.extend_with(SyncStateRpcApi::to_delegate(SyncStateRpcHandler::new(
+	).into_rpc_module().unwrap();
+	let sync_state = SyncStateRpc::new(
 		chain_spec,
 		client,
 		shared_authority_set,
 		shared_epoch_changes,
 		deny_unsafe,
-	)?));
+	)?.into_rpc_module().unwrap();
 
-	io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(
-		beefy_gadget_rpc::BeefyRpcHandler::new(
-			beefy.beefy_commitment_stream,
-			beefy.subscription_executor,
-		),
-	));
+	let beefy = beefy_gadget_rpc::BeefyRpcHandler::new(
+		beefy.beefy_commitment_stream,
+		beefy.subscription_executor,
+	).into_rpc_module().unwrap();
 
-	Ok(io)
+
+	rpc_api.merge(system).unwrap();
+	rpc_api.merge(payment).unwrap();
+	rpc_api.merge(mmr).unwrap();
+
+
+	Ok(rpc_api)
 }
 
 /// Instantiate all RPC extensions for light node.
@@ -191,15 +197,15 @@ where
 	P: TransactionPool + Sync + Send + 'static,
 	F: Fetcher<Block> + 'static,
 {
-	use frame_rpc_system::{LightSystem, SystemApi};
+	use frame_rpc_system::SystemRpc;
 
 	let LightDeps { client, pool, remote_blockchain, fetcher } = deps;
-	let mut io = jsonrpc_core::IoHandler::default();
-	io.extend_with(SystemApi::<Hash, AccountId, Nonce>::to_delegate(LightSystem::new(
+	let mut rpc_api = RpcModule::new(());
+	rpc_api.merge(SystemRpc::new(
 		client,
 		remote_blockchain,
 		fetcher,
 		pool,
-	)));
-	io
+	).into_rpc_module().unwrap());
+	rpc_api
 }

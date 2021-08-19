@@ -12,11 +12,11 @@ futures-timer = "3.0.2"
 
 metered-channel = { path = "../metered-channel"}
 
-sc-network = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-keystore = { git = "https://github.com/paritytech/substrate", branch = "master" }
-substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-network = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
+sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
+sp-keystore = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
+substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
 
 jemalloc-ctl = { version = "0.3.3", optional = true }
 
