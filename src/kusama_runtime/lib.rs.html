@@ -1935,6 +1935,7 @@
 <span id="1932">1932</span>
 <span id="1933">1933</span>
 <span id="1934">1934</span>
+<span id="1935">1935</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1988,7 +1989,8 @@
 <span class="kw">use</span> <span class="ident">frame_support</span>::{
 	<span class="ident">construct_runtime</span>, <span class="ident">parameter_types</span>,
 	<span class="ident">traits</span>::{
-		<span class="ident">Contains</span>, <span class="ident">Everything</span>, <span class="ident">InstanceFilter</span>, <span class="ident">KeyOwnerProofSystem</span>, <span class="ident">LockIdentifier</span>, <span class="ident">OnRuntimeUpgrade</span>,
+		<span class="ident">Contains</span>, <span class="ident">Everything</span>, <span class="ident">InstanceFilter</span>, <span class="ident">KeyOwnerProofSystem</span>, <span class="ident">LockIdentifier</span>, <span class="ident">Nothing</span>,
+		<span class="ident">OnRuntimeUpgrade</span>,
 	},
 	<span class="ident">weights::Weight</span>,
 	<span class="ident">PalletId</span>, <span class="ident">RuntimeDebug</span>,
@@ -3257,7 +3259,7 @@
 	<span class="comment">// Anyone can execute XCM messages locally...</span>
 	<span class="kw">type</span> <span class="ident">ExecuteXcmOrigin</span> <span class="op">=</span> <span class="ident">xcm_builder::EnsureXcmOrigin</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">LocalOriginToLocation</span><span class="op">&gt;</span>;
 	<span class="comment">// ...but they must match our filter, which rejects all.</span>
-	<span class="kw">type</span> <span class="ident">XcmExecuteFilter</span> <span class="op">=</span> ();
+	<span class="kw">type</span> <span class="ident">XcmExecuteFilter</span> <span class="op">=</span> <span class="ident">Nothing</span>;
 	<span class="kw">type</span> <span class="ident">XcmExecutor</span> <span class="op">=</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">XcmConfig</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">XcmTeleportFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
 	<span class="kw">type</span> <span class="ident">XcmReserveTransferFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
