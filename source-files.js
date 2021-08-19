@@ -86,6 +86,7 @@ sourcesIndex["xcm"] = {"name":"","dirs":[{"name":"v0","files":["junction.rs","mo
 sourcesIndex["xcm_builder"] = {"name":"","files":["barriers.rs","currency_adapter.rs","filter_asset_location.rs","fungibles_adapter.rs","lib.rs","location_conversion.rs","matches_fungible.rs","origin_conversion.rs","weight.rs"]};
 sourcesIndex["xcm_executor"] = {"name":"","dirs":[{"name":"traits","files":["conversion.rs","filter_asset_location.rs","matches_fungible.rs","matches_fungibles.rs","mod.rs","on_response.rs","should_execute.rs","transact_asset.rs","weight.rs"]}],"files":["assets.rs","config.rs","lib.rs"]};
 sourcesIndex["xcm_executor_integration_tests"] = {"name":"","files":["lib.rs"]};
+sourcesIndex["xcm_procedural"] = {"name":"","dirs":[{"name":"v0","files":["multilocation.rs"]},{"name":"v1","files":["multilocation.rs"]}],"files":["lib.rs","v0.rs","v1.rs"]};
 sourcesIndex["xcm_simulator"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["xcm_simulator_example"] = {"name":"","files":["lib.rs","parachain.rs","relay_chain.rs"]};
 createSourceSidebar();
