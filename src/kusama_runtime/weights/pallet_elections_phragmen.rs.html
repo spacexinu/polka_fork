@@ -115,6 +115,10 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -209,6 +213,10 @@
 		(<span class="number">132_820_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">5</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">5</span> <span class="kw">as</span> <span class="ident">Weight</span>))
+	}
+	<span class="comment">// Storage: Benchmark Override (r:0 w:0)</span>
+	<span class="kw">fn</span> <span class="ident">remove_member_without_replacement</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+		(<span class="number">2_000_000_000_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 	}
 	<span class="kw">fn</span> <span class="ident">remove_member_wrong_refund</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">8_551_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">1</span> <span class="kw">as</span> <span class="ident">Weight</span>))
