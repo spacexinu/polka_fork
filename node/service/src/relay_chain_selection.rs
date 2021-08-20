@@ -178,10 +178,13 @@ where
 		target_hash: Hash,
 		maybe_max_number: Option<BlockNumber>,
 	) -> Result<Option<Hash>, ConsensusError> {
+		let longest_chain_best = self.fallback
+			.finality_target(target_hash, maybe_max_number).await?;
+
 		if self.selection.overseer.is_disconnected() {
-			return self.fallback.finality_target(target_hash, maybe_max_number).await
+			return longest_chain_best;
 		}
-		self.selection.finality_target(target_hash, maybe_max_number).await
+		self.selection.finality_target(target_hash, longest_chain_best, maybe_max_number).await
 	}
 }
 
@@ -316,30 +319,33 @@ where
 	async fn finality_target(
 		&self,
 		target_hash: Hash,
+		best_leaf: Hash,
 		maybe_max_number: Option<BlockNumber>,
 	) -> Result<Option<Hash>, ConsensusError> {
 		let mut overseer = self.overseer.clone();
 
-		let subchain_head = {
-			let (tx, rx) = oneshot::channel();
-			overseer
-				.send_msg(
-					ChainSelectionMessage::BestLeafContaining(target_hash, tx),
-					std::any::type_name::<Self>(),
-				)
-				.await;
+		// TODO: re-enable.
+		let subchain_head = best_leaf;
+		// let subchain_head = {
+		// 	let (tx, rx) = oneshot::channel();
+		// 	overseer
+		// 		.send_msg(
+		// 			ChainSelectionMessage::BestLeafContaining(target_hash, tx),
+		// 			std::any::type_name::<Self>(),
+		// 		)
+		// 		.await;
 
-			let best = rx
-				.await
-				.map_err(Error::OverseerDisconnected)
-				.map_err(|e| ConsensusError::Other(Box::new(e)))?;
+		// 	let best = rx
+		// 		.await
+		// 		.map_err(Error::OverseerDisconnected)
+		// 		.map_err(|e| ConsensusError::Other(Box::new(e)))?;
 
-			match best {
-				// No viable leaves containing the block.
-				None => return Ok(Some(target_hash)),
-				Some(best) => best,
-			}
-		};
+		// 	match best {
+		// 		// No viable leaves containing the block.
+		// 		None => return Ok(Some(target_hash)),
+		// 		Some(best) => best,
+		// 	}
+		// };
 
 		let target_number = self.block_number(target_hash)?;
 
