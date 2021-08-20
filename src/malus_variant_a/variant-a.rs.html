@@ -112,6 +112,7 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -207,6 +208,7 @@
 				<span class="ident">CandidateValidationSubsystem::with_config</span>(
 					<span class="ident">candidate_validation_config</span>,
 					<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
+					<span class="ident">polkadot_node_core_pvf::Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 				),
 				<span class="ident">Skippy::default</span>(),
 			),

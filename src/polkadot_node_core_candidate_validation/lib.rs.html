@@ -605,6 +605,18 @@
 <span id="602">602</span>
 <span id="603">603</span>
 <span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -678,6 +690,7 @@
 <span class="doccomment">/// The candidate validation subsystem.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CandidateValidationSubsystem</span> {
 	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+	<span class="ident">pvf_metrics</span>: <span class="ident">polkadot_node_core_pvf::Metrics</span>,
 	<span class="ident">config</span>: <span class="ident">Config</span>,
 }
 
@@ -686,8 +699,12 @@
 	<span class="doccomment">/// strategy.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Check out [`IsolationStrategy`] to get more details.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_config</span>(<span class="ident">config</span>: <span class="ident">Config</span>, <span class="ident">metrics</span>: <span class="ident">Metrics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">CandidateValidationSubsystem</span> { <span class="ident">config</span>, <span class="ident">metrics</span> }
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_config</span>(
+		<span class="ident">config</span>: <span class="ident">Config</span>,
+		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+		<span class="ident">pvf_metrics</span>: <span class="ident">polkadot_node_core_pvf::Metrics</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="ident">CandidateValidationSubsystem</span> { <span class="ident">config</span>, <span class="ident">metrics</span>, <span class="ident">pvf_metrics</span> }
 	}
 }
 
@@ -697,10 +714,15 @@
 	<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CandidateValidationMessage</span><span class="op">&gt;</span>,
 {
 	<span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpawnedSubsystem</span> {
-		<span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span>
-			<span class="ident">run</span>(<span class="ident">ctx</span>, <span class="self">self</span>.<span class="ident">metrics</span>, <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">artifacts_cache_path</span>, <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">program_path</span>)
-				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">SubsystemError::with_origin</span>(<span class="string">&quot;candidate-validation&quot;</span>, <span class="ident">e</span>))
-				.<span class="ident">boxed</span>();
+		<span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">run</span>(
+			<span class="ident">ctx</span>,
+			<span class="self">self</span>.<span class="ident">metrics</span>,
+			<span class="self">self</span>.<span class="ident">pvf_metrics</span>,
+			<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">artifacts_cache_path</span>,
+			<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">program_path</span>,
+		)
+		.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">SubsystemError::with_origin</span>(<span class="string">&quot;candidate-validation&quot;</span>, <span class="ident">e</span>))
+		.<span class="ident">boxed</span>();
 		<span class="ident">SpawnedSubsystem</span> { <span class="ident">name</span>: <span class="string">&quot;candidate-validation-subsystem&quot;</span>, <span class="ident">future</span> }
 	}
 }
@@ -708,6 +730,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(
 	<span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>,
 	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+	<span class="ident">pvf_metrics</span>: <span class="ident">polkadot_node_core_pvf::Metrics</span>,
 	<span class="ident">cache_path</span>: <span class="ident">PathBuf</span>,
 	<span class="ident">program_path</span>: <span class="ident">PathBuf</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubsystemResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
@@ -717,6 +740,7 @@
 {
 	<span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">validation_host</span>, <span class="ident">task</span>) <span class="op">=</span> <span class="ident">polkadot_node_core_pvf::start</span>(
 		<span class="ident">polkadot_node_core_pvf::Config::new</span>(<span class="ident">cache_path</span>, <span class="ident">program_path</span>),
+		<span class="ident">pvf_metrics</span>,
 	);
 	<span class="ident">ctx</span>.<span class="ident">spawn_blocking</span>(<span class="string">&quot;pvf-validation-host&quot;</span>, <span class="ident">task</span>.<span class="ident">boxed</span>())<span class="question-mark">?</span>;
 

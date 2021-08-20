@@ -964,6 +964,11 @@
 <span id="961">961</span>
 <span id="962">962</span>
 <span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -989,7 +994,9 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">artifacts</span>::{<span class="ident">ArtifactId</span>, <span class="ident">ArtifactPathId</span>, <span class="ident">ArtifactState</span>, <span class="ident">Artifacts</span>},
-	<span class="ident">execute</span>, <span class="ident">prepare</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">ValidationError</span>, <span class="ident">LOG_TARGET</span>,
+	<span class="ident">execute</span>,
+	<span class="ident">metrics::Metrics</span>,
+	<span class="ident">prepare</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">ValidationError</span>, <span class="ident">LOG_TARGET</span>,
 };
 <span class="kw">use</span> <span class="ident">always_assert::never</span>;
 <span class="kw">use</span> <span class="ident">async_std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
@@ -1101,18 +1108,20 @@
 <span class="doccomment">/// The future should not return normally but if it does then that indicates an unrecoverable error.</span>
 <span class="doccomment">/// In that case all pending requests will be canceled, dropping the result senders and new ones</span>
 <span class="doccomment">/// will be rejected.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">config</span>: <span class="ident">Config</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ValidationHost</span>, <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">config</span>: <span class="ident">Config</span>, <span class="ident">metrics</span>: <span class="ident">Metrics</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ValidationHost</span>, <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span>) {
 	<span class="kw">let</span> (<span class="ident">to_host_tx</span>, <span class="ident">to_host_rx</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">10</span>);
 
 	<span class="kw">let</span> <span class="ident">validation_host</span> <span class="op">=</span> <span class="ident">ValidationHost</span> { <span class="ident">to_host_tx</span> };
 
 	<span class="kw">let</span> (<span class="ident">to_prepare_pool</span>, <span class="ident">from_prepare_pool</span>, <span class="ident">run_prepare_pool</span>) <span class="op">=</span> <span class="ident">prepare::start_pool</span>(
+		<span class="ident">metrics</span>.<span class="ident">clone</span>(),
 		<span class="ident">config</span>.<span class="ident">prepare_worker_program_path</span>.<span class="ident">clone</span>(),
 		<span class="ident">config</span>.<span class="ident">cache_path</span>.<span class="ident">clone</span>(),
 		<span class="ident">config</span>.<span class="ident">prepare_worker_spawn_timeout</span>,
 	);
 
 	<span class="kw">let</span> (<span class="ident">to_prepare_queue_tx</span>, <span class="ident">from_prepare_queue_rx</span>, <span class="ident">run_prepare_queue</span>) <span class="op">=</span> <span class="ident">prepare::start_queue</span>(
+		<span class="ident">metrics</span>.<span class="ident">clone</span>(),
 		<span class="ident">config</span>.<span class="ident">prepare_workers_soft_max_num</span>,
 		<span class="ident">config</span>.<span class="ident">prepare_workers_hard_max_num</span>,
 		<span class="ident">config</span>.<span class="ident">cache_path</span>.<span class="ident">clone</span>(),
@@ -1121,6 +1130,7 @@
 	);
 
 	<span class="kw">let</span> (<span class="ident">to_execute_queue_tx</span>, <span class="ident">run_execute_queue</span>) <span class="op">=</span> <span class="ident">execute::start</span>(
+		<span class="ident">metrics</span>.<span class="ident">clone</span>(),
 		<span class="ident">config</span>.<span class="ident">execute_worker_program_path</span>.<span class="ident">to_owned</span>(),
 		<span class="ident">config</span>.<span class="ident">execute_workers_max_num</span>,
 		<span class="ident">config</span>.<span class="ident">execute_worker_spawn_timeout</span>,

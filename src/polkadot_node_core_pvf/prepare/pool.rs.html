@@ -346,6 +346,42 @@
 <span id="343">343</span>
 <span id="344">344</span>
 <span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -365,6 +401,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::worker</span>::{<span class="self">self</span>, <span class="ident">Outcome</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">metrics::Metrics</span>,
 	<span class="ident">worker_common</span>::{<span class="ident">IdleWorker</span>, <span class="ident">WorkerHandle</span>},
 	<span class="ident">LOG_TARGET</span>,
 };
@@ -460,6 +497,7 @@
 	<span class="ident">from_pool</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">FromPool</span><span class="op">&gt;</span>,
 	<span class="ident">spawned</span>: <span class="ident">HopSlotMap</span><span class="op">&lt;</span><span class="ident">Worker</span>, <span class="ident">WorkerData</span><span class="op">&gt;</span>,
 	<span class="ident">mux</span>: <span class="ident">Mux</span>,
+	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 }
 
 <span class="doccomment">/// A fatal error that warrants stopping the event loop of the pool.</span>
@@ -474,6 +512,7 @@
 		<span class="kw-2">mut</span> <span class="ident">from_pool</span>,
 		<span class="kw-2">mut</span> <span class="ident">spawned</span>,
 		<span class="kw-2">mut</span> <span class="ident">mux</span>,
+		<span class="ident">metrics</span>,
 	}: <span class="ident">Pool</span>,
 ) {
 	<span class="macro">macro_rules!</span> <span class="ident">break_if_fatal</span> {
@@ -492,6 +531,7 @@
 			<span class="ident">to_pool</span> <span class="op">=</span> <span class="ident">to_pool</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> <span class="ident">to_pool</span> <span class="op">=</span> <span class="macro">break_if_fatal!</span>(<span class="ident">to_pool</span>.<span class="ident">ok_or</span>(<span class="ident">Fatal</span>));
 				<span class="ident">handle_to_pool</span>(
+					<span class="kw-2">&amp;</span><span class="ident">metrics</span>,
 					<span class="kw-2">&amp;</span><span class="ident">program_path</span>,
 					<span class="kw-2">&amp;</span><span class="ident">cache_path</span>,
 					<span class="ident">spawn_timeout</span>,
@@ -500,14 +540,17 @@
 					<span class="ident">to_pool</span>,
 				)
 			}
-			<span class="ident">ev</span> <span class="op">=</span> <span class="ident">mux</span>.<span class="ident">select_next_some</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">break_if_fatal!</span>(<span class="ident">handle_mux</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">from_pool</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spawned</span>, <span class="ident">ev</span>)),
+			<span class="ident">ev</span> <span class="op">=</span> <span class="ident">mux</span>.<span class="ident">select_next_some</span>() <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="macro">break_if_fatal!</span>(<span class="ident">handle_mux</span>(<span class="kw-2">&amp;</span><span class="ident">metrics</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">from_pool</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spawned</span>, <span class="ident">ev</span>))
+			}
 		}
 
-		<span class="macro">break_if_fatal!</span>(<span class="ident">purge_dead</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">from_pool</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spawned</span>).<span class="kw">await</span>);
+		<span class="macro">break_if_fatal!</span>(<span class="ident">purge_dead</span>(<span class="kw-2">&amp;</span><span class="ident">metrics</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">from_pool</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spawned</span>).<span class="kw">await</span>);
 	}
 }
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">purge_dead</span>(
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 	<span class="ident">from_pool</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">FromPool</span><span class="op">&gt;</span>,
 	<span class="ident">spawned</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HopSlotMap</span><span class="op">&lt;</span><span class="ident">Worker</span>, <span class="ident">WorkerData</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
@@ -526,7 +569,7 @@
 		}
 	}
 	<span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="ident">to_remove</span> {
-		<span class="kw">if</span> <span class="ident">spawned</span>.<span class="ident">remove</span>(<span class="ident">w</span>).<span class="ident">is_some</span>() {
+		<span class="kw">if</span> <span class="ident">attempt_retire</span>(<span class="ident">metrics</span>, <span class="ident">spawned</span>, <span class="ident">w</span>) {
 			<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Rip</span>(<span class="ident">w</span>))<span class="question-mark">?</span>;
 		}
 	}
@@ -534,6 +577,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">handle_to_pool</span>(
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 	<span class="ident">program_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
 	<span class="ident">cache_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
 	<span class="ident">spawn_timeout</span>: <span class="ident">Duration</span>,
@@ -544,11 +588,13 @@
 	<span class="kw">match</span> <span class="ident">to_pool</span> {
 		<span class="ident">ToPool::Spawn</span> <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;spawning a new prepare worker&quot;</span>);
+			<span class="ident">metrics</span>.<span class="ident">prepare_worker</span>().<span class="ident">on_begin_spawn</span>();
 			<span class="ident">mux</span>.<span class="ident">push</span>(<span class="ident">spawn_worker_task</span>(<span class="ident">program_path</span>.<span class="ident">to_owned</span>(), <span class="ident">spawn_timeout</span>).<span class="ident">boxed</span>());
 		},
 		<span class="ident">ToPool::StartWork</span> { <span class="ident">worker</span>, <span class="ident">code</span>, <span class="ident">artifact_path</span>, <span class="ident">background_priority</span> } <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">spawned</span>.<span class="ident">get_mut</span>(<span class="ident">worker</span>) {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idle</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">idle</span>.<span class="ident">take</span>() {
+					<span class="kw">let</span> <span class="ident">preparation_timer</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">time_preparation</span>();
 					<span class="ident">mux</span>.<span class="ident">push</span>(
 						<span class="ident">start_work_task</span>(
 							<span class="ident">worker</span>,
@@ -557,6 +603,7 @@
 							<span class="ident">cache_path</span>.<span class="ident">to_owned</span>(),
 							<span class="ident">artifact_path</span>,
 							<span class="ident">background_priority</span>,
+							<span class="ident">preparation_timer</span>,
 						)
 						.<span class="ident">boxed</span>(),
 					);
@@ -576,7 +623,7 @@
 		<span class="ident">ToPool::Kill</span>(<span class="ident">worker</span>) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="question-mark">?</span><span class="ident">worker</span>, <span class="string">&quot;killing prepare worker&quot;</span>);
 			<span class="comment">// It may be absent if it were previously already removed by `purge_dead`.</span>
-			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">spawned</span>.<span class="ident">remove</span>(<span class="ident">worker</span>);
+			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">attempt_retire</span>(<span class="ident">metrics</span>, <span class="ident">spawned</span>, <span class="ident">worker</span>);
 		},
 		<span class="ident">ToPool::BumpPriority</span>(<span class="ident">worker</span>) <span class="op">=</span><span class="op">&gt;</span>
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">spawned</span>.<span class="ident">get</span>(<span class="ident">worker</span>) {
@@ -601,13 +648,14 @@
 	}
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_work_task</span>(
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_work_task</span><span class="op">&lt;</span><span class="ident">Timer</span><span class="op">&gt;</span>(
 	<span class="ident">worker</span>: <span class="ident">Worker</span>,
 	<span class="ident">idle</span>: <span class="ident">IdleWorker</span>,
 	<span class="ident">code</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">cache_path</span>: <span class="ident">PathBuf</span>,
 	<span class="ident">artifact_path</span>: <span class="ident">PathBuf</span>,
 	<span class="ident">background_priority</span>: <span class="ident">bool</span>,
+	<span class="ident">_preparation_timer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timer</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PoolEvent</span> {
 	<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span>
 		<span class="ident">worker::start_work</span>(<span class="ident">idle</span>, <span class="ident">code</span>, <span class="kw-2">&amp;</span><span class="ident">cache_path</span>, <span class="ident">artifact_path</span>, <span class="ident">background_priority</span>).<span class="kw">await</span>;
@@ -615,12 +663,15 @@
 }
 
 <span class="kw">fn</span> <span class="ident">handle_mux</span>(
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 	<span class="ident">from_pool</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">FromPool</span><span class="op">&gt;</span>,
 	<span class="ident">spawned</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HopSlotMap</span><span class="op">&lt;</span><span class="ident">Worker</span>, <span class="ident">WorkerData</span><span class="op">&gt;</span>,
 	<span class="ident">event</span>: <span class="ident">PoolEvent</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
 	<span class="kw">match</span> <span class="ident">event</span> {
 		<span class="ident">PoolEvent::Spawn</span>(<span class="ident">idle</span>, <span class="ident">handle</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">metrics</span>.<span class="ident">prepare_worker</span>().<span class="ident">on_spawned</span>();
+
 			<span class="kw">let</span> <span class="ident">worker</span> <span class="op">=</span> <span class="ident">spawned</span>.<span class="ident">insert</span>(<span class="ident">WorkerData</span> { <span class="ident">idle</span>: <span class="prelude-val">Some</span>(<span class="ident">idle</span>), <span class="ident">handle</span> });
 
 			<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Spawned</span>(<span class="ident">worker</span>))<span class="question-mark">?</span>;
@@ -649,14 +700,14 @@
 					<span class="prelude-val">Ok</span>(())
 				},
 				<span class="ident">Outcome::Unreachable</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="kw">if</span> <span class="ident">spawned</span>.<span class="ident">remove</span>(<span class="ident">worker</span>).<span class="ident">is_some</span>() {
+					<span class="kw">if</span> <span class="ident">attempt_retire</span>(<span class="ident">metrics</span>, <span class="ident">spawned</span>, <span class="ident">worker</span>) {
 						<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Rip</span>(<span class="ident">worker</span>))<span class="question-mark">?</span>;
 					}
 
 					<span class="prelude-val">Ok</span>(())
 				},
 				<span class="ident">Outcome::DidntMakeIt</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="kw">if</span> <span class="ident">spawned</span>.<span class="ident">remove</span>(<span class="ident">worker</span>).<span class="ident">is_some</span>() {
+					<span class="kw">if</span> <span class="ident">attempt_retire</span>(<span class="ident">metrics</span>, <span class="ident">spawned</span>, <span class="ident">worker</span>) {
 						<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Concluded</span>(<span class="ident">worker</span>, <span class="bool-val">true</span>))<span class="question-mark">?</span>;
 					}
 
@@ -671,8 +722,28 @@
 	<span class="ident">from_pool</span>.<span class="ident">unbounded_send</span>(<span class="ident">m</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Fatal</span>)
 }
 
+<span class="doccomment">/// Removes the given worker from the registry if it there. This will lead to dropping and hence</span>
+<span class="doccomment">/// to killing the worker process.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns `true` if the worker exists and was removed and the process was killed.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This function takes care about counting the retired workers metric.</span>
+<span class="kw">fn</span> <span class="ident">attempt_retire</span>(
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
+	<span class="ident">spawned</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HopSlotMap</span><span class="op">&lt;</span><span class="ident">Worker</span>, <span class="ident">WorkerData</span><span class="op">&gt;</span>,
+	<span class="ident">worker</span>: <span class="ident">Worker</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">if</span> <span class="ident">spawned</span>.<span class="ident">remove</span>(<span class="ident">worker</span>).<span class="ident">is_some</span>() {
+		<span class="ident">metrics</span>.<span class="ident">prepare_worker</span>().<span class="ident">on_retired</span>();
+		<span class="bool-val">true</span>
+	} <span class="kw">else</span> {
+		<span class="bool-val">false</span>
+	}
+}
+
 <span class="doccomment">/// Spins up the pool and returns the future that should be polled to make the pool functional.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(
+	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 	<span class="ident">program_path</span>: <span class="ident">PathBuf</span>,
 	<span class="ident">cache_path</span>: <span class="ident">PathBuf</span>,
 	<span class="ident">spawn_timeout</span>: <span class="ident">Duration</span>,
@@ -681,6 +752,7 @@
 	<span class="kw">let</span> (<span class="ident">from_pool_tx</span>, <span class="ident">from_pool_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
 
 	<span class="kw">let</span> <span class="ident">run</span> <span class="op">=</span> <span class="ident">run</span>(<span class="ident">Pool</span> {
+		<span class="ident">metrics</span>,
 		<span class="ident">program_path</span>,
 		<span class="ident">cache_path</span>,
 		<span class="ident">spawn_timeout</span>,

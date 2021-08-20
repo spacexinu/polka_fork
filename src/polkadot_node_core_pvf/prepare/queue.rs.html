@@ -794,6 +794,16 @@
 <span id="791">791</span>
 <span id="792">792</span>
 <span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -814,7 +824,7 @@
 <span class="doccomment">//! A queue that handles requests for PVF preparation.</span>
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::pool</span>::{<span class="self">self</span>, <span class="ident">Worker</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">artifacts::ArtifactId</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">LOG_TARGET</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">artifacts::ArtifactId</span>, <span class="ident">metrics::Metrics</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">LOG_TARGET</span>};
 <span class="kw">use</span> <span class="ident">always_assert</span>::{<span class="ident">always</span>, <span class="ident">never</span>};
 <span class="kw">use</span> <span class="ident">async_std::path::PathBuf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel::mpsc</span>, <span class="ident">stream::StreamExt</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Future</span>, <span class="ident">SinkExt</span>};
@@ -924,6 +934,8 @@
 }
 
 <span class="kw">struct</span> <span class="ident">Queue</span> {
+	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+
 	<span class="ident">to_queue_rx</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">ToQueue</span><span class="op">&gt;</span>,
 	<span class="ident">from_queue_tx</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">FromQueue</span><span class="op">&gt;</span>,
 
@@ -952,6 +964,7 @@
 
 <span class="kw">impl</span> <span class="ident">Queue</span> {
 	<span class="kw">fn</span> <span class="ident">new</span>(
+		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 		<span class="ident">soft_capacity</span>: <span class="ident">usize</span>,
 		<span class="ident">hard_capacity</span>: <span class="ident">usize</span>,
 		<span class="ident">cache_path</span>: <span class="ident">PathBuf</span>,
@@ -961,6 +974,7 @@
 		<span class="ident">from_pool_rx</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">pool::FromPool</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="self">Self</span> {
+			<span class="ident">metrics</span>,
 			<span class="ident">to_queue_rx</span>,
 			<span class="ident">from_queue_tx</span>,
 			<span class="ident">to_pool_tx</span>,
@@ -1015,6 +1029,7 @@
 		<span class="question-mark">?</span><span class="ident">priority</span>,
 		<span class="string">&quot;PVF is enqueued for preparation.&quot;</span>,
 	);
+	<span class="ident">queue</span>.<span class="ident">metrics</span>.<span class="ident">prepare_enqueued</span>();
 
 	<span class="kw">let</span> <span class="ident">artifact_id</span> <span class="op">=</span> <span class="ident">pvf</span>.<span class="ident">as_artifact_id</span>();
 	<span class="kw">if</span> <span class="macro">never!</span>(
@@ -1113,6 +1128,8 @@
 	<span class="ident">worker</span>: <span class="ident">Worker</span>,
 	<span class="ident">rip</span>: <span class="ident">bool</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
+	<span class="ident">queue</span>.<span class="ident">metrics</span>.<span class="ident">prepare_concluded</span>();
+
 	<span class="macro">macro_rules!</span> <span class="ident">never_none</span> {
 		(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span> {
@@ -1283,6 +1300,7 @@
 
 <span class="doccomment">/// Spins up the queue and returns the future that should be polled to make the queue functional.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(
+	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 	<span class="ident">soft_capacity</span>: <span class="ident">usize</span>,
 	<span class="ident">hard_capacity</span>: <span class="ident">usize</span>,
 	<span class="ident">cache_path</span>: <span class="ident">PathBuf</span>,
@@ -1293,6 +1311,7 @@
 	<span class="kw">let</span> (<span class="ident">from_queue_tx</span>, <span class="ident">from_queue_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
 
 	<span class="kw">let</span> <span class="ident">run</span> <span class="op">=</span> <span class="ident">Queue::new</span>(
+		<span class="ident">metrics</span>,
 		<span class="ident">soft_capacity</span>,
 		<span class="ident">hard_capacity</span>,
 		<span class="ident">cache_path</span>,
@@ -1362,6 +1381,7 @@
 			<span class="kw">let</span> <span class="ident">workers</span>: <span class="ident">SlotMap</span><span class="op">&lt;</span><span class="ident">Worker</span>, ()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SlotMap::with_key</span>();
 
 			<span class="kw">let</span> (<span class="ident">to_queue_tx</span>, <span class="ident">from_queue_rx</span>, <span class="ident">run</span>) <span class="op">=</span> <span class="ident">start</span>(
+				<span class="ident">Metrics::default</span>(),
 				<span class="ident">soft_capacity</span>,
 				<span class="ident">hard_capacity</span>,
 				<span class="ident">tempdir</span>.<span class="ident">path</span>().<span class="ident">to_owned</span>().<span class="ident">into</span>(),

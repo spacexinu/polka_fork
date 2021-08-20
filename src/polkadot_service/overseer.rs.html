@@ -302,6 +302,7 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
+<span id="302">302</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -494,7 +495,8 @@
 		),
 		<span class="ident">candidate_validation</span>: <span class="ident">CandidateValidationSubsystem::with_config</span>(
 			<span class="ident">candidate_validation_config</span>,
-			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
+			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>, <span class="comment">// candidate-validation metrics</span>
+			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>, <span class="comment">// validation host metrics</span>
 		),
 		<span class="ident">chain_api</span>: <span class="ident">ChainApiSubsystem::new</span>(<span class="ident">runtime_client</span>.<span class="ident">clone</span>(), <span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>),
 		<span class="ident">collation_generation</span>: <span class="ident">CollationGenerationSubsystem::new</span>(<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>),
