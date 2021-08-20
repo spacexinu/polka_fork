@@ -3404,7 +3404,7 @@
 
 				<span class="kw">match</span> <span class="ident">confirmation_rx</span>.<span class="kw">await</span> {
 					<span class="prelude-val">Err</span>(<span class="ident">oneshot::Canceled</span>) <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;Dispute coordinator confirmation lost&quot;</span>,)
+						<span class="macro">tracing::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;Dispute coordinator confirmation lost&quot;</span>,)
 					},
 					<span class="prelude-val">Ok</span>(<span class="ident">ImportStatementsResult::ValidImport</span>) <span class="op">=</span><span class="op">&gt;</span> {},
 					<span class="prelude-val">Ok</span>(<span class="ident">ImportStatementsResult::InvalidImport</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">tracing::warn!</span>(

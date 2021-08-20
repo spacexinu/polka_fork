@@ -116,6 +116,10 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -225,6 +229,10 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_error</span>(<span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
 	<span class="kw">match</span> <span class="ident">result</span> {
 		<span class="prelude-val">Err</span>(<span class="ident">Error::Fatal</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">f</span>),
+		<span class="prelude-val">Err</span>(<span class="ident">Error::NonFatal</span>(<span class="ident">error</span> @ <span class="ident">NonFatal::ImportCanceled</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="macro">tracing::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">error</span>);
+			<span class="prelude-val">Ok</span>(())
+		},
 		<span class="prelude-val">Err</span>(<span class="ident">Error::NonFatal</span>(<span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">error</span>);
 			<span class="prelude-val">Ok</span>(())
