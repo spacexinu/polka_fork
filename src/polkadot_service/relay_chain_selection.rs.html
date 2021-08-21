@@ -484,7 +484,6 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
-<span id="484">484</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -900,24 +899,23 @@
 			}
 		};
 
-		<span class="comment">// Prevent sending flawed data to the dispute-coordinator.</span>
-		<span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">subchain_block_descriptions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>) <span class="op">!</span><span class="op">=</span>
-			<span class="ident">subchain_number</span>.<span class="ident">checked_sub</span>(<span class="ident">target_number</span>)
-		{
-			<span class="macro">tracing::error!</span>(
-				<span class="ident">LOG_TARGET</span>,
-				<span class="ident">present_block_descriptions</span> <span class="op">=</span> <span class="ident">subchain_block_descriptions</span>.<span class="ident">len</span>(),
-				<span class="ident">target_number</span>,
-				<span class="ident">subchain_number</span>,
-				<span class="string">&quot;Mismatch of anticipated block descriptions and block number difference.&quot;</span>,
-			);
-			<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>))
-		}
-
 		<span class="kw">let</span> <span class="ident">lag</span> <span class="op">=</span> <span class="ident">initial_leaf_number</span>.<span class="ident">saturating_sub</span>(<span class="ident">subchain_number</span>);
 		<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">note_approval_checking_finality_lag</span>(<span class="ident">lag</span>);
 
 		<span class="kw">let</span> <span class="ident">lag</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disputes&quot;</span>) {
+			<span class="comment">// Prevent sending flawed data to the dispute-coordinator.</span>
+			<span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">subchain_block_descriptions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>) <span class="op">!</span><span class="op">=</span>
+				<span class="ident">subchain_number</span>.<span class="ident">checked_sub</span>(<span class="ident">target_number</span>)
+			{
+				<span class="macro">tracing::error!</span>(
+					<span class="ident">LOG_TARGET</span>,
+					<span class="ident">present_block_descriptions</span> <span class="op">=</span> <span class="ident">subchain_block_descriptions</span>.<span class="ident">len</span>(),
+					<span class="ident">target_number</span>,
+					<span class="ident">subchain_number</span>,
+					<span class="string">&quot;Mismatch of anticipated block descriptions and block number difference.&quot;</span>,
+				);
+				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>))
+			}
 			<span class="comment">// 3. Constrain according to disputes:</span>
 			<span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 			<span class="ident">overseer</span>
