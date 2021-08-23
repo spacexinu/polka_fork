@@ -167,7 +167,7 @@
 <span class="kw">use</span> <span class="ident">polkadot_test_service::construct_extrinsic</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{<span class="ident">generic::BlockId</span>, <span class="ident">traits::Block</span>};
 <span class="kw">use</span> <span class="ident">sp_state_machine::InspectState</span>;
-<span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">xcm</span>::{<span class="ident">latest::prelude</span>::<span class="kw-2">*</span>, <span class="ident">VersionedXcm</span>};
 <span class="kw">use</span> <span class="ident">xcm_executor::MAX_RECURSION_LIMIT</span>;
 
 <span class="comment">// This is the inflection point where the test should either fail or pass.</span>
@@ -200,7 +200,7 @@
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
 		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span>(
-			<span class="ident">Box::new</span>(<span class="ident">msg</span>.<span class="ident">clone</span>()),
+			<span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>.<span class="ident">clone</span>())),
 			<span class="number">1_000_000_000</span>,
 		)),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,
@@ -254,7 +254,7 @@
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
 		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span>(
-			<span class="ident">Box::new</span>(<span class="ident">msg</span>.<span class="ident">clone</span>()),
+			<span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>.<span class="ident">clone</span>())),
 			<span class="number">1_000_000_000</span>,
 		)),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,

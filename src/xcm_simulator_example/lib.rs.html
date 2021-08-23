@@ -543,9 +543,9 @@
 		<span class="ident">Relay::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">RelayChainPalletXcm::reserve_transfer_assets</span>(
 				<span class="ident">relay_chain::Origin::signed</span>(<span class="ident">ALICE</span>),
-				<span class="ident">Box::new</span>(<span class="ident">X1</span>(<span class="ident">Parachain</span>(<span class="number">1</span>)).<span class="ident">into</span>()),
-				<span class="ident">Box::new</span>(<span class="ident">X1</span>(<span class="ident">AccountId32</span> { <span class="ident">network</span>: <span class="ident">Any</span>, <span class="ident">id</span>: <span class="ident">ALICE</span>.<span class="ident">into</span>() }).<span class="ident">into</span>()),
-				(<span class="ident">Here</span>, <span class="ident">withdraw_amount</span>).<span class="ident">into</span>(),
+				<span class="ident">Box::new</span>(<span class="ident">X1</span>(<span class="ident">Parachain</span>(<span class="number">1</span>)).<span class="ident">into</span>().<span class="ident">into</span>()),
+				<span class="ident">Box::new</span>(<span class="ident">X1</span>(<span class="ident">AccountId32</span> { <span class="ident">network</span>: <span class="ident">Any</span>, <span class="ident">id</span>: <span class="ident">ALICE</span>.<span class="ident">into</span>() }).<span class="ident">into</span>().<span class="ident">into</span>()),
+				<span class="ident">Box::new</span>((<span class="ident">Here</span>, <span class="ident">withdraw_amount</span>).<span class="ident">into</span>()),
 				<span class="number">0</span>,
 				<span class="ident">max_weight_for_execution</span>,
 			));
