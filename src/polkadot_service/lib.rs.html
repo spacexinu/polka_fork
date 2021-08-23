@@ -1402,7 +1402,7 @@
 	<span class="ident">create_default_subsystems</span>, <span class="ident">OverseerGen</span>, <span class="ident">OverseerGenArgs</span>, <span class="ident">RealOverseerGen</span>,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disputes&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full-node&quot;</span>)]</span>
