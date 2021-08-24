@@ -240,7 +240,7 @@
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives</span>::{
-	<span class="ident">AvailableData</span>, <span class="ident">DisputeMessage</span>, <span class="ident">ErasureChunk</span>, <span class="ident">PoV</span>, <span class="ident">UncheckedDisputeMessage</span>,
+	<span class="ident">AvailableData</span>, <span class="ident">DisputeMessage</span>, <span class="ident">ErasureChunk</span>, <span class="ident">PoV</span>, <span class="ident">Proof</span>, <span class="ident">UncheckedDisputeMessage</span>,
 };
 <span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{
 	<span class="ident">CandidateHash</span>, <span class="ident">CandidateReceipt</span>, <span class="ident">CommittedCandidateReceipt</span>, <span class="ident">Hash</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>, <span class="ident">ValidatorIndex</span>,
@@ -288,7 +288,7 @@
 	<span class="doccomment">/// The erasure-encoded chunk of data belonging to the candidate block.</span>
 	<span class="kw">pub</span> <span class="ident">chunk</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Proof for this chunk&#39;s branch in the Merkle tree.</span>
-	<span class="kw">pub</span> <span class="ident">proof</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">proof</span>: <span class="ident">Proof</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ErasureChunk</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ChunkResponse</span> {
