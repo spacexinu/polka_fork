@@ -783,7 +783,7 @@
 	<span class="kw">use</span> <span class="ident">sc_cli</span>::{<span class="ident">CliConfiguration</span>, <span class="ident">SubstrateCli</span>};
 	<span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokio_runtime</span> <span class="op">=</span> <span class="ident">build_runtime</span>()<span class="question-mark">?</span>;
+	<span class="kw">let</span> <span class="ident">tokio_runtime</span> <span class="op">=</span> <span class="ident">build_runtime</span>()<span class="question-mark">?</span>;
 	<span class="kw">let</span> <span class="ident">task_executor</span> <span class="op">=</span> <span class="ident">task_executor</span>(<span class="ident">tokio_runtime</span>.<span class="ident">handle</span>().<span class="ident">clone</span>());
 	<span class="comment">// parse cli args</span>
 	<span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">polkadot_cli::Cli</span> <span class="kw">as</span> <span class="ident">StructOpt</span><span class="op">&gt;</span><span class="ident">::from_args</span>();
@@ -815,7 +815,7 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_runner</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">build_runtime</span>().<span class="ident">unwrap</span>();
+		<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">build_runtime</span>().<span class="ident">unwrap</span>();
 		<span class="kw">let</span> <span class="ident">task_executor</span> <span class="op">=</span> <span class="ident">task_executor</span>(<span class="ident">runtime</span>.<span class="ident">handle</span>().<span class="ident">clone</span>());
 		<span class="kw">let</span> (<span class="ident">rpc</span>, <span class="ident">task_manager</span>, <span class="ident">client</span>, <span class="ident">pool</span>, <span class="ident">command_sink</span>, <span class="ident">backend</span>) <span class="op">=</span>
 			<span class="ident">client_parts</span>::<span class="op">&lt;</span><span class="ident">PolkadotChainInfo</span><span class="op">&gt;</span>(<span class="ident">ConfigOrChainSpec::ChainSpec</span>(

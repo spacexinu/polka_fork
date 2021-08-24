@@ -157,7 +157,7 @@
 <span class="doccomment">/// Weight functions for `pallet_vesting`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WeightInfo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">frame_system::Config</span><span class="op">&gt;</span> <span class="ident">pallet_vesting::WeightInfo</span> <span class="kw">for</span> <span class="ident">WeightInfo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">vest_locked</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">vest_locked</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">93_789_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 70_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">41_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
@@ -166,14 +166,14 @@
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">2</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">2</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">vest_unlocked</span>(<span class="ident">_l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">vest_unlocked</span>(<span class="ident">_l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">90_737_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 0</span>
 			.<span class="ident">saturating_add</span>((<span class="number">263_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">s</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">2</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">2</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">vest_other_locked</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">vest_other_locked</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">85_211_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 17_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">153_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
@@ -182,7 +182,7 @@
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">vest_other_unlocked</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">vest_other_unlocked</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">90_368_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 17_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">31_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
@@ -191,21 +191,21 @@
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">vested_transfer</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">_s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">vested_transfer</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">_s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">167_500_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 194_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">255_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">force_vested_transfer</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">_s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">force_vested_transfer</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">_s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">174_000_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 70_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">143_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">4</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">4</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">not_unlocking_merge_schedules</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">not_unlocking_merge_schedules</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">101_778_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 17_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">194_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
@@ -214,7 +214,7 @@
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-	<span class="kw">fn</span> <span class="ident">unlocking_merge_schedules</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>, ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">unlocking_merge_schedules</span>(<span class="ident">l</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">104_111_000</span> <span class="kw">as</span> <span class="ident">Weight</span>)
 			<span class="comment">// Standard Error: 88_000</span>
 			.<span class="ident">saturating_add</span>((<span class="number">276_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">l</span> <span class="kw">as</span> <span class="ident">Weight</span>))
@@ -223,6 +223,7 @@
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 			.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
-}</pre></div>
+}
+</pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="westend_runtime" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>
