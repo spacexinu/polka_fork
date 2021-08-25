@@ -1400,6 +1400,14 @@
 <span id="1397">1397</span>
 <span id="1398">1398</span>
 <span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1495,7 +1503,7 @@
 	<span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
 	<span class="ident">ValidationFailed</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ValidationFailed</span>),
 	<span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-	<span class="ident">Mpsc</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">mpsc::SendError</span>),
+	<span class="ident">BackgroundValidationMpsc</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">mpsc::SendError</span>),
 	<span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
 	<span class="ident">UtilError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">util::Error</span>),
 }
@@ -1847,7 +1855,7 @@
 					<span class="ident">tx_command</span>
 						.<span class="ident">send</span>(<span class="ident">ValidatedCandidateCommand::AttestNoPoV</span>(<span class="ident">candidate</span>.<span class="ident">hash</span>()))
 						.<span class="kw">await</span>
-						.<span class="ident">map_err</span>(<span class="ident">Error::Mpsc</span>)<span class="question-mark">?</span>;
+						.<span class="ident">map_err</span>(<span class="ident">Error::BackgroundValidationMpsc</span>)<span class="question-mark">?</span>;
 					<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
 				},
 				<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
@@ -2053,11 +2061,19 @@
 			<span class="comment">// spawn background task.</span>
 			<span class="kw">let</span> <span class="ident">bg</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">validate_and_make_available</span>(<span class="ident">params</span>).<span class="kw">await</span> {
-					<span class="macro">tracing::error!</span>(
-						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-						<span class="string">&quot;Failed to validate and make available: {:?}&quot;</span>,
-						<span class="ident">e</span>
-					);
+					<span class="kw">if</span> <span class="kw">let</span> <span class="ident">Error::BackgroundValidationMpsc</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="ident">e</span> {
+						<span class="macro">tracing::debug!</span>(
+							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+							<span class="question-mark">?</span><span class="ident">error</span>,
+							<span class="string">&quot;Mpsc background validation mpsc died during validation- leaf no longer active?&quot;</span>
+						);
+					} <span class="kw">else</span> {
+						<span class="macro">tracing::error!</span>(
+							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+							<span class="string">&quot;Failed to validate and make available: {:?}&quot;</span>,
+							<span class="ident">e</span>
+						);
+					}
 				}
 			};
 			<span class="ident">sender</span>
