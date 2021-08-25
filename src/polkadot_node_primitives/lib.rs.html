@@ -412,6 +412,8 @@
 <span id="409">409</span>
 <span id="410">410</span>
 <span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -467,8 +469,10 @@
 	<span class="ident">SignedDisputeStatement</span>, <span class="ident">UncheckedDisputeMessage</span>, <span class="ident">ValidDisputeVote</span>,
 };
 
-<span class="comment">// For a 16-ary Merkle Prefix Trie, we can expect at most 16 32-byte hashes per node.</span>
-<span class="kw">const</span> <span class="ident">MERKLE_NODE_MAX_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span>;
+<span class="comment">// For a 16-ary Merkle Prefix Trie, we can expect at most 16 32-byte hashes per node</span>
+<span class="comment">// plus some overhead:</span>
+<span class="comment">// header 1 + bitmap 2 + max partial_key 8 + children 16 * (32 + len 1) + value 32 + value len 1</span>
+<span class="kw">const</span> <span class="ident">MERKLE_NODE_MAX_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span> <span class="op">+</span> <span class="number">100</span>;
 <span class="comment">// 16-ary Merkle Prefix Trie for 32-bit ValidatorIndex has depth at most 8.</span>
 <span class="kw">const</span> <span class="ident">MERKLE_PROOF_MAX_DEPTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
 
