@@ -884,6 +884,96 @@
 <span id="881">881</span>
 <span id="882">882</span>
 <span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1382,6 +1472,7 @@
 <span class="macro">parameter_types!</span> {
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BaseXcmWeight</span>: <span class="ident">frame_support::weights::Weight</span> <span class="op">=</span> <span class="number">1_000</span>;
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AnyNetwork</span>: <span class="ident">xcm::latest::NetworkId</span> <span class="op">=</span> <span class="ident">xcm::latest::NetworkId::Any</span>;
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxInstructions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
 }
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">LocalOriginToLocation</span> <span class="op">=</span> <span class="ident">xcm_builder::SignedToAccountId32</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">AccountId</span>, <span class="ident">AnyNetwork</span><span class="op">&gt;</span>;
@@ -1393,12 +1484,14 @@
 	<span class="kw">type</span> <span class="ident">ExecuteXcmOrigin</span> <span class="op">=</span> <span class="ident">xcm_builder::EnsureXcmOrigin</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">LocalOriginToLocation</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">xcm_config::InvertNothing</span>;
 	<span class="kw">type</span> <span class="ident">SendXcmOrigin</span> <span class="op">=</span> <span class="ident">xcm_builder::EnsureXcmOrigin</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">LocalOriginToLocation</span><span class="op">&gt;</span>;
-	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">xcm_builder::FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">xcm_builder::FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">XcmRouter</span> <span class="op">=</span> <span class="ident">xcm_config::DoNothingRouter</span>;
 	<span class="kw">type</span> <span class="ident">XcmExecuteFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
 	<span class="kw">type</span> <span class="ident">XcmExecutor</span> <span class="op">=</span> <span class="ident">xcm_executor::XcmExecutor</span><span class="op">&lt;</span><span class="ident">xcm_config::XcmConfig</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">XcmTeleportFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
 	<span class="kw">type</span> <span class="ident">XcmReserveTransferFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
+	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
+	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">parachains_hrmp::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
@@ -1410,6 +1503,91 @@
 <span class="kw">impl</span> <span class="ident">parachains_scheduler::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
 
 <span class="kw">impl</span> <span class="ident">paras_sudo_wrapper::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
+
+<span class="kw">impl</span> <span class="ident">pallet_test_notifier::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
+	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
+	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
+}
+
+<span class="attribute">#[<span class="ident">frame_support::pallet</span>]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pallet_test_notifier</span> {
+	<span class="kw">use</span> <span class="ident">frame_support::pallet_prelude</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">frame_system::pallet_prelude</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">pallet_xcm</span>::{<span class="ident">ensure_response</span>, <span class="ident">QueryId</span>};
+	<span class="kw">use</span> <span class="ident">sp_runtime::DispatchResult</span>;
+	<span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
+
+	<span class="attribute">#[<span class="ident">pallet::pallet</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::generate_store</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">Store</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>);
+
+	<span class="attribute">#[<span class="ident">pallet::config</span>]</span>
+	<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Config</span>: <span class="ident">frame_system::Config</span> <span class="op">+</span> <span class="ident">pallet_xcm::Config</span> {
+		<span class="kw">type</span> <span class="ident">Event</span>: <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Event</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Origin</span>: <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Origin</span><span class="op">&gt;</span>
+			<span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">pallet_xcm::Origin</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Origin</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Call</span>: <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">pallet_xcm::Config</span><span class="op">&gt;</span><span class="ident">::Call</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::event</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::generate_deposit</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deposit_event</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
+		<span class="ident">QueryPrepared</span>(<span class="ident">QueryId</span>),
+		<span class="ident">NotifyQueryPrepared</span>(<span class="ident">QueryId</span>),
+		<span class="ident">ResponseReceived</span>(<span class="ident">MultiLocation</span>, <span class="ident">QueryId</span>, <span class="ident">Response</span>),
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::error</span>]</span>
+	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="ident">UnexpectedId</span>,
+		<span class="ident">BadAccountFormat</span>,
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::call</span>]</span>
+	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">1_000_000</span>)]</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_new_query</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
+			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">who</span>
+				.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">d</span><span class="op">|</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>))
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::BadAccountFormat</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">qid</span> <span class="op">=</span> <span class="ident">pallet_xcm::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new_query</span>(
+				<span class="ident">Junction::AccountId32</span> { <span class="ident">network</span>: <span class="ident">Any</span>, <span class="ident">id</span> }.<span class="ident">into</span>(),
+				<span class="number">100u32</span>.<span class="ident">into</span>(),
+			);
+			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::QueryPrepared</span>(<span class="ident">qid</span>));
+			<span class="prelude-val">Ok</span>(())
+		}
+
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">1_000_000</span>)]</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_new_notify_query</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
+			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">who</span>
+				.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">d</span><span class="op">|</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>))
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::BadAccountFormat</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">Call</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::notification_received</span>(<span class="number">0</span>, <span class="ident">Default::default</span>());
+			<span class="kw">let</span> <span class="ident">qid</span> <span class="op">=</span> <span class="ident">pallet_xcm::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new_notify_query</span>(
+				<span class="ident">Junction::AccountId32</span> { <span class="ident">network</span>: <span class="ident">Any</span>, <span class="ident">id</span> }.<span class="ident">into</span>(),
+				<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Call::from</span>(<span class="ident">call</span>),
+				<span class="number">100u32</span>.<span class="ident">into</span>(),
+			);
+			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NotifyQueryPrepared</span>(<span class="ident">qid</span>));
+			<span class="prelude-val">Ok</span>(())
+		}
+
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">1_000_000</span>)]</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notification_received</span>(
+			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+			<span class="ident">query_id</span>: <span class="ident">QueryId</span>,
+			<span class="ident">response</span>: <span class="ident">Response</span>,
+		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
+			<span class="kw">let</span> <span class="ident">responder</span> <span class="op">=</span> <span class="ident">ensure_response</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Origin::from</span>(<span class="ident">origin</span>))<span class="question-mark">?</span>;
+			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ResponseReceived</span>(<span class="ident">responder</span>, <span class="ident">query_id</span>, <span class="ident">response</span>));
+			<span class="prelude-val">Ok</span>(())
+		}
+	}
+}
 
 <span class="macro">construct_runtime!</span> {
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Runtime</span> <span class="kw">where</span>
@@ -1460,6 +1638,8 @@
 		<span class="ident">ParasDisputes</span>: <span class="ident">parachains_disputes</span>::{<span class="ident">Pallet</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
 
 		<span class="ident">Sudo</span>: <span class="ident">pallet_sudo</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
+
+		<span class="ident">TestNotifier</span>: <span class="ident">pallet_test_notifier</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
 	}
 }
 

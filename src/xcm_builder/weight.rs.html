@@ -235,37 +235,6 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -290,76 +259,43 @@
 <span class="kw">use</span> <span class="ident">parity_scale_codec::Decode</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">SaturatedConversion</span>, <span class="ident">Saturating</span>, <span class="ident">Zero</span>};
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">marker::PhantomData</span>, <span class="ident">result::Result</span>};
-<span class="kw">use</span> <span class="ident">xcm::latest</span>::{<span class="ident">AssetId</span>, <span class="ident">AssetId::Concrete</span>, <span class="ident">Error</span>, <span class="ident">MultiAsset</span>, <span class="ident">MultiLocation</span>, <span class="ident">Order</span>, <span class="ident">Xcm</span>};
+<span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">xcm_executor</span>::{
 	<span class="ident">traits</span>::{<span class="ident">WeightBounds</span>, <span class="ident">WeightTrader</span>},
 	<span class="ident">Assets</span>,
 };
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">C</span>)<span class="op">&gt;</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">Weight</span><span class="op">&gt;</span>, <span class="ident">C</span>: <span class="ident">Decode</span> <span class="op">+</span> <span class="ident">GetDispatchInfo</span><span class="op">&gt;</span> <span class="ident">WeightBounds</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">shallow</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">message</span> {
-			<span class="ident">Xcm::Transact</span> { <span class="ident">call</span>, .. } <span class="op">=</span><span class="op">&gt;</span>
-				<span class="ident">call</span>.<span class="ident">ensure_decoded</span>()<span class="question-mark">?</span>.<span class="ident">get_dispatch_info</span>().<span class="ident">weight</span>.<span class="ident">saturating_add</span>(<span class="ident">T::get</span>()),
-			<span class="ident">Xcm::RelayedFrom</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">message</span>, .. } <span class="op">=</span><span class="op">&gt;</span>
-				<span class="ident">T::get</span>().<span class="ident">saturating_add</span>(<span class="self">Self</span><span class="ident">::shallow</span>(<span class="ident">message</span>.<span class="ident">as_mut</span>())<span class="question-mark">?</span>),
-			<span class="ident">Xcm::WithdrawAsset</span> { <span class="ident">effects</span>, .. } <span class="op">|</span>
-			<span class="ident">Xcm::ReserveAssetDeposited</span> { <span class="ident">effects</span>, .. } <span class="op">|</span>
-			<span class="ident">Xcm::ReceiveTeleportedAsset</span> { <span class="ident">effects</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra</span> <span class="op">=</span> <span class="ident">T::get</span>();
-				<span class="kw">for</span> <span class="ident">order</span> <span class="kw">in</span> <span class="ident">effects</span>.<span class="ident">iter_mut</span>() {
-					<span class="ident">extra</span>.<span class="ident">saturating_accrue</span>(<span class="self">Self</span><span class="ident">::shallow_order</span>(<span class="ident">order</span>)<span class="question-mark">?</span>);
-				}
-				<span class="ident">extra</span>
-			},
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::get</span>(),
-		})
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">C</span>, <span class="ident">M</span>)<span class="op">&gt;</span>);
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">Weight</span><span class="op">&gt;</span>, <span class="ident">C</span>: <span class="ident">Decode</span> <span class="op">+</span> <span class="ident">GetDispatchInfo</span>, <span class="ident">M</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">WeightBounds</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
+	<span class="kw">for</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span>
+{
+	<span class="kw">fn</span> <span class="ident">weight</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instructions_left</span> <span class="op">=</span> <span class="ident">M::get</span>();
+		<span class="self">Self</span><span class="ident">::weight_with_limit</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">instructions_left</span>)
 	}
-	<span class="kw">fn</span> <span class="ident">deep</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">message</span> {
-			<span class="ident">Xcm::RelayedFrom</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">message</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::deep</span>(<span class="ident">message</span>.<span class="ident">as_mut</span>())<span class="question-mark">?</span>,
-			<span class="ident">Xcm::WithdrawAsset</span> { <span class="ident">effects</span>, .. } <span class="op">|</span>
-			<span class="ident">Xcm::ReserveAssetDeposited</span> { <span class="ident">effects</span>, .. } <span class="op">|</span>
-			<span class="ident">Xcm::ReceiveTeleportedAsset</span> { <span class="ident">effects</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra</span> <span class="op">=</span> <span class="number">0</span>;
-				<span class="kw">for</span> <span class="ident">order</span> <span class="kw">in</span> <span class="ident">effects</span>.<span class="ident">iter_mut</span>() {
-					<span class="ident">extra</span>.<span class="ident">saturating_accrue</span>(<span class="self">Self</span><span class="ident">::deep_order</span>(<span class="ident">order</span>)<span class="question-mark">?</span>);
-				}
-				<span class="ident">extra</span>
-			},
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-		})
+	<span class="kw">fn</span> <span class="ident">instr_weight</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
+		<span class="self">Self</span><span class="ident">::instr_weight_with_limit</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">u32::max_value</span>())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">Weight</span><span class="op">&gt;</span>, <span class="ident">C</span>: <span class="ident">Decode</span> <span class="op">+</span> <span class="ident">GetDispatchInfo</span><span class="op">&gt;</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">shallow_order</span>(<span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">order</span> {
-			<span class="ident">Order::BuyExecution</span> { .. } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="comment">// On success, execution of this will result in more weight being consumed but</span>
-				<span class="comment">// we don&#39;t count it here since this is only the *shallow*, non-negotiable weight</span>
-				<span class="comment">// spend and doesn&#39;t count weight placed behind a `BuyExecution` since it will not</span>
-				<span class="comment">// be definitely consumed from any existing weight credit if execution of the message</span>
-				<span class="comment">// is attempted.</span>
-				<span class="ident">T::get</span>()
-			},
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::get</span>(),
-		})
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">Weight</span><span class="op">&gt;</span>, <span class="ident">C</span>: <span class="ident">Decode</span> <span class="op">+</span> <span class="ident">GetDispatchInfo</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">weight_with_limit</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">instrs_limit</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="number">0</span>;
+		<span class="kw-2">*</span><span class="ident">instrs_limit</span> <span class="op">=</span> <span class="ident">instrs_limit</span>.<span class="ident">checked_sub</span>(<span class="ident">message</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
+		<span class="kw">for</span> <span class="ident">m</span> <span class="kw">in</span> <span class="ident">message</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
+			<span class="ident">r</span> <span class="op">+</span><span class="op">=</span> <span class="self">Self</span><span class="ident">::instr_weight_with_limit</span>(<span class="ident">m</span>, <span class="ident">instrs_limit</span>)<span class="question-mark">?</span>;
+		}
+		<span class="prelude-val">Ok</span>(<span class="ident">r</span>)
 	}
-	<span class="kw">fn</span> <span class="ident">deep_order</span>(<span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">order</span> {
-			<span class="ident">Order::BuyExecution</span> { <span class="ident">instructions</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra</span> <span class="op">=</span> <span class="number">0</span>;
-				<span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">instructions</span>.<span class="ident">iter_mut</span>() {
-					<span class="ident">extra</span>.<span class="ident">saturating_accrue</span>(
-						<span class="self">Self</span><span class="ident">::shallow</span>(<span class="ident">instruction</span>)<span class="question-mark">?</span>.<span class="ident">saturating_add</span>(<span class="self">Self</span><span class="ident">::deep</span>(<span class="ident">instruction</span>)<span class="question-mark">?</span>),
-					);
-				}
-				<span class="ident">extra</span>
-			},
+	<span class="kw">fn</span> <span class="ident">instr_weight_with_limit</span>(
+		<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
+		<span class="ident">instrs_limit</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">u32</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
+		<span class="prelude-val">Ok</span>(<span class="ident">T::get</span>().<span class="ident">saturating_add</span>(<span class="kw">match</span> <span class="ident">message</span> {
+			<span class="ident">Transact</span> { <span class="ident">require_weight_at_most</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">require_weight_at_most</span>,
+			<span class="ident">SetErrorHandler</span>(<span class="ident">xcm</span>) <span class="op">|</span> <span class="ident">SetAppendix</span>(<span class="ident">xcm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::weight_with_limit</span>(<span class="ident">xcm</span>, <span class="ident">instrs_limit</span>)<span class="question-mark">?</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-		})
+		}))
 	}
 }
 
@@ -393,10 +329,11 @@
 		<span class="self">Self</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">PhantomData</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">units_per_second</span>) <span class="op">=</span> <span class="ident">T::get</span>();
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">units_per_second</span> <span class="op">*</span> (<span class="ident">weight</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">/</span> (<span class="ident">WEIGHT_PER_SECOND</span> <span class="kw">as</span> <span class="ident">u128</span>);
-		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span> <span class="ident">payment</span>.<span class="ident">checked_sub</span>((<span class="ident">id</span>, <span class="ident">amount</span>).<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::TooExpensive</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span>
+			<span class="ident">payment</span>.<span class="ident">checked_sub</span>((<span class="ident">id</span>, <span class="ident">amount</span>).<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::TooExpensive</span>)<span class="question-mark">?</span>;
 		<span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_add</span>(<span class="ident">weight</span>);
 		<span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">1</span>.<span class="ident">saturating_add</span>(<span class="ident">amount</span>);
 		<span class="prelude-val">Ok</span>(<span class="ident">unused</span>)
@@ -438,13 +375,14 @@
 		<span class="self">Self</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">PhantomData</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">units_per_second</span>) <span class="op">=</span> <span class="ident">T::get</span>();
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">units_per_second</span> <span class="op">*</span> (<span class="ident">weight</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">/</span> (<span class="ident">WEIGHT_PER_SECOND</span> <span class="kw">as</span> <span class="ident">u128</span>);
 		<span class="kw">if</span> <span class="ident">amount</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
 			<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">payment</span>)
 		}
-		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span> <span class="ident">payment</span>.<span class="ident">checked_sub</span>((<span class="ident">id</span>, <span class="ident">amount</span>).<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::TooExpensive</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span>
+			<span class="ident">payment</span>.<span class="ident">checked_sub</span>((<span class="ident">id</span>, <span class="ident">amount</span>).<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::TooExpensive</span>)<span class="question-mark">?</span>;
 		<span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_add</span>(<span class="ident">weight</span>);
 		<span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">1</span>.<span class="ident">saturating_add</span>(<span class="ident">amount</span>);
 		<span class="prelude-val">Ok</span>(<span class="ident">unused</span>)
@@ -497,11 +435,11 @@
 		<span class="self">Self</span>(<span class="number">0</span>, <span class="ident">Zero::zero</span>(), <span class="ident">PhantomData</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">WeightToFee::calc</span>(<span class="kw-2">&amp;</span><span class="ident">weight</span>);
-		<span class="kw">let</span> <span class="ident">u128_amount</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">amount</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Overflow</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">u128_amount</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">amount</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::Overflow</span>)<span class="question-mark">?</span>;
 		<span class="kw">let</span> <span class="ident">required</span> <span class="op">=</span> (<span class="ident">Concrete</span>(<span class="ident">AssetId::get</span>()), <span class="ident">u128_amount</span>).<span class="ident">into</span>();
-		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span> <span class="ident">payment</span>.<span class="ident">checked_sub</span>(<span class="ident">required</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::TooExpensive</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span> <span class="ident">payment</span>.<span class="ident">checked_sub</span>(<span class="ident">required</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::TooExpensive</span>)<span class="question-mark">?</span>;
 		<span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_add</span>(<span class="ident">weight</span>);
 		<span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">1</span>.<span class="ident">saturating_add</span>(<span class="ident">amount</span>);
 		<span class="prelude-val">Ok</span>(<span class="ident">unused</span>)

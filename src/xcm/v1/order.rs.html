@@ -236,6 +236,62 @@
 <span id="233">233</span>
 <span id="234">234</span>
 <span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -255,10 +311,9 @@
 
 <span class="doccomment">//! Version 1 of the Cross-Consensus Message format data structures.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-	<span class="kw">super</span><span class="ident">::v0::Order</span> <span class="kw">as</span> <span class="ident">Order0</span>, <span class="ident">MultiAsset</span>, <span class="ident">MultiAssetFilter</span>, <span class="ident">MultiAssets</span>, <span class="ident">MultiLocation</span>, <span class="ident">Xcm</span>,
-};
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">MultiAsset</span>, <span class="ident">MultiAssetFilter</span>, <span class="ident">MultiAssets</span>, <span class="ident">MultiLocation</span>, <span class="ident">Xcm</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">v0::Order</span> <span class="kw">as</span> <span class="ident">OldOrder</span>, <span class="ident">v2::Instruction</span>};
+<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec::Vec</span>};
 <span class="kw">use</span> <span class="ident">core</span>::{
 	<span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
 	<span class="ident">result</span>,
@@ -423,18 +478,18 @@
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Order0</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">OldOrder</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
 	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">old</span>: <span class="ident">Order0</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">old</span>: <span class="ident">OldOrder</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
 		<span class="kw">use</span> <span class="ident">Order</span>::<span class="kw-2">*</span>;
 		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">old</span> {
-			<span class="ident">Order0::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Noop</span>,
-			<span class="ident">Order0::DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">dest</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DepositAsset</span> {
+			<span class="ident">OldOrder::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Noop</span>,
+			<span class="ident">OldOrder::DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">dest</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DepositAsset</span> {
 				<span class="ident">assets</span>: <span class="ident">assets</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 				<span class="ident">max_assets</span>: <span class="number">1</span>,
 				<span class="ident">beneficiary</span>: <span class="ident">dest</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 			},
-			<span class="ident">Order0::DepositReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DepositReserveAsset</span> {
+			<span class="ident">OldOrder::DepositReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DepositReserveAsset</span> {
 				<span class="ident">assets</span>: <span class="ident">assets</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 				<span class="ident">max_assets</span>: <span class="number">1</span>,
 				<span class="ident">dest</span>: <span class="ident">dest</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
@@ -443,9 +498,9 @@
 					.<span class="ident">map</span>(<span class="ident">Order</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::try_from</span>)
 					.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
 			},
-			<span class="ident">Order0::ExchangeAsset</span> { <span class="ident">give</span>, <span class="ident">receive</span> } <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">OldOrder::ExchangeAsset</span> { <span class="ident">give</span>, <span class="ident">receive</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">ExchangeAsset</span> { <span class="ident">give</span>: <span class="ident">give</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">receive</span>: <span class="ident">receive</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span> },
-			<span class="ident">Order0::InitiateReserveWithdraw</span> { <span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">OldOrder::InitiateReserveWithdraw</span> { <span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">InitiateReserveWithdraw</span> {
 					<span class="ident">assets</span>: <span class="ident">assets</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 					<span class="ident">reserve</span>: <span class="ident">reserve</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
@@ -454,7 +509,7 @@
 						.<span class="ident">map</span>(<span class="ident">Order</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::try_from</span>)
 						.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
 				},
-			<span class="ident">Order0::InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InitiateTeleport</span> {
+			<span class="ident">OldOrder::InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InitiateTeleport</span> {
 				<span class="ident">assets</span>: <span class="ident">assets</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 				<span class="ident">dest</span>: <span class="ident">dest</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
 				<span class="ident">effects</span>: <span class="ident">effects</span>
@@ -462,13 +517,70 @@
 					.<span class="ident">map</span>(<span class="ident">Order</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::try_from</span>)
 					.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
 			},
-			<span class="ident">Order0::QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span> } <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">OldOrder::QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>: <span class="ident">dest</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">assets</span>: <span class="ident">assets</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span> },
-			<span class="ident">Order0::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">OldOrder::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span>
 					<span class="ident">xcm</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Xcm</span>::<span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="ident">::try_from</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 				<span class="ident">BuyExecution</span> { <span class="ident">fees</span>: <span class="ident">fees</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> }
 			},
+		})
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">old</span>: <span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+		<span class="kw">use</span> <span class="ident">Order</span>::<span class="kw-2">*</span>;
+		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">old</span> {
+			<span class="ident">Instruction::DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">beneficiary</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">beneficiary</span> },
+			<span class="ident">Instruction::DepositReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">DepositReserveAsset</span> {
+					<span class="ident">assets</span>,
+					<span class="ident">max_assets</span>,
+					<span class="ident">dest</span>,
+					<span class="ident">effects</span>: <span class="ident">xcm</span>
+						.<span class="number">0</span>
+						.<span class="ident">into_iter</span>()
+						.<span class="ident">map</span>(<span class="ident">Order</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::try_from</span>)
+						.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+				},
+			<span class="ident">Instruction::ExchangeAsset</span> { <span class="ident">give</span>, <span class="ident">receive</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ExchangeAsset</span> { <span class="ident">give</span>, <span class="ident">receive</span> },
+			<span class="ident">Instruction::InitiateReserveWithdraw</span> { <span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">InitiateReserveWithdraw</span> {
+					<span class="ident">assets</span>,
+					<span class="ident">reserve</span>,
+					<span class="ident">effects</span>: <span class="ident">xcm</span>
+						.<span class="number">0</span>
+						.<span class="ident">into_iter</span>()
+						.<span class="ident">map</span>(<span class="ident">Order</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::try_from</span>)
+						.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+				},
+			<span class="ident">Instruction::InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InitiateTeleport</span> {
+				<span class="ident">assets</span>,
+				<span class="ident">dest</span>,
+				<span class="ident">effects</span>: <span class="ident">xcm</span>
+					.<span class="number">0</span>
+					.<span class="ident">into_iter</span>()
+					.<span class="ident">map</span>(<span class="ident">Order</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::try_from</span>)
+					.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+			},
+			<span class="ident">Instruction::QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="comment">// Cannot handle special response weights.</span>
+				<span class="kw">if</span> <span class="ident">max_response_weight</span> <span class="op">&gt;</span> <span class="number">0</span> {
+					<span class="kw">return</span> <span class="prelude-val">Err</span>(())
+				}
+				<span class="ident">QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span> }
+			},
+			<span class="ident">Instruction::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight_limit</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+				<span class="kw">let</span> <span class="ident">halt_on_error</span> <span class="op">=</span> <span class="bool-val">true</span>;
+				<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="number">0</span>;
+				<span class="kw">let</span> <span class="ident">debt</span> <span class="op">=</span> <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">weight_limit</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
+				<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> }
+			},
+			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
 		})
 	}
 }

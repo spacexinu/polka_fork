@@ -603,7 +603,7 @@
 						},
 					)<span class="op">*</span>
 					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::CannotReachDestination</span>(<span class="ident">destination</span>, <span class="ident">message</span>));
+						<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::Unroutable</span>);
 					}
 				}
 			}
@@ -628,7 +628,7 @@
 							);
 						},
 					)<span class="op">*</span>
-					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::SendFailed</span>(<span class="string">&quot;Only sends to children parachain.&quot;</span>)),
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::Transport</span>(<span class="string">&quot;Only sends to children parachain.&quot;</span>)),
 				}
 			}
 
@@ -639,7 +639,7 @@
 		<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParachainXcmRouter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
 		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Get</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::ParaId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::SendXcm</span> <span class="kw">for</span> <span class="ident">ParachainXcmRouter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-			<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MultiLocation</span>, <span class="ident">message</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmResult</span> {
+			<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MultiLocation</span>, <span class="ident">message</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::SendResult</span> {
 				<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">UmpSink</span>, <span class="ident">XcmpMessageHandlerT</span>};
 
 				<span class="kw">match</span> <span class="ident">destination</span>.<span class="ident">interior</span>() {
@@ -655,7 +655,7 @@
 							<span class="prelude-val">Ok</span>(())
 						},
 					)<span class="op">*</span>
-					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::CannotReachDestination</span>(<span class="ident">destination</span>, <span class="ident">message</span>)),
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::SendError::CannotReachDestination</span>(<span class="ident">destination</span>, <span class="ident">message</span>)),
 				}
 			}
 		}
@@ -663,7 +663,7 @@
 		<span class="doccomment">/// XCM router for relay chain.</span>
 		<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelayChainXcmRouter</span>;
 		<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::SendXcm</span> <span class="kw">for</span> <span class="ident">RelayChainXcmRouter</span> {
-			<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MultiLocation</span>, <span class="ident">message</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmResult</span> {
+			<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::MultiLocation</span>, <span class="ident">message</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::SendResult</span> {
 				<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::DmpMessageHandlerT</span>;
 
 				<span class="kw">match</span> <span class="ident">destination</span>.<span class="ident">interior</span>() {
@@ -674,7 +674,7 @@
 							<span class="prelude-val">Ok</span>(())
 						},
 					)<span class="op">*</span>
-					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::XcmError::SendFailed</span>(<span class="string">&quot;Only sends to children parachain.&quot;</span>)),
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::SendError::Unroutable</span>),
 				}
 			}
 		}

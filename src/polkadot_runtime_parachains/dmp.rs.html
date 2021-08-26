@@ -448,7 +448,7 @@
 <span class="kw">use</span> <span class="ident">primitives::v1</span>::{<span class="ident">DownwardMessage</span>, <span class="ident">Hash</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>, <span class="ident">InboundDownwardMessage</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">BlakeTwo256</span>, <span class="ident">Hash</span> <span class="kw">as</span> <span class="ident">HashT</span>, <span class="ident">SaturatedConversion</span>};
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">fmt</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">xcm::latest::Error</span> <span class="kw">as</span> <span class="ident">XcmError</span>;
+<span class="kw">use</span> <span class="ident">xcm::latest::SendError</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
 
@@ -459,10 +459,10 @@
 	<span class="ident">ExceedsMaxMessageSize</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueueDownwardMessageError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XcmError</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueueDownwardMessageError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SendError</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">QueueDownwardMessageError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">match</span> <span class="ident">err</span> {
-			<span class="ident">QueueDownwardMessageError::ExceedsMaxMessageSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">XcmError::ExceedsMaxMessageSize</span>,
+			<span class="ident">QueueDownwardMessageError::ExceedsMaxMessageSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SendError::ExceedsMaxMessageSize</span>,
 		}
 	}
 }

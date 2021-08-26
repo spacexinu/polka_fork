@@ -103,10 +103,10 @@
 	<span class="doccomment">/// How to get a call origin from a `OriginKind` value.</span>
 	<span class="kw">type</span> <span class="ident">OriginConverter</span>: <span class="ident">ConvertOrigin</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Call</span> <span class="kw">as</span> <span class="ident">Dispatchable</span><span class="op">&gt;</span><span class="ident">::Origin</span><span class="op">&gt;</span>;
 
-	<span class="doccomment">/// Combinations of (Location, Asset) pairs which we unilateral trust as reserves.</span>
+	<span class="doccomment">/// Combinations of (Location, Asset) pairs which we trust as reserves.</span>
 	<span class="kw">type</span> <span class="ident">IsReserve</span>: <span class="ident">FilterAssetLocation</span>;
 
-	<span class="doccomment">/// Combinations of (Location, Asset) pairs which we bilateral trust as teleporters.</span>
+	<span class="doccomment">/// Combinations of (Location, Asset) pairs which we trust as teleporters.</span>
 	<span class="kw">type</span> <span class="ident">IsTeleporter</span>: <span class="ident">FilterAssetLocation</span>;
 
 	<span class="doccomment">/// Means of inverting a location.</span>

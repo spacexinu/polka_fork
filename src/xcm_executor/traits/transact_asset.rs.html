@@ -366,7 +366,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// When composed as a tuple, all type-items are called. It is up to the implementer that there exists no</span>
 	<span class="doccomment">/// value for `_what` which can cause side-effects for more than one of the type-items.</span>
-	<span class="kw">fn</span> <span class="ident">check_out</span>(<span class="ident">_origin</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>, <span class="ident">_what</span>: <span class="kw-2">&amp;</span><span class="ident">MultiAsset</span>) {}
+	<span class="kw">fn</span> <span class="ident">check_out</span>(<span class="ident">_dest</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>, <span class="ident">_what</span>: <span class="kw-2">&amp;</span><span class="ident">MultiAsset</span>) {}
 
 	<span class="doccomment">/// Deposit the `what` asset into the account of `who`.</span>
 	<span class="doccomment">///</span>
@@ -375,8 +375,8 @@
 		<span class="prelude-val">Err</span>(<span class="ident">XcmError::Unimplemented</span>)
 	}
 
-	<span class="doccomment">/// Withdraw the given asset from the consensus system. Return the actual asset(s) withdrawn. In</span>
-	<span class="doccomment">/// the case of `what` being a wildcard, this may be something more specific.</span>
+	<span class="doccomment">/// Withdraw the given asset from the consensus system. Return the actual asset(s) withdrawn,</span>
+	<span class="doccomment">/// which should always be equal to `_what`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Implementations should return `XcmError::FailedToTransactAsset` if withdraw failed.</span>
 	<span class="kw">fn</span> <span class="ident">withdraw_asset</span>(<span class="ident">_what</span>: <span class="kw-2">&amp;</span><span class="ident">MultiAsset</span>, <span class="ident">_who</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {

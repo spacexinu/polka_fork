@@ -911,6 +911,15 @@
 <span id="908">908</span>
 <span id="909">909</span>
 <span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -936,26 +945,30 @@
 
 <span class="doccomment">/// A relative path between state-bearing consensus systems.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// A location in a consensus system is defined as an *isolatable state machine* held within global consensus. The</span>
-<span class="doccomment">/// location in question need not have a sophisticated consensus algorithm of its own; a single account within</span>
-<span class="doccomment">/// Ethereum, for example, could be considered a location.</span>
+<span class="doccomment">/// A location in a consensus system is defined as an *isolatable state machine* held within global</span>
+<span class="doccomment">/// consensus. The location in question need not have a sophisticated consensus algorithm of its</span>
+<span class="doccomment">/// own; a single account within Ethereum, for example, could be considered a location.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A very-much non-exhaustive list of types of location include:</span>
 <span class="doccomment">/// - A (normal, layer-1) block chain, e.g. the Bitcoin mainnet or a parachain.</span>
 <span class="doccomment">/// - A layer-0 super-chain, e.g. the Polkadot Relay chain.</span>
 <span class="doccomment">/// - A layer-2 smart contract, e.g. an ERC-20 on Ethereum.</span>
-<span class="doccomment">/// - A logical functional component of a chain, e.g. a single instance of a pallet on a Frame-based Substrate chain.</span>
+<span class="doccomment">/// - A logical functional component of a chain, e.g. a single instance of a pallet on a Frame-based</span>
+<span class="doccomment">///   Substrate chain.</span>
 <span class="doccomment">/// - An account.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// A `MultiLocation` is a *relative identifier*, meaning that it can only be used to define the relative path</span>
-<span class="doccomment">/// between two locations, and cannot generally be used to refer to a location universally. It is comprised of a</span>
-<span class="doccomment">/// number of *junctions*, each morphing the previous location, either diving down into one of its internal locations,</span>
-<span class="doccomment">/// called a *sub-consensus*, or going up into its parent location.</span>
+<span class="doccomment">/// A `MultiLocation` is a *relative identifier*, meaning that it can only be used to define the</span>
+<span class="doccomment">/// relative path between two locations, and cannot generally be used to refer to a location</span>
+<span class="doccomment">/// universally. It is comprised of an integer number of parents specifying the number of times to</span>
+<span class="doccomment">/// &quot;escape&quot; upwards into the containing consensus system and then a number of *junctions*, each</span>
+<span class="doccomment">/// diving down and specifying some interior portion of state (which may be considered a</span>
+<span class="doccomment">/// &quot;sub-consensus&quot; system).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The `parents` field of this struct indicates the number of parent junctions that exist at the</span>
-<span class="doccomment">/// beginning of this `MultiLocation`. A corollary of such a property is that no parent junctions</span>
-<span class="doccomment">/// can be added in the middle or at the end of a `MultiLocation`, thus ensuring well-formedness</span>
-<span class="doccomment">/// of each and every `MultiLocation` that can be constructed.</span>
+<span class="doccomment">/// This specific `MultiLocation` implementation uses a `Junctions` datatype which is a Rust `enum`</span>
+<span class="doccomment">/// in order to make pattern matching easier. There are occasions where it is important to ensure</span>
+<span class="doccomment">/// that a value is strictly an interior location, in those cases, `Junctions` may be used.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `MultiLocation` value of `Null` simply refers to the interpreting consensus system.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiLocation</span> {
 	<span class="doccomment">/// The number of parent junctions at the beginning of this `MultiLocation`.</span>
@@ -963,6 +976,11 @@
 	<span class="doccomment">/// The interior (i.e. non-parent) junctions that this `MultiLocation` contains.</span>
 	<span class="kw">pub</span> <span class="ident">interior</span>: <span class="ident">Junctions</span>,
 }
+
+<span class="doccomment">/// A relative location which is constrained to be an interior location of the context.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See also `MultiLocation`.</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InteriorMultiLocation</span> <span class="op">=</span> <span class="ident">Junctions</span>;
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MultiLocation</span> {
 	<span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -1638,7 +1656,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Example</span>
 	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use xcm::latest::{Junctions::*, Junction::*};</span>
+	<span class="doccomment">/// # use xcm::v1::{Junctions::*, Junction::*};</span>
 	<span class="doccomment">/// # fn main() {</span>
 	<span class="doccomment">/// let mut m = X3(Parachain(2), PalletInstance(3), OnlyChild);</span>
 	<span class="doccomment">/// assert_eq!(m.match_and_split(&amp;X2(Parachain(2), PalletInstance(3))), Some(&amp;OnlyChild));</span>

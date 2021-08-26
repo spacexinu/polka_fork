@@ -1491,6 +1491,9 @@
 <span id="1488">1488</span>
 <span id="1489">1489</span>
 <span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2406,6 +2409,7 @@
 <span class="macro">parameter_types!</span> {
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WestendForWestmint</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span>
 		(<span class="ident">Wild</span>(<span class="ident">AllOf</span> { <span class="ident">fun</span>: <span class="ident">WildFungible</span>, <span class="ident">id</span>: <span class="ident">Concrete</span>(<span class="ident">WndLocation::get</span>()) }), <span class="ident">Parachain</span>(<span class="number">1000</span>).<span class="ident">into</span>());
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxInstructions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
 }
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TrustedTeleporters</span> <span class="op">=</span> (<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">WestendForWestmint</span><span class="op">&gt;</span>,);
 
@@ -2429,7 +2433,7 @@
 	<span class="kw">type</span> <span class="ident">IsTeleporter</span> <span class="op">=</span> <span class="ident">TrustedTeleporters</span>;
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">LocationInverter</span><span class="op">&lt;</span><span class="ident">Ancestry</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Barrier</span> <span class="op">=</span> <span class="ident">Barrier</span>;
-	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Trader</span> <span class="op">=</span> <span class="ident">UsingComponents</span><span class="op">&lt;</span><span class="ident">WeightToFee</span>, <span class="ident">WndLocation</span>, <span class="ident">AccountId</span>, <span class="ident">Balances</span>, <span class="ident">ToAuthor</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">ResponseHandler</span> <span class="op">=</span> ();
 }
@@ -2452,8 +2456,10 @@
 	<span class="kw">type</span> <span class="ident">XcmExecutor</span> <span class="op">=</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">XcmConfig</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">XcmTeleportFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
 	<span class="kw">type</span> <span class="ident">XcmReserveTransferFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
-	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">LocationInverter</span><span class="op">&lt;</span><span class="ident">Ancestry</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
+	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
 }
 
 <span class="macro">construct_runtime!</span> {

@@ -90,8 +90,6 @@
 <span id="87">87</span>
 <span id="88">88</span>
 <span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -110,10 +108,7 @@
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">parameter_types</span>, <span class="ident">traits::Everything</span>, <span class="ident">weights::Weight</span>};
-<span class="kw">use</span> <span class="ident">xcm::latest</span>::{
-	<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">XcmError</span>, <span class="ident">Junctions::Here</span>, <span class="ident">MultiAsset</span>, <span class="ident">MultiLocation</span>, <span class="ident">NetworkId</span>, <span class="ident">Parent</span>,
-	<span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">XcmResult</span>, <span class="ident">SendXcm</span>, <span class="ident">Xcm</span>,
-};
+<span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">xcm_builder</span>::{<span class="ident">AllowUnpaidExecutionFrom</span>, <span class="ident">FixedWeightBounds</span>, <span class="ident">SignedToAccountId32</span>};
 <span class="kw">use</span> <span class="ident">xcm_executor</span>::{
 	<span class="ident">traits</span>::{<span class="ident">InvertLocation</span>, <span class="ident">TransactAsset</span>, <span class="ident">WeightTrader</span>},
@@ -122,6 +117,7 @@
 
 <span class="macro">parameter_types!</span> {
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OurNetwork</span>: <span class="ident">NetworkId</span> <span class="op">=</span> <span class="ident">NetworkId::Polkadot</span>;
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxInstructions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
 }
 
 <span class="doccomment">/// Type to convert an `Origin` type value into a `MultiLocation` value which represents an interior location</span>
@@ -133,7 +129,7 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DoNothingRouter</span>;
 <span class="kw">impl</span> <span class="ident">SendXcm</span> <span class="kw">for</span> <span class="ident">DoNothingRouter</span> {
-	<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">_dest</span>: <span class="ident">MultiLocation</span>, <span class="ident">_msg</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">XcmResult</span> {
+	<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">_dest</span>: <span class="ident">MultiLocation</span>, <span class="ident">_msg</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SendResult</span> {
 		<span class="prelude-val">Ok</span>(())
 	}
 }
@@ -180,9 +176,9 @@
 	<span class="kw">type</span> <span class="ident">IsTeleporter</span> <span class="op">=</span> ();
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">InvertNothing</span>;
 	<span class="kw">type</span> <span class="ident">Barrier</span> <span class="op">=</span> <span class="ident">Barrier</span>;
-	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::BaseXcmWeight</span>, <span class="kw">super</span><span class="ident">::Call</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::BaseXcmWeight</span>, <span class="kw">super</span><span class="ident">::Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Trader</span> <span class="op">=</span> <span class="ident">DummyWeightTrader</span>;
-	<span class="kw">type</span> <span class="ident">ResponseHandler</span> <span class="op">=</span> ();
+	<span class="kw">type</span> <span class="ident">ResponseHandler</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::Xcm</span>;
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_test_runtime" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

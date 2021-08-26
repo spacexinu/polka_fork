@@ -369,6 +369,59 @@
 <span id="366">366</span>
 <span id="367">367</span>
 <span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -393,10 +446,12 @@
 	<span class="ident">ensure</span>,
 	<span class="ident">weights::GetDispatchInfo</span>,
 };
+<span class="kw">use</span> <span class="ident">sp_runtime::traits::Saturating</span>;
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">marker::PhantomData</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">xcm::latest</span>::{
-	<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">XcmError</span>, <span class="ident">ExecuteXcm</span>, <span class="ident">MultiAssets</span>, <span class="ident">MultiLocation</span>, <span class="ident">Order</span>, <span class="ident">Outcome</span>, <span class="ident">Response</span>, <span class="ident">SendXcm</span>,
-	<span class="ident">Xcm</span>,
+	<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">XcmError</span>, <span class="ident">ExecuteXcm</span>,
+	<span class="ident">Instruction</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
+	<span class="ident">MultiAssets</span>, <span class="ident">MultiLocation</span>, <span class="ident">Outcome</span>, <span class="ident">Response</span>, <span class="ident">SendXcm</span>, <span class="ident">Xcm</span>,
 };
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">traits</span>;
@@ -411,7 +466,25 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">config::Config</span>;
 
 <span class="doccomment">/// The XCM executor.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">Config</span>: <span class="ident">config::Config</span><span class="op">&gt;</span> {
+	<span class="ident">holding</span>: <span class="ident">Assets</span>,
+	<span class="ident">origin</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
+	<span class="ident">trader</span>: <span class="ident">Config::Trader</span>,
+	<span class="doccomment">/// The most recent error result and instruction index into the fragment in which it occured,</span>
+	<span class="doccomment">/// if any.</span>
+	<span class="ident">error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">XcmError</span>)<span class="op">&gt;</span>,
+	<span class="doccomment">/// The surplus weight, defined as the amount by which `max_weight` is</span>
+	<span class="doccomment">/// an over-estimate of the actual weight consumed. We do it this way to avoid needing the</span>
+	<span class="doccomment">/// execution engine to keep track of all instructions&#39; weights (it only needs to care about</span>
+	<span class="doccomment">/// the weight of dynamically determined instructions such as `Transact`).</span>
+	<span class="ident">total_surplus</span>: <span class="ident">u64</span>,
+	<span class="ident">total_refunded</span>: <span class="ident">u64</span>,
+	<span class="ident">error_handler</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
+	<span class="ident">error_handler_weight</span>: <span class="ident">u64</span>,
+	<span class="ident">appendix</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
+	<span class="ident">appendix_weight</span>: <span class="ident">u64</span>,
+	<span class="ident">_config</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span>,
+}
 
 <span class="doccomment">/// The maximum recursion limit for `execute_xcm` and `execute_effects`.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_RECURSION_LIMIT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">8</span>;
@@ -419,7 +492,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Config</span>: <span class="ident">config::Config</span><span class="op">&gt;</span> <span class="ident">ExecuteXcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">execute_xcm_in_credit</span>(
 		<span class="ident">origin</span>: <span class="ident">MultiLocation</span>,
-		<span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
+		<span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
 		<span class="ident">weight_limit</span>: <span class="ident">Weight</span>,
 		<span class="kw-2">mut</span> <span class="ident">weight_credit</span>: <span class="ident">Weight</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Outcome</span> {
@@ -431,143 +504,186 @@
 			<span class="ident">weight_limit</span>,
 			<span class="ident">weight_credit</span>,
 		);
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Xcm</span>::<span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">message</span>);
-		<span class="kw">let</span> <span class="ident">shallow_weight</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Config::Weigher::shallow</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">message</span>) {
+		<span class="kw">let</span> <span class="ident">xcm_weight</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Config::Weigher::weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">message</span>) {
 			<span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
 			<span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Outcome::Error</span>(<span class="ident">XcmError::WeightNotComputable</span>),
 		};
-		<span class="kw">let</span> <span class="ident">deep_weight</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Config::Weigher::deep</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">message</span>) {
-			<span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-			<span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Outcome::Error</span>(<span class="ident">XcmError::WeightNotComputable</span>),
-		};
-		<span class="kw">let</span> <span class="ident">maximum_weight</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shallow_weight</span>.<span class="ident">checked_add</span>(<span class="ident">deep_weight</span>) {
-			<span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Outcome::Error</span>(<span class="ident">XcmError::Overflow</span>),
-		};
-		<span class="kw">if</span> <span class="ident">maximum_weight</span> <span class="op">&gt;</span> <span class="ident">weight_limit</span> {
-			<span class="kw">return</span> <span class="ident">Outcome::Error</span>(<span class="ident">XcmError::WeightLimitReached</span>(<span class="ident">maximum_weight</span>))
+		<span class="kw">if</span> <span class="ident">xcm_weight</span> <span class="op">&gt;</span> <span class="ident">weight_limit</span> {
+			<span class="kw">return</span> <span class="ident">Outcome::Error</span>(<span class="ident">XcmError::WeightLimitReached</span>(<span class="ident">xcm_weight</span>))
 		}
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">trader</span> <span class="op">=</span> <span class="ident">Config::Trader::new</span>();
-		<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::do_execute_xcm</span>(
-			<span class="ident">origin</span>,
+		<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">origin</span>);
+
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">Config::Barrier::should_execute</span>(
+			<span class="kw-2">&amp;</span><span class="ident">origin</span>,
 			<span class="bool-val">true</span>,
-			<span class="ident">message</span>,
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">message</span>,
+			<span class="ident">xcm_weight</span>,
 			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">weight_credit</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">shallow_weight</span>),
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">trader</span>,
-			<span class="number">0</span>,
-		);
-		<span class="ident">drop</span>(<span class="ident">trader</span>);
-		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm&quot;</span>, <span class="string">&quot;result: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>);
-		<span class="kw">match</span> <span class="ident">result</span> {
-			<span class="prelude-val">Ok</span>(<span class="ident">surplus</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::Complete</span>(<span class="ident">maximum_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">surplus</span>)),
-			<span class="comment">// TODO: #2841 #REALWEIGHT We can do better than returning `maximum_weight` here, and we should otherwise</span>
-			<span class="comment">//  we&#39;ll needlessly be disregarding block execution time.</span>
-			<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::Incomplete</span>(<span class="ident">maximum_weight</span>, <span class="ident">e</span>),
+		) {
+			<span class="kw">return</span> <span class="ident">Outcome::Error</span>(<span class="ident">XcmError::Barrier</span>)
+		}
+
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vm</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">origin</span>);
+
+		<span class="kw">while</span> <span class="op">!</span><span class="ident">message</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
+			<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">vm</span>.<span class="ident">execute</span>(<span class="ident">message</span>);
+			<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm_in_credit&quot;</span>, <span class="string">&quot;result: {:?}&quot;</span>, <span class="ident">result</span>);
+			<span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>((<span class="ident">i</span>, <span class="ident">e</span>, <span class="ident">w</span>)) <span class="op">=</span> <span class="ident">result</span> {
+				<span class="ident">vm</span>.<span class="ident">total_surplus</span>.<span class="ident">saturating_accrue</span>(<span class="ident">w</span>);
+				<span class="ident">vm</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">e</span>));
+				<span class="ident">vm</span>.<span class="ident">take_error_handler</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">vm</span>.<span class="ident">take_appendix</span>())
+			} <span class="kw">else</span> {
+				<span class="ident">vm</span>.<span class="ident">drop_error_handler</span>();
+				<span class="ident">vm</span>.<span class="ident">take_appendix</span>()
+			}
+		}
+
+		<span class="ident">vm</span>.<span class="ident">refund_surplus</span>();
+		<span class="ident">drop</span>(<span class="ident">vm</span>.<span class="ident">trader</span>);
+
+		<span class="comment">// TODO #2841: Do something with holding? (Fail-safe AssetTrap?)</span>
+
+		<span class="kw">let</span> <span class="ident">weight_used</span> <span class="op">=</span> <span class="ident">xcm_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">vm</span>.<span class="ident">total_surplus</span>);
+		<span class="kw">match</span> <span class="ident">vm</span>.<span class="ident">error</span> {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::Complete</span>(<span class="ident">weight_used</span>),
+			<span class="comment">// TODO: #2841 #REALWEIGHT We should deduct the cost of any instructions following</span>
+			<span class="comment">// the error which didn&#39;t end up being executed.</span>
+			<span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::Incomplete</span>(<span class="ident">weight_used</span>, <span class="ident">e</span>),
 		}
 	}
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Config</span>: <span class="ident">config::Config</span><span class="op">&gt;</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">reanchored</span>(<span class="kw-2">mut</span> <span class="ident">assets</span>: <span class="ident">Assets</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MultiAssets</span> {
-		<span class="kw">let</span> <span class="ident">inv_dest</span> <span class="op">=</span> <span class="ident">Config::LocationInverter::invert_location</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>);
-		<span class="ident">assets</span>.<span class="ident">prepend_location</span>(<span class="kw-2">&amp;</span><span class="ident">inv_dest</span>);
-		<span class="ident">assets</span>.<span class="ident">into_assets_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">into</span>()
+	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">origin</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span> {
+			<span class="ident">holding</span>: <span class="ident">Assets::new</span>(),
+			<span class="ident">origin</span>,
+			<span class="ident">trader</span>: <span class="ident">Config::Trader::new</span>(),
+			<span class="ident">error</span>: <span class="prelude-val">None</span>,
+			<span class="ident">total_surplus</span>: <span class="number">0</span>,
+			<span class="ident">total_refunded</span>: <span class="number">0</span>,
+			<span class="ident">error_handler</span>: <span class="ident">Xcm</span>(<span class="macro">vec!</span>[]),
+			<span class="ident">error_handler_weight</span>: <span class="number">0</span>,
+			<span class="ident">appendix</span>: <span class="ident">Xcm</span>(<span class="macro">vec!</span>[]),
+			<span class="ident">appendix_weight</span>: <span class="number">0</span>,
+			<span class="ident">_config</span>: <span class="ident">PhantomData</span>,
+		}
 	}
 
-	<span class="doccomment">/// Execute the XCM and return the portion of weight of `shallow_weight + deep_weight` that `message` did not use.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// NOTE: The amount returned must be less than `shallow_weight + deep_weight` of `message`.</span>
-	<span class="kw">fn</span> <span class="ident">do_execute_xcm</span>(
-		<span class="ident">origin</span>: <span class="ident">MultiLocation</span>,
-		<span class="ident">top_level</span>: <span class="ident">bool</span>,
-		<span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
-		<span class="ident">weight_credit</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Weight</span>,
-		<span class="ident">maybe_shallow_weight</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weight</span><span class="op">&gt;</span>,
-		<span class="ident">trader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Config::Trader</span>,
-		<span class="ident">num_recursions</span>: <span class="ident">u32</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// Execute the XCM program fragment and report back the error and which instruction caused it,</span>
+	<span class="doccomment">/// or `Ok` if there was no error.</span>
+	<span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">xcm</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), (<span class="ident">u32</span>, <span class="ident">XcmError</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> {
 		<span class="macro">log::trace!</span>(
-			<span class="ident">target</span>: <span class="string">&quot;xcm::do_execute_xcm&quot;</span>,
-			<span class="string">&quot;origin: {:?}, top_level: {:?}, message: {:?}, weight_credit: {:?}, maybe_shallow_weight: {:?}, recursion: {:?}&quot;</span>,
-			<span class="ident">origin</span>,
-			<span class="ident">top_level</span>,
-			<span class="ident">message</span>,
-			<span class="ident">weight_credit</span>,
-			<span class="ident">maybe_shallow_weight</span>,
-			<span class="ident">num_recursions</span>,
+			<span class="ident">target</span>: <span class="string">&quot;xcm::execute&quot;</span>,
+			<span class="string">&quot;origin: {:?}, total_surplus/refunded: {:?}/{:?}, error_handler_weight: {:?}&quot;</span>,
+			<span class="self">self</span>.<span class="ident">origin</span>,
+			<span class="self">self</span>.<span class="ident">total_surplus</span>,
+			<span class="self">self</span>.<span class="ident">total_refunded</span>,
+			<span class="self">self</span>.<span class="ident">error_handler_weight</span>,
 		);
-
-		<span class="kw">if</span> <span class="ident">num_recursions</span> <span class="op">&gt;</span> <span class="ident">MAX_RECURSION_LIMIT</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::RecursionLimitReached</span>)
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
+		<span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">instr</span>) <span class="kw">in</span> <span class="ident">xcm</span>.<span class="number">0</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
+			<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span> {
+				<span class="ident">r</span> @ <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span>
+					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">process_instruction</span>(<span class="ident">instr</span>) {
+						<span class="kw-2">*</span><span class="ident">r</span> <span class="op">=</span> <span class="prelude-val">Err</span>((<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">e</span>, <span class="number">0</span>));
+					},
+				<span class="prelude-val">Err</span>((<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">w</span>)) <span class="op">=</span><span class="op">&gt;</span>
+					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">Config::Weigher::instr_weight</span>(<span class="kw-2">&amp;</span><span class="ident">instr</span>) {
+						<span class="ident">w</span>.<span class="ident">saturating_accrue</span>(<span class="ident">x</span>)
+					},
+			}
 		}
+		<span class="ident">result</span>
+	}
 
-		<span class="comment">// This is the weight of everything that cannot be paid for. This basically means all computation</span>
-		<span class="comment">// except any XCM which is behind an Order::BuyExecution.</span>
-		<span class="kw">let</span> <span class="ident">shallow_weight</span> <span class="op">=</span> <span class="ident">maybe_shallow_weight</span>
-			.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Config::Weigher::shallow</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">message</span>).<span class="ident">ok</span>())
-			.<span class="ident">ok_or</span>(<span class="ident">XcmError::WeightNotComputable</span>)<span class="question-mark">?</span>;
+	<span class="doccomment">/// Remove the registered error handler and return it. Do not refund its weight.</span>
+	<span class="kw">fn</span> <span class="ident">take_error_handler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Xcm</span>::<span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>(<span class="macro">vec!</span>[]);
+		<span class="ident">sp_std::mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">error_handler</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>);
+		<span class="self">self</span>.<span class="ident">error_handler_weight</span> <span class="op">=</span> <span class="number">0</span>;
+		<span class="ident">r</span>
+	}
 
-		<span class="ident">Config::Barrier::should_execute</span>(
-			<span class="kw-2">&amp;</span><span class="ident">origin</span>,
-			<span class="ident">top_level</span>,
-			<span class="kw-2">&amp;</span><span class="ident">message</span>,
-			<span class="ident">shallow_weight</span>,
-			<span class="ident">weight_credit</span>,
-		)
-		.<span class="ident">map_err</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">XcmError::Barrier</span>)<span class="question-mark">?</span>;
+	<span class="doccomment">/// Drop the registered error handler and refund its weight.</span>
+	<span class="kw">fn</span> <span class="ident">drop_error_handler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+		<span class="self">self</span>.<span class="ident">error_handler</span> <span class="op">=</span> <span class="ident">Xcm</span>::<span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>(<span class="macro">vec!</span>[]);
+		<span class="self">self</span>.<span class="ident">total_surplus</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_surplus</span>.<span class="ident">saturating_add</span>(<span class="self">self</span>.<span class="ident">error_handler_weight</span>);
+		<span class="self">self</span>.<span class="ident">error_handler_weight</span> <span class="op">=</span> <span class="number">0</span>;
+	}
 
-		<span class="comment">// The surplus weight, defined as the amount by which `shallow_weight` plus all nested</span>
-		<span class="comment">// `shallow_weight` values (ensuring no double-counting and also known as `deep_weight`) is an</span>
-		<span class="comment">// over-estimate of the actual weight consumed.</span>
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total_surplus</span>: <span class="ident">Weight</span> <span class="op">=</span> <span class="number">0</span>;
+	<span class="doccomment">/// Remove the registered appendix and return it.</span>
+	<span class="kw">fn</span> <span class="ident">take_appendix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Xcm</span>::<span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>(<span class="macro">vec!</span>[]);
+		<span class="ident">sp_std::mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">appendix</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>);
+		<span class="self">self</span>.<span class="ident">appendix_weight</span> <span class="op">=</span> <span class="number">0</span>;
+		<span class="ident">r</span>
+	}
 
-		<span class="kw">let</span> <span class="ident">maybe_holding_effects</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">origin</span>.<span class="ident">clone</span>(), <span class="ident">message</span>) {
-			(<span class="ident">origin</span>, <span class="ident">Xcm::WithdrawAsset</span> { <span class="ident">assets</span>, <span class="ident">effects</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// Refund any unused weight.</span>
+	<span class="kw">fn</span> <span class="ident">refund_surplus</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+		<span class="kw">let</span> <span class="ident">current_surplus</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_surplus</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">total_refunded</span>);
+		<span class="kw">if</span> <span class="ident">current_surplus</span> <span class="op">&gt;</span> <span class="number">0</span> {
+			<span class="self">self</span>.<span class="ident">total_refunded</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_refunded</span>.<span class="ident">saturating_add</span>(<span class="ident">current_surplus</span>);
+			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">trader</span>.<span class="ident">refund_weight</span>(<span class="ident">current_surplus</span>) {
+				<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">subsume</span>(<span class="ident">w</span>);
+			}
+		}
+	}
+
+	<span class="doccomment">/// Process a single XCM instruction, mutating the state of the XCM virtual machine.</span>
+	<span class="kw">fn</span> <span class="ident">process_instruction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">instr</span>: <span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">XcmError</span><span class="op">&gt;</span> {
+		<span class="kw">match</span> <span class="ident">instr</span> {
+			<span class="ident">WithdrawAsset</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// Take `assets` from the origin account (on-chain) and place in holding.</span>
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">holding</span> <span class="op">=</span> <span class="ident">Assets::default</span>();
-				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>() {
-					<span class="kw">let</span> <span class="ident">withdrawn</span> <span class="op">=</span> <span class="ident">Config::AssetTransactor::withdraw_asset</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">origin</span>)<span class="question-mark">?</span>;
-					<span class="ident">holding</span>.<span class="ident">subsume_assets</span>(<span class="ident">withdrawn</span>);
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
+				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">drain</span>().<span class="ident">into_iter</span>() {
+					<span class="ident">Config::AssetTransactor::withdraw_asset</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="ident">origin</span>)<span class="question-mark">?</span>;
+					<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">subsume</span>(<span class="ident">asset</span>);
 				}
-				<span class="prelude-val">Some</span>((<span class="ident">holding</span>, <span class="ident">effects</span>))
+				<span class="prelude-val">Ok</span>(())
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::ReserveAssetDeposited</span> { <span class="ident">assets</span>, <span class="ident">effects</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">ReserveAssetDeposited</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// check whether we trust origin to be our reserve location for this asset.</span>
-				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>() {
-					<span class="comment">// We only trust the origin to send us assets that they identify as their</span>
-					<span class="comment">// sovereign assets.</span>
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
+				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">drain</span>().<span class="ident">into_iter</span>() {
+					<span class="comment">// Must ensure that we recognise the asset as being managed by the origin.</span>
 					<span class="macro">ensure!</span>(
-						<span class="ident">Config::IsReserve::filter_asset_location</span>(<span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">origin</span>),
+						<span class="ident">Config::IsReserve::filter_asset_location</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="ident">origin</span>),
 						<span class="ident">XcmError::UntrustedReserveLocation</span>
 					);
+					<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">subsume</span>(<span class="ident">asset</span>);
 				}
-				<span class="prelude-val">Some</span>((<span class="ident">assets</span>.<span class="ident">into</span>(), <span class="ident">effects</span>))
+				<span class="prelude-val">Ok</span>(())
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::TransferAsset</span> { <span class="ident">assets</span>, <span class="ident">beneficiary</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">TransferAsset</span> { <span class="ident">assets</span>, <span class="ident">beneficiary</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// Take `assets` from the origin account (on-chain) and place into dest account.</span>
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
 				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>() {
-					<span class="ident">Config::AssetTransactor::beam_asset</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">origin</span>, <span class="kw-2">&amp;</span><span class="ident">beneficiary</span>)<span class="question-mark">?</span>;
+					<span class="ident">Config::AssetTransactor::beam_asset</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="ident">origin</span>, <span class="kw-2">&amp;</span><span class="ident">beneficiary</span>)<span class="question-mark">?</span>;
 				}
-				<span class="prelude-val">None</span>
+				<span class="prelude-val">Ok</span>(())
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::TransferReserveAsset</span> { <span class="kw-2">mut</span> <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">TransferReserveAsset</span> { <span class="kw-2">mut</span> <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
 				<span class="comment">// Take `assets` from the origin account (on-chain) and place into dest account.</span>
 				<span class="kw">let</span> <span class="ident">inv_dest</span> <span class="op">=</span> <span class="ident">Config::LocationInverter::invert_location</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>);
 				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>() {
-					<span class="ident">Config::AssetTransactor::beam_asset</span>(<span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">origin</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>)<span class="question-mark">?</span>;
+					<span class="ident">Config::AssetTransactor::beam_asset</span>(<span class="ident">asset</span>, <span class="ident">origin</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>)<span class="question-mark">?</span>;
 				}
 				<span class="ident">assets</span>.<span class="ident">reanchor</span>(<span class="kw-2">&amp;</span><span class="ident">inv_dest</span>)<span class="question-mark">?</span>;
-				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm::ReserveAssetDeposited</span> { <span class="ident">assets</span>, <span class="ident">effects</span> })<span class="question-mark">?</span>;
-				<span class="prelude-val">None</span>
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">ReserveAssetDeposited</span>(<span class="ident">assets</span>), <span class="ident">ClearOrigin</span>];
+				<span class="ident">message</span>.<span class="ident">extend</span>(<span class="ident">xcm</span>.<span class="number">0</span>.<span class="ident">into_iter</span>());
+				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm</span>(<span class="ident">message</span>)).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::ReceiveTeleportedAsset</span> { <span class="ident">assets</span>, <span class="ident">effects</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">ReceiveTeleportedAsset</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
 				<span class="comment">// check whether we trust origin to teleport this asset to us via config trait.</span>
 				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>() {
 					<span class="comment">// We only trust the origin to send us assets that they identify as their</span>
 					<span class="comment">// sovereign assets.</span>
 					<span class="macro">ensure!</span>(
-						<span class="ident">Config::IsTeleporter::filter_asset_location</span>(<span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">origin</span>),
+						<span class="ident">Config::IsTeleporter::filter_asset_location</span>(<span class="ident">asset</span>, <span class="ident">origin</span>),
 						<span class="ident">XcmError::UntrustedTeleportLocation</span>
 					);
 					<span class="comment">// We should check that the asset can actually be teleported in (for this to be in error, there</span>
@@ -575,13 +691,15 @@
 					<span class="comment">// don&#39;t want to punish a possibly innocent chain/user).</span>
 					<span class="ident">Config::AssetTransactor::can_check_in</span>(<span class="kw-2">&amp;</span><span class="ident">origin</span>, <span class="ident">asset</span>)<span class="question-mark">?</span>;
 				}
-				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>() {
-					<span class="ident">Config::AssetTransactor::check_in</span>(<span class="kw-2">&amp;</span><span class="ident">origin</span>, <span class="ident">asset</span>);
+				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">drain</span>().<span class="ident">into_iter</span>() {
+					<span class="ident">Config::AssetTransactor::check_in</span>(<span class="ident">origin</span>, <span class="kw-2">&amp;</span><span class="ident">asset</span>);
+					<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">subsume</span>(<span class="ident">asset</span>);
 				}
-				<span class="prelude-val">Some</span>((<span class="ident">Assets::from</span>(<span class="ident">assets</span>), <span class="ident">effects</span>))
+				<span class="prelude-val">Ok</span>(())
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="kw-2">mut</span> <span class="ident">call</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="kw-2">mut</span> <span class="ident">call</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// We assume that the Relay-chain is allowed to use transact on this parachain.</span>
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">clone</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
 
 				<span class="comment">// TODO: #2841 #TRANSACTFILTER allow the trait to issue filters for the relay-chain</span>
 				<span class="kw">let</span> <span class="ident">message_call</span> <span class="op">=</span> <span class="ident">call</span>.<span class="ident">take_decoded</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::FailedToDecode</span>)<span class="question-mark">?</span>;
@@ -599,143 +717,131 @@
 				}
 				.<span class="ident">unwrap_or</span>(<span class="ident">weight</span>);
 				<span class="kw">let</span> <span class="ident">surplus</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">actual_weight</span>);
-				<span class="comment">// Credit any surplus weight that we bought. This should be safe since it&#39;s work we</span>
-				<span class="comment">// didn&#39;t realise that we didn&#39;t have to do.</span>
-				<span class="comment">// It works because we assume that the `Config::Weigher` will always count the `call`&#39;s</span>
-				<span class="comment">// `get_dispatch_info` weight into its `shallow` estimate.</span>
-				<span class="kw-2">*</span><span class="ident">weight_credit</span> <span class="op">=</span> <span class="ident">weight_credit</span>.<span class="ident">saturating_add</span>(<span class="ident">surplus</span>);
-				<span class="comment">// Do the same for the total surplus, which is reported to the caller and eventually makes its way</span>
-				<span class="comment">// back up the stack to be subtracted from the deep-weight.</span>
-				<span class="ident">total_surplus</span> <span class="op">=</span> <span class="ident">total_surplus</span>.<span class="ident">saturating_add</span>(<span class="ident">surplus</span>);
-				<span class="comment">// Return the overestimated amount so we can adjust our expectations on how much this entire</span>
-				<span class="comment">// execution has taken.</span>
-				<span class="prelude-val">None</span>
+				<span class="comment">// We assume that the `Config::Weigher` will counts the `require_weight_at_most`</span>
+				<span class="comment">// for the estimate of how much weight this instruction will take. Now that we know</span>
+				<span class="comment">// that it&#39;s less, we credit it.</span>
+				<span class="comment">//</span>
+				<span class="comment">// We make the adjustment for the total surplus, which is used eventually</span>
+				<span class="comment">// reported back to the caller and this ensures that they account for the total</span>
+				<span class="comment">// weight consumed correctly (potentially allowing them to do more operations in a</span>
+				<span class="comment">// block than they otherwise would).</span>
+				<span class="self">self</span>.<span class="ident">total_surplus</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_surplus</span>.<span class="ident">saturating_add</span>(<span class="ident">surplus</span>);
+				<span class="prelude-val">Ok</span>(())
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span> }) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="ident">Config::ResponseHandler::on_response</span>(<span class="ident">origin</span>, <span class="ident">query_id</span>, <span class="ident">response</span>);
-				<span class="prelude-val">None</span>
+			<span class="ident">QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">origin</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
+				<span class="ident">Config::ResponseHandler::on_response</span>(<span class="ident">origin</span>, <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span>);
+				<span class="prelude-val">Ok</span>(())
 			},
-			(<span class="ident">origin</span>, <span class="ident">Xcm::RelayedFrom</span> { <span class="ident">who</span>, <span class="ident">message</span> }) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">origin</span>;
-				<span class="ident">origin</span>.<span class="ident">append_with</span>(<span class="ident">who</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::MultiLocationFull</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">surplus</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::do_execute_xcm</span>(
-					<span class="ident">origin</span>,
-					<span class="ident">top_level</span>,
-					<span class="kw-2">*</span><span class="ident">message</span>,
-					<span class="ident">weight_credit</span>,
-					<span class="prelude-val">None</span>,
-					<span class="ident">trader</span>,
-					<span class="ident">num_recursions</span> <span class="op">+</span> <span class="number">1</span>,
-				)<span class="question-mark">?</span>;
-				<span class="ident">total_surplus</span> <span class="op">=</span> <span class="ident">total_surplus</span>.<span class="ident">saturating_add</span>(<span class="ident">surplus</span>);
-				<span class="prelude-val">None</span>
+			<span class="ident">DescendOrigin</span>(<span class="ident">who</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+				.<span class="ident">origin</span>
+				.<span class="ident">as_mut</span>()
+				.<span class="ident">ok_or</span>(<span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>
+				.<span class="ident">append_with</span>(<span class="ident">who</span>)
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::MultiLocationFull</span>),
+			<span class="ident">ClearOrigin</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="self">self</span>.<span class="ident">origin</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+				<span class="prelude-val">Ok</span>(())
 			},
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::UnhandledXcmMessage</span>)<span class="question-mark">?</span>, <span class="comment">// Unhandled XCM message.</span>
-		};
-
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw-2">mut</span> <span class="ident">holding</span>, <span class="ident">effects</span>)) <span class="op">=</span> <span class="ident">maybe_holding_effects</span> {
-			<span class="kw">for</span> <span class="ident">effect</span> <span class="kw">in</span> <span class="ident">effects</span>.<span class="ident">into_iter</span>() {
-				<span class="ident">total_surplus</span> <span class="op">+</span><span class="op">=</span> <span class="self">Self</span><span class="ident">::execute_orders</span>(
-					<span class="kw-2">&amp;</span><span class="ident">origin</span>,
-					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">holding</span>,
-					<span class="ident">effect</span>,
-					<span class="ident">trader</span>,
-					<span class="ident">num_recursions</span> <span class="op">+</span> <span class="number">1</span>,
-				)<span class="question-mark">?</span>;
-			}
-		}
-
-		<span class="prelude-val">Ok</span>(<span class="ident">total_surplus</span>)
-	}
-
-	<span class="kw">fn</span> <span class="ident">execute_orders</span>(
-		<span class="ident">origin</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>,
-		<span class="ident">holding</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Assets</span>,
-		<span class="ident">order</span>: <span class="ident">Order</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
-		<span class="ident">trader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Config::Trader</span>,
-		<span class="ident">num_recursions</span>: <span class="ident">u32</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
-		<span class="macro">log::trace!</span>(
-			<span class="ident">target</span>: <span class="string">&quot;xcm::execute_orders&quot;</span>,
-			<span class="string">&quot;origin: {:?}, holding: {:?}, order: {:?}, recursion: {:?}&quot;</span>,
-			<span class="ident">origin</span>,
-			<span class="ident">holding</span>,
-			<span class="ident">order</span>,
-			<span class="ident">num_recursions</span>,
-		);
-
-		<span class="kw">if</span> <span class="ident">num_recursions</span> <span class="op">&gt;</span> <span class="ident">MAX_RECURSION_LIMIT</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::RecursionLimitReached</span>)
-		}
-
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total_surplus</span> <span class="op">=</span> <span class="number">0</span>;
-		<span class="kw">match</span> <span class="ident">order</span> {
-			<span class="ident">Order::DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">beneficiary</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">deposited</span> <span class="op">=</span> <span class="ident">holding</span>.<span class="ident">limited_saturating_take</span>(<span class="ident">assets</span>, <span class="ident">max_assets</span> <span class="kw">as</span> <span class="ident">usize</span>);
+			<span class="ident">ReportError</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">max_response_weight</span>: <span class="ident">max_weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="comment">// Report the given result by sending a QueryResponse XCM to a previously given outcome</span>
+				<span class="comment">// destination if one was registered.</span>
+				<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::ExecutionResult</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">error</span> {
+					<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+					<span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+				});
+				<span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span> };
+				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">message</span>]))<span class="question-mark">?</span>;
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="ident">DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">beneficiary</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">deposited</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">limited_saturating_take</span>(<span class="ident">assets</span>, <span class="ident">max_assets</span> <span class="kw">as</span> <span class="ident">usize</span>);
 				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">deposited</span>.<span class="ident">into_assets_iter</span>() {
 					<span class="ident">Config::AssetTransactor::deposit_asset</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">beneficiary</span>)<span class="question-mark">?</span>;
 				}
+				<span class="prelude-val">Ok</span>(())
 			},
-			<span class="ident">Order::DepositReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">deposited</span> <span class="op">=</span> <span class="ident">holding</span>.<span class="ident">limited_saturating_take</span>(<span class="ident">assets</span>, <span class="ident">max_assets</span> <span class="kw">as</span> <span class="ident">usize</span>);
+			<span class="ident">DepositReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">deposited</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">limited_saturating_take</span>(<span class="ident">assets</span>, <span class="ident">max_assets</span> <span class="kw">as</span> <span class="ident">usize</span>);
 				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">deposited</span>.<span class="ident">assets_iter</span>() {
 					<span class="ident">Config::AssetTransactor::deposit_asset</span>(<span class="kw-2">&amp;</span><span class="ident">asset</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>)<span class="question-mark">?</span>;
 				}
 				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::reanchored</span>(<span class="ident">deposited</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>);
-				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm::ReserveAssetDeposited</span> { <span class="ident">assets</span>, <span class="ident">effects</span> })<span class="question-mark">?</span>;
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">ReserveAssetDeposited</span>(<span class="ident">assets</span>), <span class="ident">ClearOrigin</span>];
+				<span class="ident">message</span>.<span class="ident">extend</span>(<span class="ident">xcm</span>.<span class="number">0</span>.<span class="ident">into_iter</span>());
+				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm</span>(<span class="ident">message</span>)).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
 			},
-			<span class="ident">Order::InitiateReserveWithdraw</span> { <span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::reanchored</span>(<span class="ident">holding</span>.<span class="ident">saturating_take</span>(<span class="ident">assets</span>), <span class="kw-2">&amp;</span><span class="ident">reserve</span>);
-				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">reserve</span>, <span class="ident">Xcm::WithdrawAsset</span> { <span class="ident">assets</span>, <span class="ident">effects</span> })<span class="question-mark">?</span>;
+			<span class="ident">InitiateReserveWithdraw</span> { <span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::reanchored</span>(<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">saturating_take</span>(<span class="ident">assets</span>), <span class="kw-2">&amp;</span><span class="ident">reserve</span>);
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">WithdrawAsset</span>(<span class="ident">assets</span>), <span class="ident">ClearOrigin</span>];
+				<span class="ident">message</span>.<span class="ident">extend</span>(<span class="ident">xcm</span>.<span class="number">0</span>.<span class="ident">into_iter</span>());
+				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">reserve</span>, <span class="ident">Xcm</span>(<span class="ident">message</span>)).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
 			},
-			<span class="ident">Order::InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">effects</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// We must do this first in order to resolve wildcards.</span>
-				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="ident">holding</span>.<span class="ident">saturating_take</span>(<span class="ident">assets</span>);
+				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">saturating_take</span>(<span class="ident">assets</span>);
 				<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">assets_iter</span>() {
-					<span class="ident">Config::AssetTransactor::check_out</span>(<span class="kw-2">&amp;</span><span class="ident">origin</span>, <span class="kw-2">&amp;</span><span class="ident">asset</span>);
+					<span class="ident">Config::AssetTransactor::check_out</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>, <span class="kw-2">&amp;</span><span class="ident">asset</span>);
 				}
 				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::reanchored</span>(<span class="ident">assets</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>);
-				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm::ReceiveTeleportedAsset</span> { <span class="ident">assets</span>, <span class="ident">effects</span> })<span class="question-mark">?</span>;
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">ReceiveTeleportedAsset</span>(<span class="ident">assets</span>), <span class="ident">ClearOrigin</span>];
+				<span class="ident">message</span>.<span class="ident">extend</span>(<span class="ident">xcm</span>.<span class="number">0</span>.<span class="ident">into_iter</span>());
+				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm</span>(<span class="ident">message</span>)).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
 			},
-			<span class="ident">Order::QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::reanchored</span>(<span class="ident">holding</span>.<span class="ident">min</span>(<span class="kw-2">&amp;</span><span class="ident">assets</span>), <span class="kw-2">&amp;</span><span class="ident">dest</span>);
-				<span class="ident">Config::XcmSender::send_xcm</span>(
-					<span class="ident">dest</span>,
-					<span class="ident">Xcm::QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>: <span class="ident">Response::Assets</span>(<span class="ident">assets</span>) },
-				)<span class="question-mark">?</span>;
+			<span class="ident">QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::reanchored</span>(<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">min</span>(<span class="kw-2">&amp;</span><span class="ident">assets</span>), <span class="kw-2">&amp;</span><span class="ident">dest</span>);
+				<span class="kw">let</span> <span class="ident">max_weight</span> <span class="op">=</span> <span class="ident">max_response_weight</span>;
+				<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::Assets</span>(<span class="ident">assets</span>);
+				<span class="kw">let</span> <span class="ident">instruction</span> <span class="op">=</span> <span class="ident">QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span> };
+				<span class="ident">Config::XcmSender::send_xcm</span>(<span class="ident">dest</span>, <span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">instruction</span>])).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
 			},
-			<span class="ident">Order::BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight</span>, <span class="ident">debt</span>, <span class="ident">halt_on_error</span>, <span class="ident">instructions</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="comment">// pay for `weight` using up to `fees` of the holding register.</span>
-				<span class="kw">let</span> <span class="ident">purchasing_weight</span> <span class="op">=</span>
-					<span class="ident">Weight::from</span>(<span class="ident">weight</span>.<span class="ident">checked_add</span>(<span class="ident">debt</span>).<span class="ident">ok_or</span>(<span class="ident">XcmError::Overflow</span>)<span class="question-mark">?</span>);
-				<span class="kw">let</span> <span class="ident">max_fee</span> <span class="op">=</span>
-					<span class="ident">holding</span>.<span class="ident">try_take</span>(<span class="ident">fees</span>.<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::NotHoldingFees</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">unspent</span> <span class="op">=</span> <span class="ident">trader</span>.<span class="ident">buy_weight</span>(<span class="ident">purchasing_weight</span>, <span class="ident">max_fee</span>)<span class="question-mark">?</span>;
-				<span class="ident">holding</span>.<span class="ident">subsume_assets</span>(<span class="ident">unspent</span>);
-
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining_weight</span> <span class="op">=</span> <span class="ident">weight</span>;
-				<span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">instructions</span>.<span class="ident">into_iter</span>() {
-					<span class="kw">match</span> <span class="self">Self</span><span class="ident">::do_execute_xcm</span>(
-						<span class="ident">origin</span>.<span class="ident">clone</span>(),
-						<span class="bool-val">false</span>,
-						<span class="ident">instruction</span>,
-						<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">remaining_weight</span>,
-						<span class="prelude-val">None</span>,
-						<span class="ident">trader</span>,
-						<span class="ident">num_recursions</span> <span class="op">+</span> <span class="number">1</span>,
-					) {
-						<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">halt_on_error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-						<span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-						<span class="prelude-val">Ok</span>(<span class="ident">surplus</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">total_surplus</span> <span class="op">+</span><span class="op">=</span> <span class="ident">surplus</span>,
-					}
+			<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight_limit</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="comment">// There is no need to buy any weight is `weight_limit` is `Unlimited` since it</span>
+				<span class="comment">// would indicate that `AllowTopLevelPaidExecutionFrom` was unused for execution</span>
+				<span class="comment">// and thus there is some other reason why it has been determined that this XCM</span>
+				<span class="comment">// should be executed.</span>
+				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">weight</span>) <span class="op">=</span> <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">weight_limit</span>) {
+					<span class="comment">// pay for `weight` using up to `fees` of the holding register.</span>
+					<span class="kw">let</span> <span class="ident">max_fee</span> <span class="op">=</span>
+						<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">try_take</span>(<span class="ident">fees</span>.<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::NotHoldingFees</span>)<span class="question-mark">?</span>;
+					<span class="kw">let</span> <span class="ident">unspent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trader</span>.<span class="ident">buy_weight</span>(<span class="ident">weight</span>, <span class="ident">max_fee</span>)<span class="question-mark">?</span>;
+					<span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">subsume_assets</span>(<span class="ident">unspent</span>);
 				}
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>) <span class="op">=</span> <span class="ident">trader</span>.<span class="ident">refund_weight</span>(<span class="ident">remaining_weight</span>) {
-					<span class="ident">holding</span>.<span class="ident">subsume</span>(<span class="ident">w</span>);
-				}
+				<span class="prelude-val">Ok</span>(())
 			},
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::UnhandledEffect</span>)<span class="question-mark">?</span>,
+			<span class="ident">RefundSurplus</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="self">self</span>.<span class="ident">refund_surplus</span>();
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="ident">SetErrorHandler</span>(<span class="kw-2">mut</span> <span class="ident">handler</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">handler_weight</span> <span class="op">=</span> <span class="ident">Config::Weigher::weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">handler</span>)<span class="question-mark">?</span>;
+				<span class="self">self</span>.<span class="ident">total_surplus</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_surplus</span>.<span class="ident">saturating_add</span>(<span class="self">self</span>.<span class="ident">error_handler_weight</span>);
+				<span class="self">self</span>.<span class="ident">error_handler</span> <span class="op">=</span> <span class="ident">handler</span>;
+				<span class="self">self</span>.<span class="ident">error_handler_weight</span> <span class="op">=</span> <span class="ident">handler_weight</span>;
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="ident">SetAppendix</span>(<span class="kw-2">mut</span> <span class="ident">appendix</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">appendix_weight</span> <span class="op">=</span> <span class="ident">Config::Weigher::weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">appendix</span>)<span class="question-mark">?</span>;
+				<span class="self">self</span>.<span class="ident">total_surplus</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_surplus</span>.<span class="ident">saturating_add</span>(<span class="self">self</span>.<span class="ident">appendix_weight</span>);
+				<span class="self">self</span>.<span class="ident">appendix</span> <span class="op">=</span> <span class="ident">appendix</span>;
+				<span class="self">self</span>.<span class="ident">appendix_weight</span> <span class="op">=</span> <span class="ident">appendix_weight</span>;
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="ident">ClearError</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+				<span class="prelude-val">Ok</span>(())
+			},
+			<span class="ident">ExchangeAsset</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::Unimplemented</span>),
+			<span class="ident">HrmpNewChannelOpenRequest</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::Unimplemented</span>),
+			<span class="ident">HrmpChannelAccepted</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::Unimplemented</span>),
+			<span class="ident">HrmpChannelClosing</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">XcmError::Unimplemented</span>),
 		}
-		<span class="prelude-val">Ok</span>(<span class="ident">total_surplus</span>)
+	}
+
+	<span class="kw">fn</span> <span class="ident">reanchored</span>(<span class="kw-2">mut</span> <span class="ident">assets</span>: <span class="ident">Assets</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MultiAssets</span> {
+		<span class="kw">let</span> <span class="ident">inv_dest</span> <span class="op">=</span> <span class="ident">Config::LocationInverter::invert_location</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>);
+		<span class="ident">assets</span>.<span class="ident">prepend_location</span>(<span class="kw-2">&amp;</span><span class="ident">inv_dest</span>);
+		<span class="ident">assets</span>.<span class="ident">into_assets_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">into</span>()
 	}
 }
 </pre></div>
