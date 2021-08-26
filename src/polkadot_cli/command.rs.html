@@ -461,6 +461,10 @@
 <span id="458">458</span>
 <span id="459">459</span>
 <span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -884,8 +888,10 @@
 			<span class="kw">if</span> <span class="ident">chain_spec</span>.<span class="ident">is_kusama</span>() {
 				<span class="kw">return</span> <span class="ident">runner</span>.<span class="ident">async_run</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
 					<span class="prelude-val">Ok</span>((
-						<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::kusama_runtime::Block</span>, <span class="ident">service::KusamaExecutor</span><span class="op">&gt;</span>(<span class="ident">config</span>)
-							.<span class="ident">map_err</span>(<span class="ident">Error::SubstrateCli</span>),
+						<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::kusama_runtime::Block</span>, <span class="ident">service::KusamaExecutorDispatch</span><span class="op">&gt;</span>(
+							<span class="ident">config</span>,
+						)
+						.<span class="ident">map_err</span>(<span class="ident">Error::SubstrateCli</span>),
 						<span class="ident">task_manager</span>,
 					))
 				})
@@ -895,7 +901,7 @@
 			<span class="kw">if</span> <span class="ident">chain_spec</span>.<span class="ident">is_westend</span>() {
 				<span class="kw">return</span> <span class="ident">runner</span>.<span class="ident">async_run</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
 					<span class="prelude-val">Ok</span>((
-						<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::westend_runtime::Block</span>, <span class="ident">service::WestendExecutor</span><span class="op">&gt;</span>(
+						<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::westend_runtime::Block</span>, <span class="ident">service::WestendExecutorDispatch</span><span class="op">&gt;</span>(
 							<span class="ident">config</span>,
 						)
 						.<span class="ident">map_err</span>(<span class="ident">Error::SubstrateCli</span>),
@@ -906,8 +912,10 @@
 			<span class="comment">// else we assume it is polkadot.</span>
 			<span class="ident">runner</span>.<span class="ident">async_run</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
 				<span class="prelude-val">Ok</span>((
-					<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::polkadot_runtime::Block</span>, <span class="ident">service::PolkadotExecutor</span><span class="op">&gt;</span>(<span class="ident">config</span>)
-						.<span class="ident">map_err</span>(<span class="ident">Error::SubstrateCli</span>),
+					<span class="ident">cmd</span>.<span class="ident">run</span>::<span class="op">&lt;</span><span class="ident">service::polkadot_runtime::Block</span>, <span class="ident">service::PolkadotExecutorDispatch</span><span class="op">&gt;</span>(
+						<span class="ident">config</span>,
+					)
+					.<span class="ident">map_err</span>(<span class="ident">Error::SubstrateCli</span>),
 					<span class="ident">task_manager</span>,
 				))
 			})
