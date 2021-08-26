@@ -624,7 +624,7 @@
 {
 	<span class="kw">use</span> <span class="ident">inclusion::Event</span> <span class="kw">as</span> <span class="ident">RawEvent</span>;
 
-	<span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::events</span>()
+	<span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::read_events_no_consensus</span>()
 		.<span class="ident">into_iter</span>()
 		.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> <span class="ident">extract_event</span>(<span class="ident">record</span>.<span class="ident">event</span>))
 		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span> {
