@@ -902,7 +902,7 @@
 		<span class="kw">let</span> <span class="ident">lag</span> <span class="op">=</span> <span class="ident">initial_leaf_number</span>.<span class="ident">saturating_sub</span>(<span class="ident">subchain_number</span>);
 		<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">note_approval_checking_finality_lag</span>(<span class="ident">lag</span>);
 
-		<span class="kw">let</span> <span class="ident">lag</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disputes&quot;</span>) {
+		<span class="kw">let</span> (<span class="ident">lag</span>, <span class="ident">subchain_head</span>) <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disputes&quot;</span>) {
 			<span class="comment">// Prevent sending flawed data to the dispute-coordinator.</span>
 			<span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">subchain_block_descriptions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>) <span class="op">!</span><span class="op">=</span>
 				<span class="ident">subchain_number</span>.<span class="ident">checked_sub</span>(<span class="ident">target_number</span>)
@@ -928,7 +928,7 @@
 					<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>(),
 				)
 				.<span class="kw">await</span>;
-			<span class="kw">let</span> (<span class="ident">subchain_number</span>, <span class="ident">_subchain_head</span>) <span class="op">=</span> <span class="ident">rx</span>
+			<span class="kw">let</span> (<span class="ident">subchain_number</span>, <span class="ident">subchain_head</span>) <span class="op">=</span> <span class="ident">rx</span>
 				.<span class="kw">await</span>
 				.<span class="ident">map_err</span>(<span class="ident">Error::OverseerDisconnected</span>)
 				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ConsensusError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
@@ -937,9 +937,9 @@
 			<span class="comment">// The the total lag accounting for disputes.</span>
 			<span class="kw">let</span> <span class="ident">lag_disputes</span> <span class="op">=</span> <span class="ident">initial_leaf_number</span>.<span class="ident">saturating_sub</span>(<span class="ident">subchain_number</span>);
 			<span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">note_disputes_finality_lag</span>(<span class="ident">lag_disputes</span>);
-			<span class="ident">lag_disputes</span>
+			(<span class="ident">lag_disputes</span>, <span class="ident">subchain_head</span>)
 		} <span class="kw">else</span> {
-			<span class="ident">lag</span>
+			(<span class="ident">lag</span>, <span class="ident">subchain_head</span>)
 		};
 
 		<span class="comment">// 4. Apply the maximum safeguard to the finality lag.</span>
