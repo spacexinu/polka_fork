@@ -872,6 +872,110 @@
 <span id="869">869</span>
 <span id="870">870</span>
 <span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -901,7 +1005,7 @@
 
 <span class="kw">use</span> <span class="ident">futures</span>::{
 	<span class="ident">channel::oneshot</span>,
-	<span class="ident">future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>, <span class="ident">RemoteHandle</span>},
+	<span class="ident">future</span>::{<span class="ident">FutureExt</span>, <span class="ident">RemoteHandle</span>},
 	<span class="ident">pin_mut</span>,
 	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
 	<span class="ident">stream::FuturesUnordered</span>,
@@ -911,6 +1015,8 @@
 <span class="kw">use</span> <span class="ident">rand::seq::SliceRandom</span>;
 
 <span class="kw">use</span> <span class="ident">polkadot_erasure_coding</span>::{<span class="ident">branch_hash</span>, <span class="ident">branches</span>, <span class="ident">obtain_chunks_v1</span>, <span class="ident">recovery_threshold</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
+<span class="kw">use</span> <span class="ident">polkadot_node_network_protocol::request_response::CHUNK_REQUEST_TIMEOUT</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol</span>::{
 	<span class="ident">request_response</span>::{
 		<span class="self">self</span> <span class="kw">as</span> <span class="ident">req_res</span>, <span class="ident">incoming</span>, <span class="ident">outgoing::RequestError</span>, <span class="ident">v1</span> <span class="kw">as</span> <span class="ident">request_v1</span>,
@@ -919,7 +1025,7 @@
 	<span class="ident">IfDisconnected</span>, <span class="ident">UnifiedReputationChange</span> <span class="kw">as</span> <span class="ident">Rep</span>,
 };
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives</span>::{<span class="ident">AvailableData</span>, <span class="ident">ErasureChunk</span>};
-<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util</span>::{<span class="ident">request_session_info</span>, <span class="ident">TimeoutExt</span>};
+<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util::request_session_info</span>;
 <span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{
 	<span class="ident">AuthorityDiscoveryId</span>, <span class="ident">BlakeTwo256</span>, <span class="ident">BlockNumber</span>, <span class="ident">CandidateHash</span>, <span class="ident">CandidateReceipt</span>, <span class="ident">GroupIndex</span>,
 	<span class="ident">Hash</span>, <span class="ident">HashT</span>, <span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
@@ -934,6 +1040,12 @@
 };
 
 <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod</span> <span class="ident">futures_undead</span>;
+<span class="kw">mod</span> <span class="ident">metrics</span>;
+<span class="kw">use</span> <span class="ident">metrics::Metrics</span>;
+
+<span class="kw">use</span> <span class="ident">futures_undead::FuturesUndead</span>;
+<span class="kw">use</span> <span class="ident">sc_network</span>::{<span class="ident">OutboundFailure</span>, <span class="ident">RequestFailure</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
@@ -948,15 +1060,27 @@
 
 <span class="kw">const</span> <span class="ident">COST_INVALID_REQUEST</span>: <span class="ident">Rep</span> <span class="op">=</span> <span class="ident">Rep::CostMajor</span>(<span class="string">&quot;Peer sent unparsable request&quot;</span>);
 
-<span class="doccomment">/// Max time we want to wait for responses, before calling `launch_parallel_requests` again to fill</span>
-<span class="doccomment">/// up slots.</span>
-<span class="kw">const</span> <span class="ident">MAX_CHUNK_WAIT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>);
+<span class="doccomment">/// Time after which we consider a request to have failed</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// and we should try more peers. Note in theory the request times out at the network level,</span>
+<span class="doccomment">/// measurements have shown, that in practice requests might actually take longer to fail in</span>
+<span class="doccomment">/// certain occasions. (The very least, authority discovery is not part of the timeout.)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// For the time being this value is the same as the timeout on the networking layer, but as this</span>
+<span class="doccomment">/// timeout is more soft than the networking one, it might make sense to pick different values as</span>
+<span class="doccomment">/// well.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
+<span class="kw">const</span> <span class="ident">TIMEOUT_START_NEW_REQUESTS</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">CHUNK_REQUEST_TIMEOUT</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">const</span> <span class="ident">TIMEOUT_START_NEW_REQUESTS</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">4</span>);
 
 <span class="doccomment">/// The Availability Recovery Subsystem.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AvailabilityRecoverySubsystem</span> {
 	<span class="ident">fast_path</span>: <span class="ident">bool</span>,
 	<span class="doccomment">/// Receiver for available data requests.</span>
 	<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// Metrics for this subsystem.</span>
+	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 }
 
 <span class="kw">struct</span> <span class="ident">RequestFromBackersPhase</span> {
@@ -966,13 +1090,18 @@
 }
 
 <span class="kw">struct</span> <span class="ident">RequestChunksPhase</span> {
-	<span class="comment">// a random shuffling of the validators which indicates the order in which we connect to the validators and</span>
-	<span class="comment">// request the chunk from them.</span>
+	<span class="doccomment">/// How many request have been unsuccessful so far.</span>
+	<span class="ident">error_count</span>: <span class="ident">usize</span>,
+	<span class="doccomment">/// Total number of responses that have been received.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// including failed ones.</span>
+	<span class="ident">total_received_responses</span>: <span class="ident">usize</span>,
+	<span class="doccomment">/// a random shuffling of the validators which indicates the order in which we connect to the validators and</span>
+	<span class="doccomment">/// request the chunk from them.</span>
 	<span class="ident">shuffling</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span>,
 	<span class="ident">received_chunks</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span>, <span class="ident">ErasureChunk</span><span class="op">&gt;</span>,
-	<span class="ident">requesting_chunks</span>: <span class="ident">FuturesUnordered</span><span class="op">&lt;</span>
-		<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ErasureChunk</span><span class="op">&gt;</span>, (<span class="ident">ValidatorIndex</span>, <span class="ident">RequestError</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="op">&gt;</span>,
+	<span class="doccomment">/// Pending chunk requests with soft timeout.</span>
+	<span class="ident">requesting_chunks</span>: <span class="ident">FuturesUndead</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ErasureChunk</span><span class="op">&gt;</span>, (<span class="ident">ValidatorIndex</span>, <span class="ident">RequestError</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">struct</span> <span class="ident">InteractionParams</span> {
@@ -990,6 +1119,9 @@
 
 	<span class="doccomment">/// The root of the erasure encoding of the para block.</span>
 	<span class="ident">erasure_root</span>: <span class="ident">Hash</span>,
+
+	<span class="doccomment">/// Metrics to report</span>
+	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 }
 
 <span class="kw">enum</span> <span class="ident">InteractionPhase</span> {
@@ -1094,16 +1226,18 @@
 		<span class="ident">shuffling</span>.<span class="ident">shuffle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rand::thread_rng</span>());
 
 		<span class="ident">RequestChunksPhase</span> {
+			<span class="ident">error_count</span>: <span class="number">0</span>,
+			<span class="ident">total_received_responses</span>: <span class="number">0</span>,
 			<span class="ident">shuffling</span>: <span class="ident">shuffling</span>.<span class="ident">into</span>(),
 			<span class="ident">received_chunks</span>: <span class="ident">HashMap::new</span>(),
-			<span class="ident">requesting_chunks</span>: <span class="ident">FuturesUnordered::new</span>(),
+			<span class="ident">requesting_chunks</span>: <span class="ident">FuturesUndead::new</span>(),
 		}
 	}
 
 	<span class="kw">fn</span> <span class="ident">is_unavailable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">InteractionParams</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="ident">is_unavailable</span>(
 			<span class="self">self</span>.<span class="ident">received_chunks</span>.<span class="ident">len</span>(),
-			<span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">len</span>(),
+			<span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">total_len</span>(),
 			<span class="self">self</span>.<span class="ident">shuffling</span>.<span class="ident">len</span>(),
 			<span class="ident">params</span>.<span class="ident">threshold</span>,
 		)
@@ -1113,13 +1247,40 @@
 		<span class="self">self</span>.<span class="ident">received_chunks</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">params</span>.<span class="ident">threshold</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_unavailable</span>(<span class="ident">params</span>)
 	}
 
+	<span class="doccomment">/// Desired number of parallel requests.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// For the given threshold (total required number of chunks) get the desired number of</span>
+	<span class="doccomment">/// requests we want to have running in parallel at this time.</span>
+	<span class="kw">fn</span> <span class="ident">get_desired_request_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">threshold</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+		<span class="comment">// Upper bound for parallel requests.</span>
+		<span class="comment">// We want to limit this, so requests can be processed within the timeout and we limit the</span>
+		<span class="comment">// following feedback loop:</span>
+		<span class="comment">// 1. Requests fail due to timeout</span>
+		<span class="comment">// 2. We request more chunks to make up for it</span>
+		<span class="comment">// 3. Bandwidth is spread out even more, so we get even more timeouts</span>
+		<span class="comment">// 4. We request more chunks to make up for it ...</span>
+		<span class="kw">let</span> <span class="ident">max_requests_boundary</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">N_PARALLEL</span>, <span class="ident">threshold</span>);
+		<span class="comment">// How many chunks are still needed?</span>
+		<span class="kw">let</span> <span class="ident">remaining_chunks</span> <span class="op">=</span> <span class="ident">threshold</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">received_chunks</span>.<span class="ident">len</span>());
+		<span class="comment">// What is the current error rate, so we can make up for it?</span>
+		<span class="kw">let</span> <span class="ident">inv_error_rate</span> <span class="op">=</span>
+			<span class="self">self</span>.<span class="ident">total_received_responses</span>.<span class="ident">checked_div</span>(<span class="self">self</span>.<span class="ident">error_count</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+		<span class="comment">// Actual number of requests we want to have in flight in parallel:</span>
+		<span class="ident">std::cmp::min</span>(
+			<span class="ident">max_requests_boundary</span>,
+			<span class="ident">remaining_chunks</span> <span class="op">+</span> <span class="ident">remaining_chunks</span>.<span class="ident">checked_div</span>(<span class="ident">inv_error_rate</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+		)
+	}
+
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">launch_parallel_requests</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">InteractionParams</span>,
 		<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">SubsystemSender</span>,
 	) {
-		<span class="kw">let</span> <span class="ident">max_requests</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">N_PARALLEL</span>, <span class="ident">params</span>.<span class="ident">threshold</span>);
-		<span class="kw">while</span> <span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">max_requests</span> {
+		<span class="kw">let</span> <span class="ident">num_requests</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_desired_request_count</span>(<span class="ident">params</span>.<span class="ident">threshold</span>);
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">num_requests</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">len</span>());
+
+		<span class="kw">while</span> <span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">num_requests</span> {
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">validator_index</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shuffling</span>.<span class="ident">pop_back</span>() {
 				<span class="kw">let</span> <span class="ident">validator</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">validator_authority_keys</span>[<span class="ident">validator_index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">clone</span>();
 				<span class="macro">tracing::trace!</span>(
@@ -1138,18 +1299,13 @@
 
 				<span class="kw">let</span> (<span class="ident">req</span>, <span class="ident">res</span>) <span class="op">=</span>
 					<span class="ident">OutgoingRequest::new</span>(<span class="ident">Recipient::Authority</span>(<span class="ident">validator</span>), <span class="ident">raw_request</span>.<span class="ident">clone</span>());
+				<span class="ident">requests</span>.<span class="ident">push</span>(<span class="ident">Requests::ChunkFetching</span>(<span class="ident">req</span>));
 
-				<span class="ident">sender</span>
-					.<span class="ident">send_message</span>(
-						<span class="ident">NetworkBridgeMessage::SendRequests</span>(
-							<span class="macro">vec!</span>[<span class="ident">Requests::ChunkFetching</span>(<span class="ident">req</span>)],
-							<span class="ident">IfDisconnected::TryConnect</span>,
-						)
-						.<span class="ident">into</span>(),
-					)
-					.<span class="kw">await</span>;
+				<span class="ident">params</span>.<span class="ident">metrics</span>.<span class="ident">on_chunk_request_issued</span>();
+				<span class="kw">let</span> <span class="ident">timer</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">metrics</span>.<span class="ident">time_chunk_request</span>();
 
 				<span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">push</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+					<span class="kw">let</span> <span class="ident">_timer</span> <span class="op">=</span> <span class="ident">timer</span>;
 					<span class="kw">match</span> <span class="ident">res</span>.<span class="kw">await</span> {
 						<span class="prelude-val">Ok</span>(<span class="ident">req_res::v1::ChunkFetchingResponse::Chunk</span>(<span class="ident">chunk</span>)) <span class="op">=</span><span class="op">&gt;</span>
 							<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>.<span class="ident">recombine_into_chunk</span>(<span class="kw-2">&amp;</span><span class="ident">raw_request</span>))),
@@ -1161,15 +1317,25 @@
 				<span class="kw">break</span>
 			}
 		}
+
+		<span class="ident">sender</span>
+			.<span class="ident">send_message</span>(
+				<span class="ident">NetworkBridgeMessage::SendRequests</span>(<span class="ident">requests</span>, <span class="ident">IfDisconnected::TryConnect</span>).<span class="ident">into</span>(),
+			)
+			.<span class="kw">await</span>;
 	}
 
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_chunks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">InteractionParams</span>) {
+		<span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">metrics</span>;
+
 		<span class="comment">// Wait for all current requests to conclude or time-out, or until we reach enough chunks.</span>
-		<span class="comment">// We will also stop, if there has not been a response for `MAX_CHUNK_WAIT`, so</span>
-		<span class="comment">// `launch_parallel_requests` cann fill up slots again.</span>
+		<span class="comment">// We also declare requests undead, once `TIMEOUT_START_NEW_REQUESTS` is reached and will</span>
+		<span class="comment">// return in that case for `launch_parallel_requests` to fill up slots again.</span>
 		<span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request_result</span>) <span class="op">=</span>
-			<span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">next</span>().<span class="ident">timeout</span>(<span class="ident">MAX_CHUNK_WAIT</span>).<span class="kw">await</span>.<span class="ident">flatten</span>()
+			<span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">next_with_timeout</span>(<span class="ident">TIMEOUT_START_NEW_REQUESTS</span>).<span class="kw">await</span>
 		{
+			<span class="self">self</span>.<span class="ident">total_received_responses</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+
 			<span class="kw">match</span> <span class="ident">request_result</span> {
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">chunk</span>)) <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="comment">// Check merkle proofs of any received chunks.</span>
@@ -1184,6 +1350,9 @@
 						<span class="kw">let</span> <span class="ident">erasure_chunk_hash</span> <span class="op">=</span> <span class="ident">BlakeTwo256::hash</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>.<span class="ident">chunk</span>);
 
 						<span class="kw">if</span> <span class="ident">erasure_chunk_hash</span> <span class="op">!</span><span class="op">=</span> <span class="ident">anticipated_hash</span> {
+							<span class="ident">metrics</span>.<span class="ident">on_chunk_request_invalid</span>();
+							<span class="self">self</span>.<span class="ident">error_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+
 							<span class="macro">tracing::debug!</span>(
 								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 								<span class="ident">candidate_hash</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">params</span>.<span class="ident">candidate_hash</span>,
@@ -1191,6 +1360,8 @@
 								<span class="string">&quot;Merkle proof mismatch&quot;</span>,
 							);
 						} <span class="kw">else</span> {
+							<span class="ident">metrics</span>.<span class="ident">on_chunk_request_succeeded</span>();
+
 							<span class="macro">tracing::trace!</span>(
 								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 								<span class="ident">candidate_hash</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">params</span>.<span class="ident">candidate_hash</span>,
@@ -1200,6 +1371,9 @@
 							<span class="self">self</span>.<span class="ident">received_chunks</span>.<span class="ident">insert</span>(<span class="ident">validator_index</span>, <span class="ident">chunk</span>);
 						}
 					} <span class="kw">else</span> {
+						<span class="ident">metrics</span>.<span class="ident">on_chunk_request_invalid</span>();
+						<span class="self">self</span>.<span class="ident">error_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+
 						<span class="macro">tracing::debug!</span>(
 							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 							<span class="ident">candidate_hash</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">params</span>.<span class="ident">candidate_hash</span>,
@@ -1208,8 +1382,13 @@
 						);
 					}
 				},
-				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {},
+				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="ident">metrics</span>.<span class="ident">on_chunk_request_no_such_chunk</span>();
+					<span class="self">self</span>.<span class="ident">error_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+				},
 				<span class="prelude-val">Err</span>((<span class="ident">validator_index</span>, <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="self">self</span>.<span class="ident">error_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+
 					<span class="macro">tracing::debug!</span>(
 						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 						<span class="ident">candidate_hash</span><span class="op">=</span> <span class="question-mark">?</span><span class="ident">params</span>.<span class="ident">candidate_hash</span>,
@@ -1219,8 +1398,21 @@
 					);
 
 					<span class="kw">match</span> <span class="ident">e</span> {
-						<span class="ident">RequestError::InvalidResponse</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-						<span class="ident">RequestError::NetworkError</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">RequestError::Canceled</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="ident">RequestError::InvalidResponse</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="ident">metrics</span>.<span class="ident">on_chunk_request_invalid</span>();
+						},
+						<span class="ident">RequestError::NetworkError</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="kw">if</span> <span class="kw">let</span> <span class="ident">RequestFailure::Network</span>(<span class="ident">OutboundFailure::Timeout</span>) <span class="op">=</span> <span class="ident">err</span> {
+								<span class="ident">metrics</span>.<span class="ident">on_chunk_request_timeout</span>();
+							} <span class="kw">else</span> {
+								<span class="ident">metrics</span>.<span class="ident">on_chunk_request_error</span>();
+							}
+
+							<span class="self">self</span>.<span class="ident">shuffling</span>.<span class="ident">push_front</span>(<span class="ident">validator_index</span>);
+						},
+						<span class="ident">RequestError::Canceled</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="ident">metrics</span>.<span class="ident">on_chunk_request_error</span>();
+
 							<span class="self">self</span>.<span class="ident">shuffling</span>.<span class="ident">push_front</span>(<span class="ident">validator_index</span>);
 						},
 					}
@@ -1278,6 +1470,7 @@
 					<span class="ident">erasure_root</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">params</span>.<span class="ident">erasure_root</span>,
 					<span class="ident">received</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">received_chunks</span>.<span class="ident">len</span>(),
 					<span class="ident">requesting</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">len</span>(),
+					<span class="ident">total_requesting</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">requesting_chunks</span>.<span class="ident">total_len</span>(),
 					<span class="ident">n_validators</span> <span class="op">=</span> <span class="op">%</span><span class="ident">params</span>.<span class="ident">validators</span>.<span class="ident">len</span>(),
 					<span class="string">&quot;Data recovery is not possible&quot;</span>,
 				);
@@ -1528,6 +1721,7 @@
 	<span class="ident">receipt</span>: <span class="ident">CandidateReceipt</span>,
 	<span class="ident">backing_group</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GroupIndex</span><span class="op">&gt;</span>,
 	<span class="ident">response_sender</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AvailableData</span>, <span class="ident">RecoveryError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">AvailabilityRecoveryMessage</span><span class="op">&gt;</span>,
@@ -1541,6 +1735,7 @@
 		<span class="ident">threshold</span>: <span class="ident">recovery_threshold</span>(<span class="ident">session_info</span>.<span class="ident">validators</span>.<span class="ident">len</span>())<span class="question-mark">?</span>,
 		<span class="ident">candidate_hash</span>,
 		<span class="ident">erasure_root</span>: <span class="ident">receipt</span>.<span class="ident">descriptor</span>.<span class="ident">erasure_root</span>,
+		<span class="ident">metrics</span>: <span class="ident">metrics</span>.<span class="ident">clone</span>(),
 	};
 
 	<span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> <span class="ident">backing_group</span>
@@ -1581,6 +1776,7 @@
 	<span class="ident">session_index</span>: <span class="ident">SessionIndex</span>,
 	<span class="ident">backing_group</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GroupIndex</span><span class="op">&gt;</span>,
 	<span class="ident">response_sender</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AvailableData</span>, <span class="ident">RecoveryError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">AvailabilityRecoveryMessage</span><span class="op">&gt;</span>,
@@ -1616,8 +1812,16 @@
 	<span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">child</span>(<span class="string">&quot;session-info-ctx-received&quot;</span>);
 	<span class="kw">match</span> <span class="ident">session_info</span> {
 		<span class="prelude-val">Some</span>(<span class="ident">session_info</span>) <span class="op">=</span><span class="op">&gt;</span>
-			<span class="ident">launch_interaction</span>(<span class="ident">state</span>, <span class="ident">ctx</span>, <span class="ident">session_info</span>, <span class="ident">receipt</span>, <span class="ident">backing_group</span>, <span class="ident">response_sender</span>)
-				.<span class="kw">await</span>,
+			<span class="ident">launch_interaction</span>(
+				<span class="ident">state</span>,
+				<span class="ident">ctx</span>,
+				<span class="ident">session_info</span>,
+				<span class="ident">receipt</span>,
+				<span class="ident">backing_group</span>,
+				<span class="ident">response_sender</span>,
+				<span class="ident">metrics</span>,
+			)
+			.<span class="kw">await</span>,
 		<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;SessionInfo is `None` at {:?}&quot;</span>, <span class="ident">state</span>.<span class="ident">live_block</span>);
 			<span class="ident">response_sender</span>
@@ -1645,18 +1849,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AvailabilityRecoverySubsystem</span> {
-	<span class="doccomment">/// Create a new instance of `AvailabilityRecoverySubsystem` which starts with a fast path to request data from backers.</span>
+	<span class="doccomment">/// Create a new instance of `AvailabilityRecoverySubsystem` which starts with a fast path to</span>
+	<span class="doccomment">/// request data from backers.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_fast_path</span>(
 		<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
+		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">true</span>, <span class="ident">req_receiver</span> }
+		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">true</span>, <span class="ident">req_receiver</span>, <span class="ident">metrics</span> }
 	}
 
 	<span class="doccomment">/// Create a new instance of `AvailabilityRecoverySubsystem` which requests only chunks</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_chunks_only</span>(
 		<span class="ident">req_receiver</span>: <span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::AvailableDataFetchingRequest</span><span class="op">&gt;</span>,
+		<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">false</span>, <span class="ident">req_receiver</span> }
+		<span class="self">Self</span> { <span class="ident">fast_path</span>: <span class="bool-val">false</span>, <span class="ident">req_receiver</span>, <span class="ident">metrics</span> }
 	}
 
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubsystemResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
@@ -1665,7 +1872,7 @@
 		<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">AvailabilityRecoveryMessage</span><span class="op">&gt;</span>,
 	{
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::default</span>();
-		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">fast_path</span>, <span class="kw-2">mut</span> <span class="ident">req_receiver</span> } <span class="op">=</span> <span class="self">self</span>;
+		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">fast_path</span>, <span class="kw-2">mut</span> <span class="ident">req_receiver</span>, <span class="ident">metrics</span> } <span class="op">=</span> <span class="self">self</span>;
 
 		<span class="kw">loop</span> {
 			<span class="kw">let</span> <span class="ident">recv_req</span> <span class="op">=</span> <span class="ident">req_receiver</span>.<span class="ident">recv</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">COST_INVALID_REQUEST</span>]).<span class="ident">fuse</span>();
@@ -1694,6 +1901,7 @@
 										<span class="ident">session_index</span>,
 										<span class="ident">maybe_backing_group</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fast_path</span>),
 										<span class="ident">response_sender</span>,
+										<span class="kw-2">&amp;</span><span class="ident">metrics</span>,
 									).<span class="kw">await</span> {
 										<span class="macro">tracing::warn!</span>(
 											<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,

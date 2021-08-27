@@ -414,6 +414,13 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -720,6 +727,13 @@
 	<span class="doccomment">/// This function allows to convert back to the standard nested Vec format</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_vec</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_vec</span>().<span class="ident">clone</span>()).<span class="ident">collect</span>()
+	}
+
+	<span class="doccomment">/// Construct an invalid dummy proof</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Useful for testing, should absolutely not be used in production.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dummy_proof</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Proof</span> {
+		<span class="ident">Proof</span>(<span class="ident">BoundedVec::from_vec</span>(<span class="macro">vec!</span>[<span class="ident">BoundedVec::from_vec</span>(<span class="macro">vec!</span>[<span class="number">0</span>]).<span class="ident">unwrap</span>()]).<span class="ident">unwrap</span>())
 	}
 }
 
