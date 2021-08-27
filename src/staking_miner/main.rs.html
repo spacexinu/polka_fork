@@ -812,15 +812,15 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
 <span class="kw">struct</span> <span class="ident">SharedConfig</span> {
 	<span class="doccomment">/// The `ws` node to connect to.</span>
-	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">DEFAULT_URI</span>)]</span>
+	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">DEFAULT_URI</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;URI&quot;</span>)]</span>
 	<span class="ident">uri</span>: <span class="ident">String</span>,
 
-	<span class="doccomment">/// The file from which we read the account seed.</span>
+	<span class="doccomment">/// The seed of a funded account in hex.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// WARNING: don&#39;t use an account with a large stash for this. Based on how the bot is</span>
-	<span class="doccomment">/// configured, it might re-try lose funds through transaction fees/deposits.</span>
-	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>)]</span>
-	<span class="ident">account_seed</span>: <span class="ident">std::path::PathBuf</span>,
+	<span class="doccomment">/// WARNING: Don&#39;t use an account with a large stash for this. Based on how the bot is</span>
+	<span class="doccomment">/// configured, it might re-try and lose funds through transaction fees/deposits.</span>
+	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;SEED&quot;</span>)]</span>
+	<span class="ident">seed</span>: <span class="ident">String</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
@@ -890,7 +890,7 @@
 		<span class="kw">let</span> <span class="ident">desired_targets</span> <span class="op">=</span> <span class="ident">EPM::DesiredTargets</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>().<span class="ident">unwrap</span>();
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">candidates_and_backing</span> <span class="op">=</span> <span class="ident">BTreeMap</span>::<span class="op">&lt;</span><span class="ident">T::AccountId</span>, <span class="ident">u128</span><span class="op">&gt;</span><span class="ident">::new</span>();
 		<span class="ident">voters</span>.<span class="ident">into_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">who</span>, <span class="ident">stake</span>, <span class="ident">targets</span>)<span class="op">|</span> {
-			<span class="kw">if</span> <span class="ident">targets</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+			<span class="kw">if</span> <span class="ident">targets</span>.<span class="ident">is_empty</span>() {
 				<span class="macro">println!</span>(<span class="string">&quot;target = {:?}&quot;</span>, (<span class="ident">who</span>, <span class="ident">stake</span>, <span class="ident">targets</span>));
 				<span class="kw">return</span>
 			}
@@ -1027,7 +1027,7 @@
 	};
 
 	<span class="kw">let</span> <span class="ident">signer_account</span> <span class="op">=</span> <span class="macro">any_runtime!</span> {
-		<span class="ident">signer::read_signer_uri</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">account_seed</span>, <span class="kw-2">&amp;</span><span class="ident">client</span>)
+		<span class="ident">signer::signer_uri_from_string</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">seed</span>, <span class="kw-2">&amp;</span><span class="ident">client</span>)
 			.<span class="kw">await</span>
 			.<span class="ident">expect</span>(<span class="string">&quot;Provided account is invalid, terminating.&quot;</span>)
 	};

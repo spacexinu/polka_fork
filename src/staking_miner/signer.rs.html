@@ -79,12 +79,6 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -106,9 +100,8 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">rpc_helpers</span>, <span class="ident">AccountId</span>, <span class="ident">Error</span>, <span class="ident">Index</span>, <span class="ident">Pair</span>, <span class="ident">WsClient</span>, <span class="ident">LOG_TARGET</span>};
 <span class="kw">use</span> <span class="ident">sp_core::crypto::Pair</span> <span class="kw">as</span> <span class="kw">_</span>;
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">SIGNER_ACCOUNT_WILL_EXIST</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">SIGNER_ACCOUNT_WILL_EXIST</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span>
 	<span class="string">&quot;signer account is checked to exist upon startup; it can only die if it transfers funds out \
 	 of it, or get slashed. If it does not exist at this point, it is likely due to a bug, or the \
 	 signer got slashed. Terminating.&quot;</span>;
@@ -118,10 +111,9 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Signer</span> {
 	<span class="doccomment">/// The account id.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">account</span>: <span class="ident">AccountId</span>,
+
 	<span class="doccomment">/// The full crypto key-pair.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pair</span>: <span class="ident">Pair</span>,
-	<span class="doccomment">/// The raw URI read from file.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">uri</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_info</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">frame_system::Config</span><span class="op">&gt;</span>(
@@ -139,26 +131,22 @@
 	.<span class="kw">await</span>
 }
 
-<span class="doccomment">/// Read the signer account&#39;s URI from the given `path`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_signer_uri</span><span class="op">&lt;</span>
-	<span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Read the signer account&#39;s URI</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">signer_uri_from_string</span><span class="op">&lt;</span>
 	<span class="ident">T</span>: <span class="ident">frame_system::Config</span><span class="op">&lt;</span>
 		<span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">AccountId</span>,
 		<span class="ident">Index</span> <span class="op">=</span> <span class="ident">Index</span>,
 		<span class="ident">AccountData</span> <span class="op">=</span> <span class="ident">pallet_balances::AccountData</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span>,
 	<span class="op">&gt;</span>,
 <span class="op">&gt;</span>(
-	<span class="ident">path</span>: <span class="ident">P</span>,
+	<span class="ident">seed</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 	<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">WsClient</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Signer</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
+	<span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">seed</span>.<span class="ident">trim</span>();
 
-	<span class="comment">// trim any trailing garbage.</span>
-	<span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">trim_end</span>();
-
-	<span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">Pair::from_string</span>(<span class="kw-2">&amp;</span><span class="ident">uri</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+	<span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">Pair::from_string</span>(<span class="ident">seed</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 	<span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">T::AccountId::from</span>(<span class="ident">pair</span>.<span class="ident">public</span>());
-	<span class="kw">let</span> <span class="ident">_info</span> <span class="op">=</span> <span class="ident">get_account_info</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">account</span>, <span class="prelude-val">None</span>)
+	<span class="kw">let</span> <span class="ident">_info</span> <span class="op">=</span> <span class="ident">get_account_info</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">account</span>, <span class="prelude-val">None</span>)
 		.<span class="kw">await</span><span class="question-mark">?</span>
 		.<span class="ident">ok_or</span>(<span class="ident">Error::AccountDoesNotExists</span>)<span class="question-mark">?</span>;
 	<span class="macro">log::info!</span>(
@@ -168,7 +156,7 @@
 		<span class="ident">Token::from</span>(<span class="ident">_info</span>.<span class="ident">data</span>.<span class="ident">free</span>),
 		<span class="ident">_info</span>
 	);
-	<span class="prelude-val">Ok</span>(<span class="ident">Signer</span> { <span class="ident">account</span>, <span class="ident">pair</span>, <span class="ident">uri</span>: <span class="ident">uri</span>.<span class="ident">to_string</span>() })
+	<span class="prelude-val">Ok</span>(<span class="ident">Signer</span> { <span class="ident">account</span>, <span class="ident">pair</span> })
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="staking_miner" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
