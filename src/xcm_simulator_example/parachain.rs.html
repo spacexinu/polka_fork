@@ -323,6 +323,8 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -469,6 +471,8 @@
 	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">UnitWeightCost</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Trader</span> <span class="op">=</span> <span class="ident">FixedRateOfFungible</span><span class="op">&lt;</span><span class="ident">KsmPerSecond</span>, ()<span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">ResponseHandler</span> <span class="op">=</span> ();
+	<span class="kw">type</span> <span class="ident">AssetTrap</span> <span class="op">=</span> ();
+	<span class="kw">type</span> <span class="ident">AssetClaims</span> <span class="op">=</span> ();
 }
 
 <span class="attribute">#[<span class="ident">frame_support::pallet</span>]</span>

@@ -762,6 +762,60 @@
 <span id="759">759</span>
 <span id="760">760</span>
 <span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Cumulus.</span>
@@ -1157,6 +1211,8 @@
 	<span class="doccomment">///   prioritized under standard asset ordering. Any others will remain in holding.</span>
 	<span class="doccomment">/// - `beneficiary`: The new owner for the assets.</span>
 	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">DepositAsset</span> { <span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>, <span class="ident">max_assets</span>: <span class="ident">u32</span>, <span class="ident">beneficiary</span>: <span class="ident">MultiLocation</span> },
 
@@ -1176,6 +1232,8 @@
 	<span class="doccomment">/// - `xcm`: The orders that should follow the `ReserveAssetDeposited` instruction</span>
 	<span class="doccomment">///   which is sent onwards to `dest`.</span>
 	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">DepositReserveAsset</span> {
 		<span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>,
@@ -1193,6 +1251,8 @@
 	<span class="doccomment">/// - `give`: The asset(s) to remove from holding.</span>
 	<span class="doccomment">/// - `receive`: The minimum amount of assets(s) which `give` should be exchanged for.</span>
 	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">ExchangeAsset</span> { <span class="ident">give</span>: <span class="ident">MultiAssetFilter</span>, <span class="ident">receive</span>: <span class="ident">MultiAssets</span> },
 
@@ -1207,6 +1267,8 @@
 	<span class="doccomment">/// - `xcm`: The instructions to execute on the assets once withdrawn *on the reserve</span>
 	<span class="doccomment">///   location*.</span>
 	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">InitiateReserveWithdraw</span> { <span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>, <span class="ident">reserve</span>: <span class="ident">MultiLocation</span>, <span class="ident">xcm</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span> },
 
@@ -1220,6 +1282,8 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// NOTE: The `dest` location *MUST* respect this origin as a valid teleportation origin for all</span>
 	<span class="doccomment">/// `assets`. If it does not, then the assets may be lost.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">InitiateTeleport</span> { <span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>, <span class="ident">dest</span>: <span class="ident">MultiLocation</span>, <span class="ident">xcm</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span> },
@@ -1236,6 +1300,8 @@
 	<span class="doccomment">/// - `max_response_weight`: The maximum amount of weight that the `QueryResponse` item which</span>
 	<span class="doccomment">///   is sent as a reply may take to execute. NOTE: If this is unexpectedly large then the</span>
 	<span class="doccomment">///   response may not execute at all.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">QueryHolding</span> {
@@ -1255,13 +1321,20 @@
 	<span class="doccomment">///   expected maximum weight of the total XCM to be executed for the</span>
 	<span class="doccomment">///   `AllowTopLevelPaidExecutionFrom` barrier to allow the XCM be executed.</span>
 	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">BuyExecution</span> { <span class="ident">fees</span>: <span class="ident">MultiAsset</span>, <span class="ident">weight_limit</span>: <span class="ident">WeightLimit</span> },
 
 	<span class="doccomment">/// Refund any surplus weight previously bought with `BuyExecution`.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Errors: None.</span>
 	<span class="ident">RefundSurplus</span>,
 
-	<span class="doccomment">/// Set code that should be called in the case of an error happening.</span>
+	<span class="doccomment">/// Set the Error Handler Register. This is code that should be called in the case of an error</span>
+	<span class="doccomment">/// happening.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// An error occurring within execution of this code will _NOT_ result in the error register</span>
 	<span class="doccomment">/// being set, nor will an error handler be called due to it. The error handler and appendix</span>
@@ -1270,10 +1343,15 @@
 	<span class="doccomment">/// The apparent weight of this instruction is inclusive of the inner `Xcm`; the executing</span>
 	<span class="doccomment">/// weight however includes only the difference between the previous handler and the new</span>
 	<span class="doccomment">/// handler, which can reasonably be negative, which would result in a surplus.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Errors: None.</span>
 	<span class="ident">SetErrorHandler</span>(<span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>),
 
-	<span class="doccomment">/// Set code that should be called after code execution (including the error handler if any)</span>
-	<span class="doccomment">/// is finished. This will be called regardless of whether an error occurred.</span>
+	<span class="doccomment">/// Set the Appendix Register. This is code that should be called after code execution</span>
+	<span class="doccomment">/// (including the error handler if any) is finished. This will be called regardless of whether</span>
+	<span class="doccomment">/// an error occurred.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Any error occurring due to execution of this code will result in the error register being</span>
 	<span class="doccomment">/// set, and the error handler (if set) firing.</span>
@@ -1281,10 +1359,38 @@
 	<span class="doccomment">/// The apparent weight of this instruction is inclusive of the inner `Xcm`; the executing</span>
 	<span class="doccomment">/// weight however includes only the difference between the previous appendix and the new</span>
 	<span class="doccomment">/// appendix, which can reasonably be negative, which would result in a surplus.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Errors: None.</span>
 	<span class="ident">SetAppendix</span>(<span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>),
 
-	<span class="doccomment">/// Clear the error register.</span>
+	<span class="doccomment">/// Clear the Error Register.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Errors: None.</span>
 	<span class="ident">ClearError</span>,
+
+	<span class="doccomment">/// Create some assets which are being held on behalf of the origin.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `assets`: The assets which are to be claimed. This must match exactly with the assets</span>
+	<span class="doccomment">///   claimable by the origin of the ticket.</span>
+	<span class="doccomment">/// - `ticket`: The ticket of the asset; this is an abstract identifier to help locate the</span>
+	<span class="doccomment">///   asset.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Errors:</span>
+	<span class="ident">ClaimAsset</span> { <span class="ident">assets</span>: <span class="ident">MultiAssets</span>, <span class="ident">ticket</span>: <span class="ident">MultiLocation</span> },
+
+	<span class="doccomment">/// Always throws an error of type `Trap`.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Errors:</span>
+	<span class="doccomment">/// - `Trap`: All circumstances, whose inner value is the same as this item&#39;s inner value.</span>
+	<span class="ident">Trap</span>(<span class="ident">u64</span>),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
@@ -1337,6 +1443,8 @@
 			<span class="ident">SetErrorHandler</span>(<span class="ident">xcm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SetErrorHandler</span>(<span class="ident">xcm</span>.<span class="ident">into</span>()),
 			<span class="ident">SetAppendix</span>(<span class="ident">xcm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SetAppendix</span>(<span class="ident">xcm</span>.<span class="ident">into</span>()),
 			<span class="ident">ClearError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ClearError</span>,
+			<span class="ident">ClaimAsset</span> { <span class="ident">assets</span>, <span class="ident">ticket</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ClaimAsset</span> { <span class="ident">assets</span>, <span class="ident">ticket</span> },
+			<span class="ident">Trap</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trap</span>(<span class="ident">code</span>),
 		}
 	}
 }

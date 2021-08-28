@@ -666,6 +666,11 @@
 <span id="663">663</span>
 <span id="664">664</span>
 <span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -761,6 +766,11 @@
 	<span class="doccomment">/// Total number of distinct assets.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
 		<span class="self">self</span>.<span class="ident">fungible</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">non_fungible</span>.<span class="ident">len</span>()
+	}
+
+	<span class="doccomment">/// Returns `true` if `self` contains no assets.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+		<span class="self">self</span>.<span class="ident">fungible</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">non_fungible</span>.<span class="ident">is_empty</span>()
 	}
 
 	<span class="doccomment">/// A borrowing iterator over the fungible assets.</span>
