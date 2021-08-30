@@ -446,7 +446,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">pallet_authority_discovery::Config</span><span class="op">&gt;</span> <span class="ident">AuthorityDiscoveryConfig</span> <span class="kw">for</span> <span class="ident">T</span> {
 	<span class="kw">fn</span> <span class="ident">authorities</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span> {
-		<span class="op">&lt;</span><span class="ident">pallet_authority_discovery::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::current_authorities</span>()
+		<span class="op">&lt;</span><span class="ident">pallet_authority_discovery::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::current_authorities</span>().<span class="ident">to_vec</span>()
 	}
 }
 

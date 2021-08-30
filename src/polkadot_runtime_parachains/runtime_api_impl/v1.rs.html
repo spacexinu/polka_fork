@@ -581,8 +581,8 @@
 	<span class="comment">// Due to `max_validators`, the `SessionInfo` stores only the validators who are actively</span>
 	<span class="comment">// selected to participate in parachain consensus. We&#39;d like all authorities for the current</span>
 	<span class="comment">// and next sessions to be used in authority-discovery. The two sets likely have large overlap.</span>
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authority_ids</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">pallet_authority_discovery::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::current_authorities</span>();
-	<span class="ident">authority_ids</span>.<span class="ident">extend</span>(<span class="op">&lt;</span><span class="ident">pallet_authority_discovery::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::next_authorities</span>());
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authority_ids</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">pallet_authority_discovery::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::current_authorities</span>().<span class="ident">to_vec</span>();
+	<span class="ident">authority_ids</span>.<span class="ident">extend</span>(<span class="op">&lt;</span><span class="ident">pallet_authority_discovery::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::next_authorities</span>().<span class="ident">to_vec</span>());
 
 	<span class="comment">// Due to disputes, we&#39;d like to remain connected to authorities of the previous few sessions.</span>
 	<span class="comment">// For this, we don&#39;t need anyone other than the validators actively participating in consensus.</span>
