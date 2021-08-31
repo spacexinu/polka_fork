@@ -1531,6 +1531,11 @@
 <span id="1528">1528</span>
 <span id="1529">1529</span>
 <span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2572,6 +2577,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ProxyType</span> {
 	<span class="ident">Any</span>,
 	<span class="ident">CancelProxy</span>,
+	<span class="ident">Auction</span>,
 }
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ProxyType</span> {
 	<span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -2584,6 +2590,10 @@
 			<span class="ident">ProxyType::Any</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 			<span class="ident">ProxyType::CancelProxy</span> <span class="op">=</span><span class="op">&gt;</span>
 				<span class="macro">matches!</span>(<span class="ident">c</span>, <span class="ident">Call::Proxy</span>(<span class="ident">pallet_proxy::Call::reject_announcement</span>(..))),
+			<span class="ident">ProxyType::Auction</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">matches!</span>(
+				<span class="ident">c</span>,
+				<span class="ident">Call::Auctions</span>(..) <span class="op">|</span> <span class="ident">Call::Crowdloan</span>(..) <span class="op">|</span> <span class="ident">Call::Registrar</span>(..) <span class="op">|</span> <span class="ident">Call::Slots</span>(..)
+			),
 		}
 	}
 	<span class="kw">fn</span> <span class="ident">is_superset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">o</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
