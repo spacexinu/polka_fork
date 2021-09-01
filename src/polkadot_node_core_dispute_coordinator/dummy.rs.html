@@ -253,6 +253,7 @@
 <span id="250">250</span>
 <span id="251">251</span>
 <span id="252">252</span>
+<span id="253">253</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -489,13 +490,14 @@
 		},
 		<span class="ident">DisputeCoordinatorMessage::IssueLocalStatement</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
 		<span class="ident">DisputeCoordinatorMessage::DetermineUndisputedChain</span> {
-			<span class="ident">base_number</span>,
+			<span class="ident">base</span>: (<span class="ident">base_number</span>, <span class="ident">base_hash</span>),
 			<span class="ident">block_descriptions</span>,
 			<span class="ident">tx</span>,
 		} <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="kw">let</span> <span class="ident">undisputed_chain</span> <span class="op">=</span> <span class="ident">block_descriptions</span>
 				.<span class="ident">last</span>()
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> (<span class="ident">base_number</span> <span class="op">+</span> <span class="ident">block_descriptions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">BlockNumber</span>, <span class="ident">e</span>.<span class="ident">block_hash</span>));
+				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> (<span class="ident">base_number</span> <span class="op">+</span> <span class="ident">block_descriptions</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">BlockNumber</span>, <span class="ident">e</span>.<span class="ident">block_hash</span>))
+				.<span class="ident">unwrap_or</span>((<span class="ident">base_number</span>, <span class="ident">base_hash</span>));
 
 			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>(<span class="ident">undisputed_chain</span>);
 		},

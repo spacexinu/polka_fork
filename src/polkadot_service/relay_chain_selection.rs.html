@@ -483,7 +483,6 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
-<span id="483">483</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -921,7 +920,7 @@
 			<span class="ident">overseer</span>
 				.<span class="ident">send_msg</span>(
 					<span class="ident">DisputeCoordinatorMessage::DetermineUndisputedChain</span> {
-						<span class="ident">base_number</span>: <span class="ident">target_number</span>,
+						<span class="ident">base</span>: (<span class="ident">target_number</span>, <span class="ident">target_hash</span>),
 						<span class="ident">block_descriptions</span>: <span class="ident">subchain_block_descriptions</span>,
 						<span class="ident">tx</span>,
 					},
@@ -931,8 +930,7 @@
 			<span class="kw">let</span> (<span class="ident">subchain_number</span>, <span class="ident">subchain_head</span>) <span class="op">=</span> <span class="ident">rx</span>
 				.<span class="kw">await</span>
 				.<span class="ident">map_err</span>(<span class="ident">Error::OverseerDisconnected</span>)
-				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ConsensusError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
-				.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">subchain_number</span>, <span class="ident">subchain_head</span>));
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ConsensusError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
 
 			<span class="comment">// The the total lag accounting for disputes.</span>
 			<span class="kw">let</span> <span class="ident">lag_disputes</span> <span class="op">=</span> <span class="ident">initial_leaf_number</span>.<span class="ident">saturating_sub</span>(<span class="ident">subchain_number</span>);
