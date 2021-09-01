@@ -35,9 +35,8 @@ pub mod rialto_messages;
 use crate::rialto_messages::{ToRialtoMessagePayload, WithRialtoMessageBridge};
 
 use bridge_runtime_common::messages::{source::estimate_message_dispatch_and_delivery_fee, MessageBridge};
-use codec::Decode;
 use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
-use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
+use pallet_transaction_payment::{FeeDetails, Multiplier, RuntimeDispatchInfo};
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
@@ -45,7 +44,7 @@ use sp_runtime::traits::{Block as BlockT, IdentityLookup, NumberFor, OpaqueKeys}
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	transaction_validity::{TransactionSource, TransactionValidity},
-	ApplyExtrinsicResult, MultiSignature, MultiSigner,
+	ApplyExtrinsicResult, FixedPointNumber, MultiSignature, MultiSigner, Perquintill,
 };
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -273,13 +272,23 @@ impl pallet_balances::Config for Runtime {
 parameter_types! {
 	pub const TransactionBaseFee: Balance = 0;
 	pub const TransactionByteFee: Balance = 1;
+	// values for following parameters are copypasted from polkadot repo, but it is fine
+	// not to sync them - we're not going to make Rialto a full copy of one of Polkadot-like chains
+	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
 }
 
 impl pallet_transaction_payment::Config for Runtime {
 	type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
 	type TransactionByteFee = TransactionByteFee;
 	type WeightToFee = IdentityFee<Balance>;
-	type FeeMultiplierUpdate = ();
+	type FeeMultiplierUpdate = pallet_transaction_payment::TargetedFeeAdjustment<
+		Runtime,
+		TargetBlockFullness,
+		AdjustmentVariable,
+		MinimumMultiplier,
+	>;
 }
 
 impl pallet_sudo::Config for Runtime {
@@ -353,10 +362,11 @@ parameter_types! {
 	pub const GetDeliveryConfirmationTransactionFee: Balance =
 		bp_millau::MAX_SINGLE_MESSAGE_DELIVERY_CONFIRMATION_TX_WEIGHT as _;
 	pub const RootAccountForPayments: Option<AccountId> = None;
+  pub const BridgedChainId: bp_runtime::ChainId = bp_runtime::RIALTO_CHAIN_ID;
 }
 
 /// Instance of the messages pallet used to relay messages to/from Rialto chain.
-pub type WithRialtoMessagesInstance = pallet_bridge_messages::DefaultInstance;
+pub type WithRialtoMessagesInstance = ();
 
 impl pallet_bridge_messages::Config<WithRialtoMessagesInstance> for Runtime {
 	type Event = Event;
@@ -388,6 +398,7 @@ impl pallet_bridge_messages::Config<WithRialtoMessagesInstance> for Runtime {
 
 	type SourceHeaderChain = crate::rialto_messages::Rialto;
 	type MessageDispatch = crate::rialto_messages::FromRialtoMessageDispatch;
+	type BridgedChainId = BridgedChainId;
 }
 
 construct_runtime!(
@@ -396,7 +407,7 @@ construct_runtime!(
 		NodeBlock = opaque::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		BridgeRialtoMessages: pallet_bridge_messages::{Pallet, Call, Storage, Event<T>},
+		BridgeRialtoMessages: pallet_bridge_messages::{Pallet, Call, Storage, Event<T>, Config<T>},
 		BridgeDispatch: pallet_bridge_dispatch::{Pallet, Event<T>},
 		BridgeRialtoGrandpa: pallet_bridge_grandpa::{Pallet, Call, Storage},
 		BridgeWestendGrandpa: pallet_bridge_grandpa::<Instance1>::{Pallet, Call, Config<T>, Storage},
@@ -610,20 +621,11 @@ impl_runtime_apis! {
 			begin: bp_messages::MessageNonce,
 			end: bp_messages::MessageNonce,
 		) -> Vec<bp_messages::MessageDetails<Balance>> {
-			(begin..=end).filter_map(|nonce| {
-				let message_data = BridgeRialtoMessages::outbound_message_data(lane, nonce)?;
-				let decoded_payload = rialto_messages::ToRialtoMessagePayload::decode(
-					&mut &message_data.payload[..]
-				).ok()?;
-				Some(bp_messages::MessageDetails {
-					nonce,
-					dispatch_weight: decoded_payload.weight,
-					size: message_data.payload.len() as _,
-					delivery_and_dispatch_fee: message_data.fee,
-					dispatch_fee_payment: decoded_payload.dispatch_fee_payment,
-				})
-			})
-			.collect()
+			bridge_runtime_common::messages_api::outbound_message_details::<
+				Runtime,
+				WithRialtoMessagesInstance,
+				WithRialtoMessageBridge,
+			>(lane, begin, end)
 		}
 
 		fn latest_received_nonce(lane: bp_messages::LaneId) -> bp_messages::MessageNonce {
@@ -689,6 +691,7 @@ mod tests {
 			bp_millau::ADDITIONAL_MESSAGE_BYTE_DELIVERY_WEIGHT,
 			bp_millau::MAX_SINGLE_MESSAGE_DELIVERY_CONFIRMATION_TX_WEIGHT,
 			bp_millau::PAY_INBOUND_DISPATCH_FEE_WEIGHT,
+			DbWeight::get(),
 		);
 
 		let max_incoming_message_proof_size = bp_rialto::EXTRA_STORAGE_PROOF_SIZE.saturating_add(
@@ -713,6 +716,7 @@ mod tests {
 			max_incoming_inbound_lane_data_proof_size,
 			bp_rialto::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE,
 			bp_rialto::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE,
+			DbWeight::get(),
 		);
 	}
 }

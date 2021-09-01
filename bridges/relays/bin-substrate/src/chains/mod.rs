@@ -32,39 +32,31 @@ mod rococo;
 mod westend;
 mod wococo;
 
-use relay_utils::metrics::{FloatJsonValueMetric, MetricsParams};
+// Millau/Rialto tokens have no any real value, so the conversion rate we use is always 1:1. But we want to
+// test our code that is intended to work with real-value chains. So to keep it close to 1:1, we'll be treating
+// Rialto as BTC and Millau as wBTC (only in relayer).
+
+/// The identifier of token, which value is associated with Rialto token value by relayer.
+pub(crate) const RIALTO_ASSOCIATED_TOKEN_ID: &str = "polkadot";
+/// The identifier of token, which value is associated with Millau token value by relayer.
+pub(crate) const MILLAU_ASSOCIATED_TOKEN_ID: &str = "kusama";
+
+use relay_utils::metrics::MetricsParams;
 
 pub(crate) fn add_polkadot_kusama_price_metrics<T: finality_relay::FinalitySyncPipeline>(
+	prefix: Option<String>,
 	params: MetricsParams,
 ) -> anyhow::Result<MetricsParams> {
-	Ok(
-		relay_utils::relay_metrics(Some(finality_relay::metrics_prefix::<T>()), params)
-			// Polkadot/Kusama prices are added as metrics here, because atm we don't have Polkadot <-> Kusama
-			// relays, but we want to test metrics/dashboards in advance
-			.standalone_metric(|registry, prefix| {
-				FloatJsonValueMetric::new(
-					registry,
-					prefix,
-					"https://api.coingecko.com/api/v3/simple/price?ids=Polkadot&vs_currencies=btc".into(),
-					"$.polkadot.btc".into(),
-					"polkadot_to_base_conversion_rate".into(),
-					"Rate used to convert from DOT to some BASE tokens".into(),
-				)
-			})
-			.map_err(|e| anyhow::format_err!("{}", e))?
-			.standalone_metric(|registry, prefix| {
-				FloatJsonValueMetric::new(
-					registry,
-					prefix,
-					"https://api.coingecko.com/api/v3/simple/price?ids=Kusama&vs_currencies=btc".into(),
-					"$.kusama.btc".into(),
-					"kusama_to_base_conversion_rate".into(),
-					"Rate used to convert from KSM to some BASE tokens".into(),
-				)
-			})
-			.map_err(|e| anyhow::format_err!("{}", e))?
-			.into_params(),
-	)
+	// Polkadot/Kusama prices are added as metrics here, because atm we don't have Polkadot <-> Kusama
+	// relays, but we want to test metrics/dashboards in advance
+	Ok(relay_utils::relay_metrics(prefix, params)
+		.standalone_metric(|registry, prefix| {
+			substrate_relay_helper::helpers::token_price_metric(registry, prefix, "polkadot")
+		})?
+		.standalone_metric(|registry, prefix| {
+			substrate_relay_helper::helpers::token_price_metric(registry, prefix, "kusama")
+		})?
+		.into_params())
 }
 
 #[cfg(test)]
@@ -136,6 +128,7 @@ mod tests {
 			call.get_dispatch_info().weight,
 			bp_message_dispatch::CallOrigin::SourceRoot,
 			&call,
+			send_message::DispatchFeePayment::AtSourceChain,
 		);
 		assert_eq!(Millau::verify_message(&payload), Ok(()));
 
@@ -146,6 +139,7 @@ mod tests {
 			call.get_dispatch_info().weight,
 			bp_message_dispatch::CallOrigin::SourceRoot,
 			&call,
+			send_message::DispatchFeePayment::AtSourceChain,
 		);
 		assert!(Millau::verify_message(&payload).is_err());
 	}
@@ -173,6 +167,7 @@ mod tests {
 			maximal_dispatch_weight,
 			bp_message_dispatch::CallOrigin::SourceRoot,
 			&call,
+			send_message::DispatchFeePayment::AtSourceChain,
 		);
 		assert_eq!(Millau::verify_message(&payload), Ok(()));
 
@@ -181,6 +176,7 @@ mod tests {
 			maximal_dispatch_weight + 1,
 			bp_message_dispatch::CallOrigin::SourceRoot,
 			&call,
+			send_message::DispatchFeePayment::AtSourceChain,
 		);
 		assert!(Millau::verify_message(&payload).is_err());
 	}
@@ -198,6 +194,7 @@ mod tests {
 			maximal_dispatch_weight,
 			bp_message_dispatch::CallOrigin::SourceRoot,
 			&call,
+			send_message::DispatchFeePayment::AtSourceChain,
 		);
 		assert_eq!(Rialto::verify_message(&payload), Ok(()));
 
@@ -206,6 +203,7 @@ mod tests {
 			maximal_dispatch_weight + 1,
 			bp_message_dispatch::CallOrigin::SourceRoot,
 			&call,
+			send_message::DispatchFeePayment::AtSourceChain,
 		);
 		assert!(Rialto::verify_message(&payload).is_err());
 	}

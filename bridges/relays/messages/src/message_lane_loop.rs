@@ -65,7 +65,7 @@ pub enum RelayerMode {
 	/// The relayer doesn't care about rewards.
 	Altruistic,
 	/// The relayer will deliver all messages and confirmations as long as he's not losing any funds.
-	NoLosses,
+	Rational,
 }
 
 /// Message delivery race parameters.
@@ -175,7 +175,7 @@ pub trait TargetClient<P: MessageLane>: RelayClient {
 		id: TargetHeaderIdOf<P>,
 	) -> Result<(TargetHeaderIdOf<P>, MessageNonce), Self::Error>;
 
-	/// Get nonce of latest confirmed message.
+	/// Get nonce of the latest confirmed message.
 	async fn latest_confirmed_received_nonce(
 		&self,
 		id: TargetHeaderIdOf<P>,
@@ -212,13 +212,13 @@ pub trait TargetClient<P: MessageLane>: RelayClient {
 		nonces: RangeInclusive<MessageNonce>,
 		total_dispatch_weight: Weight,
 		total_size: u32,
-	) -> P::SourceChainBalance;
+	) -> Result<P::SourceChainBalance, Self::Error>;
 }
 
 /// State of the client.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ClientState<SelfHeaderId, PeerHeaderId> {
-	/// Best header id of this chain.
+	/// The best header id of this chain.
 	pub best_self: SelfHeaderId,
 	/// Best finalized header id of this chain.
 	pub best_finalized_self: SelfHeaderId,
@@ -258,7 +258,7 @@ pub async fn run<P: MessageLane>(
 	target_client: impl TargetClient<P>,
 	metrics_params: MetricsParams,
 	exit_signal: impl Future<Output = ()> + Send + 'static,
-) -> Result<(), String> {
+) -> anyhow::Result<()> {
 	let exit_signal = exit_signal.shared();
 	relay_utils::relay_loop(source_client, target_client)
 		.reconnect_delay(params.reconnect_delay)
@@ -775,10 +775,12 @@ pub(crate) mod tests {
 			nonces: RangeInclusive<MessageNonce>,
 			total_dispatch_weight: Weight,
 			total_size: u32,
-		) -> TestSourceChainBalance {
-			BASE_MESSAGE_DELIVERY_TRANSACTION_COST * (nonces.end() - nonces.start() + 1)
-				+ total_dispatch_weight
-				+ total_size as TestSourceChainBalance
+		) -> Result<TestSourceChainBalance, TestError> {
+			Ok(
+				BASE_MESSAGE_DELIVERY_TRANSACTION_COST * (nonces.end() - nonces.start() + 1)
+					+ total_dispatch_weight
+					+ total_size as TestSourceChainBalance,
+			)
 		}
 	}
 

@@ -80,7 +80,7 @@ pub trait SourceClient<P: HeadersSyncPipeline>: RelayClient {
 /// Target client trait.
 #[async_trait]
 pub trait TargetClient<P: HeadersSyncPipeline>: RelayClient {
-	/// Returns ID of best header known to the target node.
+	/// Returns ID of the best header known to the target node.
 	async fn best_header_id(&self) -> Result<HeaderIdOf<P>, Self::Error>;
 
 	/// Returns true if header is known to the target node.
@@ -126,7 +126,7 @@ pub async fn run<P: HeadersSyncPipeline, TC: TargetClient<P>>(
 	sync_params: HeadersSyncParams,
 	metrics_params: MetricsParams,
 	exit_signal: impl Future<Output = ()> + 'static + Send,
-) -> Result<(), String> {
+) -> anyhow::Result<()> {
 	let exit_signal = exit_signal.shared();
 	relay_utils::relay_loop(source_client, target_client)
 		.with_metrics(Some(metrics_prefix::<P>()), metrics_params)

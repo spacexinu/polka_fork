@@ -31,7 +31,10 @@ use bp_messages::{
 };
 use bp_runtime::{messages::MessageDispatchResult, Size};
 use codec::{Decode, Encode};
-use frame_support::{parameter_types, weights::Weight};
+use frame_support::{
+	parameter_types,
+	weights::{RuntimeDbWeight, Weight},
+};
 use sp_core::H256;
 use sp_runtime::{
 	testing::Header as SubstrateHeader,
@@ -53,6 +56,8 @@ pub struct TestPayload {
 	/// Note: in correct code `dispatch_result.unspent_weight` will always be <= `declared_weight`, but for test
 	/// purposes we'll be making it larger than `declared_weight` sometimes.
 	pub dispatch_result: MessageDispatchResult,
+	/// Extra bytes that affect payload size.
+	pub extra: Vec<u8>,
 }
 pub type TestMessageFee = u64;
 pub type TestRelayer = u64;
@@ -87,6 +92,7 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+	pub const DbWeight: RuntimeDbWeight = RuntimeDbWeight { read: 1, write: 2 };
 }
 
 impl frame_system::Config for TestRuntime {
@@ -110,7 +116,7 @@ impl frame_system::Config for TestRuntime {
 	type SystemWeightInfo = ();
 	type BlockWeights = ();
 	type BlockLength = ();
-	type DbWeight = ();
+	type DbWeight = DbWeight;
 	type SS58Prefix = ();
 	type OnSetCode = ();
 }
@@ -136,6 +142,7 @@ parameter_types! {
 	pub const MaxUnrewardedRelayerEntriesAtInboundLane: u64 = 16;
 	pub const MaxUnconfirmedMessagesAtInboundLane: u64 = 32;
 	pub storage TokenConversionRate: FixedU128 = 1.into();
+  pub const TestBridgedChainId: bp_runtime::ChainId = *b"test";
 }
 
 #[derive(Debug, Clone, Encode, Decode, PartialEq, Eq)]
@@ -175,11 +182,12 @@ impl Config for TestRuntime {
 
 	type SourceHeaderChain = TestSourceHeaderChain;
 	type MessageDispatch = TestMessageDispatch;
+	type BridgedChainId = TestBridgedChainId;
 }
 
 impl Size for TestPayload {
 	fn size_hint(&self) -> u32 {
-		16
+		16 + self.extra.len() as u32
 	}
 }
 
@@ -358,16 +366,29 @@ impl TestOnDeliveryConfirmed1 {
 		let key = (b"TestOnDeliveryConfirmed1", lane, messages).encode();
 		assert_eq!(frame_support::storage::unhashed::get(&key), Some(true));
 	}
-}
 
-impl OnDeliveryConfirmed for TestOnDeliveryConfirmed1 {
-	fn on_messages_delivered(lane: &LaneId, messages: &DeliveredMessages) {
-		let key = (b"TestOnDeliveryConfirmed1", lane, messages).encode();
-		frame_support::storage::unhashed::put(&key, &true);
+	/// Set consumed weight returned by the callback.
+	pub fn set_consumed_weight_per_message(weight: Weight) {
+		frame_support::storage::unhashed::put(b"TestOnDeliveryConfirmed1_Weight", &weight);
+	}
+
+	/// Get consumed weight returned by the callback.
+	pub fn get_consumed_weight_per_message() -> Option<Weight> {
+		frame_support::storage::unhashed::get(b"TestOnDeliveryConfirmed1_Weight")
 	}
 }
 
-/// Seconde on-messages-delivered callback.
+impl OnDeliveryConfirmed for TestOnDeliveryConfirmed1 {
+	fn on_messages_delivered(lane: &LaneId, messages: &DeliveredMessages) -> Weight {
+		let key = (b"TestOnDeliveryConfirmed1", lane, messages).encode();
+		frame_support::storage::unhashed::put(&key, &true);
+		Self::get_consumed_weight_per_message()
+			.unwrap_or_else(|| DbWeight::get().reads_writes(1, 1))
+			.saturating_mul(messages.total_messages())
+	}
+}
+
+/// Second on-messages-delivered callback.
 #[derive(Debug)]
 pub struct TestOnDeliveryConfirmed2;
 
@@ -380,9 +401,10 @@ impl TestOnDeliveryConfirmed2 {
 }
 
 impl OnDeliveryConfirmed for TestOnDeliveryConfirmed2 {
-	fn on_messages_delivered(lane: &LaneId, messages: &DeliveredMessages) {
+	fn on_messages_delivered(lane: &LaneId, messages: &DeliveredMessages) -> Weight {
 		let key = (b"TestOnDeliveryConfirmed2", lane, messages).encode();
 		frame_support::storage::unhashed::put(&key, &true);
+		0
 	}
 }
 
@@ -448,6 +470,7 @@ pub const fn message_payload(id: u64, declared_weight: Weight) -> TestPayload {
 		id,
 		declared_weight,
 		dispatch_result: dispatch_result(0),
+		extra: Vec::new(),
 	}
 }
 

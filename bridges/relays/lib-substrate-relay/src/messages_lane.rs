@@ -14,16 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
 
+//! Tools for supporting message lanes between two Substrate-based chains.
+
 use crate::messages_source::SubstrateMessagesProof;
 use crate::messages_target::SubstrateMessagesReceivingProof;
 use crate::on_demand_headers::OnDemandHeadersRelay;
 
+use async_trait::async_trait;
 use bp_messages::{LaneId, MessageNonce};
 use frame_support::weights::Weight;
 use messages_relay::message_lane::{MessageLane, SourceHeaderIdOf, TargetHeaderIdOf};
-use relay_substrate_client::{BlockNumberOf, Chain, Client, HashOf};
-use relay_utils::{metrics::MetricsParams, BlockNumberBase};
-use sp_core::Bytes;
+use relay_substrate_client::{
+	metrics::{FloatStorageValueMetric, StorageProofOverheadMetric},
+	BlockNumberOf, Chain, Client, HashOf,
+};
+use relay_utils::{
+	metrics::{F64SharedRef, MetricsParams},
+	BlockNumberBase,
+};
+use sp_core::{storage::StorageKey, Bytes};
+use sp_runtime::FixedU128;
 use std::ops::RangeInclusive;
 
 /// Substrate <-> Substrate messages relay parameters.
@@ -42,12 +52,18 @@ pub struct MessagesRelayParams<SC: Chain, SS, TC: Chain, TS> {
 	pub target_to_source_headers_relay: Option<OnDemandHeadersRelay<TC>>,
 	/// Identifier of lane that needs to be served.
 	pub lane_id: LaneId,
+	/// Relayer operating mode.
+	pub relayer_mode: messages_relay::message_lane_loop::RelayerMode,
 	/// Metrics parameters.
 	pub metrics_params: MetricsParams,
 }
 
 /// Message sync pipeline for Substrate <-> Substrate relays.
-pub trait SubstrateMessageLane: MessageLane {
+#[async_trait]
+pub trait SubstrateMessageLane: 'static + Clone + Send + Sync {
+	/// Underlying generic message lane.
+	type MessageLane: MessageLane;
+
 	/// Name of the runtime method that returns dispatch weight of outbound messages at the source chain.
 	const OUTBOUND_LANE_MESSAGE_DETAILS_METHOD: &'static str;
 	/// Name of the runtime method that returns latest generated nonce at the source chain.
@@ -57,15 +73,20 @@ pub trait SubstrateMessageLane: MessageLane {
 
 	/// Name of the runtime method that returns latest received nonce at the target chain.
 	const INBOUND_LANE_LATEST_RECEIVED_NONCE_METHOD: &'static str;
-	/// Name of the runtime method that returns latest confirmed (reward-paid) nonce at the target chain.
+	/// Name of the runtime method that returns the latest confirmed (reward-paid) nonce at the target chain.
 	const INBOUND_LANE_LATEST_CONFIRMED_NONCE_METHOD: &'static str;
-	/// Numebr of the runtime method that returns state of "unrewarded relayers" set at the target chain.
+	/// Number of the runtime method that returns state of "unrewarded relayers" set at the target chain.
 	const INBOUND_LANE_UNREWARDED_RELAYERS_STATE: &'static str;
 
 	/// Name of the runtime method that returns id of best finalized source header at target chain.
 	const BEST_FINALIZED_SOURCE_HEADER_ID_AT_TARGET: &'static str;
 	/// Name of the runtime method that returns id of best finalized target header at source chain.
 	const BEST_FINALIZED_TARGET_HEADER_ID_AT_SOURCE: &'static str;
+
+	/// Name of the messages pallet as it is declared in the `construct_runtime!()` at source chain.
+	const MESSAGE_PALLET_NAME_AT_SOURCE: &'static str;
+	/// Name of the messages pallet as it is declared in the `construct_runtime!()` at target chain.
+	const MESSAGE_PALLET_NAME_AT_TARGET: &'static str;
 
 	/// Source chain.
 	type SourceChain: Chain;
@@ -79,9 +100,9 @@ pub trait SubstrateMessageLane: MessageLane {
 	fn make_messages_delivery_transaction(
 		&self,
 		transaction_nonce: <Self::TargetChain as Chain>::Index,
-		generated_at_header: SourceHeaderIdOf<Self>,
+		generated_at_header: SourceHeaderIdOf<Self::MessageLane>,
 		nonces: RangeInclusive<MessageNonce>,
-		proof: Self::MessagesProof,
+		proof: <Self::MessageLane as MessageLane>::MessagesProof,
 	) -> Bytes;
 
 	/// Returns id of account that we're using to sign transactions at source chain (delivery proof).
@@ -91,8 +112,8 @@ pub trait SubstrateMessageLane: MessageLane {
 	fn make_messages_receiving_proof_transaction(
 		&self,
 		transaction_nonce: <Self::SourceChain as Chain>::Index,
-		generated_at_header: TargetHeaderIdOf<Self>,
-		proof: Self::MessagesReceivingProof,
+		generated_at_header: TargetHeaderIdOf<Self::MessageLane>,
+		proof: <Self::MessageLane as MessageLane>::MessagesReceivingProof,
 	) -> Bytes;
 }
 
@@ -100,15 +121,15 @@ pub trait SubstrateMessageLane: MessageLane {
 #[derive(Debug)]
 pub struct SubstrateMessageLaneToSubstrate<Source: Chain, SourceSignParams, Target: Chain, TargetSignParams> {
 	/// Client for the source Substrate chain.
-	pub(crate) source_client: Client<Source>,
+	pub source_client: Client<Source>,
 	/// Parameters required to sign transactions for source chain.
-	pub(crate) source_sign: SourceSignParams,
+	pub source_sign: SourceSignParams,
 	/// Client for the target Substrate chain.
-	pub(crate) target_client: Client<Target>,
+	pub target_client: Client<Target>,
 	/// Parameters required to sign transactions for target chain.
-	pub(crate) target_sign: TargetSignParams,
+	pub target_sign: TargetSignParams,
 	/// Account id of relayer at the source chain.
-	pub(crate) relayer_id_at_source: Source::AccountId,
+	pub relayer_id_at_source: Source::AccountId,
 }
 
 impl<Source: Chain, SourceSignParams: Clone, Target: Chain, TargetSignParams: Clone> Clone
@@ -185,9 +206,103 @@ pub fn select_delivery_transaction_limits<W: pallet_bridge_messages::WeightInfoE
 	(max_number_of_messages, weight_for_messages_dispatch)
 }
 
+/// Shared references to the values of standalone metrics of the message lane relay loop.
+#[derive(Debug, Clone)]
+pub struct StandaloneMessagesMetrics {
+	/// Shared reference to the actual target -> <base> chain token conversion rate.
+	pub target_to_base_conversion_rate: Option<F64SharedRef>,
+	/// Shared reference to the actual source -> <base> chain token conversion rate.
+	pub source_to_base_conversion_rate: Option<F64SharedRef>,
+	/// Shared reference to the stored (in the source chain runtime storage) target -> source chain conversion rate.
+	pub target_to_source_conversion_rate: Option<F64SharedRef>,
+}
+
+impl StandaloneMessagesMetrics {
+	/// Return conversion rate from target to source tokens.
+	pub async fn target_to_source_conversion_rate(&self) -> Option<f64> {
+		let target_to_base_conversion_rate = (*self.target_to_base_conversion_rate.as_ref()?.read().await)?;
+		let source_to_base_conversion_rate = (*self.source_to_base_conversion_rate.as_ref()?.read().await)?;
+		Some(source_to_base_conversion_rate / target_to_base_conversion_rate)
+	}
+}
+
+/// Add general standalone metrics for the message lane relay loop.
+pub fn add_standalone_metrics<P: SubstrateMessageLane>(
+	metrics_prefix: Option<String>,
+	metrics_params: MetricsParams,
+	source_client: Client<P::SourceChain>,
+	source_chain_token_id: Option<&str>,
+	target_chain_token_id: Option<&str>,
+	target_to_source_conversion_rate_params: Option<(StorageKey, FixedU128)>,
+) -> anyhow::Result<(MetricsParams, StandaloneMessagesMetrics)> {
+	let mut target_to_source_conversion_rate = None;
+	let mut source_to_base_conversion_rate = None;
+	let mut target_to_base_conversion_rate = None;
+	let mut metrics_params =
+		relay_utils::relay_metrics(metrics_prefix, metrics_params).standalone_metric(|registry, prefix| {
+			StorageProofOverheadMetric::new(
+				registry,
+				prefix,
+				source_client.clone(),
+				format!("{}_storage_proof_overhead", P::SourceChain::NAME.to_lowercase()),
+				format!("{} storage proof overhead", P::SourceChain::NAME),
+			)
+		})?;
+	if let Some((target_to_source_conversion_rate_storage_key, initial_target_to_source_conversion_rate)) =
+		target_to_source_conversion_rate_params
+	{
+		metrics_params = metrics_params.standalone_metric(|registry, prefix| {
+			let metric = FloatStorageValueMetric::<_, sp_runtime::FixedU128>::new(
+				registry,
+				prefix,
+				source_client,
+				target_to_source_conversion_rate_storage_key,
+				Some(initial_target_to_source_conversion_rate),
+				format!(
+					"{}_{}_to_{}_conversion_rate",
+					P::SourceChain::NAME,
+					P::TargetChain::NAME,
+					P::SourceChain::NAME
+				),
+				format!(
+					"{} to {} tokens conversion rate (used by {})",
+					P::TargetChain::NAME,
+					P::SourceChain::NAME,
+					P::SourceChain::NAME
+				),
+			)?;
+			target_to_source_conversion_rate = Some(metric.shared_value_ref());
+			Ok(metric)
+		})?;
+	}
+	if let Some(source_chain_token_id) = source_chain_token_id {
+		metrics_params = metrics_params.standalone_metric(|registry, prefix| {
+			let metric = crate::helpers::token_price_metric(registry, prefix, source_chain_token_id)?;
+			source_to_base_conversion_rate = Some(metric.shared_value_ref());
+			Ok(metric)
+		})?;
+	}
+	if let Some(target_chain_token_id) = target_chain_token_id {
+		metrics_params = metrics_params.standalone_metric(|registry, prefix| {
+			let metric = crate::helpers::token_price_metric(registry, prefix, target_chain_token_id)?;
+			target_to_base_conversion_rate = Some(metric.shared_value_ref());
+			Ok(metric)
+		})?;
+	}
+	Ok((
+		metrics_params.into_params(),
+		StandaloneMessagesMetrics {
+			target_to_base_conversion_rate,
+			source_to_base_conversion_rate,
+			target_to_source_conversion_rate,
+		},
+	))
+}
+
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use async_std::sync::{Arc, RwLock};
 
 	type RialtoToMillauMessagesWeights = pallet_bridge_messages::weights::RialtoWeight<rialto_runtime::Runtime>;
 
@@ -206,5 +321,16 @@ mod tests {
 			// Any significant change in this values should attract additional attention.
 			(782, 216_583_333_334),
 		);
+	}
+
+	#[async_std::test]
+	async fn target_to_source_conversion_rate_works() {
+		let metrics = StandaloneMessagesMetrics {
+			target_to_base_conversion_rate: Some(Arc::new(RwLock::new(Some(183.15)))),
+			source_to_base_conversion_rate: Some(Arc::new(RwLock::new(Some(12.32)))),
+			target_to_source_conversion_rate: None, // we don't care
+		};
+
+		assert_eq!(metrics.target_to_source_conversion_rate().await, Some(12.32 / 183.15),);
 	}
 }

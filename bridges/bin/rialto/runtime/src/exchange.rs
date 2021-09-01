@@ -55,8 +55,8 @@ pub struct EthereumTransactionInclusionProof {
 ///
 /// The assumption is that this pair will never appear more than once in
 /// transactions included into finalized blocks. This is obviously true
-/// for any existing eth-like chain (that keep current transaction format),
-/// because otherwise transaction can be replayed over and over.
+/// for any existing eth-like chain (that keep current TX format), because
+/// otherwise transaction can be replayed over and over.
 #[derive(Encode, Decode, PartialEq, RuntimeDebug)]
 pub struct EthereumTransactionTag {
 	/// Account that has locked funds.
@@ -65,7 +65,7 @@ pub struct EthereumTransactionTag {
 	pub nonce: sp_core::U256,
 }
 
-/// Eth transaction from runtime perspective.
+/// Ethereum transaction from runtime perspective.
 pub struct EthTransaction;
 
 impl MaybeLockFundsTransaction for EthTransaction {
@@ -128,7 +128,7 @@ impl MaybeLockFundsTransaction for EthTransaction {
 
 /// Prepares everything required to bench claim of funds locked by given transaction.
 #[cfg(feature = "runtime-benchmarks")]
-pub(crate) fn prepare_environment_for_claim<T: pallet_bridge_eth_poa::Config<I>, I: frame_support::traits::Instance>(
+pub(crate) fn prepare_environment_for_claim<T: pallet_bridge_eth_poa::Config<I>, I: 'static>(
 	transactions: &[(RawTransaction, RawTransactionReceipt)],
 ) -> bp_eth_poa::H256 {
 	use bp_eth_poa::compute_merkle_root;

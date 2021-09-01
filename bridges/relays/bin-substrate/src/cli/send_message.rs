@@ -22,7 +22,6 @@ use crate::cli::{
 	TargetSigningParams,
 };
 use bp_message_dispatch::{CallOrigin, MessagePayload};
-use bp_runtime::messages::DispatchFeePayment;
 use codec::Encode;
 use frame_support::weights::Weight;
 use relay_substrate_client::{Chain, TransactionSignScheme};
@@ -30,26 +29,50 @@ use sp_core::{Bytes, Pair};
 use sp_runtime::{traits::IdentifyAccount, AccountId32, MultiSignature, MultiSigner};
 use std::fmt::Debug;
 use structopt::StructOpt;
+use strum::{EnumString, EnumVariantNames, VariantNames};
+
+/// Relayer operating mode.
+#[derive(Debug, EnumString, EnumVariantNames, Clone, Copy, PartialEq, Eq)]
+#[strum(serialize_all = "kebab_case")]
+pub enum DispatchFeePayment {
+	/// The dispatch fee is paid at the source chain.
+	AtSourceChain,
+	/// The dispatch fee is paid at the target chain.
+	AtTargetChain,
+}
+
+impl From<DispatchFeePayment> for bp_runtime::messages::DispatchFeePayment {
+	fn from(dispatch_fee_payment: DispatchFeePayment) -> Self {
+		match dispatch_fee_payment {
+			DispatchFeePayment::AtSourceChain => Self::AtSourceChain,
+			DispatchFeePayment::AtTargetChain => Self::AtTargetChain,
+		}
+	}
+}
 
 /// Send bridge message.
 #[derive(StructOpt)]
 pub struct SendMessage {
 	/// A bridge instance to encode call for.
-	#[structopt(possible_values = &FullBridge::variants(), case_insensitive = true)]
+	#[structopt(possible_values = FullBridge::VARIANTS, case_insensitive = true)]
 	bridge: FullBridge,
 	#[structopt(flatten)]
 	source: SourceConnectionParams,
 	#[structopt(flatten)]
 	source_sign: SourceSigningParams,
-	/// The SURI of secret key to use when transactions are submitted to the Target node.
-	#[structopt(long, required_if("origin", "Target"))]
-	target_signer: Option<String>,
-	/// The password for the SURI of secret key to use when transactions are submitted to the Target node.
-	#[structopt(long)]
-	target_signer_password: Option<String>,
+	#[structopt(flatten)]
+	target_sign: TargetSigningParams,
 	/// Hex-encoded lane id. Defaults to `00000000`.
 	#[structopt(long, default_value = "00000000")]
 	lane: HexLaneId,
+	/// Where dispatch fee is paid?
+	#[structopt(
+		long,
+		possible_values = DispatchFeePayment::VARIANTS,
+		case_insensitive = true,
+		default_value = "at-source-chain",
+	)]
+	dispatch_fee_payment: DispatchFeePayment,
 	/// Dispatch weight of the message. If not passed, determined automatically.
 	#[structopt(long)]
 	dispatch_weight: Option<ExplicitOrMaximal<Weight>>,
@@ -72,9 +95,9 @@ impl SendMessage {
 		crate::select_full_bridge!(self.bridge, {
 			let SendMessage {
 				source_sign,
-				target_signer,
-				target_signer_password,
+				target_sign,
 				ref mut message,
+				dispatch_fee_payment,
 				dispatch_weight,
 				origin,
 				bridge,
@@ -101,12 +124,6 @@ impl SendMessage {
 					match origin {
 						Origins::Source => CallOrigin::SourceAccount(source_account_id),
 						Origins::Target => {
-							let target_sign = TargetSigningParams {
-								target_signer: target_signer.clone().ok_or_else(|| {
-									anyhow::format_err!("The argument target_signer is not available")
-								})?,
-								target_signer_password: target_signer_password.clone(),
-							};
 							let target_sign = target_sign.to_keypair::<Target>()?;
 							let digest = account_ownership_digest(
 								&target_call,
@@ -123,6 +140,7 @@ impl SendMessage {
 						}
 					},
 					&target_call,
+					*dispatch_fee_payment,
 				)
 			};
 			Ok(payload)
@@ -158,10 +176,11 @@ impl SendMessage {
 				fee,
 			})?;
 
+			let source_genesis_hash = *source_client.genesis_hash();
 			source_client
-				.submit_signed_extrinsic(source_sign.public().into(), |transaction_nonce| {
+				.submit_signed_extrinsic(source_sign.public().into(), move |transaction_nonce| {
 					let signed_source_call = Source::sign_transaction(
-						*source_client.genesis_hash(),
+						source_genesis_hash,
 						&source_sign,
 						transaction_nonce,
 						send_message_call,
@@ -211,6 +230,7 @@ pub(crate) fn message_payload<SAccountId, TPublic, TSignature>(
 	weight: Weight,
 	origin: CallOrigin<SAccountId, TPublic, TSignature>,
 	call: &impl Encode,
+	dispatch_fee_payment: DispatchFeePayment,
 ) -> MessagePayload<SAccountId, TPublic, TSignature, Vec<u8>>
 where
 	SAccountId: Encode + Debug,
@@ -222,7 +242,7 @@ where
 		spec_version,
 		weight,
 		origin,
-		dispatch_fee_payment: DispatchFeePayment::AtSourceChain,
+		dispatch_fee_payment: dispatch_fee_payment.into(),
 		call: HexBytes::encode(call),
 	};
 
@@ -260,7 +280,7 @@ mod tests {
 		// given
 		let mut send_message = SendMessage::from_iter(vec![
 			"send-message",
-			"RialtoToMillau",
+			"rialto-to-millau",
 			"--source-port",
 			"1234",
 			"--source-signer",
@@ -280,7 +300,7 @@ mod tests {
 				spec_version: relay_millau_client::Millau::RUNTIME_VERSION.spec_version,
 				weight: 1038000,
 				origin: CallOrigin::SourceAccount(sp_keyring::AccountKeyring::Alice.to_account_id()),
-				dispatch_fee_payment: DispatchFeePayment::AtSourceChain,
+				dispatch_fee_payment: bp_runtime::messages::DispatchFeePayment::AtSourceChain,
 				call: hex!("0401081234").to_vec(),
 			}
 		);
@@ -291,7 +311,7 @@ mod tests {
 		// given
 		let mut send_message = SendMessage::from_iter(vec![
 			"send-message",
-			"MillauToRialto",
+			"millau-to-rialto",
 			"--source-port",
 			"1234",
 			"--source-signer",
@@ -324,18 +344,18 @@ mod tests {
 					sp_keyring::AccountKeyring::Bob.into(),
 					signature,
 				),
-				dispatch_fee_payment: DispatchFeePayment::AtSourceChain,
-				call: hex!("0701081234").to_vec(),
+				dispatch_fee_payment: bp_runtime::messages::DispatchFeePayment::AtSourceChain,
+				call: hex!("0001081234").to_vec(),
 			}
 		);
 	}
 
 	#[test]
-	fn target_signer_must_exist_if_origin_is_target() {
+	fn accepts_send_message_command_without_target_sign_options() {
 		// given
 		let send_message = SendMessage::from_iter_safe(vec![
 			"send-message",
-			"MillauToRialto",
+			"rialto-to-millau",
 			"--source-port",
 			"1234",
 			"--source-signer",
@@ -347,6 +367,31 @@ mod tests {
 			"1234",
 		]);
 
-		assert!(send_message.is_err());
+		assert!(send_message.is_ok());
+	}
+
+	#[test]
+	fn accepts_non_default_dispatch_fee_payment() {
+		// given
+		let mut send_message = SendMessage::from_iter(vec![
+			"send-message",
+			"rialto-to-millau",
+			"--source-port",
+			"1234",
+			"--source-signer",
+			"//Alice",
+			"--dispatch-fee-payment",
+			"at-target-chain",
+			"remark",
+		]);
+
+		// when
+		let payload = send_message.encode_payload().unwrap();
+
+		// then
+		assert_eq!(
+			payload.dispatch_fee_payment,
+			bp_runtime::messages::DispatchFeePayment::AtTargetChain
+		);
 	}
 }

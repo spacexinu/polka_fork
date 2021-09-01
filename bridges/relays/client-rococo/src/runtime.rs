@@ -22,9 +22,6 @@ use bp_runtime::Chain;
 use codec::{Decode, Encode};
 use frame_support::weights::Weight;
 
-/// Instance of messages pallet that is used to bridge with Wococo chain.
-pub type WithWococoMessagesInstance = pallet_bridge_messages::Instance1;
-
 /// Unchecked Rococo extrinsic.
 pub type UncheckedExtrinsic = bp_polkadot_core::UncheckedExtrinsic<Call>;
 
@@ -61,7 +58,7 @@ where
 /// All entries here (like pretty much in the entire file) must be kept in sync with Rococo
 /// `construct_runtime`, so that we maintain SCALE-compatibility.
 ///
-/// See: https://github.com/paritytech/polkadot/blob/master/runtime/rococo/src/lib.rs
+/// See: [link](https://github.com/paritytech/polkadot/blob/master/runtime/rococo/src/lib.rs)
 #[allow(clippy::large_enum_variant)]
 #[derive(Encode, Decode, Debug, PartialEq, Eq, Clone)]
 pub enum Call {

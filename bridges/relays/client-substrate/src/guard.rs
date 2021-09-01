@@ -80,7 +80,7 @@ pub fn abort_on_spec_version_change<C: ChainWithBalances>(mut env: impl Environm
 	});
 }
 
-/// Abort if, during a 24 hours, free balance of given account is decreased at least by given value.
+/// Abort if, during 24 hours, free balance of given account is decreased at least by given value.
 /// Other components may increase (or decrease) balance of account and it WILL affect logic of the guard.
 pub fn abort_when_account_balance_decreased<C: ChainWithBalances>(
 	mut env: impl Environment<C>,
@@ -185,6 +185,8 @@ mod tests {
 	impl Chain for TestChain {
 		const NAME: &'static str = "Test";
 		const AVERAGE_BLOCK_INTERVAL: Duration = Duration::from_millis(1);
+		const STORAGE_PROOF_OVERHEAD: u32 = 0;
+		const MAXIMAL_ENCODED_ACCOUNT_ID_SIZE: u32 = 0;
 
 		type AccountId = u32;
 		type Index = u32;

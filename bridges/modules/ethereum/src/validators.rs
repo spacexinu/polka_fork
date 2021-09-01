@@ -188,7 +188,10 @@ impl<'a> Validators<'a> {
 		finalized_blocks: &[(HeaderId, Option<S::Submitter>)],
 	) -> Option<ChangeToEnact> {
 		// if we haven't finalized any blocks, no changes may be finalized
-		let newest_finalized_id = finalized_blocks.last().map(|(id, _)| id)?;
+		let newest_finalized_id = match finalized_blocks.last().map(|(id, _)| id) {
+			Some(last_finalized_id) => last_finalized_id,
+			None => return None,
+		};
 		let oldest_finalized_id = finalized_blocks
 			.first()
 			.map(|(id, _)| id)
@@ -273,10 +276,8 @@ impl ValidatorsSource {
 pub(crate) mod tests {
 	use super::*;
 	use crate::mock::{run_test, validators_addresses, validators_change_receipt, TestRuntime};
-	use crate::DefaultInstance;
 	use crate::{AuraScheduledChange, BridgeStorage, Headers, ScheduledChanges, StoredHeader};
 	use bp_eth_poa::compute_merkle_root;
-	use frame_support::StorageMap;
 
 	const TOTAL_VALIDATORS: usize = 3;
 
@@ -435,7 +436,7 @@ pub(crate) mod tests {
 			};
 			Headers::<TestRuntime>::insert(id100.hash, header100);
 			if let Some(scheduled_at) = scheduled_at {
-				ScheduledChanges::<DefaultInstance>::insert(scheduled_at.hash, scheduled_change);
+				ScheduledChanges::<TestRuntime, ()>::insert(scheduled_at.hash, scheduled_change);
 			}
 
 			validators.finalize_validators_change(&storage, &finalized_blocks)

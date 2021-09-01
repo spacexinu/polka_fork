@@ -20,12 +20,13 @@ use crate::select_full_bridge;
 use frame_support::weights::DispatchInfo;
 use relay_substrate_client::Chain;
 use structopt::StructOpt;
+use strum::VariantNames;
 
 /// Encode source chain runtime call.
 #[derive(StructOpt, Debug)]
 pub struct EncodeCall {
 	/// A bridge instance to encode call for.
-	#[structopt(possible_values = &FullBridge::variants(), case_insensitive = true)]
+	#[structopt(possible_values = FullBridge::VARIANTS, case_insensitive = true)]
 	bridge: FullBridge,
 	#[structopt(flatten)]
 	call: Call,
@@ -194,7 +195,7 @@ mod tests {
 		// given
 		let mut encode_call = EncodeCall::from_iter(vec![
 			"encode-call",
-			"RialtoToMillau",
+			"rialto-to-millau",
 			"transfer",
 			"--amount",
 			"12345",
@@ -208,20 +209,20 @@ mod tests {
 		// then
 		assert_eq!(
 			format!("{:?}", hex),
-			"0x0c00d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27de5c0"
+			"0x0400d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27de5c0"
 		);
 	}
 
 	#[test]
 	fn should_encode_remark_with_default_payload() {
 		// given
-		let mut encode_call = EncodeCall::from_iter(vec!["encode-call", "RialtoToMillau", "remark"]);
+		let mut encode_call = EncodeCall::from_iter(vec!["encode-call", "rialto-to-millau", "remark"]);
 
 		// when
 		let hex = encode_call.encode().unwrap();
 
 		// then
-		assert!(format!("{:?}", hex).starts_with("0x070154556e69782074696d653a"));
+		assert!(format!("{:?}", hex).starts_with("0x000154556e69782074696d653a"));
 	}
 
 	#[test]
@@ -229,7 +230,7 @@ mod tests {
 		// given
 		let mut encode_call = EncodeCall::from_iter(vec![
 			"encode-call",
-			"RialtoToMillau",
+			"rialto-to-millau",
 			"remark",
 			"--remark-payload",
 			"1234",
@@ -239,20 +240,20 @@ mod tests {
 		let hex = encode_call.encode().unwrap();
 
 		// then
-		assert_eq!(format!("{:?}", hex), "0x0701081234");
+		assert_eq!(format!("{:?}", hex), "0x0001081234");
 	}
 
 	#[test]
 	fn should_encode_remark_with_size() {
 		// given
 		let mut encode_call =
-			EncodeCall::from_iter(vec!["encode-call", "RialtoToMillau", "remark", "--remark-size", "12"]);
+			EncodeCall::from_iter(vec!["encode-call", "rialto-to-millau", "remark", "--remark-size", "12"]);
 
 		// when
 		let hex = encode_call.encode().unwrap();
 
 		// then
-		assert_eq!(format!("{:?}", hex), "0x070130000000000000000000000000");
+		assert_eq!(format!("{:?}", hex), "0x000130000000000000000000000000");
 	}
 
 	#[test]
@@ -260,7 +261,7 @@ mod tests {
 		// when
 		let err = EncodeCall::from_iter_safe(vec![
 			"encode-call",
-			"RialtoToMillau",
+			"rialto-to-millau",
 			"remark",
 			"--remark-payload",
 			"1234",

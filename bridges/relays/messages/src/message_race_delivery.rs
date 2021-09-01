@@ -11,7 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
-//! Message delivery race delivers proof-of-messages from lane.source to lane.target.
+//! Message delivery race delivers proof-of-messages from "lane.source" to "lane.target".
 
 use crate::message_lane::{MessageLane, SourceHeaderIdOf, TargetHeaderIdOf};
 use crate::message_lane_loop::{
@@ -219,7 +219,7 @@ where
 /// Additional nonces data from the target client used by message delivery race.
 #[derive(Debug, Clone)]
 struct DeliveryRaceTargetNoncesData {
-	/// Latest nonce that we know: (1) has been delivered to us (2) has been confirmed
+	/// The latest nonce that we know: (1) has been delivered to us (2) has been confirmed
 	/// back to the source node (by confirmations race) and (3) relayer has received
 	/// reward for (and this has been confirmed by the message delivery race).
 	confirmed_nonce: MessageNonce,
@@ -540,8 +540,7 @@ where
 /// From given set of source nonces, that are ready to be delivered, select nonces
 /// to fit into single delivery transaction.
 ///
-/// The function returns nonces that are NOT selected for current batch and will be
-/// delivered later.
+/// The function returns last nonce that must be delivered to the target chain.
 #[allow(clippy::too_many_arguments)]
 async fn select_nonces_for_delivery_transaction<P: MessageLane>(
 	relayer_mode: RelayerMode,
@@ -564,6 +563,8 @@ async fn select_nonces_for_delivery_transaction<P: MessageLane>(
 	let mut selected_unpaid_weight: Weight = 0;
 	let mut selected_size: u32 = 0;
 	let mut selected_count: MessageNonce = 0;
+	let mut selected_reward = P::SourceChainBalance::zero();
+	let mut selected_cost = P::SourceChainBalance::zero();
 
 	let mut total_reward = P::SourceChainBalance::zero();
 	let mut total_confirmations_cost = P::SourceChainBalance::zero();
@@ -647,14 +648,22 @@ async fn select_nonces_for_delivery_transaction<P: MessageLane>(
 			RelayerMode::Altruistic => {
 				soft_selected_count = index + 1;
 			}
-			RelayerMode::NoLosses => {
+			RelayerMode::Rational => {
 				let delivery_transaction_cost = lane_target_client
 					.estimate_delivery_transaction_in_source_tokens(
 						0..=(new_selected_count as MessageNonce - 1),
 						new_selected_unpaid_weight,
 						new_selected_size as u32,
 					)
-					.await;
+					.await
+					.map_err(|err| {
+						log::debug!(
+							target: "bridge",
+							"Failed to estimate delivery transaction cost: {:?}. No nonces selected for delivery",
+							err,
+						);
+					})
+					.ok()?;
 
 				// if it is the first message that makes reward less than cost, let's log it
 				// if this message makes batch profitable again, let's log it
@@ -690,9 +699,11 @@ async fn select_nonces_for_delivery_transaction<P: MessageLane>(
 					);
 				}
 
-				// NoLosses relayer never want to lose his funds
+				// Rational relayer never want to lose his funds
 				if total_reward >= total_cost {
 					soft_selected_count = index + 1;
+					selected_reward = total_reward;
+					selected_cost = total_cost;
 				}
 			}
 		}
@@ -724,6 +735,18 @@ async fn select_nonces_for_delivery_transaction<P: MessageLane>(
 	}
 
 	if hard_selected_count != 0 {
+		if relayer_mode != RelayerMode::Altruistic {
+			log::trace!(
+				target: "bridge",
+				"Expected reward from delivering nonces [{:?}; {:?}] is: {:?} - {:?} = {:?}",
+				hard_selected_begin_nonce,
+				hard_selected_begin_nonce + hard_selected_count as MessageNonce - 1,
+				selected_reward,
+				selected_cost,
+				selected_reward - selected_cost,
+			);
+		}
+
 		Some(hard_selected_begin_nonce + hard_selected_count as MessageNonce - 1)
 	} else {
 		None
@@ -1143,9 +1166,9 @@ mod tests {
 	}
 
 	#[async_std::test]
-	async fn no_losses_relayer_is_delivering_messages_if_cost_is_equal_to_reward() {
+	async fn rational_relayer_is_delivering_messages_if_cost_is_equal_to_reward() {
 		let (state, mut strategy) = prepare_strategy();
-		strategy.relayer_mode = RelayerMode::NoLosses;
+		strategy.relayer_mode = RelayerMode::Rational;
 
 		// so now we have:
 		// - 20..=23 with reward = cost
@@ -1157,7 +1180,7 @@ mod tests {
 	}
 
 	#[async_std::test]
-	async fn no_losses_relayer_is_not_delivering_messages_if_cost_is_larger_than_reward() {
+	async fn rational_relayer_is_not_delivering_messages_if_cost_is_larger_than_reward() {
 		let (mut state, mut strategy) = prepare_strategy();
 		let nonces = source_nonces(
 			24..=25,
@@ -1167,7 +1190,7 @@ mod tests {
 		);
 		strategy.strategy.source_nonces_updated(header_id(2), nonces);
 		state.best_finalized_source_header_id_at_best_target = Some(header_id(2));
-		strategy.relayer_mode = RelayerMode::NoLosses;
+		strategy.relayer_mode = RelayerMode::Rational;
 
 		// so now we have:
 		// - 20..=23 with reward = cost
@@ -1180,7 +1203,7 @@ mod tests {
 	}
 
 	#[async_std::test]
-	async fn no_losses_relayer_is_delivering_unpaid_messages() {
+	async fn rational_relayer_is_delivering_unpaid_messages() {
 		async fn test_with_dispatch_fee_payment(
 			dispatch_fee_payment: DispatchFeePayment,
 		) -> Option<(RangeInclusive<MessageNonce>, MessageProofParameters)> {
@@ -1198,7 +1221,7 @@ mod tests {
 			strategy.max_messages_in_single_batch = 100;
 			strategy.max_messages_weight_in_single_batch = 100;
 			strategy.max_messages_size_in_single_batch = 100;
-			strategy.relayer_mode = RelayerMode::NoLosses;
+			strategy.relayer_mode = RelayerMode::Rational;
 
 			// so now we have:
 			// - 20..=23 with reward = cost
