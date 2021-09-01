@@ -148,7 +148,8 @@ impl Contains<Call> for BaseFilter {
 			Call::Multisig(_) |
 			Call::Bounties(_) |
 			Call::Tips(_) |
-			Call::ElectionProviderMultiPhase(_) => true,
+			Call::ElectionProviderMultiPhase(_) |
+			Call::BridgeKusamaGrandpa(_) => true,
 		}
 	}
 }
@@ -1035,6 +1036,30 @@ impl pallet_proxy::Config for Runtime {
 	type AnnouncementDepositFactor = AnnouncementDepositFactor;
 }
 
+parameter_types! {
+	/// This is a pretty unscientific cap.
+	///
+	/// Note that once this is hit the bridge GRANDPA pallet will essentially throttle incoming requests down to one
+	/// call per block.
+	pub const MaxBridgeGrandpaRequests: u32 = 50;
+	/// Number of headers to keep in bridge GRANDPA pallet.
+	///
+	/// Assuming the worst case of every header being finalized, we will keep headers at least for a
+	/// week.
+	pub const BridgeGrandpaHeadersToKeep: u32 = 7 * bp_kusama::DAYS as u32;
+}
+
+/// Instance of the with-Kusama bridge GRANDPA pallet.
+pub type KusamaGrandpaInstance = ();
+
+impl pallet_bridge_grandpa::Config for Runtime {
+	type BridgedChain = bp_kusama::Kusama;
+	type MaxRequests = MaxBridgeGrandpaRequests;
+	type HeadersToKeep = BridgeGrandpaHeadersToKeep;
+
+	type WeightInfo = pallet_bridge_grandpa::weights::RialtoWeight<Runtime>; // TODO
+}
+
 construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
@@ -1096,6 +1121,10 @@ construct_runtime! {
 		// Election pallet. Only works with staking, but placed here to maintain indices.
 		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 36,
 
+		// Bridge pallets to bridge with Kusama.
+		BridgeKusamaGrandpa: pallet_bridge_grandpa::{Pallet, Call, Storage, Config<T>} = 110,
+		//BridgeKusamaMessages: pallet_bridge_messages::{Pallet, Call, Storage, Event<T>, Config<T>} = 111,
+		//BridgeKusamaMessagesDispatch: pallet_bridge_dispatch::{Pallet, Event<T>} = 112,
 	}
 }
 
@@ -1292,6 +1321,17 @@ sp_api::impl_runtime_apis! {
 		) -> Result<(), mmr::Error> {
 			// dummy implementation due to lack of MMR pallet.
 			Err(mmr::Error::Verify)
+		}
+	}
+
+	impl bp_kusama::KusamaFinalityApi<Block> for Runtime {
+		fn best_finalized() -> (bp_kusama::BlockNumber, bp_kusama::Hash) {
+			let header = BridgeKusamaGrandpa::best_finalized();
+			(header.number, header.hash())
+		}
+
+		fn is_known_header(hash: bp_kusama::Hash) -> bool {
+			BridgeKusamaGrandpa::is_known_header(hash)
 		}
 	}
 
