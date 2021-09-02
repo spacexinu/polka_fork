@@ -977,6 +977,8 @@
 <span id="974">974</span>
 <span id="975">975</span>
 <span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1498,6 +1500,8 @@
 	<span class="kw">type</span> <span class="ident">XcmReserveTransferFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
 	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
 	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
+	<span class="kw">const</span> <span class="ident">VERSION_DISCOVERY_QUEUE_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
+	<span class="kw">type</span> <span class="ident">AdvertisedXcmVersion</span> <span class="op">=</span> <span class="ident">pallet_xcm::CurrentXcmVersion</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">parachains_hrmp::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
@@ -1520,7 +1524,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pallet_test_notifier</span> {
 	<span class="kw">use</span> <span class="ident">frame_support::pallet_prelude</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">frame_system::pallet_prelude</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">pallet_xcm</span>::{<span class="ident">ensure_response</span>, <span class="ident">QueryId</span>};
+	<span class="kw">use</span> <span class="ident">pallet_xcm::ensure_response</span>;
 	<span class="kw">use</span> <span class="ident">sp_runtime::DispatchResult</span>;
 	<span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
 

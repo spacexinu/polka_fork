@@ -445,6 +445,34 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -527,6 +555,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Response</span> {
 	<span class="doccomment">/// Some assets.</span>
 	<span class="ident">Assets</span>(<span class="ident">MultiAssets</span>),
+	<span class="doccomment">/// An XCM version.</span>
+	<span class="ident">Version</span>(<span class="kw">super</span><span class="ident">::Version</span>),
 }
 
 <span class="doccomment">/// Cross-Consensus Message: A message from one consensus system to another.</span>
@@ -718,6 +748,25 @@
 	<span class="doccomment">/// Errors:</span>
 	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">10</span>)]</span>
 	<span class="ident">RelayedFrom</span> { <span class="ident">who</span>: <span class="ident">InteriorMultiLocation</span>, <span class="ident">message</span>: <span class="ident">alloc::boxed::Box</span><span class="op">&lt;</span><span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> },
+
+	<span class="doccomment">/// Ask the destination system to respond with the most recent version of XCM that they</span>
+	<span class="doccomment">/// support in a `QueryResponse` instruction. Any changes to this should also elicit similar</span>
+	<span class="doccomment">/// responses when they happen.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">11</span>)]</span>
+	<span class="ident">SubscribeVersion</span> {
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
+		<span class="ident">query_id</span>: <span class="ident">u64</span>,
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
+		<span class="ident">max_response_weight</span>: <span class="ident">u64</span>,
+	},
+
+	<span class="doccomment">/// Cancel the effect of a previous `SubscribeVersion` instruction.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">12</span>)]</span>
+	<span class="ident">UnsubscribeVersion</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
@@ -750,6 +799,9 @@
 				<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span>: <span class="ident">call</span>.<span class="ident">into</span>() },
 			<span class="ident">RelayedFrom</span> { <span class="ident">who</span>, <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">RelayedFrom</span> { <span class="ident">who</span>, <span class="ident">message</span>: <span class="ident">alloc::boxed::Box::new</span>((<span class="kw-2">*</span><span class="ident">message</span>).<span class="ident">into</span>()) },
+			<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> },
+			<span class="ident">UnsubscribeVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">UnsubscribeVersion</span>,
 		}
 	}
 }
@@ -875,6 +927,9 @@
 				<span class="ident">HrmpChannelClosing</span> { <span class="ident">initiator</span>, <span class="ident">sender</span>, <span class="ident">recipient</span> },
 			<span class="ident">Instruction::Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span> },
+			<span class="ident">Instruction::SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> },
+			<span class="ident">Instruction::UnsubscribeVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">UnsubscribeVersion</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
 		})
 	}
@@ -886,6 +941,7 @@
 	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">response</span>: <span class="ident">NewResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, ()<span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="ident">response</span> {
 			<span class="ident">NewResponse::Assets</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Assets</span>(<span class="ident">assets</span>)),
+			<span class="ident">NewResponse::Version</span>(<span class="ident">version</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Version</span>(<span class="ident">version</span>)),
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
 		}
 	}

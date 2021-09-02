@@ -1954,6 +1954,8 @@
 <span id="1951">1951</span>
 <span id="1952">1952</span>
 <span id="1953">1953</span>
+<span id="1954">1954</span>
+<span id="1955">1955</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3264,6 +3266,7 @@
 	<span class="kw">type</span> <span class="ident">ResponseHandler</span> <span class="op">=</span> <span class="ident">XcmPallet</span>;
 	<span class="kw">type</span> <span class="ident">AssetTrap</span> <span class="op">=</span> <span class="ident">XcmPallet</span>;
 	<span class="kw">type</span> <span class="ident">AssetClaims</span> <span class="op">=</span> <span class="ident">XcmPallet</span>;
+	<span class="kw">type</span> <span class="ident">SubscriptionService</span> <span class="op">=</span> <span class="ident">XcmPallet</span>;
 }
 
 <span class="macro">parameter_types!</span> {
@@ -3283,7 +3286,6 @@
 	<span class="comment">// And a usual Signed origin to be used in XCM as a corresponding AccountId32</span>
 	<span class="ident">SignedToAccountId32</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">AccountId</span>, <span class="ident">KusamaNetwork</span><span class="op">&gt;</span>,
 );
-
 <span class="kw">impl</span> <span class="ident">pallet_xcm::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
 	<span class="kw">type</span> <span class="ident">SendXcmOrigin</span> <span class="op">=</span> <span class="ident">xcm_builder::EnsureXcmOrigin</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">LocalOriginToLocation</span><span class="op">&gt;</span>;
@@ -3299,6 +3301,8 @@
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">LocationInverter</span><span class="op">&lt;</span><span class="ident">Ancestry</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
 	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
+	<span class="kw">const</span> <span class="ident">VERSION_DISCOVERY_QUEUE_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
+	<span class="kw">type</span> <span class="ident">AdvertisedXcmVersion</span> <span class="op">=</span> <span class="ident">pallet_xcm::CurrentXcmVersion</span>;
 }
 
 <span class="macro">parameter_types!</span> {

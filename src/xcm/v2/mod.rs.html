@@ -816,6 +816,50 @@
 <span id="813">813</span>
 <span id="814">814</span>
 <span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Cumulus.</span>
@@ -855,6 +899,12 @@
 	<span class="ident">InteriorMultiLocation</span>, <span class="ident">Junction</span>, <span class="ident">Junctions</span>, <span class="ident">MultiAsset</span>, <span class="ident">MultiAssetFilter</span>, <span class="ident">MultiAssets</span>,
 	<span class="ident">MultiLocation</span>, <span class="ident">NetworkId</span>, <span class="ident">OriginKind</span>, <span class="ident">Parent</span>, <span class="ident">ParentThen</span>, <span class="ident">WildFungibility</span>, <span class="ident">WildMultiAsset</span>,
 };
+
+<span class="doccomment">/// This module&#39;s XCM version.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw">super</span><span class="ident">::Version</span> <span class="op">=</span> <span class="number">2</span>;
+
+<span class="doccomment">/// An identifier for a query.</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">QueryId</span> <span class="op">=</span> <span class="ident">u64</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Default</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Eq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">PartialEq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
@@ -935,11 +985,12 @@
 			<span class="ident">MultiAssetFilter</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
 			<span class="ident">MultiAssets</span>, <span class="ident">MultiLocation</span>,
 			<span class="ident">NetworkId</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
-			<span class="ident">OriginKind</span>, <span class="ident">Outcome</span>, <span class="ident">Parent</span>, <span class="ident">ParentThen</span>, <span class="ident">Response</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">XcmResult</span>, <span class="ident">SendError</span>,
-			<span class="ident">SendResult</span>, <span class="ident">SendXcm</span>,
+			<span class="ident">OriginKind</span>, <span class="ident">Outcome</span>, <span class="ident">Parent</span>, <span class="ident">ParentThen</span>, <span class="ident">QueryId</span>, <span class="ident">Response</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">XcmResult</span>,
+			<span class="ident">SendError</span>, <span class="ident">SendResult</span>, <span class="ident">SendXcm</span>,
 			<span class="ident">WeightLimit</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
 			<span class="ident">WildFungibility</span>::{<span class="self">self</span>, <span class="ident">Fungible</span> <span class="kw">as</span> <span class="ident">WildFungible</span>, <span class="ident">NonFungible</span> <span class="kw">as</span> <span class="ident">WildNonFungible</span>},
 			<span class="ident">WildMultiAsset</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
+			<span class="ident">VERSION</span> <span class="kw">as</span> <span class="ident">XCM_VERSION</span>,
 		};
 	}
 	<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Instruction</span>, <span class="ident">Xcm</span>};
@@ -961,6 +1012,8 @@
 	<span class="ident">Assets</span>(<span class="ident">MultiAssets</span>),
 	<span class="doccomment">/// The outcome of an XCM instruction.</span>
 	<span class="ident">ExecutionResult</span>(<span class="ident">result::Result</span><span class="op">&lt;</span>(), (<span class="ident">u32</span>, <span class="ident">Error</span>)<span class="op">&gt;</span>),
+	<span class="doccomment">/// An XCM version.</span>
+	<span class="ident">Version</span>(<span class="kw">super</span><span class="ident">::Version</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Response</span> {
@@ -1058,7 +1111,7 @@
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">QueryResponse</span> {
 		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
-		<span class="ident">query_id</span>: <span class="ident">u64</span>,
+		<span class="ident">query_id</span>: <span class="ident">QueryId</span>,
 		<span class="ident">response</span>: <span class="ident">Response</span>,
 		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
 		<span class="ident">max_weight</span>: <span class="ident">u64</span>,
@@ -1110,7 +1163,12 @@
 	<span class="doccomment">/// Kind: *Instruction*.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
-	<span class="ident">Transact</span> { <span class="ident">origin_type</span>: <span class="ident">OriginKind</span>, <span class="ident">require_weight_at_most</span>: <span class="ident">u64</span>, <span class="ident">call</span>: <span class="ident">DoubleEncoded</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> },
+	<span class="ident">Transact</span> {
+		<span class="ident">origin_type</span>: <span class="ident">OriginKind</span>,
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
+		<span class="ident">require_weight_at_most</span>: <span class="ident">u64</span>,
+		<span class="ident">call</span>: <span class="ident">DoubleEncoded</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>,
+	},
 
 	<span class="doccomment">/// A message to notify about a new incoming HRMP channel. This message is meant to be sent by the</span>
 	<span class="doccomment">/// relay-chain to a para.</span>
@@ -1196,7 +1254,7 @@
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">ReportError</span> {
 		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
-		<span class="ident">query_id</span>: <span class="ident">u64</span>,
+		<span class="ident">query_id</span>: <span class="ident">QueryId</span>,
 		<span class="ident">dest</span>: <span class="ident">MultiLocation</span>,
 		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
 		<span class="ident">max_response_weight</span>: <span class="ident">u64</span>,
@@ -1214,7 +1272,12 @@
 	<span class="doccomment">/// Kind: *Instruction*</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
-	<span class="ident">DepositAsset</span> { <span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>, <span class="ident">max_assets</span>: <span class="ident">u32</span>, <span class="ident">beneficiary</span>: <span class="ident">MultiLocation</span> },
+	<span class="ident">DepositAsset</span> {
+		<span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>,
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
+		<span class="ident">max_assets</span>: <span class="ident">u32</span>,
+		<span class="ident">beneficiary</span>: <span class="ident">MultiLocation</span>,
+	},
 
 	<span class="doccomment">/// Remove the asset(s) (`assets`) from the Holding Register and place equivalent assets under</span>
 	<span class="doccomment">/// the ownership of `dest` within this consensus system (i.e. deposit them into its sovereign</span>
@@ -1237,6 +1300,7 @@
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">DepositReserveAsset</span> {
 		<span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>,
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
 		<span class="ident">max_assets</span>: <span class="ident">u32</span>,
 		<span class="ident">dest</span>: <span class="ident">MultiLocation</span>,
 		<span class="ident">xcm</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
@@ -1306,7 +1370,7 @@
 	<span class="doccomment">/// Errors:</span>
 	<span class="ident">QueryHolding</span> {
 		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
-		<span class="ident">query_id</span>: <span class="ident">u64</span>,
+		<span class="ident">query_id</span>: <span class="ident">QueryId</span>,
 		<span class="ident">dest</span>: <span class="ident">MultiLocation</span>,
 		<span class="ident">assets</span>: <span class="ident">MultiAssetFilter</span>,
 		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
@@ -1390,7 +1454,24 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Errors:</span>
 	<span class="doccomment">/// - `Trap`: All circumstances, whose inner value is the same as this item&#39;s inner value.</span>
-	<span class="ident">Trap</span>(<span class="ident">u64</span>),
+	<span class="ident">Trap</span>(<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span> <span class="ident">u64</span>),
+
+	<span class="doccomment">/// Ask the destination system to respond with the most recent version of XCM that they</span>
+	<span class="doccomment">/// support in a `QueryResponse` instruction. Any changes to this should also elicit similar</span>
+	<span class="doccomment">/// responses when they happen.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="ident">SubscribeVersion</span> {
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
+		<span class="ident">query_id</span>: <span class="ident">QueryId</span>,
+		<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">compact</span>)]</span>
+		<span class="ident">max_response_weight</span>: <span class="ident">u64</span>,
+	},
+
+	<span class="doccomment">/// Cancel the effect of a previous `SubscribeVersion` instruction.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Kind: *Instruction*</span>
+	<span class="ident">UnsubscribeVersion</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
@@ -1445,6 +1526,9 @@
 			<span class="ident">ClearError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ClearError</span>,
 			<span class="ident">ClaimAsset</span> { <span class="ident">assets</span>, <span class="ident">ticket</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ClaimAsset</span> { <span class="ident">assets</span>, <span class="ident">ticket</span> },
 			<span class="ident">Trap</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trap</span>(<span class="ident">code</span>),
+			<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> },
+			<span class="ident">UnsubscribeVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">UnsubscribeVersion</span>,
 		}
 	}
 }
@@ -1465,6 +1549,7 @@
 	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">old_response</span>: <span class="ident">OldResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, ()<span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="ident">old_response</span> {
 			<span class="ident">OldResponse::Assets</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Assets</span>(<span class="ident">assets</span>)),
+			<span class="ident">OldResponse::Version</span>(<span class="ident">version</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Version</span>(<span class="ident">version</span>)),
 		}
 	}
 }
@@ -1514,6 +1599,9 @@
 				<span class="macro">vec!</span>[<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span> }],
 			<span class="comment">// We don&#39;t handle this one at all due to nested XCM.</span>
 			<span class="ident">OldXcm::RelayedFrom</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+			<span class="ident">OldXcm::SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="macro">vec!</span>[<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> }],
+			<span class="ident">OldXcm::UnsubscribeVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">UnsubscribeVersion</span>],
 		}))
 	}
 }
