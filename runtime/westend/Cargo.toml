@@ -17,7 +17,7 @@ static_assertions = "1.1.0"
 
 authority-discovery-primitives = { package = "sp-authority-discovery", git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 babe-primitives = { package = "sp-consensus-babe", git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-beefy-primitives = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "polkadot-v0.9.9" }
+beefy-primitives = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "cmichi-tmp-experiment" }
 inherents = { package = "sp-inherents", git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 offchain-primitives = { package = "sp-offchain", git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 sp-api = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
