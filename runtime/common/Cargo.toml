@@ -35,7 +35,7 @@ pallet-offences = { git = "https://github.com/paritytech/substrate", default-fea
 pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-treasury = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-election-provider-multi-phase = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-pallet-beefy-mmr = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "cmichi-tmp-experiment" }
+pallet-beefy-mmr = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
 
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, optional = true , branch = "cmichi-tmp-experiment" }
 pallet-babe = { git = "https://github.com/paritytech/substrate", default-features=false, optional = true , branch = "cmichi-tmp-experiment" }

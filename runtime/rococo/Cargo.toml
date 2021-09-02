@@ -29,13 +29,13 @@ inherents = { package = "sp-inherents", git = "https://github.com/paritytech/sub
 offchain-primitives = { package = "sp-offchain", git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 
 babe-primitives = { package = "sp-consensus-babe", git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-beefy-primitives = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "cmichi-tmp-experiment" }
+beefy-primitives = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
 frame-executive = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-authority-discovery = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-authorship = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-babe = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-pallet-beefy = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "cmichi-tmp-experiment" }
-pallet-beefy-mmr = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "cmichi-tmp-experiment" }
+pallet-beefy = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+pallet-beefy-mmr = { git = "https://github.com/paritytech/grandpa-bridge-gadget", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
 pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-collective = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
