@@ -1539,6 +1539,13 @@
 <span id="1536">1536</span>
 <span id="1537">1537</span>
 <span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1607,9 +1614,9 @@
 <span class="kw">use</span> <span class="ident">sp_version::RuntimeVersion</span>;
 
 <span class="kw">use</span> <span class="ident">runtime_parachains</span>::{
-	<span class="ident">configuration</span> <span class="kw">as</span> <span class="ident">parachains_configuration</span>, <span class="ident">dmp</span> <span class="kw">as</span> <span class="ident">parachains_dmp</span>, <span class="ident">hrmp</span> <span class="kw">as</span> <span class="ident">parachains_hrmp</span>,
-	<span class="ident">inclusion</span> <span class="kw">as</span> <span class="ident">parachains_inclusion</span>, <span class="ident">initializer</span> <span class="kw">as</span> <span class="ident">parachains_initializer</span>,
-	<span class="ident">origin</span> <span class="kw">as</span> <span class="ident">parachains_origin</span>, <span class="ident">paras</span> <span class="kw">as</span> <span class="ident">parachains_paras</span>,
+	<span class="ident">configuration</span> <span class="kw">as</span> <span class="ident">parachains_configuration</span>, <span class="ident">disputes</span> <span class="kw">as</span> <span class="ident">parachains_disputes</span>,
+	<span class="ident">dmp</span> <span class="kw">as</span> <span class="ident">parachains_dmp</span>, <span class="ident">hrmp</span> <span class="kw">as</span> <span class="ident">parachains_hrmp</span>, <span class="ident">inclusion</span> <span class="kw">as</span> <span class="ident">parachains_inclusion</span>,
+	<span class="ident">initializer</span> <span class="kw">as</span> <span class="ident">parachains_initializer</span>, <span class="ident">origin</span> <span class="kw">as</span> <span class="ident">parachains_origin</span>, <span class="ident">paras</span> <span class="kw">as</span> <span class="ident">parachains_paras</span>,
 	<span class="ident">paras_inherent</span> <span class="kw">as</span> <span class="ident">parachains_paras_inherent</span>, <span class="ident">scheduler</span> <span class="kw">as</span> <span class="ident">parachains_scheduler</span>,
 	<span class="ident">session_info</span> <span class="kw">as</span> <span class="ident">parachains_session_info</span>, <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">parachains_shared</span>, <span class="ident">ump</span> <span class="kw">as</span> <span class="ident">parachains_ump</span>,
 };
@@ -1765,6 +1772,7 @@
 		<span class="ident">Ump</span>: <span class="ident">parachains_ump</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span>},
 		<span class="ident">Hrmp</span>: <span class="ident">parachains_hrmp</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Config</span>},
 		<span class="ident">ParaSessionInfo</span>: <span class="ident">parachains_session_info</span>::{<span class="ident">Pallet</span>, <span class="ident">Storage</span>},
+		<span class="ident">ParasDisputes</span>: <span class="ident">parachains_disputes</span>::{<span class="ident">Pallet</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
 
 		<span class="comment">// Parachain Onboarding Pallets</span>
 		<span class="ident">Registrar</span>: <span class="ident">paras_registrar</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
@@ -1916,6 +1924,12 @@
 <span class="kw">impl</span> <span class="ident">pallet_session::historical::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 	<span class="kw">type</span> <span class="ident">FullIdentification</span> <span class="op">=</span> ();
 	<span class="kw">type</span> <span class="ident">FullIdentificationOf</span> <span class="op">=</span> <span class="ident">FullIdentificationOf</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">parachains_disputes::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
+	<span class="kw">type</span> <span class="ident">RewardValidators</span> <span class="op">=</span> ();
+	<span class="kw">type</span> <span class="ident">PunishValidators</span> <span class="op">=</span> ();
 }
 
 <span class="macro">parameter_types!</span> {
