@@ -2870,22 +2870,22 @@
 		<span class="ident">configuration</span>: <span class="ident">rococo_runtime::ConfigurationConfig</span> {
 			<span class="ident">config</span>: <span class="ident">default_parachains_host_configuration</span>(),
 		},
-		<span class="ident">bridge_rococo_grandpa</span>: <span class="ident">rococo_runtime::BridgeRococoGrandpaConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">endowed_accounts</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
-		<span class="ident">bridge_wococo_grandpa</span>: <span class="ident">rococo_runtime::BridgeWococoGrandpaConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">endowed_accounts</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
-		<span class="ident">bridge_rococo_messages</span>: <span class="ident">rococo_runtime::BridgeRococoMessagesConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">endowed_accounts</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
-		<span class="ident">bridge_wococo_messages</span>: <span class="ident">rococo_runtime::BridgeWococoMessagesConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">endowed_accounts</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
+		<span class="comment">// bridge_rococo_grandpa: rococo_runtime::BridgeRococoGrandpaConfig {</span>
+		<span class="comment">// 	owner: Some(endowed_accounts[0].clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
+		<span class="comment">// bridge_wococo_grandpa: rococo_runtime::BridgeWococoGrandpaConfig {</span>
+		<span class="comment">// 	owner: Some(endowed_accounts[0].clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
+		<span class="comment">// bridge_rococo_messages: rococo_runtime::BridgeRococoMessagesConfig {</span>
+		<span class="comment">// 	owner: Some(endowed_accounts[0].clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
+		<span class="comment">// bridge_wococo_messages: rococo_runtime::BridgeWococoMessagesConfig {</span>
+		<span class="comment">// 	owner: Some(endowed_accounts[0].clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
 	}
 }
 
@@ -3369,22 +3369,22 @@
 		},
 		<span class="ident">hrmp</span>: <span class="ident">Default::default</span>(),
 		<span class="ident">paras</span>: <span class="ident">rococo_runtime::ParasConfig</span> { <span class="ident">paras</span>: <span class="macro">vec!</span>[] },
-		<span class="ident">bridge_rococo_grandpa</span>: <span class="ident">rococo_runtime::BridgeRococoGrandpaConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">root_key</span>.<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
-		<span class="ident">bridge_wococo_grandpa</span>: <span class="ident">rococo_runtime::BridgeWococoGrandpaConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">root_key</span>.<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
-		<span class="ident">bridge_rococo_messages</span>: <span class="ident">rococo_runtime::BridgeRococoMessagesConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">root_key</span>.<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
-		<span class="ident">bridge_wococo_messages</span>: <span class="ident">rococo_runtime::BridgeWococoMessagesConfig</span> {
-			<span class="ident">owner</span>: <span class="prelude-val">Some</span>(<span class="ident">root_key</span>.<span class="ident">clone</span>()),
-			..<span class="ident">Default::default</span>()
-		},
+		<span class="comment">// bridge_rococo_grandpa: rococo_runtime::BridgeRococoGrandpaConfig {</span>
+		<span class="comment">// 	owner: Some(root_key.clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
+		<span class="comment">// bridge_wococo_grandpa: rococo_runtime::BridgeWococoGrandpaConfig {</span>
+		<span class="comment">// 	owner: Some(root_key.clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
+		<span class="comment">// bridge_rococo_messages: rococo_runtime::BridgeRococoMessagesConfig {</span>
+		<span class="comment">// 	owner: Some(root_key.clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
+		<span class="comment">// bridge_wococo_messages: rococo_runtime::BridgeWococoMessagesConfig {</span>
+		<span class="comment">// 	owner: Some(root_key.clone()),</span>
+		<span class="comment">// 	..Default::default()</span>
+		<span class="comment">// },</span>
 	}
 }
 

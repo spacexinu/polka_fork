@@ -1621,9 +1621,9 @@
 	<span class="ident">session_info</span> <span class="kw">as</span> <span class="ident">parachains_session_info</span>, <span class="ident">shared</span> <span class="kw">as</span> <span class="ident">parachains_shared</span>, <span class="ident">ump</span> <span class="kw">as</span> <span class="ident">parachains_ump</span>,
 };
 
-<span class="kw">use</span> <span class="ident">bridge_runtime_common::messages</span>::{
-	<span class="ident">source::estimate_message_dispatch_and_delivery_fee</span>, <span class="ident">MessageBridge</span>,
-};
+<span class="comment">// use bridge_runtime_common::messages::{</span>
+<span class="comment">// 	source::estimate_message_dispatch_and_delivery_fee, MessageBridge,</span>
+<span class="comment">// };</span>
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet_balances::Call</span> <span class="kw">as</span> <span class="ident">BalancesCall</span>;
 
@@ -1640,7 +1640,7 @@
 };
 <span class="kw">use</span> <span class="ident">xcm_executor::XcmExecutor</span>;
 
-<span class="kw">mod</span> <span class="ident">bridge_messages</span>;
+<span class="comment">//mod bridge_messages;</span>
 <span class="doccomment">/// Constant values used within the runtime.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
 <span class="kw">mod</span> <span class="ident">validator_manager</span>;
@@ -1652,9 +1652,9 @@
 <span class="doccomment">/// Runtime version (Rococo).</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="ident">RuntimeVersion</span> <span class="op">=</span> <span class="ident">RuntimeVersion</span> {
 	<span class="ident">spec_name</span>: <span class="macro">create_runtime_str!</span>(<span class="string">&quot;rococo&quot;</span>),
-	<span class="ident">impl_name</span>: <span class="macro">create_runtime_str!</span>(<span class="string">&quot;parity-rococo-v1.6&quot;</span>),
+	<span class="ident">impl_name</span>: <span class="macro">create_runtime_str!</span>(<span class="string">&quot;parity-rococo-v1.7&quot;</span>),
 	<span class="ident">authoring_version</span>: <span class="number">0</span>,
-	<span class="ident">spec_version</span>: <span class="number">9100</span>,
+	<span class="ident">spec_version</span>: <span class="number">9101</span>,
 	<span class="ident">impl_version</span>: <span class="number">0</span>,
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disable-runtime-api&quot;</span>))]</span>
 	<span class="ident">apis</span>: <span class="ident">RUNTIME_API_VERSIONS</span>,
@@ -1792,18 +1792,18 @@
 		<span class="comment">// It might seem strange that we add both sides of the bridge to the same runtime. We do this because this</span>
 		<span class="comment">// runtime as shared by both the Rococo and Wococo chains. When running as Rococo we only use</span>
 		<span class="comment">// `BridgeWococoGrandpa`, and vice versa.</span>
-		<span class="ident">BridgeRococoGrandpa</span>: <span class="ident">pallet_bridge_grandpa</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">40</span>,
-		<span class="ident">BridgeWococoGrandpa</span>: <span class="ident">pallet_bridge_grandpa</span>::<span class="op">&lt;</span><span class="ident">Instance1</span><span class="op">&gt;</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">41</span>,
+		<span class="comment">// BridgeRococoGrandpa: pallet_bridge_grandpa::{Pallet, Call, Storage, Config&lt;T&gt;} = 40,</span>
+		<span class="comment">// BridgeWococoGrandpa: pallet_bridge_grandpa::&lt;Instance1&gt;::{Pallet, Call, Storage, Config&lt;T&gt;} = 41,</span>
 
 		<span class="comment">// Validator Manager pallet.</span>
 		<span class="ident">ValidatorManager</span>: <span class="ident">validator_manager</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
 
 		<span class="comment">// Bridge messages support. The same story as with the bridge grandpa pallet above ^^^ - when we&#39;re</span>
 		<span class="comment">// running as Rococo we only use `BridgeWococoMessages`/`BridgeWococoMessagesDispatch`, and vice versa.</span>
-		<span class="ident">BridgeRococoMessages</span>: <span class="ident">pallet_bridge_messages</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">43</span>,
-		<span class="ident">BridgeWococoMessages</span>: <span class="ident">pallet_bridge_messages</span>::<span class="op">&lt;</span><span class="ident">Instance1</span><span class="op">&gt;</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">44</span>,
-		<span class="ident">BridgeRococoMessagesDispatch</span>: <span class="ident">pallet_bridge_dispatch</span>::{<span class="ident">Pallet</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">45</span>,
-		<span class="ident">BridgeWococoMessagesDispatch</span>: <span class="ident">pallet_bridge_dispatch</span>::<span class="op">&lt;</span><span class="ident">Instance1</span><span class="op">&gt;</span>::{<span class="ident">Pallet</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">46</span>,
+		<span class="comment">// BridgeRococoMessages: pallet_bridge_messages::{Pallet, Call, Storage, Event&lt;T&gt;, Config&lt;T&gt;} = 43,</span>
+		<span class="comment">// BridgeWococoMessages: pallet_bridge_messages::&lt;Instance1&gt;::{Pallet, Call, Storage, Event&lt;T&gt;, Config&lt;T&gt;} = 44,</span>
+		<span class="comment">// BridgeRococoMessagesDispatch: pallet_bridge_dispatch::{Pallet, Event&lt;T&gt;} = 45,</span>
+		<span class="comment">// BridgeWococoMessagesDispatch: pallet_bridge_dispatch::&lt;Instance1&gt;::{Pallet, Event&lt;T&gt;} = 46,</span>
 
 		<span class="comment">// A &quot;council&quot;</span>
 		<span class="ident">Collective</span>: <span class="ident">pallet_collective</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Origin</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">80</span>,
@@ -2364,144 +2364,144 @@
 	<span class="kw">type</span> <span class="ident">ParachainHeads</span> <span class="op">=</span> <span class="ident">ParasProvider</span>;
 }
 
-<span class="macro">parameter_types!</span> {
-	<span class="doccomment">/// This is a pretty unscientific cap.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that once this is hit the pallet will essentially throttle incoming requests down to one</span>
-	<span class="doccomment">/// call per block.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxRequests</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span> <span class="op">*</span> <span class="ident">HOURS</span> <span class="kw">as</span> <span class="ident">u32</span>;
+<span class="comment">// parameter_types! {</span>
+<span class="comment">// 	/// This is a pretty unscientific cap.</span>
+<span class="comment">// 	///</span>
+<span class="comment">// 	/// Note that once this is hit the pallet will essentially throttle incoming requests down to one</span>
+<span class="comment">// 	/// call per block.</span>
+<span class="comment">// 	pub const MaxRequests: u32 = 4 * HOURS as u32;</span>
 
-	<span class="doccomment">/// Number of headers to keep.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Assuming the worst case of every header being finalized, we will keep headers at least for a</span>
-	<span class="doccomment">/// week.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HeadersToKeep</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">7</span> <span class="op">*</span> <span class="ident">DAYS</span> <span class="kw">as</span> <span class="ident">u32</span>;
-}
+<span class="comment">// 	/// Number of headers to keep.</span>
+<span class="comment">// 	///</span>
+<span class="comment">// 	/// Assuming the worst case of every header being finalized, we will keep headers at least for a</span>
+<span class="comment">// 	/// week.</span>
+<span class="comment">// 	pub const HeadersToKeep: u32 = 7 * DAYS as u32;</span>
+<span class="comment">// }</span>
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RococoGrandpaInstance</span> <span class="op">=</span> ();
-<span class="kw">impl</span> <span class="ident">pallet_bridge_grandpa::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">BridgedChain</span> <span class="op">=</span> <span class="ident">bp_rococo::Rococo</span>;
-	<span class="kw">type</span> <span class="ident">MaxRequests</span> <span class="op">=</span> <span class="ident">MaxRequests</span>;
-	<span class="kw">type</span> <span class="ident">HeadersToKeep</span> <span class="op">=</span> <span class="ident">HeadersToKeep</span>;
+<span class="comment">// pub type RococoGrandpaInstance = ();</span>
+<span class="comment">// impl pallet_bridge_grandpa::Config for Runtime {</span>
+<span class="comment">// 	type BridgedChain = bp_rococo::Rococo;</span>
+<span class="comment">// 	type MaxRequests = MaxRequests;</span>
+<span class="comment">// 	type HeadersToKeep = HeadersToKeep;</span>
 
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">pallet_bridge_grandpa::weights::RialtoWeight</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
-}
+<span class="comment">// 	type WeightInfo = pallet_bridge_grandpa::weights::RialtoWeight&lt;Runtime&gt;;</span>
+<span class="comment">// }</span>
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">WococoGrandpaInstance</span> <span class="op">=</span> <span class="ident">pallet_bridge_grandpa::Instance1</span>;
-<span class="kw">impl</span> <span class="ident">pallet_bridge_grandpa::Config</span><span class="op">&lt;</span><span class="ident">WococoGrandpaInstance</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">BridgedChain</span> <span class="op">=</span> <span class="ident">bp_wococo::Wococo</span>;
-	<span class="kw">type</span> <span class="ident">MaxRequests</span> <span class="op">=</span> <span class="ident">MaxRequests</span>;
-	<span class="kw">type</span> <span class="ident">HeadersToKeep</span> <span class="op">=</span> <span class="ident">HeadersToKeep</span>;
+<span class="comment">// pub type WococoGrandpaInstance = pallet_bridge_grandpa::Instance1;</span>
+<span class="comment">// impl pallet_bridge_grandpa::Config&lt;WococoGrandpaInstance&gt; for Runtime {</span>
+<span class="comment">// 	type BridgedChain = bp_wococo::Wococo;</span>
+<span class="comment">// 	type MaxRequests = MaxRequests;</span>
+<span class="comment">// 	type HeadersToKeep = HeadersToKeep;</span>
 
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">pallet_bridge_grandpa::weights::RialtoWeight</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
-}
+<span class="comment">// 	type WeightInfo = pallet_bridge_grandpa::weights::RialtoWeight&lt;Runtime&gt;;</span>
+<span class="comment">// }</span>
 
-<span class="comment">// Instance that is &quot;deployed&quot; at Wococo chain. Responsible for dispatching Rococo -&gt; Wococo messages.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AtWococoFromRococoMessagesDispatch</span> <span class="op">=</span> <span class="ident">pallet_bridge_dispatch::DefaultInstance</span>;
-<span class="kw">impl</span> <span class="ident">pallet_bridge_dispatch::Config</span><span class="op">&lt;</span><span class="ident">AtWococoFromRococoMessagesDispatch</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
-	<span class="kw">type</span> <span class="ident">MessageId</span> <span class="op">=</span> (<span class="ident">bp_messages::LaneId</span>, <span class="ident">bp_messages::MessageNonce</span>);
-	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
-	<span class="kw">type</span> <span class="ident">CallFilter</span> <span class="op">=</span> <span class="ident">frame_support::traits::Everything</span>;
-	<span class="kw">type</span> <span class="ident">EncodedCall</span> <span class="op">=</span> <span class="ident">bridge_messages::FromRococoEncodedCall</span>;
-	<span class="kw">type</span> <span class="ident">SourceChainAccountId</span> <span class="op">=</span> <span class="ident">bp_wococo::AccountId</span>;
-	<span class="kw">type</span> <span class="ident">TargetChainAccountPublic</span> <span class="op">=</span> <span class="ident">sp_runtime::MultiSigner</span>;
-	<span class="kw">type</span> <span class="ident">TargetChainSignature</span> <span class="op">=</span> <span class="ident">sp_runtime::MultiSignature</span>;
-	<span class="kw">type</span> <span class="ident">AccountIdConverter</span> <span class="op">=</span> <span class="ident">bp_rococo::AccountIdConverter</span>;
-}
+<span class="comment">// // Instance that is &quot;deployed&quot; at Wococo chain. Responsible for dispatching Rococo -&gt; Wococo messages.</span>
+<span class="comment">// pub type AtWococoFromRococoMessagesDispatch = pallet_bridge_dispatch::DefaultInstance;</span>
+<span class="comment">// impl pallet_bridge_dispatch::Config&lt;AtWococoFromRococoMessagesDispatch&gt; for Runtime {</span>
+<span class="comment">// 	type Event = Event;</span>
+<span class="comment">// 	type MessageId = (bp_messages::LaneId, bp_messages::MessageNonce);</span>
+<span class="comment">// 	type Call = Call;</span>
+<span class="comment">// 	type CallFilter = frame_support::traits::Everything;</span>
+<span class="comment">// 	type EncodedCall = bridge_messages::FromRococoEncodedCall;</span>
+<span class="comment">// 	type SourceChainAccountId = bp_wococo::AccountId;</span>
+<span class="comment">// 	type TargetChainAccountPublic = sp_runtime::MultiSigner;</span>
+<span class="comment">// 	type TargetChainSignature = sp_runtime::MultiSignature;</span>
+<span class="comment">// 	type AccountIdConverter = bp_rococo::AccountIdConverter;</span>
+<span class="comment">// }</span>
 
-<span class="comment">// Instance that is &quot;deployed&quot; at Rococo chain. Responsible for dispatching Wococo -&gt; Rococo messages.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AtRococoFromWococoMessagesDispatch</span> <span class="op">=</span> <span class="ident">pallet_bridge_dispatch::Instance1</span>;
-<span class="kw">impl</span> <span class="ident">pallet_bridge_dispatch::Config</span><span class="op">&lt;</span><span class="ident">AtRococoFromWococoMessagesDispatch</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
-	<span class="kw">type</span> <span class="ident">MessageId</span> <span class="op">=</span> (<span class="ident">bp_messages::LaneId</span>, <span class="ident">bp_messages::MessageNonce</span>);
-	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
-	<span class="kw">type</span> <span class="ident">CallFilter</span> <span class="op">=</span> <span class="ident">frame_support::traits::Everything</span>;
-	<span class="kw">type</span> <span class="ident">EncodedCall</span> <span class="op">=</span> <span class="ident">bridge_messages::FromWococoEncodedCall</span>;
-	<span class="kw">type</span> <span class="ident">SourceChainAccountId</span> <span class="op">=</span> <span class="ident">bp_rococo::AccountId</span>;
-	<span class="kw">type</span> <span class="ident">TargetChainAccountPublic</span> <span class="op">=</span> <span class="ident">sp_runtime::MultiSigner</span>;
-	<span class="kw">type</span> <span class="ident">TargetChainSignature</span> <span class="op">=</span> <span class="ident">sp_runtime::MultiSignature</span>;
-	<span class="kw">type</span> <span class="ident">AccountIdConverter</span> <span class="op">=</span> <span class="ident">bp_wococo::AccountIdConverter</span>;
-}
+<span class="comment">// // Instance that is &quot;deployed&quot; at Rococo chain. Responsible for dispatching Wococo -&gt; Rococo messages.</span>
+<span class="comment">// pub type AtRococoFromWococoMessagesDispatch = pallet_bridge_dispatch::Instance1;</span>
+<span class="comment">// impl pallet_bridge_dispatch::Config&lt;AtRococoFromWococoMessagesDispatch&gt; for Runtime {</span>
+<span class="comment">// 	type Event = Event;</span>
+<span class="comment">// 	type MessageId = (bp_messages::LaneId, bp_messages::MessageNonce);</span>
+<span class="comment">// 	type Call = Call;</span>
+<span class="comment">// 	type CallFilter = frame_support::traits::Everything;</span>
+<span class="comment">// 	type EncodedCall = bridge_messages::FromWococoEncodedCall;</span>
+<span class="comment">// 	type SourceChainAccountId = bp_rococo::AccountId;</span>
+<span class="comment">// 	type TargetChainAccountPublic = sp_runtime::MultiSigner;</span>
+<span class="comment">// 	type TargetChainSignature = sp_runtime::MultiSignature;</span>
+<span class="comment">// 	type AccountIdConverter = bp_wococo::AccountIdConverter;</span>
+<span class="comment">// }</span>
 
-<span class="macro">parameter_types!</span> {
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxMessagesToPruneAtOnce</span>: <span class="ident">bp_messages::MessageNonce</span> <span class="op">=</span> <span class="number">8</span>;
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxUnrewardedRelayerEntriesAtInboundLane</span>: <span class="ident">bp_messages::MessageNonce</span> <span class="op">=</span>
-		<span class="ident">bp_rococo::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE</span>;
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxUnconfirmedMessagesAtInboundLane</span>: <span class="ident">bp_messages::MessageNonce</span> <span class="op">=</span>
-		<span class="ident">bp_rococo::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE</span>;
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RootAccountForPayments</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-}
+<span class="comment">// parameter_types! {</span>
+<span class="comment">// 	pub const MaxMessagesToPruneAtOnce: bp_messages::MessageNonce = 8;</span>
+<span class="comment">// 	pub const MaxUnrewardedRelayerEntriesAtInboundLane: bp_messages::MessageNonce =</span>
+<span class="comment">// 		bp_rococo::MAX_UNREWARDED_RELAYER_ENTRIES_AT_INBOUND_LANE;</span>
+<span class="comment">// 	pub const MaxUnconfirmedMessagesAtInboundLane: bp_messages::MessageNonce =</span>
+<span class="comment">// 		bp_rococo::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;</span>
+<span class="comment">// 	pub const RootAccountForPayments: Option&lt;AccountId&gt; = None;</span>
+<span class="comment">// }</span>
 
-<span class="comment">// Instance that is &quot;deployed&quot; at Wococo chain. Responsible for sending Wococo -&gt; Rococo messages</span>
-<span class="comment">// and receiving Rococo -&gt; Wococo messages.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AtWococoWithRococoMessagesInstance</span> <span class="op">=</span> <span class="ident">pallet_bridge_messages::DefaultInstance</span>;
-<span class="kw">impl</span> <span class="ident">pallet_bridge_messages::Config</span><span class="op">&lt;</span><span class="ident">AtWococoWithRococoMessagesInstance</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">pallet_bridge_messages::weights::RialtoWeight</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
-	<span class="kw">type</span> <span class="ident">Parameter</span> <span class="op">=</span> ();
-	<span class="kw">type</span> <span class="ident">MaxMessagesToPruneAtOnce</span> <span class="op">=</span> <span class="ident">MaxMessagesToPruneAtOnce</span>;
-	<span class="kw">type</span> <span class="ident">MaxUnrewardedRelayerEntriesAtInboundLane</span> <span class="op">=</span> <span class="ident">MaxUnrewardedRelayerEntriesAtInboundLane</span>;
-	<span class="kw">type</span> <span class="ident">MaxUnconfirmedMessagesAtInboundLane</span> <span class="op">=</span> <span class="ident">MaxUnconfirmedMessagesAtInboundLane</span>;
+<span class="comment">// // Instance that is &quot;deployed&quot; at Wococo chain. Responsible for sending Wococo -&gt; Rococo messages</span>
+<span class="comment">// // and receiving Rococo -&gt; Wococo messages.</span>
+<span class="comment">// pub type AtWococoWithRococoMessagesInstance = pallet_bridge_messages::DefaultInstance;</span>
+<span class="comment">// impl pallet_bridge_messages::Config&lt;AtWococoWithRococoMessagesInstance&gt; for Runtime {</span>
+<span class="comment">// 	type Event = Event;</span>
+<span class="comment">// 	type WeightInfo = pallet_bridge_messages::weights::RialtoWeight&lt;Runtime&gt;;</span>
+<span class="comment">// 	type Parameter = ();</span>
+<span class="comment">// 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;</span>
+<span class="comment">// 	type MaxUnrewardedRelayerEntriesAtInboundLane = MaxUnrewardedRelayerEntriesAtInboundLane;</span>
+<span class="comment">// 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;</span>
 
-	<span class="kw">type</span> <span class="ident">OutboundPayload</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::ToRococoMessagePayload</span>;
-	<span class="kw">type</span> <span class="ident">OutboundMessageFee</span> <span class="op">=</span> <span class="ident">bp_wococo::Balance</span>;
+<span class="comment">// 	type OutboundPayload = crate::bridge_messages::ToRococoMessagePayload;</span>
+<span class="comment">// 	type OutboundMessageFee = bp_wococo::Balance;</span>
 
-	<span class="kw">type</span> <span class="ident">InboundPayload</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::FromRococoMessagePayload</span>;
-	<span class="kw">type</span> <span class="ident">InboundMessageFee</span> <span class="op">=</span> <span class="ident">bp_rococo::Balance</span>;
-	<span class="kw">type</span> <span class="ident">InboundRelayer</span> <span class="op">=</span> <span class="ident">bp_rococo::AccountId</span>;
+<span class="comment">// 	type InboundPayload = crate::bridge_messages::FromRococoMessagePayload;</span>
+<span class="comment">// 	type InboundMessageFee = bp_rococo::Balance;</span>
+<span class="comment">// 	type InboundRelayer = bp_rococo::AccountId;</span>
 
-	<span class="kw">type</span> <span class="ident">AccountIdConverter</span> <span class="op">=</span> <span class="ident">bp_wococo::AccountIdConverter</span>;
+<span class="comment">// 	type AccountIdConverter = bp_wococo::AccountIdConverter;</span>
 
-	<span class="kw">type</span> <span class="ident">TargetHeaderChain</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::RococoAtWococo</span>;
-	<span class="kw">type</span> <span class="ident">LaneMessageVerifier</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::ToRococoMessageVerifier</span>;
-	<span class="kw">type</span> <span class="ident">MessageDeliveryAndDispatchPayment</span> <span class="op">=</span>
-		<span class="ident">pallet_bridge_messages::instant_payments::InstantCurrencyPayments</span><span class="op">&lt;</span>
-			<span class="ident">Runtime</span>,
-			<span class="ident">pallet_balances::Pallet</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
-			<span class="kw">crate</span><span class="ident">::bridge_messages::GetDeliveryConfirmationTransactionFee</span>,
-			<span class="ident">RootAccountForPayments</span>,
-		<span class="op">&gt;</span>;
-	<span class="kw">type</span> <span class="ident">OnDeliveryConfirmed</span> <span class="op">=</span> ();
+<span class="comment">// 	type TargetHeaderChain = crate::bridge_messages::RococoAtWococo;</span>
+<span class="comment">// 	type LaneMessageVerifier = crate::bridge_messages::ToRococoMessageVerifier;</span>
+<span class="comment">// 	type MessageDeliveryAndDispatchPayment =</span>
+<span class="comment">// 		pallet_bridge_messages::instant_payments::InstantCurrencyPayments&lt;</span>
+<span class="comment">// 			Runtime,</span>
+<span class="comment">// 			pallet_balances::Pallet&lt;Runtime&gt;,</span>
+<span class="comment">// 			crate::bridge_messages::GetDeliveryConfirmationTransactionFee,</span>
+<span class="comment">// 			RootAccountForPayments,</span>
+<span class="comment">// 		&gt;;</span>
+<span class="comment">// 	type OnDeliveryConfirmed = ();</span>
 
-	<span class="kw">type</span> <span class="ident">SourceHeaderChain</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::RococoAtWococo</span>;
-	<span class="kw">type</span> <span class="ident">MessageDispatch</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::FromRococoMessageDispatch</span>;
-}
+<span class="comment">// 	type SourceHeaderChain = crate::bridge_messages::RococoAtWococo;</span>
+<span class="comment">// 	type MessageDispatch = crate::bridge_messages::FromRococoMessageDispatch;</span>
+<span class="comment">// }</span>
 
-<span class="comment">// Instance that is &quot;deployed&quot; at Rococo chain. Responsible for sending Rococo -&gt; Wococo messages</span>
-<span class="comment">// and receiving Wococo -&gt; Rococo messages.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AtRococoWithWococoMessagesInstance</span> <span class="op">=</span> <span class="ident">pallet_bridge_messages::Instance1</span>;
-<span class="kw">impl</span> <span class="ident">pallet_bridge_messages::Config</span><span class="op">&lt;</span><span class="ident">AtRococoWithWococoMessagesInstance</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">pallet_bridge_messages::weights::RialtoWeight</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
-	<span class="kw">type</span> <span class="ident">Parameter</span> <span class="op">=</span> ();
-	<span class="kw">type</span> <span class="ident">MaxMessagesToPruneAtOnce</span> <span class="op">=</span> <span class="ident">MaxMessagesToPruneAtOnce</span>;
-	<span class="kw">type</span> <span class="ident">MaxUnrewardedRelayerEntriesAtInboundLane</span> <span class="op">=</span> <span class="ident">MaxUnrewardedRelayerEntriesAtInboundLane</span>;
-	<span class="kw">type</span> <span class="ident">MaxUnconfirmedMessagesAtInboundLane</span> <span class="op">=</span> <span class="ident">MaxUnconfirmedMessagesAtInboundLane</span>;
+<span class="comment">// // Instance that is &quot;deployed&quot; at Rococo chain. Responsible for sending Rococo -&gt; Wococo messages</span>
+<span class="comment">// // and receiving Wococo -&gt; Rococo messages.</span>
+<span class="comment">// pub type AtRococoWithWococoMessagesInstance = pallet_bridge_messages::Instance1;</span>
+<span class="comment">// impl pallet_bridge_messages::Config&lt;AtRococoWithWococoMessagesInstance&gt; for Runtime {</span>
+<span class="comment">// 	type Event = Event;</span>
+<span class="comment">// 	type WeightInfo = pallet_bridge_messages::weights::RialtoWeight&lt;Runtime&gt;;</span>
+<span class="comment">// 	type Parameter = ();</span>
+<span class="comment">// 	type MaxMessagesToPruneAtOnce = MaxMessagesToPruneAtOnce;</span>
+<span class="comment">// 	type MaxUnrewardedRelayerEntriesAtInboundLane = MaxUnrewardedRelayerEntriesAtInboundLane;</span>
+<span class="comment">// 	type MaxUnconfirmedMessagesAtInboundLane = MaxUnconfirmedMessagesAtInboundLane;</span>
 
-	<span class="kw">type</span> <span class="ident">OutboundPayload</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::ToWococoMessagePayload</span>;
-	<span class="kw">type</span> <span class="ident">OutboundMessageFee</span> <span class="op">=</span> <span class="ident">bp_rococo::Balance</span>;
+<span class="comment">// 	type OutboundPayload = crate::bridge_messages::ToWococoMessagePayload;</span>
+<span class="comment">// 	type OutboundMessageFee = bp_rococo::Balance;</span>
 
-	<span class="kw">type</span> <span class="ident">InboundPayload</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::FromWococoMessagePayload</span>;
-	<span class="kw">type</span> <span class="ident">InboundMessageFee</span> <span class="op">=</span> <span class="ident">bp_wococo::Balance</span>;
-	<span class="kw">type</span> <span class="ident">InboundRelayer</span> <span class="op">=</span> <span class="ident">bp_wococo::AccountId</span>;
+<span class="comment">// 	type InboundPayload = crate::bridge_messages::FromWococoMessagePayload;</span>
+<span class="comment">// 	type InboundMessageFee = bp_wococo::Balance;</span>
+<span class="comment">// 	type InboundRelayer = bp_wococo::AccountId;</span>
 
-	<span class="kw">type</span> <span class="ident">AccountIdConverter</span> <span class="op">=</span> <span class="ident">bp_rococo::AccountIdConverter</span>;
+<span class="comment">// 	type AccountIdConverter = bp_rococo::AccountIdConverter;</span>
 
-	<span class="kw">type</span> <span class="ident">TargetHeaderChain</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::WococoAtRococo</span>;
-	<span class="kw">type</span> <span class="ident">LaneMessageVerifier</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::ToWococoMessageVerifier</span>;
-	<span class="kw">type</span> <span class="ident">MessageDeliveryAndDispatchPayment</span> <span class="op">=</span>
-		<span class="ident">pallet_bridge_messages::instant_payments::InstantCurrencyPayments</span><span class="op">&lt;</span>
-			<span class="ident">Runtime</span>,
-			<span class="ident">pallet_balances::Pallet</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
-			<span class="kw">crate</span><span class="ident">::bridge_messages::GetDeliveryConfirmationTransactionFee</span>,
-			<span class="ident">RootAccountForPayments</span>,
-		<span class="op">&gt;</span>;
-	<span class="kw">type</span> <span class="ident">OnDeliveryConfirmed</span> <span class="op">=</span> ();
+<span class="comment">// 	type TargetHeaderChain = crate::bridge_messages::WococoAtRococo;</span>
+<span class="comment">// 	type LaneMessageVerifier = crate::bridge_messages::ToWococoMessageVerifier;</span>
+<span class="comment">// 	type MessageDeliveryAndDispatchPayment =</span>
+<span class="comment">// 		pallet_bridge_messages::instant_payments::InstantCurrencyPayments&lt;</span>
+<span class="comment">// 			Runtime,</span>
+<span class="comment">// 			pallet_balances::Pallet&lt;Runtime&gt;,</span>
+<span class="comment">// 			crate::bridge_messages::GetDeliveryConfirmationTransactionFee,</span>
+<span class="comment">// 			RootAccountForPayments,</span>
+<span class="comment">// 		&gt;;</span>
+<span class="comment">// 	type OnDeliveryConfirmed = ();</span>
 
-	<span class="kw">type</span> <span class="ident">SourceHeaderChain</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::WococoAtRococo</span>;
-	<span class="kw">type</span> <span class="ident">MessageDispatch</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::bridge_messages::FromWococoMessageDispatch</span>;
-}
+<span class="comment">// 	type SourceHeaderChain = crate::bridge_messages::WococoAtRococo;</span>
+<span class="comment">// 	type MessageDispatch = crate::bridge_messages::FromWococoMessageDispatch;</span>
+<span class="comment">// }</span>
 
 <span class="kw">impl</span> <span class="ident">Randomness</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParentHashRandomness</span> {
 	<span class="kw">fn</span> <span class="ident">random</span>(<span class="ident">subject</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Hash</span>, <span class="ident">BlockNumber</span>) {
@@ -2942,137 +2942,137 @@
 		}
 	}
 
-	<span class="kw">impl</span> <span class="ident">bp_rococo::RococoFinalityApi</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-		<span class="kw">fn</span> <span class="ident">best_finalized</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bp_rococo::BlockNumber</span>, <span class="ident">bp_rococo::Hash</span>) {
-			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">BridgeRococoGrandpa::best_finalized</span>();
-			(<span class="ident">header</span>.<span class="ident">number</span>, <span class="ident">header</span>.<span class="ident">hash</span>())
-		}
+	<span class="comment">// impl bp_rococo::RococoFinalityApi&lt;Block&gt; for Runtime {</span>
+	<span class="comment">// 	fn best_finalized() -&gt; (bp_rococo::BlockNumber, bp_rococo::Hash) {</span>
+	<span class="comment">// 		let header = BridgeRococoGrandpa::best_finalized();</span>
+	<span class="comment">// 		(header.number, header.hash())</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">is_known_header</span>(<span class="ident">hash</span>: <span class="ident">bp_rococo::Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-			<span class="ident">BridgeRococoGrandpa::is_known_header</span>(<span class="ident">hash</span>)
-		}
-	}
+	<span class="comment">// 	fn is_known_header(hash: bp_rococo::Hash) -&gt; bool {</span>
+	<span class="comment">// 		BridgeRococoGrandpa::is_known_header(hash)</span>
+	<span class="comment">// 	}</span>
+	<span class="comment">// }</span>
 
-	<span class="kw">impl</span> <span class="ident">bp_wococo::WococoFinalityApi</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-		<span class="kw">fn</span> <span class="ident">best_finalized</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bp_wococo::BlockNumber</span>, <span class="ident">bp_wococo::Hash</span>) {
-			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">BridgeWococoGrandpa::best_finalized</span>();
-			(<span class="ident">header</span>.<span class="ident">number</span>, <span class="ident">header</span>.<span class="ident">hash</span>())
-		}
+	<span class="comment">// impl bp_wococo::WococoFinalityApi&lt;Block&gt; for Runtime {</span>
+	<span class="comment">// 	fn best_finalized() -&gt; (bp_wococo::BlockNumber, bp_wococo::Hash) {</span>
+	<span class="comment">// 		let header = BridgeWococoGrandpa::best_finalized();</span>
+	<span class="comment">// 		(header.number, header.hash())</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">is_known_header</span>(<span class="ident">hash</span>: <span class="ident">bp_wococo::Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-			<span class="ident">BridgeWococoGrandpa::is_known_header</span>(<span class="ident">hash</span>)
-		}
-	}
+	<span class="comment">// 	fn is_known_header(hash: bp_wococo::Hash) -&gt; bool {</span>
+	<span class="comment">// 		BridgeWococoGrandpa::is_known_header(hash)</span>
+	<span class="comment">// 	}</span>
+	<span class="comment">// }</span>
 
-	<span class="kw">impl</span> <span class="ident">bp_rococo::ToRococoOutboundLaneApi</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Balance</span>, <span class="ident">bridge_messages::ToRococoMessagePayload</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-		<span class="kw">fn</span> <span class="ident">estimate_message_delivery_and_dispatch_fee</span>(
-			<span class="ident">_lane_id</span>: <span class="ident">bp_messages::LaneId</span>,
-			<span class="ident">payload</span>: <span class="ident">bridge_messages::ToWococoMessagePayload</span>,
-		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span> {
-			<span class="ident">estimate_message_dispatch_and_delivery_fee</span>::<span class="op">&lt;</span><span class="ident">bridge_messages::AtWococoWithRococoMessageBridge</span><span class="op">&gt;</span>(
-				<span class="kw-2">&amp;</span><span class="ident">payload</span>,
-				<span class="ident">bridge_messages::AtWococoWithRococoMessageBridge::RELAYER_FEE_PERCENT</span>,
-			).<span class="ident">ok</span>()
-		}
+	<span class="comment">// impl bp_rococo::ToRococoOutboundLaneApi&lt;Block, Balance, bridge_messages::ToRococoMessagePayload&gt; for Runtime {</span>
+	<span class="comment">// 	fn estimate_message_delivery_and_dispatch_fee(</span>
+	<span class="comment">// 		_lane_id: bp_messages::LaneId,</span>
+	<span class="comment">// 		payload: bridge_messages::ToWococoMessagePayload,</span>
+	<span class="comment">// 	) -&gt; Option&lt;Balance&gt; {</span>
+	<span class="comment">// 		estimate_message_dispatch_and_delivery_fee::&lt;bridge_messages::AtWococoWithRococoMessageBridge&gt;(</span>
+	<span class="comment">// 			&amp;payload,</span>
+	<span class="comment">// 			bridge_messages::AtWococoWithRococoMessageBridge::RELAYER_FEE_PERCENT,</span>
+	<span class="comment">// 		).ok()</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">message_details</span>(
-			<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>,
-			<span class="ident">begin</span>: <span class="ident">bp_messages::MessageNonce</span>,
-			<span class="ident">end</span>: <span class="ident">bp_messages::MessageNonce</span>,
-		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bp_messages::MessageDetails</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-			(<span class="ident">begin</span>..<span class="op">=</span><span class="ident">end</span>).<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">nonce</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">message_data</span> <span class="op">=</span> <span class="ident">BridgeRococoMessages::outbound_message_data</span>(<span class="ident">lane</span>, <span class="ident">nonce</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">decoded_payload</span> <span class="op">=</span> <span class="ident">bridge_messages::ToRococoMessagePayload::decode</span>(
-					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">message_data</span>.<span class="ident">payload</span>[..]
-				).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-				<span class="prelude-val">Some</span>(<span class="ident">bp_messages::MessageDetails</span> {
-					<span class="ident">nonce</span>,
-					<span class="ident">dispatch_weight</span>: <span class="ident">decoded_payload</span>.<span class="ident">weight</span>,
-					<span class="ident">size</span>: <span class="ident">message_data</span>.<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">delivery_and_dispatch_fee</span>: <span class="ident">message_data</span>.<span class="ident">fee</span>,
-					<span class="ident">dispatch_fee_payment</span>: <span class="ident">decoded_payload</span>.<span class="ident">dispatch_fee_payment</span>,
-				})
-			})
-			.<span class="ident">collect</span>()
-		}
+	<span class="comment">// 	fn message_details(</span>
+	<span class="comment">// 		lane: bp_messages::LaneId,</span>
+	<span class="comment">// 		begin: bp_messages::MessageNonce,</span>
+	<span class="comment">// 		end: bp_messages::MessageNonce,</span>
+	<span class="comment">// 	) -&gt; Vec&lt;bp_messages::MessageDetails&lt;Balance&gt;&gt; {</span>
+	<span class="comment">// 		(begin..=end).filter_map(|nonce| {</span>
+	<span class="comment">// 			let message_data = BridgeRococoMessages::outbound_message_data(lane, nonce)?;</span>
+	<span class="comment">// 			let decoded_payload = bridge_messages::ToRococoMessagePayload::decode(</span>
+	<span class="comment">// 				&amp;mut &amp;message_data.payload[..]</span>
+	<span class="comment">// 			).ok()?;</span>
+	<span class="comment">// 			Some(bp_messages::MessageDetails {</span>
+	<span class="comment">// 				nonce,</span>
+	<span class="comment">// 				dispatch_weight: decoded_payload.weight,</span>
+	<span class="comment">// 				size: message_data.payload.len() as _,</span>
+	<span class="comment">// 				delivery_and_dispatch_fee: message_data.fee,</span>
+	<span class="comment">// 				dispatch_fee_payment: decoded_payload.dispatch_fee_payment,</span>
+	<span class="comment">// 			})</span>
+	<span class="comment">// 		})</span>
+	<span class="comment">// 		.collect()</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">latest_received_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeRococoMessages::outbound_latest_received_nonce</span>(<span class="ident">lane</span>)
-		}
+	<span class="comment">// 	fn latest_received_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeRococoMessages::outbound_latest_received_nonce(lane)</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">latest_generated_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeRococoMessages::outbound_latest_generated_nonce</span>(<span class="ident">lane</span>)
-		}
-	}
+	<span class="comment">// 	fn latest_generated_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeRococoMessages::outbound_latest_generated_nonce(lane)</span>
+	<span class="comment">// 	}</span>
+	<span class="comment">// }</span>
 
-	<span class="kw">impl</span> <span class="ident">bp_rococo::FromRococoInboundLaneApi</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-		<span class="kw">fn</span> <span class="ident">latest_received_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeRococoMessages::inbound_latest_received_nonce</span>(<span class="ident">lane</span>)
-		}
+	<span class="comment">// impl bp_rococo::FromRococoInboundLaneApi&lt;Block&gt; for Runtime {</span>
+	<span class="comment">// 	fn latest_received_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeRococoMessages::inbound_latest_received_nonce(lane)</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">latest_confirmed_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeRococoMessages::inbound_latest_confirmed_nonce</span>(<span class="ident">lane</span>)
-		}
+	<span class="comment">// 	fn latest_confirmed_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeRococoMessages::inbound_latest_confirmed_nonce(lane)</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">unrewarded_relayers_state</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::UnrewardedRelayersState</span> {
-			<span class="ident">BridgeRococoMessages::inbound_unrewarded_relayers_state</span>(<span class="ident">lane</span>)
-		}
-	}
+	<span class="comment">// 	fn unrewarded_relayers_state(lane: bp_messages::LaneId) -&gt; bp_messages::UnrewardedRelayersState {</span>
+	<span class="comment">// 		BridgeRococoMessages::inbound_unrewarded_relayers_state(lane)</span>
+	<span class="comment">// 	}</span>
+	<span class="comment">// }</span>
 
-	<span class="kw">impl</span> <span class="ident">bp_wococo::ToWococoOutboundLaneApi</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Balance</span>, <span class="ident">bridge_messages::ToWococoMessagePayload</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-		<span class="kw">fn</span> <span class="ident">estimate_message_delivery_and_dispatch_fee</span>(
-			<span class="ident">_lane_id</span>: <span class="ident">bp_messages::LaneId</span>,
-			<span class="ident">payload</span>: <span class="ident">bridge_messages::ToWococoMessagePayload</span>,
-		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span> {
-			<span class="ident">estimate_message_dispatch_and_delivery_fee</span>::<span class="op">&lt;</span><span class="ident">bridge_messages::AtRococoWithWococoMessageBridge</span><span class="op">&gt;</span>(
-				<span class="kw-2">&amp;</span><span class="ident">payload</span>,
-				<span class="ident">bridge_messages::AtRococoWithWococoMessageBridge::RELAYER_FEE_PERCENT</span>,
-			).<span class="ident">ok</span>()
-		}
+	<span class="comment">// impl bp_wococo::ToWococoOutboundLaneApi&lt;Block, Balance, bridge_messages::ToWococoMessagePayload&gt; for Runtime {</span>
+	<span class="comment">// 	fn estimate_message_delivery_and_dispatch_fee(</span>
+	<span class="comment">// 		_lane_id: bp_messages::LaneId,</span>
+	<span class="comment">// 		payload: bridge_messages::ToWococoMessagePayload,</span>
+	<span class="comment">// 	) -&gt; Option&lt;Balance&gt; {</span>
+	<span class="comment">// 		estimate_message_dispatch_and_delivery_fee::&lt;bridge_messages::AtRococoWithWococoMessageBridge&gt;(</span>
+	<span class="comment">// 			&amp;payload,</span>
+	<span class="comment">// 			bridge_messages::AtRococoWithWococoMessageBridge::RELAYER_FEE_PERCENT,</span>
+	<span class="comment">// 		).ok()</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">message_details</span>(
-			<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>,
-			<span class="ident">begin</span>: <span class="ident">bp_messages::MessageNonce</span>,
-			<span class="ident">end</span>: <span class="ident">bp_messages::MessageNonce</span>,
-		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bp_messages::MessageDetails</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-			(<span class="ident">begin</span>..<span class="op">=</span><span class="ident">end</span>).<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">nonce</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">message_data</span> <span class="op">=</span> <span class="ident">BridgeWococoMessages::outbound_message_data</span>(<span class="ident">lane</span>, <span class="ident">nonce</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">decoded_payload</span> <span class="op">=</span> <span class="ident">bridge_messages::ToWococoMessagePayload::decode</span>(
-					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">message_data</span>.<span class="ident">payload</span>[..]
-				).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-				<span class="prelude-val">Some</span>(<span class="ident">bp_messages::MessageDetails</span> {
-					<span class="ident">nonce</span>,
-					<span class="ident">dispatch_weight</span>: <span class="ident">decoded_payload</span>.<span class="ident">weight</span>,
-					<span class="ident">size</span>: <span class="ident">message_data</span>.<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">delivery_and_dispatch_fee</span>: <span class="ident">message_data</span>.<span class="ident">fee</span>,
-					<span class="ident">dispatch_fee_payment</span>: <span class="ident">decoded_payload</span>.<span class="ident">dispatch_fee_payment</span>,
-				})
-			})
-			.<span class="ident">collect</span>()
-		}
+	<span class="comment">// 	fn message_details(</span>
+	<span class="comment">// 		lane: bp_messages::LaneId,</span>
+	<span class="comment">// 		begin: bp_messages::MessageNonce,</span>
+	<span class="comment">// 		end: bp_messages::MessageNonce,</span>
+	<span class="comment">// 	) -&gt; Vec&lt;bp_messages::MessageDetails&lt;Balance&gt;&gt; {</span>
+	<span class="comment">// 		(begin..=end).filter_map(|nonce| {</span>
+	<span class="comment">// 			let message_data = BridgeWococoMessages::outbound_message_data(lane, nonce)?;</span>
+	<span class="comment">// 			let decoded_payload = bridge_messages::ToWococoMessagePayload::decode(</span>
+	<span class="comment">// 				&amp;mut &amp;message_data.payload[..]</span>
+	<span class="comment">// 			).ok()?;</span>
+	<span class="comment">// 			Some(bp_messages::MessageDetails {</span>
+	<span class="comment">// 				nonce,</span>
+	<span class="comment">// 				dispatch_weight: decoded_payload.weight,</span>
+	<span class="comment">// 				size: message_data.payload.len() as _,</span>
+	<span class="comment">// 				delivery_and_dispatch_fee: message_data.fee,</span>
+	<span class="comment">// 				dispatch_fee_payment: decoded_payload.dispatch_fee_payment,</span>
+	<span class="comment">// 			})</span>
+	<span class="comment">// 		})</span>
+	<span class="comment">// 		.collect()</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">latest_received_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeWococoMessages::outbound_latest_received_nonce</span>(<span class="ident">lane</span>)
-		}
+	<span class="comment">// 	fn latest_received_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeWococoMessages::outbound_latest_received_nonce(lane)</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">latest_generated_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeWococoMessages::outbound_latest_generated_nonce</span>(<span class="ident">lane</span>)
-		}
-	}
+	<span class="comment">// 	fn latest_generated_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeWococoMessages::outbound_latest_generated_nonce(lane)</span>
+	<span class="comment">// 	}</span>
+	<span class="comment">// }</span>
 
-	<span class="kw">impl</span> <span class="ident">bp_wococo::FromWococoInboundLaneApi</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-		<span class="kw">fn</span> <span class="ident">latest_received_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeWococoMessages::inbound_latest_received_nonce</span>(<span class="ident">lane</span>)
-		}
+	<span class="comment">// impl bp_wococo::FromWococoInboundLaneApi&lt;Block&gt; for Runtime {</span>
+	<span class="comment">// 	fn latest_received_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeWococoMessages::inbound_latest_received_nonce(lane)</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">latest_confirmed_nonce</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::MessageNonce</span> {
-			<span class="ident">BridgeWococoMessages::inbound_latest_confirmed_nonce</span>(<span class="ident">lane</span>)
-		}
+	<span class="comment">// 	fn latest_confirmed_nonce(lane: bp_messages::LaneId) -&gt; bp_messages::MessageNonce {</span>
+	<span class="comment">// 		BridgeWococoMessages::inbound_latest_confirmed_nonce(lane)</span>
+	<span class="comment">// 	}</span>
 
-		<span class="kw">fn</span> <span class="ident">unrewarded_relayers_state</span>(<span class="ident">lane</span>: <span class="ident">bp_messages::LaneId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bp_messages::UnrewardedRelayersState</span> {
-			<span class="ident">BridgeWococoMessages::inbound_unrewarded_relayers_state</span>(<span class="ident">lane</span>)
-		}
-	}
+	<span class="comment">// 	fn unrewarded_relayers_state(lane: bp_messages::LaneId) -&gt; bp_messages::UnrewardedRelayersState {</span>
+	<span class="comment">// 		BridgeWococoMessages::inbound_unrewarded_relayers_state(lane)</span>
+	<span class="comment">// 	}</span>
+	<span class="comment">// }</span>
 
 	<span class="kw">impl</span> <span class="ident">frame_system_rpc_runtime_api::AccountNonceApi</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">AccountId</span>, <span class="ident">Nonce</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 		<span class="kw">fn</span> <span class="ident">account_nonce</span>(<span class="ident">account</span>: <span class="ident">AccountId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Nonce</span> {
