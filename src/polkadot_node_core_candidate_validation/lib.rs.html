@@ -617,6 +617,8 @@
 <span id="614">614</span>
 <span id="615">615</span>
 <span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -689,8 +691,10 @@
 
 <span class="doccomment">/// The candidate validation subsystem.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CandidateValidationSubsystem</span> {
-	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
-	<span class="ident">pvf_metrics</span>: <span class="ident">polkadot_node_core_pvf::Metrics</span>,
+	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+	<span class="kw">pub</span> <span class="ident">metrics</span>: <span class="ident">Metrics</span>,
+	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+	<span class="kw">pub</span> <span class="ident">pvf_metrics</span>: <span class="ident">polkadot_node_core_pvf::Metrics</span>,
 	<span class="ident">config</span>: <span class="ident">Config</span>,
 }
 

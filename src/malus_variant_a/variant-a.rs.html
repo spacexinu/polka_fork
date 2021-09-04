@@ -113,6 +113,7 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -150,9 +151,8 @@
 
 <span class="comment">// Import extra types relevant to the particular</span>
 <span class="comment">// subsystem.</span>
-<span class="kw">use</span> <span class="ident">polkadot_node_core_candidate_validation</span>::{<span class="ident">CandidateValidationSubsystem</span>, <span class="ident">Metrics</span>};
+<span class="kw">use</span> <span class="ident">polkadot_node_core_candidate_validation::CandidateValidationSubsystem</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem::messages::CandidateValidationMessage</span>;
-<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util::metrics::Metrics</span> <span class="kw">as</span> <span class="kw">_</span>;
 
 <span class="comment">// Filter wrapping related types.</span>
 <span class="kw">use</span> <span class="ident">malus</span>::<span class="kw-2">*</span>;
@@ -204,14 +204,16 @@
 		<span class="comment">// modify the subsystem(s) as needed:</span>
 		<span class="kw">let</span> <span class="ident">all_subsystems</span> <span class="op">=</span> <span class="ident">create_default_subsystems</span>(<span class="ident">args</span>)<span class="question-mark">?</span>.<span class="ident">replace_candidate_validation</span>(
 			<span class="comment">// create the filtered subsystem</span>
-			<span class="ident">FilteredSubsystem::new</span>(
-				<span class="ident">CandidateValidationSubsystem::with_config</span>(
-					<span class="ident">candidate_validation_config</span>,
-					<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
-					<span class="ident">polkadot_node_core_pvf::Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
-				),
-				<span class="ident">Skippy::default</span>(),
-			),
+			<span class="op">|</span><span class="ident">orig</span>: <span class="ident">CandidateValidationSubsystem</span><span class="op">|</span> {
+				<span class="ident">FilteredSubsystem::new</span>(
+					<span class="ident">CandidateValidationSubsystem::with_config</span>(
+						<span class="ident">candidate_validation_config</span>,
+						<span class="ident">orig</span>.<span class="ident">metrics</span>,
+						<span class="ident">orig</span>.<span class="ident">pvf_metrics</span>,
+					),
+					<span class="ident">Skippy::default</span>(),
+				)
+			},
 		);
 
 		<span class="ident">Overseer::new</span>(<span class="ident">leaves</span>, <span class="ident">all_subsystems</span>, <span class="ident">registry</span>, <span class="ident">runtime_client</span>, <span class="ident">spawner</span>)

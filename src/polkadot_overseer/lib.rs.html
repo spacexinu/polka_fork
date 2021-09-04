@@ -1494,7 +1494,7 @@
 	<span class="doccomment">/// }</span>
 	<span class="doccomment">/// let spawner = sp_core::testing::TaskExecutor::new();</span>
 	<span class="doccomment">/// let all_subsystems = AllSubsystems::&lt;()&gt;::dummy()</span>
-	<span class="doccomment">///		.replace_candidate_validation(ValidationSubsystem);</span>
+	<span class="doccomment">///		.replace_candidate_validation(|_| ValidationSubsystem);</span>
 	<span class="doccomment">/// let (overseer, _handle) = Overseer::new(</span>
 	<span class="doccomment">///     vec![],</span>
 	<span class="doccomment">///     all_subsystems,</span>

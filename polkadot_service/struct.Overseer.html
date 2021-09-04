@@ -83,7 +83,7 @@ For the sake of simplicity the termination of the example is done with a timeout
 }
 <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">sp_core::testing::TaskExecutor::new</span>();
 <span class="kw">let</span> <span class="ident">all_subsystems</span> <span class="op">=</span> <span class="ident">AllSubsystems</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::dummy</span>()
-	.<span class="ident">replace_candidate_validation</span>(<span class="ident">ValidationSubsystem</span>);
+	.<span class="ident">replace_candidate_validation</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ValidationSubsystem</span>);
 <span class="kw">let</span> (<span class="ident">overseer</span>, <span class="ident">_handle</span>) <span class="op">=</span> <span class="ident">Overseer::new</span>(
     <span class="macro">vec!</span>[],
     <span class="ident">all_subsystems</span>,
