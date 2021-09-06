@@ -11,15 +11,15 @@ codec = { package = "parity-scale-codec", version = "2.0.0", default-features = 
 
 # Substrate Dependencies
 
-frame-support = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-frame-system = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-pallet-session = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-sp-staking = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-sp-std = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+frame-system = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+pallet-session = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-staking = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-std = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
 
 [dev-dependencies]
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
 serde = "1.0"
 
 [features]

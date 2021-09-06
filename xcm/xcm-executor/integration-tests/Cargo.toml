@@ -6,20 +6,20 @@ description = "Integration tests for the XCM Executor"
 version = "0.9.9-1"
 
 [dependencies]
-frame-support = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+frame-system = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
 futures = "0.3.15"
 pallet-xcm = { path = "../../pallet-xcm" }
 polkadot-test-client = { path = "../../../node/test/client" }
 polkadot-test-runtime = { path = "../../../runtime/test-runtime", features = ["runtime-benchmarks"] }
 polkadot-test-service = { path = "../../../node/test/service" }
-sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
-sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "cmichi-tmp-experiment" }
-sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
+sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
 xcm = { path = "../..", default-features = false }
 xcm-executor = { path = ".." }
-sp-tracing = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
+sp-tracing = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
 
 [features]
 default = ["std"]

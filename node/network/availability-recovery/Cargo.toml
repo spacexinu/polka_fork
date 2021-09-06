@@ -25,9 +25,9 @@ env_logger = "0.8.4"
 futures-timer = "3.0.2"
 log = "0.4.11"
 
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
-sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
-sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
-sc-network = { git = "https://github.com/paritytech/substrate", branch = "cmichi-tmp-experiment" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
+sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
+sc-network = { git = "https://github.com/paritytech/substrate", branch = "hc-contract-experiment-patched-v0.9.9" }
 
 polkadot-subsystem-testhelpers = { package = "polkadot-node-subsystem-test-helpers", path = "../../subsystem-test-helpers" }
