@@ -1840,6 +1840,18 @@
 <span id="1837">1837</span>
 <span id="1838">1838</span>
 <span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2377,6 +2389,9 @@
 			<span class="ident">config</span>: <span class="ident">default_parachains_host_configuration</span>(),
 		},
 		<span class="ident">paras</span>: <span class="ident">Default::default</span>(),
+		<span class="ident">registrar</span>: <span class="ident">westend_runtime::RegistrarConfig</span> {
+			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
+		},
 	}
 }
 
@@ -2870,6 +2885,9 @@
 		<span class="ident">configuration</span>: <span class="ident">rococo_runtime::ConfigurationConfig</span> {
 			<span class="ident">config</span>: <span class="ident">default_parachains_host_configuration</span>(),
 		},
+		<span class="ident">registrar</span>: <span class="ident">rococo_runtime::RegistrarConfig</span> {
+			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
+		},
 		<span class="comment">// bridge_rococo_grandpa: rococo_runtime::BridgeRococoGrandpaConfig {</span>
 		<span class="comment">// 	owner: Some(endowed_accounts[0].clone()),</span>
 		<span class="comment">// 	..Default::default()</span>
@@ -3299,6 +3317,9 @@
 			<span class="ident">config</span>: <span class="ident">default_parachains_host_configuration</span>(),
 		},
 		<span class="ident">paras</span>: <span class="ident">Default::default</span>(),
+		<span class="ident">registrar</span>: <span class="ident">westend_runtime::RegistrarConfig</span> {
+			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
+		},
 	}
 }
 
@@ -3369,6 +3390,9 @@
 		},
 		<span class="ident">hrmp</span>: <span class="ident">Default::default</span>(),
 		<span class="ident">paras</span>: <span class="ident">rococo_runtime::ParasConfig</span> { <span class="ident">paras</span>: <span class="macro">vec!</span>[] },
+		<span class="ident">registrar</span>: <span class="ident">rococo_runtime::RegistrarConfig</span> {
+			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
+		},
 		<span class="comment">// bridge_rococo_grandpa: rococo_runtime::BridgeRococoGrandpaConfig {</span>
 		<span class="comment">// 	owner: Some(root_key.clone()),</span>
 		<span class="comment">// 	..Default::default()</span>
