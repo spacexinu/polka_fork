@@ -838,7 +838,7 @@ impl pallet_bridge_grandpa::Config<WococoGrandpaInstance> for Runtime {
 }
 
 // Instance that is "deployed" at Wococo chain. Responsible for dispatching Rococo -> Wococo messages.
-pub type AtWococoFromRococoMessagesDispatch = pallet_bridge_dispatch::DefaultInstance;
+pub type AtWococoFromRococoMessagesDispatch = ();
 impl pallet_bridge_dispatch::Config<AtWococoFromRococoMessagesDispatch> for Runtime {
 	type Event = Event;
 	type MessageId = (bp_messages::LaneId, bp_messages::MessageNonce);
@@ -872,11 +872,13 @@ parameter_types! {
 	pub const MaxUnconfirmedMessagesAtInboundLane: bp_messages::MessageNonce =
 		bp_rococo::MAX_UNCONFIRMED_MESSAGES_AT_INBOUND_LANE;
 	pub const RootAccountForPayments: Option<AccountId> = None;
+	pub const RococoChainId: bp_runtime::ChainId = bp_runtime::ROCOCO_CHAIN_ID;
+	pub const WococoChainId: bp_runtime::ChainId = bp_runtime::WOCOCO_CHAIN_ID;
 }
 
 // Instance that is "deployed" at Wococo chain. Responsible for sending Wococo -> Rococo messages
 // and receiving Rococo -> Wococo messages.
-pub type AtWococoWithRococoMessagesInstance = pallet_bridge_messages::DefaultInstance;
+pub type AtWococoWithRococoMessagesInstance = ();
 impl pallet_bridge_messages::Config<AtWococoWithRococoMessagesInstance> for Runtime {
 	type Event = Event;
 	type WeightInfo = pallet_bridge_messages::weights::RialtoWeight<Runtime>;
@@ -907,6 +909,7 @@ impl pallet_bridge_messages::Config<AtWococoWithRococoMessagesInstance> for Runt
 
 	type SourceHeaderChain = crate::bridge_messages::RococoAtWococo;
 	type MessageDispatch = crate::bridge_messages::FromRococoMessageDispatch;
+	type BridgedChainId = RococoChainId;
 }
 
 // Instance that is "deployed" at Rococo chain. Responsible for sending Rococo -> Wococo messages
@@ -942,6 +945,7 @@ impl pallet_bridge_messages::Config<AtRococoWithWococoMessagesInstance> for Runt
 
 	type SourceHeaderChain = crate::bridge_messages::WococoAtRococo;
 	type MessageDispatch = crate::bridge_messages::FromWococoMessageDispatch;
+	type BridgedChainId = WococoChainId;
 }
 
 impl Randomness<Hash, BlockNumber> for ParentHashRandomness {
