@@ -860,6 +860,56 @@
 <span id="857">857</span>
 <span id="858">858</span>
 <span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Cumulus.</span>
@@ -880,7 +930,7 @@
 <span class="doccomment">//! Version 1 of the Cross-Consensus Message format data structures.</span>
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::v1</span>::{<span class="ident">Order</span> <span class="kw">as</span> <span class="ident">OldOrder</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">OldResponse</span>, <span class="ident">Xcm</span> <span class="kw">as</span> <span class="ident">OldXcm</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::DoubleEncoded</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DoubleEncoded</span>, <span class="ident">GetWeight</span>};
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec::Vec</span>};
 <span class="kw">use</span> <span class="ident">core</span>::{
 	<span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
@@ -892,7 +942,9 @@
 
 <span class="kw">mod</span> <span class="ident">traits</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">Error</span>, <span class="ident">ExecuteXcm</span>, <span class="ident">Outcome</span>, <span class="prelude-ty">Result</span>, <span class="ident">SendError</span>, <span class="ident">SendResult</span>, <span class="ident">SendXcm</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::{
+	<span class="ident">Error</span>, <span class="ident">ExecuteXcm</span>, <span class="ident">Outcome</span>, <span class="prelude-ty">Result</span>, <span class="ident">SendError</span>, <span class="ident">SendResult</span>, <span class="ident">SendXcm</span>, <span class="ident">Weight</span>, <span class="ident">XcmWeightInfo</span>,
+};
 <span class="comment">// These parts of XCM v1 have been unchanged in XCM v2, and are re-imported here.</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::v1</span>::{
 	<span class="ident">Ancestor</span>, <span class="ident">AncestorThen</span>, <span class="ident">AssetId</span>, <span class="ident">AssetInstance</span>, <span class="ident">BodyId</span>, <span class="ident">BodyPart</span>, <span class="ident">Fungibility</span>,
@@ -990,7 +1042,7 @@
 			<span class="ident">WeightLimit</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
 			<span class="ident">WildFungibility</span>::{<span class="self">self</span>, <span class="ident">Fungible</span> <span class="kw">as</span> <span class="ident">WildFungible</span>, <span class="ident">NonFungible</span> <span class="kw">as</span> <span class="ident">WildNonFungible</span>},
 			<span class="ident">WildMultiAsset</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
-			<span class="ident">VERSION</span> <span class="kw">as</span> <span class="ident">XCM_VERSION</span>,
+			<span class="ident">XcmWeightInfo</span>, <span class="ident">VERSION</span> <span class="kw">as</span> <span class="ident">XCM_VERSION</span>,
 		};
 	}
 	<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Instruction</span>, <span class="ident">Xcm</span>};
@@ -1529,6 +1581,54 @@
 			<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
 				<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> },
 			<span class="ident">UnsubscribeVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">UnsubscribeVersion</span>,
+		}
+	}
+}
+
+<span class="comment">// TODO: Automate Generation</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span>, <span class="ident">W</span>: <span class="ident">XcmWeightInfo</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">GetWeight</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+		<span class="kw">use</span> <span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+		<span class="kw">match</span> <span class="self">self</span> {
+			<span class="ident">WithdrawAsset</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::withdraw_asset</span>(<span class="ident">assets</span>),
+			<span class="ident">ReserveAssetDeposited</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::reserve_asset_deposited</span>(<span class="ident">assets</span>),
+			<span class="ident">ReceiveTeleportedAsset</span>(<span class="ident">assets</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::receive_teleported_asset</span>(<span class="ident">assets</span>),
+			<span class="ident">QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::query_response</span>(<span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span>),
+			<span class="ident">TransferAsset</span> { <span class="ident">assets</span>, <span class="ident">beneficiary</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::transfer_asset</span>(<span class="ident">assets</span>, <span class="ident">beneficiary</span>),
+			<span class="ident">TransferReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::transfer_reserve_asset</span>(<span class="kw-2">&amp;</span><span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span>),
+			<span class="ident">Transact</span> { <span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::transact</span>(<span class="ident">origin_type</span>, <span class="ident">require_weight_at_most</span>, <span class="ident">call</span>),
+			<span class="ident">HrmpNewChannelOpenRequest</span> { <span class="ident">sender</span>, <span class="ident">max_message_size</span>, <span class="ident">max_capacity</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::hrmp_new_channel_open_request</span>(<span class="ident">sender</span>, <span class="ident">max_message_size</span>, <span class="ident">max_capacity</span>),
+			<span class="ident">HrmpChannelAccepted</span> { <span class="ident">recipient</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::hrmp_channel_accepted</span>(<span class="ident">recipient</span>),
+			<span class="ident">HrmpChannelClosing</span> { <span class="ident">initiator</span>, <span class="ident">sender</span>, <span class="ident">recipient</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::hrmp_channel_closing</span>(<span class="ident">initiator</span>, <span class="ident">sender</span>, <span class="ident">recipient</span>),
+			<span class="ident">ClearOrigin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::clear_origin</span>(),
+			<span class="ident">DescendOrigin</span>(<span class="ident">who</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::descend_origin</span>(<span class="ident">who</span>),
+			<span class="ident">ReportError</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::report_error</span>(<span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">max_response_weight</span>),
+			<span class="ident">DepositAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">beneficiary</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::deposit_asset</span>(<span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">beneficiary</span>),
+			<span class="ident">DepositReserveAsset</span> { <span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::deposit_reserve_asset</span>(<span class="ident">assets</span>, <span class="ident">max_assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span>),
+			<span class="ident">ExchangeAsset</span> { <span class="ident">give</span>, <span class="ident">receive</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::exchange_asset</span>(<span class="ident">give</span>, <span class="ident">receive</span>),
+			<span class="ident">InitiateReserveWithdraw</span> { <span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::initiate_reserve_withdraw</span>(<span class="ident">assets</span>, <span class="ident">reserve</span>, <span class="ident">xcm</span>),
+			<span class="ident">InitiateTeleport</span> { <span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::initiate_teleport</span>(<span class="ident">assets</span>, <span class="ident">dest</span>, <span class="ident">xcm</span>),
+			<span class="ident">QueryHolding</span> { <span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::query_holding</span>(<span class="ident">query_id</span>, <span class="ident">dest</span>, <span class="ident">assets</span>, <span class="ident">max_response_weight</span>),
+			<span class="ident">BuyExecution</span> { <span class="ident">fees</span>, <span class="ident">weight_limit</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::buy_execution</span>(<span class="ident">fees</span>, <span class="ident">weight_limit</span>),
+			<span class="ident">RefundSurplus</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::refund_surplus</span>(),
+			<span class="ident">SetErrorHandler</span>(<span class="ident">xcm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::set_error_handler</span>(<span class="ident">xcm</span>),
+			<span class="ident">SetAppendix</span>(<span class="ident">xcm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::set_appendix</span>(<span class="ident">xcm</span>),
+			<span class="ident">ClearError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::clear_error</span>(),
+			<span class="ident">ClaimAsset</span> { <span class="ident">assets</span>, <span class="ident">ticket</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::claim_asset</span>(<span class="ident">assets</span>, <span class="ident">ticket</span>),
+			<span class="ident">Trap</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::trap</span>(<span class="ident">code</span>),
+			<span class="ident">SubscribeVersion</span> { <span class="ident">query_id</span>, <span class="ident">max_response_weight</span> } <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">W::subscribe_version</span>(<span class="ident">query_id</span>, <span class="ident">max_response_weight</span>),
+			<span class="ident">UnsubscribeVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">W::unsubscribe_version</span>(),
 		}
 	}
 }
