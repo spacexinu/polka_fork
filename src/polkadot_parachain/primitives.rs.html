@@ -432,6 +432,14 @@
 <span id="429">429</span>
 <span id="430">430</span>
 <span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -763,7 +771,8 @@
 <span class="doccomment">/// unidirectional, meaning that `(A, B)` and `(B, A)` refer to different channels. The convention is</span>
 <span class="doccomment">/// that we use the first item tuple for the sender and the second for the recipient. Only one channel</span>
 <span class="doccomment">/// is allowed between two participants in one direction, i.e. there cannot be 2 different channels</span>
-<span class="doccomment">/// identified by `(A, B)`.</span>
+<span class="doccomment">/// identified by `(A, B)`. A channel with the same para id in sender and recipient is invalid. That</span>
+<span class="doccomment">/// is, however, not enforced.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Hash</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrmpChannelId</span> {
@@ -771,6 +780,13 @@
 	<span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">Id</span>,
 	<span class="doccomment">/// The para that acts as the recipient in this channel.</span>
 	<span class="kw">pub</span> <span class="ident">recipient</span>: <span class="ident">Id</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">HrmpChannelId</span> {
+	<span class="doccomment">/// Returns true if the given id corresponds to either the sender or the recipient.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_participant</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Id</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+		<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span> <span class="op">|</span><span class="op">|</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">recipient</span>
+	}
 }
 
 <span class="doccomment">/// A message from a parachain to its Relay Chain.</span>

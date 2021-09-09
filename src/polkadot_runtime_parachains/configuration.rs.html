@@ -1125,11 +1125,6 @@
 <span id="1122">1122</span>
 <span id="1123">1123</span>
 <span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1224,8 +1219,10 @@
 	<span class="kw">pub</span> <span class="ident">hrmp_max_parachain_outbound_channels</span>: <span class="ident">u32</span>,
 	<span class="doccomment">/// The maximum number of outbound HRMP channels a parathread is allowed to open.</span>
 	<span class="kw">pub</span> <span class="ident">hrmp_max_parathread_outbound_channels</span>: <span class="ident">u32</span>,
-	<span class="doccomment">/// Number of sessions after which an HRMP open channel request expires.</span>
-	<span class="kw">pub</span> <span class="ident">hrmp_open_request_ttl</span>: <span class="ident">u32</span>,
+	<span class="doccomment">/// NOTE: this field is deprecated. Channel open requests became non-expiring. Changing this value</span>
+	<span class="doccomment">/// doesn&#39;t have any effect. This field doesn&#39;t have a `deprecated` attribute because that would</span>
+	<span class="doccomment">/// trigger warnings coming from macros.</span>
+	<span class="kw">pub</span> <span class="ident">_hrmp_open_request_ttl</span>: <span class="ident">u32</span>,
 	<span class="doccomment">/// The deposit that the sender should provide for opening an HRMP channel.</span>
 	<span class="kw">pub</span> <span class="ident">hrmp_sender_deposit</span>: <span class="ident">Balance</span>,
 	<span class="doccomment">/// The deposit that the recipient should provide for accepting opening an HRMP channel.</span>
@@ -1335,7 +1332,7 @@
 			<span class="ident">ump_service_total_weight</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">max_upward_message_size</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">max_upward_message_num_per_candidate</span>: <span class="ident">Default::default</span>(),
-			<span class="ident">hrmp_open_request_ttl</span>: <span class="ident">Default::default</span>(),
+			<span class="ident">_hrmp_open_request_ttl</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">hrmp_sender_deposit</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">hrmp_recipient_deposit</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">hrmp_channel_max_capacity</span>: <span class="ident">Default::default</span>(),
@@ -1774,12 +1771,10 @@
 
 		<span class="doccomment">/// Sets the number of sessions after which an HRMP open channel request expires.</span>
 		<span class="attribute">#[<span class="ident">pallet::weight</span>((<span class="number">1_000</span>, <span class="ident">DispatchClass::Operational</span>))]</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_hrmp_open_request_ttl</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">new</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-			<span class="ident">ensure_root</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
-			<span class="self">Self</span><span class="ident">::update_config_member</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-				<span class="ident">sp_std::mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">config</span>.<span class="ident">hrmp_open_request_ttl</span>, <span class="ident">new</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">new</span>
-			});
-			<span class="prelude-val">Ok</span>(())
+		<span class="comment">// Deprecated, but is not marked as such, because that would trigger warnings coming from</span>
+		<span class="comment">// the macro.</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_hrmp_open_request_ttl</span>(<span class="ident">_origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
+			<span class="prelude-val">Err</span>(<span class="string">&quot;this doesn&#39;t have any effect&quot;</span>.<span class="ident">into</span>())
 		}
 
 		<span class="doccomment">/// Sets the amount of funds that the sender should provide for opening an HRMP channel.</span>
@@ -2021,7 +2016,7 @@
 				<span class="ident">ump_service_total_weight</span>: <span class="number">20000</span>,
 				<span class="ident">max_upward_message_size</span>: <span class="number">448</span>,
 				<span class="ident">max_upward_message_num_per_candidate</span>: <span class="number">5</span>,
-				<span class="ident">hrmp_open_request_ttl</span>: <span class="number">1312</span>,
+				<span class="ident">_hrmp_open_request_ttl</span>: <span class="number">0</span>,
 				<span class="ident">hrmp_sender_deposit</span>: <span class="number">22</span>,
 				<span class="ident">hrmp_recipient_deposit</span>: <span class="number">4905</span>,
 				<span class="ident">hrmp_channel_max_capacity</span>: <span class="number">3921</span>,
@@ -2144,11 +2139,6 @@
 			<span class="ident">Configuration::set_max_upward_message_num_per_candidate</span>(
 				<span class="ident">Origin::root</span>(),
 				<span class="ident">new_config</span>.<span class="ident">max_upward_message_num_per_candidate</span>,
-			)
-			.<span class="ident">unwrap</span>();
-			<span class="ident">Configuration::set_hrmp_open_request_ttl</span>(
-				<span class="ident">Origin::root</span>(),
-				<span class="ident">new_config</span>.<span class="ident">hrmp_open_request_ttl</span>,
 			)
 			.<span class="ident">unwrap</span>();
 			<span class="ident">Configuration::set_hrmp_sender_deposit</span>(<span class="ident">Origin::root</span>(), <span class="ident">new_config</span>.<span class="ident">hrmp_sender_deposit</span>)
