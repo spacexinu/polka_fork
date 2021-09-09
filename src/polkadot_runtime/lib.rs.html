@@ -1736,6 +1736,9 @@
 <span id="1733">1733</span>
 <span id="1734">1734</span>
 <span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2101,7 +2104,6 @@
 	<span class="kw">pub</span> <span class="ident">SolutionImprovementThreshold</span>: <span class="ident">Perbill</span> <span class="op">=</span> <span class="ident">Perbill::from_rational</span>(<span class="number">5u32</span>, <span class="number">10_000</span>);
 
 	<span class="comment">// miner configs</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MinerMaxIterations</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
 	<span class="kw">pub</span> <span class="ident">OffchainRepeat</span>: <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="number">5</span>;
 }
 
@@ -2129,7 +2131,6 @@
 	<span class="kw">type</span> <span class="ident">SlashHandler</span> <span class="op">=</span> (); <span class="comment">// burn slashes</span>
 	<span class="kw">type</span> <span class="ident">RewardHandler</span> <span class="op">=</span> (); <span class="comment">// nothing to do upon rewards</span>
 	<span class="kw">type</span> <span class="ident">SolutionImprovementThreshold</span> <span class="op">=</span> <span class="ident">SolutionImprovementThreshold</span>;
-	<span class="kw">type</span> <span class="ident">MinerMaxIterations</span> <span class="op">=</span> <span class="ident">MinerMaxIterations</span>;
 	<span class="kw">type</span> <span class="ident">MinerMaxWeight</span> <span class="op">=</span> <span class="ident">OffchainSolutionWeightLimit</span>; <span class="comment">// For now use the one from staking.</span>
 	<span class="kw">type</span> <span class="ident">MinerMaxLength</span> <span class="op">=</span> <span class="ident">OffchainSolutionLengthLimit</span>;
 	<span class="kw">type</span> <span class="ident">OffchainRepeat</span> <span class="op">=</span> <span class="ident">OffchainRepeat</span>;
@@ -2138,6 +2139,11 @@
 	<span class="kw">type</span> <span class="ident">OnChainAccuracy</span> <span class="op">=</span> <span class="ident">Perbill</span>;
 	<span class="kw">type</span> <span class="ident">Solution</span> <span class="op">=</span> <span class="ident">NposCompactSolution16</span>;
 	<span class="kw">type</span> <span class="ident">Fallback</span> <span class="op">=</span> <span class="ident">Fallback</span>;
+	<span class="kw">type</span> <span class="ident">Solver</span> <span class="op">=</span> <span class="ident">frame_election_provider_support::SequentialPhragmen</span><span class="op">&lt;</span>
+		<span class="ident">AccountId</span>,
+		<span class="ident">pallet_election_provider_multi_phase::SolutionAccuracyOf</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
+		<span class="ident">runtime_common::elections::OffchainRandomBalancing</span>,
+	<span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">BenchmarkingConfig</span> <span class="op">=</span> <span class="ident">runtime_common::elections::BenchmarkConfig</span>;
 	<span class="kw">type</span> <span class="ident">ForceOrigin</span> <span class="op">=</span> <span class="ident">EnsureOneOf</span><span class="op">&lt;</span>
 		<span class="ident">AccountId</span>,

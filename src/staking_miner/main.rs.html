@@ -533,6 +533,104 @@
 <span id="530">530</span>
 <span id="531">531</span>
 <span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -574,9 +672,11 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">signer::get_account_info</span>;
 
+<span class="kw">use</span> <span class="ident">frame_election_provider_support::NposSolver</span>;
 <span class="kw">use</span> <span class="ident">frame_support::traits::Get</span>;
 <span class="kw">use</span> <span class="ident">jsonrpsee_ws_client</span>::{<span class="ident">WsClient</span>, <span class="ident">WsClientBuilder</span>};
 <span class="kw">use</span> <span class="ident">remote_externalities</span>::{<span class="ident">Builder</span>, <span class="ident">Mode</span>, <span class="ident">OnlineConfig</span>};
+<span class="kw">use</span> <span class="ident">sp_npos_elections::ExtendedBalance</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime::traits::Block</span> <span class="kw">as</span> <span class="ident">BlockT</span>;
 <span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
 
@@ -729,15 +829,43 @@
 	}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Error</span> {
+<span class="doccomment">/// Same as [`any_runtime`], but instead of returning a `Result`, this simply returns `()`. Useful</span>
+<span class="doccomment">/// for situations where the result is not useful and un-ergonomic to handle.</span>
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="macro">macro_rules!</span> <span class="ident">any_runtime_unit</span> {
+	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="kw">unsafe</span> {
+			<span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::RUNTIME</span> {
+				<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::AnyRuntime::Polkadot</span> <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+					<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::polkadot_runtime_exports</span>::<span class="kw-2">*</span>;
+					<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>)<span class="kw-2">*</span>;
+				},
+				<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::AnyRuntime::Kusama</span> <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+					<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::kusama_runtime_exports</span>::<span class="kw-2">*</span>;
+					<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>)<span class="kw-2">*</span>;
+				},
+				<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::AnyRuntime::Westend</span> <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+					<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::westend_runtime_exports</span>::<span class="kw-2">*</span>;
+					<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>)<span class="kw-2">*</span>;
+				}
+			}
+		}
+	}
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">frame_support::DebugNoBound</span>, <span class="ident">thiserror::Error</span>)]</span>
+<span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span> {
 	<span class="ident">Io</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
-	<span class="ident">Jsonrpsee</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">jsonrpsee_ws_client::types::Error</span>),
+	<span class="ident">JsonRpsee</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">jsonrpsee_ws_client::types::Error</span>),
+	<span class="ident">RpcHelperError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">rpc_helpers::RpcHelperError</span>),
 	<span class="ident">Codec</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">codec::Error</span>),
 	<span class="ident">Crypto</span>(<span class="ident">sp_core::crypto::SecretStringError</span>),
 	<span class="ident">RemoteExternalities</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
-	<span class="ident">PalletMiner</span>(<span class="ident">EPM::unsigned::MinerError</span>),
-	<span class="ident">PalletElection</span>(<span class="ident">EPM::ElectionError</span>),
+	<span class="ident">PalletMiner</span>(<span class="ident">EPM::unsigned::MinerError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
+	<span class="ident">PalletElection</span>(<span class="ident">EPM::ElectionError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
 	<span class="ident">PalletFeasibility</span>(<span class="ident">EPM::FeasibilityError</span>),
 	<span class="ident">AccountDoesNotExists</span>,
 	<span class="ident">IncorrectPhase</span>,
@@ -745,33 +873,33 @@
 	<span class="ident">VersionMismatch</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sp_core::crypto::SecretStringError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">sp_core::crypto::SecretStringError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sp_core::crypto::SecretStringError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">sp_core::crypto::SecretStringError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">Error::Crypto</span>(<span class="ident">e</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EPM::unsigned::MinerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">EPM::unsigned::MinerError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EPM::unsigned::MinerError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">EPM::unsigned::MinerError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">Error::PalletMiner</span>(<span class="ident">e</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EPM::ElectionError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">EPM::ElectionError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EPM::ElectionError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">EPM::ElectionError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">Error::PalletElection</span>(<span class="ident">e</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EPM::FeasibilityError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">EPM::FeasibilityError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EPM::FeasibilityError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">EPM::FeasibilityError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">Error::PalletFeasibility</span>(<span class="ident">e</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
-		<span class="op">&lt;</span><span class="ident">Error</span> <span class="kw">as</span> <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span><span class="ident">::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
+		<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span><span class="ident">::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
 	}
 }
 
@@ -786,6 +914,58 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
+<span class="kw">enum</span> <span class="ident">Solvers</span> {
+	<span class="ident">SeqPhragmen</span> {
+		<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;10&quot;</span>)]</span>
+		<span class="ident">iterations</span>: <span class="ident">usize</span>,
+	},
+	<span class="ident">PhragMMS</span> {
+		<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;10&quot;</span>)]</span>
+		<span class="ident">iterations</span>: <span class="ident">usize</span>,
+	},
+}
+
+<span class="doccomment">/// Mine a solution with the given `solver`.</span>
+<span class="kw">fn</span> <span class="ident">mine_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+	<span class="ident">solver</span>: <span class="kw-2">&amp;</span><span class="ident">Solvers</span>,
+	<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ext</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::SolutionOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">u32</span>), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">T</span>: <span class="ident">EPM::Config</span>,
+	<span class="ident">T::Solver</span>: <span class="ident">NposSolver</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">sp_npos_elections::Error</span><span class="op">&gt;</span>,
+{
+	<span class="kw">use</span> <span class="ident">frame_election_provider_support</span>::{<span class="ident">PhragMMS</span>, <span class="ident">SequentialPhragmen</span>};
+
+	<span class="kw">match</span> <span class="ident">solver</span> {
+		<span class="ident">Solvers::SeqPhragmen</span> { <span class="ident">iterations</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">BalanceIterations::set</span>(<span class="kw-2">*</span><span class="ident">iterations</span>);
+			<span class="ident">mine_unchecked</span>::<span class="op">&lt;</span>
+				<span class="ident">T</span>,
+				<span class="ident">SequentialPhragmen</span><span class="op">&lt;</span>
+					<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::AccountId</span>,
+					<span class="ident">sp_runtime::Perbill</span>,
+					<span class="ident">Balancing</span>,
+				<span class="op">&gt;</span>,
+			<span class="op">&gt;</span>(<span class="ident">ext</span>, <span class="bool-val">false</span>)
+		},
+		<span class="ident">Solvers::PhragMMS</span> { <span class="ident">iterations</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">BalanceIterations::set</span>(<span class="kw-2">*</span><span class="ident">iterations</span>);
+			<span class="ident">mine_unchecked</span>::<span class="op">&lt;</span>
+				<span class="ident">T</span>,
+				<span class="ident">PhragMMS</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::AccountId</span>, <span class="ident">sp_runtime::Perbill</span>, <span class="ident">Balancing</span><span class="op">&gt;</span>,
+			<span class="op">&gt;</span>(<span class="ident">ext</span>, <span class="bool-val">false</span>)
+		},
+	}
+}
+
+<span class="macro">frame_support::parameter_types!</span> {
+	<span class="doccomment">/// Number of balancing iterations for a solution algorithm. Set based on the [`Solvers`] CLI</span>
+	<span class="doccomment">/// config.</span>
+	<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">BalanceIterations</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
+	<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">Balancing</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">ExtendedBalance</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">BalanceIterations::get</span>(), <span class="number">0</span>));
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
 <span class="kw">struct</span> <span class="ident">MonitorConfig</span> {
 	<span class="doccomment">/// They type of event to listen to.</span>
 	<span class="doccomment">///</span>
@@ -795,8 +975,8 @@
 	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;head&quot;</span>, <span class="ident">possible_values</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;head&quot;</span>, <span class="string">&quot;finalized&quot;</span>]</span>)]
 	<span class="ident">listen</span>: <span class="ident">String</span>,
 
-	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;10&quot;</span>)]</span>
-	<span class="ident">iterations</span>: <span class="ident">usize</span>,
+	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">subcommand</span>)]</span>
+	<span class="ident">solver</span>: <span class="ident">Solvers</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
@@ -805,8 +985,8 @@
 	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
 	<span class="ident">at</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Hash</span><span class="op">&gt;</span>,
 
-	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;10&quot;</span>)]</span>
-	<span class="ident">iterations</span>: <span class="ident">usize</span>,
+	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">subcommand</span>)]</span>
+	<span class="ident">solver</span>: <span class="ident">Solvers</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
@@ -839,7 +1019,7 @@
 	<span class="ident">uri</span>: <span class="ident">String</span>,
 	<span class="ident">at</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B::Hash</span><span class="op">&gt;</span>,
 	<span class="ident">additional</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ext</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ext</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">storage::generator::StorageMap</span>, <span class="ident">traits::PalletInfo</span>};
 	<span class="kw">use</span> <span class="ident">sp_core::hashing::twox_128</span>;
 
@@ -863,13 +1043,20 @@
 
 <span class="doccomment">/// Compute the election at the given block number. It expects to NOT be `Phase::Off`. In other</span>
 <span class="doccomment">/// words, the snapshot must exists on the given externalities.</span>
-<span class="kw">fn</span> <span class="ident">mine_unchecked</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span>(
+<span class="kw">fn</span> <span class="ident">mine_unchecked</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(
 	<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ext</span>,
-	<span class="ident">iterations</span>: <span class="ident">usize</span>,
 	<span class="ident">do_feasibility</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::SolutionOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">u32</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">EPM::RawSolution</span><span class="op">&lt;</span><span class="ident">EPM::SolutionOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">u32</span>), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">T</span>: <span class="ident">EPM::Config</span>,
+	<span class="ident">S</span>: <span class="ident">NposSolver</span><span class="op">&lt;</span>
+		<span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">EPM::Config</span><span class="op">&gt;</span><span class="ident">::Solver</span> <span class="kw">as</span> <span class="ident">NposSolver</span><span class="op">&gt;</span><span class="ident">::Error</span>,
+		<span class="ident">AccountId</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">EPM::Config</span><span class="op">&gt;</span><span class="ident">::Solver</span> <span class="kw">as</span> <span class="ident">NposSolver</span><span class="op">&gt;</span><span class="ident">::AccountId</span>,
+	<span class="op">&gt;</span>,
+{
 	<span class="ident">ext</span>.<span class="ident">execute_with</span>(<span class="op">|</span><span class="op">|</span> {
-		<span class="kw">let</span> (<span class="ident">solution</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="op">&lt;</span><span class="ident">EPM::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::mine_solution</span>(<span class="ident">iterations</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> (<span class="ident">solution</span>, <span class="kw">_</span>) <span class="op">=</span>
+			<span class="op">&lt;</span><span class="ident">EPM::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::mine_solution</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>().<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
 		<span class="kw">if</span> <span class="ident">do_feasibility</span> {
 			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">EPM::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::feasibility_check</span>(
 				<span class="ident">solution</span>.<span class="ident">clone</span>(),
@@ -882,7 +1069,7 @@
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="kw">fn</span> <span class="ident">mine_dpos</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span>(<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">mine_dpos</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span>(<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="ident">ext</span>.<span class="ident">execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 		<span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 		<span class="kw">use</span> <span class="ident">EPM::RoundSnapshot</span>;
@@ -919,10 +1106,10 @@
 	})
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_versions</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">frame_system::Config</span><span class="op">&gt;</span>(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_versions</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">frame_system::Config</span> <span class="op">+</span> <span class="ident">EPM::Config</span><span class="op">&gt;</span>(
 	<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">WsClient</span>,
 	<span class="ident">print</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">linked_version</span> <span class="op">=</span> <span class="ident">T::Version::get</span>();
 	<span class="kw">let</span> <span class="ident">on_chain_version</span> <span class="op">=</span> <span class="ident">rpc_helpers::rpc</span>::<span class="op">&lt;</span><span class="ident">sp_version::RuntimeVersion</span><span class="op">&gt;</span>(
 		<span class="ident">client</span>,
@@ -1022,7 +1209,7 @@
 	}
 	<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;connected to chain {:?}&quot;</span>, <span class="ident">chain</span>);
 
-	<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">any_runtime!</span> {
+	<span class="macro">any_runtime_unit!</span> {
 		<span class="ident">check_versions</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="bool-val">true</span>).<span class="kw">await</span>
 	};
 
@@ -1034,9 +1221,18 @@
 
 	<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="macro">any_runtime!</span> {
 		<span class="kw">match</span> <span class="ident">command</span>.<span class="ident">clone</span>() {
-			<span class="ident">Command::Monitor</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">monitor_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">shared</span>, <span class="ident">c</span>, <span class="ident">signer_account</span>).<span class="kw">await</span>,
-			<span class="ident">Command::DryRun</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dry_run_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">shared</span>, <span class="ident">c</span>, <span class="ident">signer_account</span>).<span class="kw">await</span>,
-			<span class="ident">Command::EmergencySolution</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">emergency_solution_cmd</span>(<span class="ident">shared</span>.<span class="ident">clone</span>()).<span class="kw">await</span>,
+			<span class="ident">Command::Monitor</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">monitor_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">shared</span>, <span class="ident">c</span>, <span class="ident">signer_account</span>).<span class="kw">await</span>
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+					<span class="macro">log::error!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;Monitor error: {:?}&quot;</span>, <span class="ident">e</span>);
+				}),
+			<span class="ident">Command::DryRun</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dry_run_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">shared</span>, <span class="ident">c</span>, <span class="ident">signer_account</span>).<span class="kw">await</span>
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+					<span class="macro">log::error!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;DryRun error: {:?}&quot;</span>, <span class="ident">e</span>);
+				}),
+			<span class="ident">Command::EmergencySolution</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">emergency_solution_cmd</span>(<span class="ident">shared</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+					<span class="macro">log::error!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;EmergencySolution error: {:?}&quot;</span>, <span class="ident">e</span>);
+				}),
 		}
 	};
 	<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;round of execution finished. outcome = {:?}&quot;</span>, <span class="ident">outcome</span>);
