@@ -1987,8 +1987,6 @@
 <span id="1984">1984</span>
 <span id="1985">1985</span>
 <span id="1986">1986</span>
-<span id="1987">1987</span>
-<span id="1988">1988</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2342,9 +2340,6 @@
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SignedDepositByte</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">0</span>, <span class="number">10</span>) <span class="op">/</span> <span class="number">1024</span>;
 	<span class="comment">// Each good submission will get 1/10 KSM as reward</span>
 	<span class="kw">pub</span> <span class="ident">SignedRewardBase</span>: <span class="ident">Balance</span> <span class="op">=</span>  <span class="ident">UNITS</span> <span class="op">/</span> <span class="number">10</span>;
-	<span class="comment">// fallback: emergency phase.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Fallback</span>: <span class="ident">pallet_election_provider_multi_phase::FallbackStrategy</span> <span class="op">=</span>
-		<span class="ident">pallet_election_provider_multi_phase::FallbackStrategy::Nothing</span>;
 	<span class="kw">pub</span> <span class="ident">SolutionImprovementThreshold</span>: <span class="ident">Perbill</span> <span class="op">=</span> <span class="ident">Perbill::from_rational</span>(<span class="number">5u32</span>, <span class="number">10_000</span>);
 
 	<span class="comment">// miner configs</span>
@@ -2381,11 +2376,10 @@
 	<span class="kw">type</span> <span class="ident">MinerTxPriority</span> <span class="op">=</span> <span class="ident">NposSolutionPriority</span>;
 	<span class="kw">type</span> <span class="ident">DataProvider</span> <span class="op">=</span> <span class="ident">Staking</span>;
 	<span class="kw">type</span> <span class="ident">Solution</span> <span class="op">=</span> <span class="ident">NposCompactSolution24</span>;
-	<span class="kw">type</span> <span class="ident">OnChainAccuracy</span> <span class="op">=</span> <span class="ident">Perbill</span>;
-	<span class="kw">type</span> <span class="ident">Fallback</span> <span class="op">=</span> <span class="ident">Fallback</span>;
+	<span class="kw">type</span> <span class="ident">Fallback</span> <span class="op">=</span> <span class="ident">pallet_election_provider_multi_phase::NoFallback</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Solver</span> <span class="op">=</span> <span class="ident">frame_election_provider_support::SequentialPhragmen</span><span class="op">&lt;</span>
 		<span class="ident">AccountId</span>,
-		<span class="ident">pallet_election_provider_multi_phase::SolutionAccuracyOf</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
+		<span class="ident">pallet_election_provider_multi_phase::SolutionAccuracyOf</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
 		<span class="ident">runtime_common::elections::OffchainRandomBalancing</span>,
 	<span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">BenchmarkingConfig</span> <span class="op">=</span> <span class="ident">runtime_common::elections::BenchmarkConfig</span>;
@@ -2394,7 +2388,7 @@
 		<span class="ident">EnsureRoot</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>,
 		<span class="ident">pallet_collective::EnsureProportionAtLeast</span><span class="op">&lt;</span><span class="ident">_2</span>, <span class="ident">_3</span>, <span class="ident">AccountId</span>, <span class="ident">CouncilCollective</span><span class="op">&gt;</span>,
 	<span class="op">&gt;</span>;
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_election_provider_multi_phase::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_election_provider_multi_phase::WeightInfo</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">fn</span> <span class="ident">era_payout</span>(
@@ -2475,6 +2469,11 @@
 	<span class="ident">pallet_collective::EnsureProportionAtLeast</span><span class="op">&lt;</span><span class="ident">_1</span>, <span class="ident">_2</span>, <span class="ident">AccountId</span>, <span class="ident">CouncilCollective</span><span class="op">&gt;</span>,
 <span class="op">&gt;</span>;
 
+<span class="kw">impl</span> <span class="ident">frame_election_provider_support::onchain::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+	<span class="kw">type</span> <span class="ident">Accuracy</span> <span class="op">=</span> <span class="ident">runtime_common::elections::OnOnChainAccuracy</span>;
+	<span class="kw">type</span> <span class="ident">DataProvider</span> <span class="op">=</span> <span class="ident">Staking</span>;
+}
+
 <span class="kw">impl</span> <span class="ident">pallet_staking::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 	<span class="kw">const</span> <span class="ident">MAX_NOMINATIONS</span>: <span class="ident">u32</span> <span class="op">=</span>
 		<span class="op">&lt;</span><span class="ident">NposCompactSolution24</span> <span class="kw">as</span> <span class="ident">sp_npos_elections::NposSolution</span><span class="op">&gt;</span><span class="ident">::LIMIT</span> <span class="kw">as</span> <span class="ident">u32</span>;
@@ -2482,10 +2481,7 @@
 	<span class="kw">type</span> <span class="ident">UnixTime</span> <span class="op">=</span> <span class="ident">Timestamp</span>;
 	<span class="kw">type</span> <span class="ident">CurrencyToVote</span> <span class="op">=</span> <span class="ident">CurrencyToVote</span>;
 	<span class="kw">type</span> <span class="ident">ElectionProvider</span> <span class="op">=</span> <span class="ident">ElectionProviderMultiPhase</span>;
-	<span class="kw">type</span> <span class="ident">GenesisElectionProvider</span> <span class="op">=</span>
-		<span class="ident">frame_election_provider_support::onchain::OnChainSequentialPhragmen</span><span class="op">&lt;</span>
-			<span class="ident">pallet_election_provider_multi_phase::OnChainConfig</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-		<span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">GenesisElectionProvider</span> <span class="op">=</span> <span class="ident">runtime_common::elections::GenesisElectionOf</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">RewardRemainder</span> <span class="op">=</span> <span class="ident">Treasury</span>;
 	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
 	<span class="kw">type</span> <span class="ident">Slash</span> <span class="op">=</span> <span class="ident">Treasury</span>;
