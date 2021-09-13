@@ -1368,6 +1368,33 @@
 <span id="1365">1365</span>
 <span id="1366">1366</span>
 <span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
+<span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1453,11 +1480,15 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kusama-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_client::KusamaExecutorDispatch</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_client::PolkadotExecutorDispatch</span>;
+
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">chain_spec</span>::{<span class="ident">KusamaChainSpec</span>, <span class="ident">PolkadotChainSpec</span>, <span class="ident">RococoChainSpec</span>, <span class="ident">WestendChainSpec</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">consensus_common</span>::{<span class="ident">block_validation::Chain</span>, <span class="ident">Proposal</span>, <span class="ident">SelectChain</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full-node&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_client</span>::{
 	<span class="ident">AbstractClient</span>, <span class="ident">Client</span>, <span class="ident">ClientHandle</span>, <span class="ident">ExecuteWithClient</span>, <span class="ident">FullBackend</span>, <span class="ident">FullClient</span>,
-	<span class="ident">PolkadotExecutorDispatch</span>, <span class="ident">RuntimeApiCollection</span>,
+	<span class="ident">RuntimeApiCollection</span>,
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{<span class="ident">Block</span>, <span class="ident">BlockId</span>, <span class="ident">CollatorPair</span>, <span class="ident">Hash</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sc_client_api</span>::{<span class="ident">Backend</span>, <span class="ident">CallExecutor</span>, <span class="ident">ExecutionStrategy</span>};
@@ -1481,6 +1512,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kusama-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kusama_runtime</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_runtime</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rococo-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rococo_runtime</span>;
@@ -1597,6 +1629,10 @@
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full-node&quot;</span>)]</span>
 	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Creating a custom database is required for validators&quot;</span>)]</span>
 	<span class="ident">DatabasePathRequired</span>,
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full-node&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Expected at least one of polkadot, kusama, westend or rococo runtime feature&quot;</span>)]</span>
+	<span class="ident">NoRuntime</span>,
 }
 
 <span class="doccomment">/// Can be called for a `Configuration` to identify which network the configuration targets.</span>
@@ -2639,13 +2675,19 @@
 		<span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">Arc::new</span>(<span class="ident">Client::Westend</span>(<span class="ident">client</span>)), <span class="ident">backend</span>, <span class="ident">import_queue</span>, <span class="ident">task_manager</span>))
 	}
 
-	<span class="kw">let</span> <span class="ident">service::PartialComponents</span> { <span class="ident">client</span>, <span class="ident">backend</span>, <span class="ident">import_queue</span>, <span class="ident">task_manager</span>, .. } <span class="op">=</span>
-		<span class="ident">new_partial</span>::<span class="op">&lt;</span><span class="ident">polkadot_runtime::RuntimeApi</span>, <span class="ident">PolkadotExecutorDispatch</span><span class="op">&gt;</span>(
-			<span class="ident">config</span>,
-			<span class="ident">jaeger_agent</span>,
-			<span class="prelude-val">None</span>,
-		)<span class="question-mark">?</span>;
-	<span class="prelude-val">Ok</span>((<span class="ident">Arc::new</span>(<span class="ident">Client::Polkadot</span>(<span class="ident">client</span>)), <span class="ident">backend</span>, <span class="ident">import_queue</span>, <span class="ident">task_manager</span>))
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>)]</span>
+	{
+		<span class="kw">let</span> <span class="ident">service::PartialComponents</span> { <span class="ident">client</span>, <span class="ident">backend</span>, <span class="ident">import_queue</span>, <span class="ident">task_manager</span>, .. } <span class="op">=</span>
+			<span class="ident">new_partial</span>::<span class="op">&lt;</span><span class="ident">polkadot_runtime::RuntimeApi</span>, <span class="ident">PolkadotExecutorDispatch</span><span class="op">&gt;</span>(
+				<span class="ident">config</span>,
+				<span class="ident">jaeger_agent</span>,
+				<span class="prelude-val">None</span>,
+			)<span class="question-mark">?</span>;
+		<span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">Arc::new</span>(<span class="ident">Client::Polkadot</span>(<span class="ident">client</span>)), <span class="ident">backend</span>, <span class="ident">import_queue</span>, <span class="ident">task_manager</span>))
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>))]</span>
+	<span class="prelude-val">Err</span>(<span class="ident">Error::NoRuntime</span>)
 }
 
 <span class="doccomment">/// Build a new light node.</span>
@@ -2666,7 +2708,13 @@
 		<span class="kw">return</span> <span class="ident">new_light</span>::<span class="op">&lt;</span><span class="ident">westend_runtime::RuntimeApi</span>, <span class="ident">WestendExecutorDispatch</span><span class="op">&gt;</span>(<span class="ident">config</span>)
 	}
 
-	<span class="ident">new_light</span>::<span class="op">&lt;</span><span class="ident">polkadot_runtime::RuntimeApi</span>, <span class="ident">PolkadotExecutorDispatch</span><span class="op">&gt;</span>(<span class="ident">config</span>)
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>)]</span>
+	{
+		<span class="kw">return</span> <span class="ident">new_light</span>::<span class="op">&lt;</span><span class="ident">polkadot_runtime::RuntimeApi</span>, <span class="ident">PolkadotExecutorDispatch</span><span class="op">&gt;</span>(<span class="ident">config</span>)
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>))]</span>
+	<span class="prelude-val">Err</span>(<span class="ident">Error::NoRuntime</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full-node&quot;</span>)]</span>
@@ -2724,17 +2772,23 @@
 		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">full</span><span class="op">|</span> <span class="ident">full</span>.<span class="ident">with_client</span>(<span class="ident">Client::Westend</span>))
 	}
 
-	<span class="ident">new_full</span>::<span class="op">&lt;</span><span class="ident">polkadot_runtime::RuntimeApi</span>, <span class="ident">PolkadotExecutorDispatch</span>, <span class="kw">_</span><span class="op">&gt;</span>(
-		<span class="ident">config</span>,
-		<span class="ident">is_collator</span>,
-		<span class="ident">grandpa_pause</span>,
-		<span class="ident">disable_beefy</span>,
-		<span class="ident">jaeger_agent</span>,
-		<span class="ident">telemetry_worker_handle</span>,
-		<span class="prelude-val">None</span>,
-		<span class="ident">overseer_gen</span>,
-	)
-	.<span class="ident">map</span>(<span class="op">|</span><span class="ident">full</span><span class="op">|</span> <span class="ident">full</span>.<span class="ident">with_client</span>(<span class="ident">Client::Polkadot</span>))
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>)]</span>
+	{
+		<span class="kw">return</span> <span class="ident">new_full</span>::<span class="op">&lt;</span><span class="ident">polkadot_runtime::RuntimeApi</span>, <span class="ident">PolkadotExecutorDispatch</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+			<span class="ident">config</span>,
+			<span class="ident">is_collator</span>,
+			<span class="ident">grandpa_pause</span>,
+			<span class="ident">disable_beefy</span>,
+			<span class="ident">jaeger_agent</span>,
+			<span class="ident">telemetry_worker_handle</span>,
+			<span class="prelude-val">None</span>,
+			<span class="ident">overseer_gen</span>,
+		)
+		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">full</span><span class="op">|</span> <span class="ident">full</span>.<span class="ident">with_client</span>(<span class="ident">Client::Polkadot</span>))
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;polkadot-native&quot;</span>))]</span>
+	<span class="prelude-val">Err</span>(<span class="ident">Error::NoRuntime</span>)
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_service" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
