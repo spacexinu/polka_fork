@@ -91,6 +91,7 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -154,14 +155,15 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OnOnChainAccuracy</span> <span class="op">=</span> <span class="ident">sp_runtime::Perbill</span>;
 
 <span class="doccomment">/// The election provider of the genesis</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GenesisElectionOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">frame_election_provider_support::onchain::OnChainSequentialPhragmen</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GenesisElectionOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
+	<span class="ident">frame_election_provider_support::onchain::OnChainSequentialPhragmen</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Maximum number of iterations for balancing that will be executed in the embedded miner of</span>
 <span class="doccomment">/// pallet-election-provider-multi-phase.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MINER_MAX_ITERATIONS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
 
-<span class="doccomment">/// A source of random balance for the NPoS Solver, which is meant to be run by the OCW election</span>
-<span class="doccomment">/// miner.</span>
+<span class="doccomment">/// A source of random balance for the NPoS Solver, which is meant to be run by the offchain worker</span>
+<span class="doccomment">/// election miner.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OffchainRandomBalancing</span>;
 <span class="kw">impl</span> <span class="ident">frame_support::pallet_prelude::Get</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">sp_npos_elections::ExtendedBalance</span>)<span class="op">&gt;</span><span class="op">&gt;</span>
 	<span class="kw">for</span> <span class="ident">OffchainRandomBalancing</span>
