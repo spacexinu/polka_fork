@@ -2009,6 +2009,61 @@
 <span id="2006">2006</span>
 <span id="2007">2007</span>
 <span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
+<span id="2019">2019</span>
+<span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
+<span id="2027">2027</span>
+<span id="2028">2028</span>
+<span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
+<span id="2034">2034</span>
+<span id="2035">2035</span>
+<span id="2036">2036</span>
+<span id="2037">2037</span>
+<span id="2038">2038</span>
+<span id="2039">2039</span>
+<span id="2040">2040</span>
+<span id="2041">2041</span>
+<span id="2042">2042</span>
+<span id="2043">2043</span>
+<span id="2044">2044</span>
+<span id="2045">2045</span>
+<span id="2046">2046</span>
+<span id="2047">2047</span>
+<span id="2048">2048</span>
+<span id="2049">2049</span>
+<span id="2050">2050</span>
+<span id="2051">2051</span>
+<span id="2052">2052</span>
+<span id="2053">2053</span>
+<span id="2054">2054</span>
+<span id="2055">2055</span>
+<span id="2056">2056</span>
+<span id="2057">2057</span>
+<span id="2058">2058</span>
+<span id="2059">2059</span>
+<span id="2060">2060</span>
+<span id="2061">2061</span>
+<span id="2062">2062</span>
+<span id="2063">2063</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3517,10 +3572,65 @@
 	<span class="ident">frame_system::ChainContext</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
 	<span class="ident">Runtime</span>,
 	<span class="ident">AllPallets</span>,
-	(<span class="ident">TechnicalMembershipStoragePrefixMigration</span>, <span class="ident">MigrateTipsPalletPrefix</span>),
+	(
+		<span class="ident">CouncilStoragePrefixMigration</span>,
+		<span class="ident">TechnicalCommitteeStoragePrefixMigration</span>,
+		<span class="ident">TechnicalMembershipStoragePrefixMigration</span>,
+		<span class="ident">MigrateTipsPalletPrefix</span>,
+	),
 <span class="op">&gt;</span>;
 <span class="doccomment">/// The payload being signed in the transactions.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignedPayload</span> <span class="op">=</span> <span class="ident">generic::SignedPayload</span><span class="op">&lt;</span><span class="ident">Call</span>, <span class="ident">SignedExtra</span><span class="op">&gt;</span>;
+
+<span class="kw">const</span> <span class="ident">COUNCIL_OLD_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Instance1Collective&quot;</span>;
+<span class="doccomment">/// Migrate from `Instance1Collective` to the new pallet prefix `Council`</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CouncilStoragePrefixMigration</span>;
+
+<span class="kw">impl</span> <span class="ident">OnRuntimeUpgrade</span> <span class="kw">for</span> <span class="ident">CouncilStoragePrefixMigration</span> {
+	<span class="kw">fn</span> <span class="ident">on_runtime_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">frame_support::weights::Weight</span> {
+		<span class="ident">pallet_collective::migrations::v4::migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Council</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">COUNCIL_OLD_PREFIX</span>)
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">pre_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_collective::migrations::v4::pre_migrate</span>::<span class="op">&lt;</span><span class="ident">Council</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">COUNCIL_OLD_PREFIX</span>);
+		<span class="prelude-val">Ok</span>(())
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">post_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_collective::migrations::v4::post_migrate</span>::<span class="op">&lt;</span><span class="ident">Council</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">COUNCIL_OLD_PREFIX</span>);
+		<span class="prelude-val">Ok</span>(())
+	}
+}
+
+<span class="kw">const</span> <span class="ident">TECHNICAL_COMMITTEE_OLD_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Instance2Collective&quot;</span>;
+<span class="doccomment">/// Migrate from `Instance2Collective` to the new pallet prefix `TechnicalCommittee`</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TechnicalCommitteeStoragePrefixMigration</span>;
+
+<span class="kw">impl</span> <span class="ident">OnRuntimeUpgrade</span> <span class="kw">for</span> <span class="ident">TechnicalCommitteeStoragePrefixMigration</span> {
+	<span class="kw">fn</span> <span class="ident">on_runtime_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">frame_support::weights::Weight</span> {
+		<span class="ident">pallet_collective::migrations::v4::migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">TechnicalCommittee</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+			<span class="ident">TECHNICAL_COMMITTEE_OLD_PREFIX</span>,
+		)
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">pre_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_collective::migrations::v4::pre_migrate</span>::<span class="op">&lt;</span><span class="ident">TechnicalCommittee</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+			<span class="ident">TECHNICAL_COMMITTEE_OLD_PREFIX</span>,
+		);
+		<span class="prelude-val">Ok</span>(())
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">post_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_collective::migrations::v4::post_migrate</span>::<span class="op">&lt;</span><span class="ident">TechnicalCommittee</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+			<span class="ident">TECHNICAL_COMMITTEE_OLD_PREFIX</span>,
+		);
+		<span class="prelude-val">Ok</span>(())
+	}
+}
 
 <span class="kw">const</span> <span class="ident">TECHNICAL_MEMBERSHIP_OLD_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Instance1Membership&quot;</span>;
 <span class="doccomment">/// Migrate from `Instance1Membership` to the new pallet prefix `TechnicalMembership`</span>
