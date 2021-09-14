@@ -1392,6 +1392,26 @@
 <span id="1389">1389</span>
 <span id="1390">1390</span>
 <span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
+<span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2287,11 +2307,31 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Default</span>, <span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionInfo</span> {
 	<span class="doccomment">/// Validators in canonical ordering.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// NOTE: There might be more authorities in the current session, than `validators` participating</span>
+	<span class="doccomment">/// in parachain consensus. See</span>
+	<span class="doccomment">/// [`max_validators`](https://github.com/paritytech/polkadot/blob/a52dca2be7840b23c19c153cf7e110b1e3e475f8/runtime/parachains/src/configuration.rs#L148).</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// `SessionInfo::validators` will be limited to to `max_validators` when set.</span>
 	<span class="kw">pub</span> <span class="ident">validators</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ValidatorId</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Validators&#39; authority discovery keys for the session in canonical ordering.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// NOTE: The first `validators.len()` entries will match the corresponding validators in</span>
+	<span class="doccomment">/// `validators`, afterwards any remaining authorities can be found. This is any authorities not</span>
+	<span class="doccomment">/// participating in parachain consensus - see</span>
+	<span class="doccomment">/// [`max_validators`](https://github.com/paritytech/polkadot/blob/a52dca2be7840b23c19c153cf7e110b1e3e475f8/runtime/parachains/src/configuration.rs#L148)</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">ignore_malloc_size_of</span> <span class="op">=</span> <span class="string">&quot;outside type&quot;</span>)]</span>
 	<span class="kw">pub</span> <span class="ident">discovery_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// The assignment keys for validators.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// NOTE: There might be more authorities in the current session, than validators participating</span>
+	<span class="doccomment">/// in parachain consensus. See</span>
+	<span class="doccomment">/// [`max_validators`](https://github.com/paritytech/polkadot/blob/a52dca2be7840b23c19c153cf7e110b1e3e475f8/runtime/parachains/src/configuration.rs#L148).</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Therefore:</span>
+	<span class="doccomment">/// ```ignore</span>
+	<span class="doccomment">///		assignment_keys.len() == validators.len() &amp;&amp; validators.len() &lt;= discovery_keys.len()</span>
+	<span class="doccomment">///	```</span>
 	<span class="kw">pub</span> <span class="ident">assignment_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AssignmentId</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Validators in shuffled ordering - these are the validator groups as produced</span>
 	<span class="doccomment">/// by the `Scheduler` module for the session and are typically referred to by</span>
