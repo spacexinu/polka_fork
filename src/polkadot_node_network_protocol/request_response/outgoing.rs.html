@@ -272,11 +272,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RequestError</span> {
 	<span class="doccomment">/// Response could not be decoded.</span>
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Response could not be decoded&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Response could not be decoded: {0}&quot;</span>)]</span>
 	<span class="ident">InvalidResponse</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">DecodingError</span>),
 
 	<span class="doccomment">/// Some error in substrate/libp2p happened.</span>
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Some network error occurred&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
 	<span class="ident">NetworkError</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">network::RequestFailure</span>),
 
 	<span class="doccomment">/// Response got canceled by networking.</span>
