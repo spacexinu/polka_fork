@@ -242,6 +242,9 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -289,10 +292,10 @@
 
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
-		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span>(
-			<span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>)),
-			<span class="number">1_000_000_000</span>,
-		)),
+		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span> {
+			<span class="ident">message</span>: <span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>)),
+			<span class="ident">max_weight</span>: <span class="number">1_000_000_000</span>,
+		}),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,
 		<span class="number">0</span>,
 	);
@@ -333,7 +336,7 @@
 
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
-		<span class="ident">polkadot_test_runtime::Call::TestNotifier</span>(<span class="ident">pallet_test_notifier::Call::prepare_new_query</span>()),
+		<span class="ident">polkadot_test_runtime::Call::TestNotifier</span>(<span class="ident">pallet_test_notifier::Call::prepare_new_query</span> {}),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,
 		<span class="number">0</span>,
 	);
@@ -369,7 +372,10 @@
 
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
-		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span>(<span class="ident">msg</span>, <span class="number">1_000_000_000</span>)),
+		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span> {
+			<span class="ident">message</span>: <span class="ident">msg</span>,
+			<span class="ident">max_weight</span>: <span class="number">1_000_000_000</span>,
+		}),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,
 		<span class="number">1</span>,
 	);
@@ -418,7 +424,7 @@
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
 		<span class="ident">polkadot_test_runtime::Call::TestNotifier</span>(
-			<span class="ident">pallet_test_notifier::Call::prepare_new_notify_query</span>(),
+			<span class="ident">pallet_test_notifier::Call::prepare_new_notify_query</span> {},
 		),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,
 		<span class="number">0</span>,
@@ -454,10 +460,10 @@
 
 	<span class="kw">let</span> <span class="ident">execute</span> <span class="op">=</span> <span class="ident">construct_extrinsic</span>(
 		<span class="kw-2">&amp;</span><span class="ident">client</span>,
-		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span>(
-			<span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>)),
-			<span class="number">1_000_000_000</span>,
-		)),
+		<span class="ident">polkadot_test_runtime::Call::Xcm</span>(<span class="ident">pallet_xcm::Call::execute</span> {
+			<span class="ident">message</span>: <span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>)),
+			<span class="ident">max_weight</span>: <span class="number">1_000_000_000</span>,
+		}),
 		<span class="ident">sp_keyring::Sr25519Keyring::Alice</span>,
 		<span class="number">1</span>,
 	);

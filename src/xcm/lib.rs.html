@@ -482,6 +482,8 @@
 <span id="479">479</span>
 <span id="480">480</span>
 <span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -515,6 +517,7 @@
 };
 <span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">CodecError</span>, <span class="ident">Input</span>};
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">v0</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">v1</span>;
@@ -554,7 +557,7 @@
 }
 
 <span class="doccomment">/// A single `MultiLocation` value, together with its version code.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Eq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">PartialEq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">encode_bound</span>())]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">decode_bound</span>())]</span>
@@ -608,7 +611,7 @@
 }
 
 <span class="doccomment">/// A single `Response` value, together with its version code.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Eq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">PartialEq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">encode_bound</span>())]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">decode_bound</span>())]</span>
@@ -684,7 +687,7 @@
 }
 
 <span class="doccomment">/// A single `MultiAsset` value, together with its version code.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Eq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">PartialEq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">encode_bound</span>())]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">decode_bound</span>())]</span>
@@ -738,7 +741,7 @@
 }
 
 <span class="doccomment">/// A single `MultiAssets` value, together with its version code.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Eq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">PartialEq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">encode_bound</span>())]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">decode_bound</span>())]</span>
@@ -792,10 +795,11 @@
 }
 
 <span class="doccomment">/// A single XCM message, together with its version code.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Eq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">PartialEq</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">encode_bound</span>())]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">decode_bound</span>())]</span>
+<span class="attribute">#[<span class="ident">scale_info</span>(<span class="ident">bounds</span>(), <span class="ident">skip_type_params</span>(<span class="ident">Call</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VersionedXcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
 	<span class="ident">V0</span>(<span class="ident">v0::Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>),
 	<span class="ident">V1</span>(<span class="ident">v1::Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>),

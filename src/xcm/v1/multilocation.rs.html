@@ -925,6 +925,7 @@
 <span id="922">922</span>
 <span id="923">923</span>
 <span id="924">924</span>
+<span id="925">925</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -947,6 +948,7 @@
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::Junction</span>;
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">mem</span>, <span class="ident">result</span>};
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 
 <span class="doccomment">/// A relative path between state-bearing consensus systems.</span>
 <span class="doccomment">///</span>
@@ -974,7 +976,7 @@
 <span class="doccomment">/// that a value is strictly an interior location, in those cases, `Junctions` may be used.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `MultiLocation` value of `Null` simply refers to the interpreting consensus system.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Debug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiLocation</span> {
 	<span class="doccomment">/// The number of parent junctions at the beginning of this `MultiLocation`.</span>
 	<span class="kw">pub</span> <span class="ident">parents</span>: <span class="ident">u8</span>,
@@ -1298,7 +1300,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Parent junctions cannot be constructed with this type. Refer to `MultiLocation` for</span>
 <span class="doccomment">/// instructions on constructing parent junctions.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Debug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Junctions</span> {
 	<span class="doccomment">/// The interpreting consensus system.</span>
 	<span class="ident">Here</span>,

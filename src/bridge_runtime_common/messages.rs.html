@@ -1518,6 +1518,7 @@
 <span id="1515">1515</span>
 <span id="1516">1516</span>
 <span id="1517">1517</span>
+<span id="1518">1518</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Parity Bridges Common.</span>
@@ -1558,6 +1559,7 @@
 	<span class="ident">RuntimeDebug</span>,
 };
 <span class="kw">use</span> <span class="ident">hash_db::Hasher</span>;
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
 	<span class="ident">traits</span>::{<span class="ident">AtLeast32BitUnsigned</span>, <span class="ident">CheckedAdd</span>, <span class="ident">CheckedDiv</span>, <span class="ident">CheckedMul</span>},
 	<span class="ident">FixedPointNumber</span>, <span class="ident">FixedPointOperand</span>, <span class="ident">FixedU128</span>,
@@ -1721,7 +1723,7 @@
 	<span class="doccomment">/// - hash of finalized header;</span>
 	<span class="doccomment">/// - storage proof of inbound lane state;</span>
 	<span class="doccomment">/// - lane id.</span>
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromBridgedChainMessagesDeliveryProof</span><span class="op">&lt;</span><span class="ident">BridgedHeaderHash</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// Hash of the bridge header the proof is for.</span>
 		<span class="kw">pub</span> <span class="ident">bridged_header_hash</span>: <span class="ident">BridgedHeaderHash</span>,
@@ -1952,7 +1954,7 @@
 	<span class="doccomment">/// - storage proof of messages and (optionally) outbound lane state;</span>
 	<span class="doccomment">/// - lane id;</span>
 	<span class="doccomment">/// - nonces (inclusive range) of messages which are included in this proof.</span>
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromBridgedChainMessagesProof</span><span class="op">&lt;</span><span class="ident">BridgedHeaderHash</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// Hash of the finalized bridged header the proof is for.</span>
 		<span class="kw">pub</span> <span class="ident">bridged_header_hash</span>: <span class="ident">BridgedHeaderHash</span>,

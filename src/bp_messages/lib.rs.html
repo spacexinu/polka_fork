@@ -391,6 +391,7 @@
 <span id="388">388</span>
 <span id="389">389</span>
 <span id="390">390</span>
+<span id="391">391</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Parity Bridges Common.</span>
@@ -420,6 +421,7 @@
 <span class="kw">use</span> <span class="ident">bp_runtime::messages::DispatchFeePayment</span>;
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">use</span> <span class="ident">frame_support::RuntimeDebug</span>;
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">collections::vec_deque::VecDeque</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">source_chain</span>;
@@ -429,7 +431,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frame_support::weights::Weight</span>;
 
 <span class="doccomment">/// Messages pallet operating mode.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OperatingMode</span> {
 	<span class="doccomment">/// Normal mode, when all operations are allowed.</span>
@@ -475,7 +477,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessagePayload</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Message key (unique message identifier) as it is stored in the storage.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageKey</span> {
 	<span class="doccomment">/// ID of the message lane.</span>
 	<span class="kw">pub</span> <span class="ident">lane_id</span>: <span class="ident">LaneId</span>,
@@ -484,7 +486,7 @@
 }
 
 <span class="doccomment">/// Message data as it is stored in the storage.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageData</span><span class="op">&lt;</span><span class="ident">Fee</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Message payload.</span>
 	<span class="kw">pub</span> <span class="ident">payload</span>: <span class="ident">MessagePayload</span>,
@@ -493,7 +495,7 @@
 }
 
 <span class="doccomment">/// Message as it is stored in the storage.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Fee</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Message key.</span>
 	<span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">MessageKey</span>,
@@ -502,7 +504,7 @@
 }
 
 <span class="doccomment">/// Inbound lane data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundLaneData</span><span class="op">&lt;</span><span class="ident">RelayerId</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Identifiers of relayers and messages that they have delivered to this lane (ordered by message nonce).</span>
 	<span class="doccomment">///</span>
@@ -589,7 +591,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This struct represents a continuous range of messages that have been delivered by the same relayer</span>
 <span class="doccomment">/// and whose confirmations are still pending.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnrewardedRelayer</span><span class="op">&lt;</span><span class="ident">RelayerId</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Identifier of the relayer.</span>
 	<span class="kw">pub</span> <span class="ident">relayer</span>: <span class="ident">RelayerId</span>,
@@ -598,7 +600,7 @@
 }
 
 <span class="doccomment">/// Delivered messages with their dispatch result.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeliveredMessages</span> {
 	<span class="doccomment">/// Nonce of the first message that has been delivered (inclusive).</span>
 	<span class="kw">pub</span> <span class="ident">begin</span>: <span class="ident">MessageNonce</span>,
@@ -648,7 +650,7 @@
 }
 
 <span class="doccomment">/// Gist of `InboundLaneData::relayers` field used by runtime APIs.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnrewardedRelayersState</span> {
 	<span class="doccomment">/// Number of entries in the `InboundLaneData::relayers` set.</span>
 	<span class="kw">pub</span> <span class="ident">unrewarded_relayer_entries</span>: <span class="ident">MessageNonce</span>,
@@ -660,7 +662,7 @@
 }
 
 <span class="doccomment">/// Outbound lane data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OutboundLaneData</span> {
 	<span class="doccomment">/// Nonce of oldest message that we haven&#39;t yet pruned. May point to not-yet-generated message if</span>
 	<span class="doccomment">/// all sent messages are already pruned.</span>

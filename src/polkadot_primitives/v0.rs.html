@@ -934,6 +934,7 @@
 <span id="931">931</span>
 <span id="932">932</span>
 <span id="933">933</span>
+<span id="934">934</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -960,6 +961,7 @@
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">parity_util_mem</span>::{<span class="ident">MallocSizeOf</span>, <span class="ident">MallocSizeOfOps</span>};
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -1043,7 +1045,7 @@
 }
 
 <span class="doccomment">/// Index of the validator is used as a lightweight replacement of the `ValidatorId` when appropriate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValidatorIndex</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
@@ -1076,7 +1078,7 @@
 }
 
 <span class="doccomment">/// Retriability for a given active para.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Retriable</span> {
 	<span class="doccomment">/// Ineligible for retry. This means it&#39;s either a parachain that is always scheduled anyway or</span>
@@ -1142,7 +1144,7 @@
 }
 
 <span class="doccomment">/// Identifier for a chain, either one of a number of parachains or the relay chain.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Chain</span> {
 	<span class="doccomment">/// The relay chain.</span>
@@ -1152,7 +1154,7 @@
 }
 
 <span class="doccomment">/// The duty roster specifying what jobs each validator must do.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DutyRoster</span> {
 	<span class="doccomment">/// Lookup from validator index to chain on which that validator has a duty to validate.</span>
@@ -1163,7 +1165,7 @@
 <span class="doccomment">/// to fully validate the candidate.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// These are global parameters that apply to all parachain candidates in a block.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalValidationData</span><span class="op">&lt;</span><span class="ident">N</span> <span class="op">=</span> <span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The maximum code size permitted, in bytes.</span>
@@ -1176,7 +1178,7 @@
 
 <span class="doccomment">/// Extra data that is needed along with the other fields in a `CandidateReceipt`</span>
 <span class="doccomment">/// to fully validate the candidate. These fields are parachain-specific.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalValidationData</span><span class="op">&lt;</span><span class="ident">N</span> <span class="op">=</span> <span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The parent head-data.</span>
@@ -1198,7 +1200,7 @@
 }
 
 <span class="doccomment">/// Commitments made in a `CandidateReceipt`. Many of these are outputs of validation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CandidateCommitments</span><span class="op">&lt;</span><span class="ident">H</span> <span class="op">=</span> <span class="ident">Hash</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Fees paid from the chain to the relay chain validators.</span>
@@ -1247,7 +1249,7 @@
 }
 
 <span class="doccomment">/// All data pertaining to the execution of a parachain candidate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CandidateReceipt</span><span class="op">&lt;</span><span class="ident">H</span> <span class="op">=</span> <span class="ident">Hash</span>, <span class="ident">N</span> <span class="op">=</span> <span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The ID of the parachain this is a candidate for.</span>
@@ -1332,7 +1334,7 @@
 
 <span class="doccomment">/// All the data which is omitted in an `AbridgedCandidateReceipt`, but that</span>
 <span class="doccomment">/// is necessary for validation of the parachain candidate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OmittedValidationData</span><span class="op">&lt;</span><span class="ident">N</span> <span class="op">=</span> <span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The global validation schedule.</span>
@@ -1346,7 +1348,7 @@
 <span class="doccomment">/// Much info in a candidate-receipt is duplicated from the relay-chain state.</span>
 <span class="doccomment">/// When submitting to the relay-chain, this data should be omitted as it can</span>
 <span class="doccomment">/// be re-generated from relay-chain state.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AbridgedCandidateReceipt</span><span class="op">&lt;</span><span class="ident">H</span> <span class="op">=</span> <span class="ident">Hash</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The ID of the parachain this is a candidate for.</span>
@@ -1481,7 +1483,7 @@
 }
 
 <span class="doccomment">/// A unique descriptor of the candidate receipt, in a lightweight format.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CandidateDescriptor</span><span class="op">&lt;</span><span class="ident">H</span> <span class="op">=</span> <span class="ident">Hash</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The ID of the para this is a candidate for.</span>
@@ -1501,7 +1503,7 @@
 }
 
 <span class="doccomment">/// A collation sent by a collator.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollationInfo</span> {
 	<span class="doccomment">/// The ID of the parachain this is a candidate for.</span>
@@ -1556,7 +1558,7 @@
 
 <span class="doccomment">/// A full collation.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Collation</span> {
 	<span class="doccomment">/// Candidate receipt itself.</span>
 	<span class="kw">pub</span> <span class="ident">info</span>: <span class="ident">CollationInfo</span>,
@@ -1566,7 +1568,7 @@
 
 <span class="doccomment">/// A Proof-of-Validation block.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoVBlock</span> {
 	<span class="doccomment">/// Block data.</span>
 	<span class="kw">pub</span> <span class="ident">block_data</span>: <span class="ident">BlockData</span>,
@@ -1582,7 +1584,7 @@
 
 <span class="doccomment">/// The data that is kept available about a particular parachain block.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AvailableData</span> {
 	<span class="doccomment">/// The PoV block.</span>
 	<span class="kw">pub</span> <span class="ident">pov_block</span>: <span class="ident">PoVBlock</span>,
@@ -1614,7 +1616,7 @@
 }
 
 <span class="comment">// Inner helper for codec on `CompactStatement`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">enum</span> <span class="ident">CompactStatementInner</span> {
 	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">1</span>)]</span>
 	<span class="ident">Seconded</span>(<span class="ident">CandidateHash</span>),
@@ -1670,7 +1672,7 @@
 
 <span class="doccomment">/// An either implicit or explicit attestation to the validity of a parachain</span>
 <span class="doccomment">/// candidate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValidityAttestation</span> {
 	<span class="doccomment">/// Implicit validity attestation by issuing.</span>
 	<span class="doccomment">/// This corresponds to issuance of a `Candidate` statement.</span>
@@ -1741,7 +1743,7 @@
 }
 
 <span class="doccomment">/// A fee schedule for messages. This is a linear function in the number of bytes of a message.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FeeSchedule</span> {
 	<span class="doccomment">/// The base fee charged for all messages.</span>

@@ -2727,6 +2727,7 @@
 	<span class="ident">CandidateHash</span>, <span class="ident">CandidateReceipt</span>, <span class="ident">CommittedCandidateReceipt</span>, <span class="ident">CoreIndex</span>, <span class="ident">GroupIndex</span>, <span class="ident">HeadData</span>,
 	<span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>, <span class="ident">SigningContext</span>, <span class="ident">UncheckedSignedAvailabilityBitfields</span>, <span class="ident">ValidatorIndex</span>,
 };
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
 	<span class="ident">traits</span>::{<span class="ident">One</span>, <span class="ident">Saturating</span>},
 	<span class="ident">DispatchError</span>,
@@ -2742,7 +2743,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The bitfield&#39;s signature should be checked at the point of submission. Afterwards it can be</span>
 <span class="doccomment">/// dropped.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AvailabilityBitfieldRecord</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="ident">bitfield</span>: <span class="ident">AvailabilityBitfield</span>, <span class="comment">// one bit per core.</span>
@@ -2750,7 +2751,7 @@
 }
 
 <span class="doccomment">/// A backed candidate pending availability.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CandidatePendingAvailability</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The availability core this is assigned to.</span>
@@ -2833,7 +2834,6 @@
 
 	<span class="attribute">#[<span class="ident">pallet::event</span>]</span>
 	<span class="attribute">#[<span class="ident">pallet::generate_deposit</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deposit_event</span>)]</span>
-	<span class="attribute">#[<span class="ident">pallet::metadata</span>(<span class="ident">T::Hash</span> <span class="op">=</span> <span class="string">&quot;Hash&quot;</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// A candidate was backed. `[candidate, head_data]`</span>
 		<span class="ident">CandidateBacked</span>(<span class="ident">CandidateReceipt</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span>, <span class="ident">HeadData</span>, <span class="ident">CoreIndex</span>, <span class="ident">GroupIndex</span>),

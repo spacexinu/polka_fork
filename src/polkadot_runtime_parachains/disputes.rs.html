@@ -2878,6 +2878,7 @@
 <span id="2875">2875</span>
 <span id="2876">2876</span>
 <span id="2877">2877</span>
+<span id="2878">2878</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2911,6 +2912,7 @@
 	<span class="ident">InvalidDisputeStatementKind</span>, <span class="ident">MultiDisputeStatementSet</span>, <span class="ident">SessionIndex</span>, <span class="ident">SigningContext</span>,
 	<span class="ident">ValidDisputeStatementKind</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>, <span class="ident">ValidatorSignature</span>,
 };
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
 	<span class="ident">traits</span>::{<span class="ident">AppVerify</span>, <span class="ident">One</span>, <span class="ident">Saturating</span>, <span class="ident">Zero</span>},
 	<span class="ident">DispatchError</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">SaturatedConversion</span>,
@@ -2918,14 +2920,14 @@
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">collections::btree_set::BTreeSet</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
 <span class="doccomment">/// Whether the dispute is local or remote.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DisputeLocation</span> {
 	<span class="ident">Local</span>,
 	<span class="ident">Remote</span>,
 }
 
 <span class="doccomment">/// The result of a dispute, whether the candidate is deemed valid (for) or invalid (against).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DisputeResult</span> {
 	<span class="ident">Valid</span>,
 	<span class="ident">Invalid</span>,

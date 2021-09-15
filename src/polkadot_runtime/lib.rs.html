@@ -1814,6 +1814,16 @@
 <span id="1811">1811</span>
 <span id="1812">1812</span>
 <span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2723,7 +2733,17 @@
 
 <span class="doccomment">/// The type used to represent the kinds of proxying allowed.</span>
 <span class="attribute">#[<span class="ident">derive</span>(
-	<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">MaxEncodedLen</span>,
+	<span class="ident">Copy</span>,
+	<span class="ident">Clone</span>,
+	<span class="ident">Eq</span>,
+	<span class="ident">PartialEq</span>,
+	<span class="ident">Ord</span>,
+	<span class="ident">PartialOrd</span>,
+	<span class="ident">Encode</span>,
+	<span class="ident">Decode</span>,
+	<span class="ident">RuntimeDebug</span>,
+	<span class="ident">MaxEncodedLen</span>,
+	<span class="ident">scale_info::TypeInfo</span>,
 )]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ProxyType</span> {
 	<span class="ident">Any</span> <span class="op">=</span> <span class="number">0</span>,
@@ -2781,9 +2801,9 @@
 				<span class="ident">Call::Scheduler</span>(..) <span class="op">|</span>
 				<span class="ident">Call::Babe</span>(..) <span class="op">|</span>
 				<span class="ident">Call::Timestamp</span>(..) <span class="op">|</span>
-				<span class="ident">Call::Indices</span>(<span class="ident">pallet_indices::Call::claim</span>(..)) <span class="op">|</span>
-				<span class="ident">Call::Indices</span>(<span class="ident">pallet_indices::Call::free</span>(..)) <span class="op">|</span>
-				<span class="ident">Call::Indices</span>(<span class="ident">pallet_indices::Call::freeze</span>(..)) <span class="op">|</span>
+				<span class="ident">Call::Indices</span>(<span class="ident">pallet_indices::Call::claim</span>{..}) <span class="op">|</span>
+				<span class="ident">Call::Indices</span>(<span class="ident">pallet_indices::Call::free</span>{..}) <span class="op">|</span>
+				<span class="ident">Call::Indices</span>(<span class="ident">pallet_indices::Call::freeze</span>{..}) <span class="op">|</span>
 				<span class="comment">// Specifically omitting Indices `transfer`, `force_transfer`</span>
 				<span class="comment">// Specifically omitting the entire Balances pallet</span>
 				<span class="ident">Call::Authorship</span>(..) <span class="op">|</span>
@@ -2800,8 +2820,8 @@
 				<span class="ident">Call::Bounties</span>(..) <span class="op">|</span>
 				<span class="ident">Call::Tips</span>(..) <span class="op">|</span>
 				<span class="ident">Call::Claims</span>(..) <span class="op">|</span>
-				<span class="ident">Call::Vesting</span>(<span class="ident">pallet_vesting::Call::vest</span>(..)) <span class="op">|</span>
-				<span class="ident">Call::Vesting</span>(<span class="ident">pallet_vesting::Call::vest_other</span>(..)) <span class="op">|</span>
+				<span class="ident">Call::Vesting</span>(<span class="ident">pallet_vesting::Call::vest</span>{..}) <span class="op">|</span>
+				<span class="ident">Call::Vesting</span>(<span class="ident">pallet_vesting::Call::vest_other</span>{..}) <span class="op">|</span>
 				<span class="comment">// Specifically omitting Vesting `vested_transfer`, and `force_vested_transfer`</span>
 				<span class="ident">Call::Utility</span>(..) <span class="op">|</span>
 				<span class="ident">Call::Identity</span>(..) <span class="op">|</span>
@@ -2821,10 +2841,10 @@
 			},
 			<span class="ident">ProxyType::IdentityJudgement</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">matches!</span>(
 				<span class="ident">c</span>,
-				<span class="ident">Call::Identity</span>(<span class="ident">pallet_identity::Call::provide_judgement</span>(..)) <span class="op">|</span> <span class="ident">Call::Utility</span>(..)
+				<span class="ident">Call::Identity</span>(<span class="ident">pallet_identity::Call::provide_judgement</span> { .. }) <span class="op">|</span> <span class="ident">Call::Utility</span>(..)
 			),
 			<span class="ident">ProxyType::CancelProxy</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="macro">matches!</span>(<span class="ident">c</span>, <span class="ident">Call::Proxy</span>(<span class="ident">pallet_proxy::Call::reject_announcement</span>(..)))
+				<span class="macro">matches!</span>(<span class="ident">c</span>, <span class="ident">Call::Proxy</span>(<span class="ident">pallet_proxy::Call::reject_announcement</span> { .. }))
 			},
 		}
 	}
@@ -3088,7 +3108,7 @@
 
 	<span class="kw">impl</span> <span class="ident">sp_api::Metadata</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 		<span class="kw">fn</span> <span class="ident">metadata</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpaqueMetadata</span> {
-			<span class="ident">Runtime::metadata</span>().<span class="ident">into</span>()
+			<span class="ident">OpaqueMetadata::new</span>(<span class="ident">Runtime::metadata</span>().<span class="ident">into</span>())
 		}
 	}
 
@@ -3516,10 +3536,10 @@
 	<span class="attribute">#[<span class="ident">ignore</span>]</span>
 	<span class="kw">fn</span> <span class="ident">transfer_cost_min_multiplier</span>() {
 		<span class="kw">let</span> <span class="ident">min_multiplier</span> <span class="op">=</span> <span class="ident">runtime_common::MinimumMultiplier::get</span>();
-		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">pallet_balances::Call</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::transfer_keep_alive</span>(
-			<span class="ident">Default::default</span>(),
-			<span class="ident">Default::default</span>(),
-		);
+		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">pallet_balances::Call</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="ident">::transfer_keep_alive</span> {
+			<span class="ident">dest</span>: <span class="ident">Default::default</span>(),
+			<span class="ident">value</span>: <span class="ident">Default::default</span>(),
+		};
 		<span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">call</span>.<span class="ident">get_dispatch_info</span>();
 		<span class="comment">// convert to outer call.</span>
 		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">Call::Balances</span>(<span class="ident">call</span>);

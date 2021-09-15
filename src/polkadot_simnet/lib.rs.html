@@ -418,6 +418,24 @@
 <span id="415">415</span>
 <span id="416">416</span>
 <span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -559,7 +577,7 @@
 	<span class="kw">let</span> <span class="ident">proposal_hash</span> <span class="op">=</span> {
 		<span class="comment">// note the call (pre-image?) of the call.</span>
 		<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(
-			<span class="ident">DemocracyCall::note_preimage</span>(<span class="ident">call</span>.<span class="ident">into</span>().<span class="ident">encode</span>()),
+			<span class="ident">DemocracyCall::note_preimage</span> { <span class="ident">encoded_proposal</span>: <span class="ident">call</span>.<span class="ident">into</span>().<span class="ident">encode</span>() },
 			<span class="prelude-val">Some</span>(<span class="ident">whales</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
 		)
 		.<span class="kw">await</span><span class="question-mark">?</span>;
@@ -582,15 +600,16 @@
 
 	<span class="comment">// submit external_propose call through council collective</span>
 	{
-		<span class="kw">let</span> <span class="ident">external_propose</span> <span class="op">=</span>
-			<span class="ident">DemocracyCall::external_propose_majority</span>(<span class="ident">proposal_hash</span>.<span class="ident">clone</span>().<span class="ident">into</span>());
+		<span class="kw">let</span> <span class="ident">external_propose</span> <span class="op">=</span> <span class="ident">DemocracyCall::external_propose_majority</span> {
+			<span class="ident">proposal_hash</span>: <span class="ident">proposal_hash</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
+		};
 		<span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">external_propose</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">len</span>()) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">1</span>;
 		<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">Weight::MAX</span> <span class="op">/</span> <span class="number">100_000_000</span>;
-		<span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::propose</span>(
-			<span class="ident">council_collective</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-			<span class="ident">Box::new</span>(<span class="ident">external_propose</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
-			<span class="ident">length</span>,
-		);
+		<span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::propose</span> {
+			<span class="ident">threshold</span>: <span class="ident">council_collective</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+			<span class="ident">proposal</span>: <span class="ident">Box::new</span>(<span class="ident">external_propose</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
+			<span class="ident">length_bound</span>: <span class="ident">length</span>,
+		};
 
 		<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">proposal</span>.<span class="ident">clone</span>(), <span class="prelude-val">Some</span>(<span class="ident">council_collective</span>[<span class="number">0</span>].<span class="ident">clone</span>()))
 			.<span class="kw">await</span><span class="question-mark">?</span>;
@@ -612,13 +631,18 @@
 
 		<span class="comment">// vote</span>
 		<span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">council_collective</span>[<span class="number">1</span>..] {
-			<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::vote</span>(<span class="ident">hash</span>.<span class="ident">clone</span>(), <span class="ident">index</span>, <span class="bool-val">true</span>);
+			<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::vote</span> { <span class="ident">proposal</span>: <span class="ident">hash</span>.<span class="ident">clone</span>(), <span class="ident">index</span>, <span class="ident">approve</span>: <span class="bool-val">true</span> };
 			<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">call</span>, <span class="prelude-val">Some</span>(<span class="ident">member</span>.<span class="ident">clone</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
 		}
 		<span class="ident">node</span>.<span class="ident">seal_blocks</span>(<span class="number">1</span>).<span class="kw">await</span>;
 
 		<span class="comment">// close vote</span>
-		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::close</span>(<span class="ident">hash</span>, <span class="ident">index</span>, <span class="ident">weight</span>, <span class="ident">length</span>);
+		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::close</span> {
+			<span class="ident">proposal_hash</span>: <span class="ident">hash</span>,
+			<span class="ident">index</span>,
+			<span class="ident">proposal_weight_bound</span>: <span class="ident">weight</span>,
+			<span class="ident">length_bound</span>: <span class="ident">length</span>,
+		};
 		<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">call</span>, <span class="prelude-val">Some</span>(<span class="ident">council_collective</span>[<span class="number">0</span>].<span class="ident">clone</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
 		<span class="ident">node</span>.<span class="ident">seal_blocks</span>(<span class="number">1</span>).<span class="kw">await</span>;
 
@@ -648,15 +672,18 @@
 
 	<span class="comment">// next technical collective must fast track the proposal.</span>
 	{
-		<span class="kw">let</span> <span class="ident">fast_track</span> <span class="op">=</span>
-			<span class="ident">DemocracyCall::fast_track</span>(<span class="ident">proposal_hash</span>.<span class="ident">into</span>(), <span class="ident">FastTrackVotingPeriod::get</span>(), <span class="number">0</span>);
+		<span class="kw">let</span> <span class="ident">fast_track</span> <span class="op">=</span> <span class="ident">DemocracyCall::fast_track</span> {
+			<span class="ident">proposal_hash</span>: <span class="ident">proposal_hash</span>.<span class="ident">into</span>(),
+			<span class="ident">voting_period</span>: <span class="ident">FastTrackVotingPeriod::get</span>(),
+			<span class="ident">delay</span>: <span class="number">0</span>,
+		};
 		<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">Weight::MAX</span> <span class="op">/</span> <span class="number">100_000_000</span>;
 		<span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">fast_track</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">len</span>()) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">1</span>;
-		<span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="ident">TechnicalCollectiveCall::propose</span>(
-			<span class="ident">technical_collective</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-			<span class="ident">Box::new</span>(<span class="ident">fast_track</span>.<span class="ident">into</span>()),
-			<span class="ident">length</span>,
-		);
+		<span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="ident">TechnicalCollectiveCall::propose</span> {
+			<span class="ident">threshold</span>: <span class="ident">technical_collective</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+			<span class="ident">proposal</span>: <span class="ident">Box::new</span>(<span class="ident">fast_track</span>.<span class="ident">into</span>()),
+			<span class="ident">length_bound</span>: <span class="ident">length</span>,
+		};
 
 		<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">proposal</span>, <span class="prelude-val">Some</span>(<span class="ident">technical_collective</span>[<span class="number">0</span>].<span class="ident">clone</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
 		<span class="ident">node</span>.<span class="ident">seal_blocks</span>(<span class="number">1</span>).<span class="kw">await</span>;
@@ -680,13 +707,19 @@
 
 		<span class="comment">// vote</span>
 		<span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">technical_collective</span>[<span class="number">1</span>..] {
-			<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">TechnicalCollectiveCall::vote</span>(<span class="ident">hash</span>.<span class="ident">clone</span>(), <span class="ident">index</span>, <span class="bool-val">true</span>);
+			<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span>
+				<span class="ident">TechnicalCollectiveCall::vote</span> { <span class="ident">proposal</span>: <span class="ident">hash</span>.<span class="ident">clone</span>(), <span class="ident">index</span>, <span class="ident">approve</span>: <span class="bool-val">true</span> };
 			<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">call</span>, <span class="prelude-val">Some</span>(<span class="ident">member</span>.<span class="ident">clone</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
 		}
 		<span class="ident">node</span>.<span class="ident">seal_blocks</span>(<span class="number">1</span>).<span class="kw">await</span>;
 
 		<span class="comment">// close vote</span>
-		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">TechnicalCollectiveCall::close</span>(<span class="ident">hash</span>, <span class="ident">index</span>, <span class="ident">weight</span>, <span class="ident">length</span>);
+		<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">CouncilCollectiveCall::close</span> {
+			<span class="ident">proposal_hash</span>: <span class="ident">hash</span>,
+			<span class="ident">index</span>,
+			<span class="ident">proposal_weight_bound</span>: <span class="ident">weight</span>,
+			<span class="ident">length_bound</span>: <span class="ident">length</span>,
+		};
 		<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">call</span>, <span class="prelude-val">Some</span>(<span class="ident">technical_collective</span>[<span class="number">0</span>].<span class="ident">clone</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
 		<span class="ident">node</span>.<span class="ident">seal_blocks</span>(<span class="number">1</span>).<span class="kw">await</span>;
 
@@ -730,14 +763,14 @@
 			<span class="macro">format!</span>(<span class="string">&quot;democracy::Event::Started not found in events: {:#?}&quot;</span>, <span class="ident">node</span>.<span class="ident">events</span>())
 		})<span class="question-mark">?</span>;
 
-	<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">DemocracyCall::vote</span>(
+	<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">DemocracyCall::vote</span> {
 		<span class="ident">ref_index</span>,
-		<span class="ident">AccountVote::Standard</span> {
+		<span class="ident">vote</span>: <span class="ident">AccountVote::Standard</span> {
 			<span class="ident">vote</span>: <span class="ident">Vote</span> { <span class="ident">aye</span>: <span class="bool-val">true</span>, <span class="ident">conviction</span>: <span class="ident">Conviction::Locked1x</span> },
 			<span class="comment">// 10 DOTS</span>
 			<span class="ident">balance</span>: <span class="number">10_000_000_000_000</span>,
 		},
-	);
+	};
 	<span class="kw">for</span> <span class="ident">whale</span> <span class="kw">in</span> <span class="ident">whales</span> {
 		<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">call</span>.<span class="ident">clone</span>(), <span class="prelude-val">Some</span>(<span class="ident">whale</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 	}
@@ -825,9 +858,12 @@
 			<span class="ident">node</span>.<span class="ident">seal_blocks</span>(<span class="number">1</span>).<span class="kw">await</span>;
 			<span class="comment">// submit extrinsics</span>
 			<span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">MultiSigner::from</span>(<span class="ident">Alice</span>.<span class="ident">public</span>()).<span class="ident">into_account</span>();
-			<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(<span class="ident">system::Call::remark</span>((<span class="string">b&quot;hello world&quot;</span>).<span class="ident">to_vec</span>()), <span class="prelude-val">Some</span>(<span class="ident">alice</span>))
-				.<span class="kw">await</span>
-				.<span class="ident">unwrap</span>();
+			<span class="ident">node</span>.<span class="ident">submit_extrinsic</span>(
+				<span class="ident">system::Call::remark</span> { <span class="ident">remark</span>: (<span class="string">b&quot;hello world&quot;</span>).<span class="ident">to_vec</span>() },
+				<span class="prelude-val">Some</span>(<span class="ident">alice</span>),
+			)
+			.<span class="kw">await</span>
+			.<span class="ident">unwrap</span>();
 
 			<span class="comment">// look ma, I can read state.</span>
 			<span class="kw">let</span> <span class="ident">_events</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">with_state</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">system::Pallet</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="ident">::events</span>());

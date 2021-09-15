@@ -1377,6 +1377,7 @@
 <span id="1374">1374</span>
 <span id="1375">1375</span>
 <span id="1376">1376</span>
+<span id="1377">1377</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1405,6 +1406,7 @@
 
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">EncodeLike</span>};
 <span class="kw">use</span> <span class="ident">frame_support::traits</span>::{<span class="ident">Contains</span>, <span class="ident">EnsureOrigin</span>, <span class="ident">Get</span>, <span class="ident">OriginTrait</span>};
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
 	<span class="ident">traits</span>::{<span class="ident">BadOrigin</span>, <span class="ident">Saturating</span>},
 	<span class="ident">RuntimeDebug</span>,
@@ -1597,7 +1599,7 @@
 	}
 
 	<span class="attribute">#[<span class="ident">pallet::origin</span>]</span>
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>)]</span>
+	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Origin</span> {
 		<span class="doccomment">/// It comes from somewhere in the XCM space wanting to transact.</span>
 		<span class="ident">Xcm</span>(<span class="ident">MultiLocation</span>),
@@ -1644,7 +1646,7 @@
 	}
 
 	<span class="doccomment">/// The status of a query.</span>
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>)]</span>
+	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryStatus</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// The query was sent but no response has yet been received.</span>
 		<span class="ident">Pending</span> {
@@ -1670,7 +1672,7 @@
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>)]</span>
+	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">TypeInfo</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VersionMigrationStage</span> {
 		<span class="ident">MigrateSupportedVersion</span>,
 		<span class="ident">MigrateVersionNotifiers</span>,

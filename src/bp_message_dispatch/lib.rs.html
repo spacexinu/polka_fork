@@ -137,6 +137,7 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Parity Bridges Common.</span>
@@ -165,6 +166,7 @@
 };
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">use</span> <span class="ident">frame_support::RuntimeDebug</span>;
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_std::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Message dispatch weight.</span>
@@ -211,7 +213,7 @@
 <span class="doccomment">/// The source chain can (and should) verify that the message can be dispatched on the target chain</span>
 <span class="doccomment">/// with a particular origin given the source chain&#39;s origin. This can be done with the</span>
 <span class="doccomment">/// `verify_message_origin()` function.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">RuntimeDebug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">RuntimeDebug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CallOrigin</span><span class="op">&lt;</span><span class="ident">SourceChainAccountId</span>, <span class="ident">TargetChainAccountPublic</span>, <span class="ident">TargetChainSignature</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Call is sent by the Root origin on the source chain. On the target chain it is dispatched</span>
 	<span class="doccomment">/// from a derived account.</span>
@@ -251,7 +253,7 @@
 }
 
 <span class="doccomment">/// Message payload type used by dispatch module.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">RuntimeDebug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">RuntimeDebug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessagePayload</span><span class="op">&lt;</span><span class="ident">SourceChainAccountId</span>, <span class="ident">TargetChainAccountPublic</span>, <span class="ident">TargetChainSignature</span>, <span class="ident">Call</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Runtime specification version. We only dispatch messages that have the same</span>
 	<span class="doccomment">/// runtime version. Otherwise we risk to misinterpret encoded calls.</span>

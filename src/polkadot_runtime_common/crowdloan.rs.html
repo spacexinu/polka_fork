@@ -2134,6 +2134,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">use</span> <span class="ident">primitives::v1::Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>;
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
 	<span class="ident">traits</span>::{
 		<span class="ident">AccountIdConversion</span>, <span class="ident">CheckedAdd</span>, <span class="ident">Hash</span>, <span class="ident">IdentifyAccount</span>, <span class="ident">One</span>, <span class="ident">Saturating</span>, <span class="ident">Verify</span>, <span class="ident">Zero</span>,
@@ -2195,7 +2196,7 @@
 	}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LastContribution</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="ident">Never</span>,
 	<span class="ident">PreEnding</span>(<span class="ident">u32</span>),
@@ -2204,7 +2205,7 @@
 
 <span class="doccomment">/// Information on a funding effort for a pre-existing parachain. We assume that the parachain ID</span>
 <span class="doccomment">/// is known as it&#39;s used for the key of the storage item for which this is the value (`Funds`).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">codec</span>(<span class="ident">dumb_trait_bound</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FundInfo</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">LeasePeriod</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The owning account who placed the deposit.</span>
@@ -2313,7 +2314,6 @@
 
 	<span class="attribute">#[<span class="ident">pallet::event</span>]</span>
 	<span class="attribute">#[<span class="ident">pallet::generate_deposit</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deposit_event</span>)]</span>
-	<span class="attribute">#[<span class="ident">pallet::metadata</span>(<span class="ident">T::AccountId</span> <span class="op">=</span> <span class="string">&quot;AccountId&quot;</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;Balance&quot;</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// Create a new crowdloaning campaign. `[fund_index]`</span>
 		<span class="ident">Created</span>(<span class="ident">ParaId</span>),

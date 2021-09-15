@@ -761,7 +761,7 @@
 <span class="doccomment">/// This specific `MultiLocation` implementation uses a Rust `enum` in order to make pattern matching easier.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `MultiLocation` value of `Null` simply refers to the interpreting consensus system.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Debug</span>, <span class="ident">scale_info::TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MultiLocation</span> {
 	<span class="doccomment">/// The interpreting consensus system.</span>
 	<span class="ident">Null</span>,

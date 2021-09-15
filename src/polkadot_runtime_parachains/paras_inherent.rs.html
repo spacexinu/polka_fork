@@ -497,6 +497,10 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -635,11 +639,11 @@
 					},
 				};
 
-			<span class="prelude-val">Some</span>(<span class="ident">Call::enter</span>(<span class="ident">inherent_data</span>))
+			<span class="prelude-val">Some</span>(<span class="ident">Call::enter</span> { <span class="ident">data</span>: <span class="ident">inherent_data</span> })
 		}
 
 		<span class="kw">fn</span> <span class="ident">is_inherent</span>(<span class="ident">call</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Call</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-			<span class="macro">matches!</span>(<span class="ident">call</span>, <span class="ident">Call::enter</span>(..))
+			<span class="macro">matches!</span>(<span class="ident">call</span>, <span class="ident">Call::enter</span> { .. })
 		}
 	}
 
@@ -929,12 +933,14 @@
 				<span class="ident">System::set_block_consumed_resources</span>(<span class="ident">used_block_weight</span>, <span class="number">0</span>);
 
 				<span class="comment">// execute the paras inherent</span>
-				<span class="kw">let</span> <span class="ident">post_info</span> <span class="op">=</span> <span class="ident">Call</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::enter</span>(<span class="ident">ParachainsInherentData</span> {
-					<span class="ident">bitfields</span>: <span class="ident">signed_bitfields</span>,
-					<span class="ident">backed_candidates</span>,
-					<span class="ident">disputes</span>: <span class="ident">Vec::new</span>(),
-					<span class="ident">parent_header</span>: <span class="ident">default_header</span>(),
-				})
+				<span class="kw">let</span> <span class="ident">post_info</span> <span class="op">=</span> <span class="ident">Call</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::enter</span> {
+					<span class="ident">data</span>: <span class="ident">ParachainsInherentData</span> {
+						<span class="ident">bitfields</span>: <span class="ident">signed_bitfields</span>,
+						<span class="ident">backed_candidates</span>,
+						<span class="ident">disputes</span>: <span class="ident">Vec::new</span>(),
+						<span class="ident">parent_header</span>: <span class="ident">default_header</span>(),
+					},
+				}
 				.<span class="ident">dispatch_bypass_filter</span>(<span class="prelude-val">None</span>.<span class="ident">into</span>())
 				.<span class="ident">unwrap_err</span>()
 				.<span class="ident">post_info</span>;
@@ -977,12 +983,14 @@
 				<span class="ident">System::set_block_consumed_resources</span>(<span class="ident">used_block_weight</span>, <span class="number">0</span>);
 
 				<span class="comment">// execute the paras inherent</span>
-				<span class="kw">let</span> <span class="ident">post_info</span> <span class="op">=</span> <span class="ident">Call</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::enter</span>(<span class="ident">ParachainsInherentData</span> {
-					<span class="ident">bitfields</span>: <span class="ident">signed_bitfields</span>,
-					<span class="ident">backed_candidates</span>,
-					<span class="ident">disputes</span>: <span class="ident">Vec::new</span>(),
-					<span class="ident">parent_header</span>: <span class="ident">header</span>,
-				})
+				<span class="kw">let</span> <span class="ident">post_info</span> <span class="op">=</span> <span class="ident">Call</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::enter</span> {
+					<span class="ident">data</span>: <span class="ident">ParachainsInherentData</span> {
+						<span class="ident">bitfields</span>: <span class="ident">signed_bitfields</span>,
+						<span class="ident">backed_candidates</span>,
+						<span class="ident">disputes</span>: <span class="ident">Vec::new</span>(),
+						<span class="ident">parent_header</span>: <span class="ident">header</span>,
+					},
+				}
 				.<span class="ident">dispatch_bypass_filter</span>(<span class="prelude-val">None</span>.<span class="ident">into</span>())
 				.<span class="ident">unwrap</span>();
 

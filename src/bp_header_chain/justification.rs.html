@@ -220,6 +220,7 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
+<span id="220">220</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Parity Bridges Common.</span>
@@ -245,6 +246,7 @@
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">use</span> <span class="ident">finality_grandpa::voter_set::VoterSet</span>;
 <span class="kw">use</span> <span class="ident">frame_support::RuntimeDebug</span>;
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_finality_grandpa</span>::{<span class="ident">AuthorityId</span>, <span class="ident">AuthoritySignature</span>, <span class="ident">SetId</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime::traits::Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span>;
 <span class="kw">use</span> <span class="ident">sp_std::collections</span>::{<span class="ident">btree_map::BTreeMap</span>, <span class="ident">btree_set::BTreeSet</span>};
@@ -255,7 +257,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This particular proof is used to prove that headers on a bridged chain</span>
 <span class="doccomment">/// (so not our chain) have been finalized correctly.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GrandpaJustification</span><span class="op">&lt;</span><span class="ident">Header</span>: <span class="ident">HeaderT</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The round (voting period) this justification is valid for.</span>
 	<span class="kw">pub</span> <span class="ident">round</span>: <span class="ident">u64</span>,

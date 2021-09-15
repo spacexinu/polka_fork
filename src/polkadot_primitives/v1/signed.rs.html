@@ -290,6 +290,7 @@
 <span id="287">287</span>
 <span id="288">288</span>
 <span id="289">289</span>
+<span id="290">290</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -308,6 +309,7 @@
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">application_crypto::AppKey</span>;
@@ -334,7 +336,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Signed</span><span class="op">&lt;</span><span class="ident">Payload</span>, <span class="ident">RealPayload</span> <span class="op">=</span> <span class="ident">Payload</span><span class="op">&gt;</span>(<span class="ident">UncheckedSigned</span><span class="op">&lt;</span><span class="ident">Payload</span>, <span class="ident">RealPayload</span><span class="op">&gt;</span>);
 
 <span class="doccomment">/// Unchecked signed data, can be converted to `Signed` by checking the signature.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UncheckedSigned</span><span class="op">&lt;</span><span class="ident">Payload</span>, <span class="ident">RealPayload</span> <span class="op">=</span> <span class="ident">Payload</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The payload is part of the signed data. The rest is the signing context,</span>
 	<span class="doccomment">/// which is known both at signing and at validation.</span>

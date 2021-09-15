@@ -2010,6 +2010,7 @@
 <span id="2007">2007</span>
 <span id="2008">2008</span>
 <span id="2009">2009</span>
+<span id="2010">2010</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2038,6 +2039,7 @@
 	<span class="ident">Balance</span>, <span class="ident">Hash</span>, <span class="ident">HrmpChannelId</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>, <span class="ident">InboundHrmpMessage</span>, <span class="ident">OutboundHrmpMessage</span>,
 	<span class="ident">SessionIndex</span>,
 };
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">AccountIdConversion</span>, <span class="ident">BlakeTwo256</span>, <span class="ident">Hash</span> <span class="kw">as</span> <span class="ident">HashT</span>, <span class="ident">UniqueSaturatedInto</span>};
 <span class="kw">use</span> <span class="ident">sp_std</span>::{
 	<span class="ident">collections</span>::{<span class="ident">btree_map::BTreeMap</span>, <span class="ident">btree_set::BTreeSet</span>},
@@ -2048,7 +2050,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A description of a request to open an HRMP channel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrmpOpenChannelRequest</span> {
 	<span class="doccomment">/// Indicates if this request was confirmed by the recipient.</span>
 	<span class="kw">pub</span> <span class="ident">confirmed</span>: <span class="ident">bool</span>,
@@ -2066,7 +2068,7 @@
 }
 
 <span class="doccomment">/// A metadata of an HRMP channel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HrmpChannel</span> {
 	<span class="comment">// NOTE: This structure is used by parachains via merkle proofs. Therefore, this struct requires</span>

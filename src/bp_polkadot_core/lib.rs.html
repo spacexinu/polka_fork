@@ -351,6 +351,13 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Parity Bridges Common.</span>
@@ -567,7 +574,7 @@
 
 <span class="doccomment">/// A simplified version of signed extensions meant for producing signed transactions</span>
 <span class="doccomment">/// and signed payload in the client code.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">scale_info::TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignedExtensions</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> {
 	<span class="ident">encode_payload</span>: <span class="ident">SignedExtra</span>,
 	<span class="ident">additional_signed</span>: <span class="ident">AdditionalSigned</span>,
@@ -620,7 +627,14 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span> <span class="ident">sp_runtime::traits::SignedExtension</span> <span class="kw">for</span> <span class="ident">SignedExtensions</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">Call</span>: <span class="ident">parity_scale_codec::Codec</span> <span class="op">+</span> <span class="ident">sp_std::fmt::Debug</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
+	<span class="ident">Call</span>: <span class="ident">parity_scale_codec::Codec</span>
+		<span class="op">+</span> <span class="ident">sp_std::fmt::Debug</span>
+		<span class="op">+</span> <span class="ident">Sync</span>
+		<span class="op">+</span> <span class="ident">Send</span>
+		<span class="op">+</span> <span class="ident">Clone</span>
+		<span class="op">+</span> <span class="ident">Eq</span>
+		<span class="op">+</span> <span class="ident">PartialEq</span>
+		<span class="op">+</span> <span class="ident">scale_info::StaticTypeInfo</span>,
 	<span class="ident">Call</span>: <span class="ident">Dispatchable</span>,
 {
 	<span class="kw">const</span> <span class="ident">IDENTIFIER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Not needed.&quot;</span>;

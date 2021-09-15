@@ -2198,6 +2198,7 @@
 <span id="2195">2195</span>
 <span id="2196">2196</span>
 <span id="2197">2197</span>
+<span id="2198">2198</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2241,6 +2242,7 @@
 	<span class="ident">CollatorId</span>, <span class="ident">CoreIndex</span>, <span class="ident">CoreOccupied</span>, <span class="ident">GroupIndex</span>, <span class="ident">GroupRotationInfo</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>,
 	<span class="ident">ParathreadClaim</span>, <span class="ident">ParathreadEntry</span>, <span class="ident">ScheduledCore</span>, <span class="ident">ValidatorIndex</span>,
 };
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">One</span>, <span class="ident">Saturating</span>};
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
@@ -2249,7 +2251,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A queued parathread entry, pre-assigned to a core.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Default</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueuedParathread</span> {
 	<span class="ident">claim</span>: <span class="ident">ParathreadEntry</span>,
@@ -2257,7 +2259,7 @@
 }
 
 <span class="doccomment">/// The queue of all parathread claims.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Default</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParathreadClaimQueue</span> {
 	<span class="ident">queue</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueuedParathread</span><span class="op">&gt;</span>,
@@ -2298,7 +2300,7 @@
 }
 
 <span class="doccomment">/// The assignment type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AssignmentKind</span> {
 	<span class="doccomment">/// A parachain.</span>
@@ -2308,7 +2310,7 @@
 }
 
 <span class="doccomment">/// How a free core is scheduled to be assigned.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoreAssignment</span> {
 	<span class="doccomment">/// The core that is assigned.</span>
