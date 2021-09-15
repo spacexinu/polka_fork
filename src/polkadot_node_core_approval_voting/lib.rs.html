@@ -3547,7 +3547,7 @@
 					<span class="prelude-val">Ok</span>(<span class="ident">block_imported_candidates</span>) <span class="op">=</span><span class="op">&gt;</span> {
 						<span class="comment">// Schedule wakeups for all imported candidates.</span>
 						<span class="kw">for</span> <span class="ident">block_batch</span> <span class="kw">in</span> <span class="ident">block_imported_candidates</span> {
-							<span class="macro">tracing::debug!</span>(
+							<span class="macro">tracing::trace!</span>(
 								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 								<span class="ident">block_hash</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">block_batch</span>.<span class="ident">block_hash</span>,
 								<span class="ident">num_candidates</span> <span class="op">=</span> <span class="ident">block_batch</span>.<span class="ident">imported_candidates</span>.<span class="ident">len</span>(),
@@ -4894,7 +4894,7 @@
 	)
 	.<span class="ident">expect</span>(<span class="string">&quot;Statement just signed; should pass checks; qed&quot;</span>);
 
-	<span class="macro">tracing::debug!</span>(
+	<span class="macro">tracing::trace!</span>(
 		<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 		<span class="question-mark">?</span><span class="ident">candidate_hash</span>,
 		<span class="question-mark">?</span><span class="ident">block_hash</span>,
