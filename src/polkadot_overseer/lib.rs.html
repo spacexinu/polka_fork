@@ -1045,7 +1045,7 @@
 <span class="comment">// TODO legacy, to be deleted, left for easier integration</span>
 <span class="comment">// TODO https://github.com/paritytech/polkadot/issues/3427</span>
 <span class="kw">mod</span> <span class="ident">subsystems</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::subsystems::AllSubsystems</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::subsystems</span>::{<span class="ident">AllSubsystems</span>, <span class="ident">DummySubsystem</span>};
 
 <span class="kw">mod</span> <span class="ident">metrics</span>;
 <span class="kw">use</span> <span class="self">self</span><span class="ident">::metrics::Metrics</span>;
