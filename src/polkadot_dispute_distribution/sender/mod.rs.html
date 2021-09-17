@@ -340,6 +340,14 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -440,9 +448,15 @@
 				<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
 			},
 			<span class="ident">Entry::Vacant</span>(<span class="ident">vacant</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">send_task</span> <span class="op">=</span>
-					<span class="ident">SendTask::new</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">active_sessions</span>, <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(), <span class="ident">req</span>)
-						.<span class="kw">await</span><span class="question-mark">?</span>;
+				<span class="kw">let</span> <span class="ident">send_task</span> <span class="op">=</span> <span class="ident">SendTask::new</span>(
+					<span class="ident">ctx</span>,
+					<span class="ident">runtime</span>,
+					<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">active_sessions</span>,
+					<span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(),
+					<span class="ident">req</span>,
+					<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metrics</span>,
+				)
+				.<span class="kw">await</span><span class="question-mark">?</span>;
 				<span class="ident">vacant</span>.<span class="ident">insert</span>(<span class="ident">send_task</span>);
 			},
 		}
@@ -483,7 +497,9 @@
 
 		<span class="kw">for</span> <span class="ident">dispute</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">disputes</span>.<span class="ident">values_mut</span>() {
 			<span class="kw">if</span> <span class="ident">have_new_sessions</span> <span class="op">|</span><span class="op">|</span> <span class="ident">dispute</span>.<span class="ident">has_failed_sends</span>() {
-				<span class="ident">dispute</span>.<span class="ident">refresh_sends</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">active_sessions</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+				<span class="ident">dispute</span>
+					.<span class="ident">refresh_sends</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">active_sessions</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metrics</span>)
+					.<span class="kw">await</span><span class="question-mark">?</span>;
 			}
 		}
 

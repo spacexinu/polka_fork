@@ -307,6 +307,37 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -330,12 +361,13 @@
 
 <span class="kw">use</span> <span class="ident">polkadot_node_network_protocol</span>::{
 	<span class="ident">request_response</span>::{
+		<span class="ident">outgoing::RequestError</span>,
 		<span class="ident">v1</span>::{<span class="ident">DisputeRequest</span>, <span class="ident">DisputeResponse</span>},
 		<span class="ident">OutgoingRequest</span>, <span class="ident">OutgoingResult</span>, <span class="ident">Recipient</span>, <span class="ident">Requests</span>,
 	},
 	<span class="ident">IfDisconnected</span>,
 };
-<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util::runtime::RuntimeInfo</span>;
+<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util</span>::{<span class="ident">metrics</span>, <span class="ident">runtime::RuntimeInfo</span>};
 <span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{
 	<span class="ident">AuthorityDiscoveryId</span>, <span class="ident">CandidateHash</span>, <span class="ident">Hash</span>, <span class="ident">SessionIndex</span>, <span class="ident">ValidatorIndex</span>,
 };
@@ -348,7 +380,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">metrics</span>::{<span class="ident">FAILED</span>, <span class="ident">SUCCEEDED</span>},
-	<span class="ident">LOG_TARGET</span>,
+	<span class="ident">Metrics</span>, <span class="ident">LOG_TARGET</span>,
 };
 
 <span class="doccomment">/// Delivery status for a particular dispute.</span>
@@ -366,6 +398,16 @@
 
 	<span class="doccomment">/// Whether we have any tasks failed since the last refresh.</span>
 	<span class="ident">has_failed_sends</span>: <span class="ident">bool</span>,
+
+	<span class="doccomment">/// Total count of failed transmissions.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Used for issuing a warning, if that number gets above a certain threshold.</span>
+	<span class="ident">failed_count</span>: <span class="ident">usize</span>,
+
+	<span class="doccomment">/// Total number of initiated requests.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Used together with `failed_count` for issuing a warning on too many failed attempts.</span>
+	<span class="ident">send_count</span>: <span class="ident">usize</span>,
 
 	<span class="doccomment">/// Sender to be cloned for tasks.</span>
 	<span class="ident">tx</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">TaskFinish</span><span class="op">&gt;</span>,
@@ -397,14 +439,14 @@
 	<span class="doccomment">/// Task was not able to get the request out to its peer.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// It should be retried in that case.</span>
-	<span class="ident">Failed</span>,
+	<span class="ident">Failed</span>(<span class="ident">RequestError</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">TaskResult</span> {
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_metrics_label</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
 			<span class="self">Self</span><span class="ident">::Succeeded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SUCCEEDED</span>,
-			<span class="self">Self</span><span class="ident">::Failed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FAILED</span>,
+			<span class="self">Self</span><span class="ident">::Failed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FAILED</span>,
 		}
 	}
 }
@@ -417,10 +459,17 @@
 		<span class="ident">active_sessions</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">SessionIndex</span>, <span class="ident">Hash</span><span class="op">&gt;</span>,
 		<span class="ident">tx</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">TaskFinish</span><span class="op">&gt;</span>,
 		<span class="ident">request</span>: <span class="ident">DisputeRequest</span>,
+		<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">send_task</span> <span class="op">=</span>
-			<span class="self">Self</span> { <span class="ident">request</span>, <span class="ident">deliveries</span>: <span class="ident">HashMap::new</span>(), <span class="ident">has_failed_sends</span>: <span class="bool-val">false</span>, <span class="ident">tx</span> };
-		<span class="ident">send_task</span>.<span class="ident">refresh_sends</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="ident">active_sessions</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">send_task</span> <span class="op">=</span> <span class="self">Self</span> {
+			<span class="ident">request</span>,
+			<span class="ident">deliveries</span>: <span class="ident">HashMap::new</span>(),
+			<span class="ident">has_failed_sends</span>: <span class="bool-val">false</span>,
+			<span class="ident">tx</span>,
+			<span class="ident">failed_count</span>: <span class="number">0</span>,
+			<span class="ident">send_count</span>: <span class="number">0</span>,
+		};
+		<span class="ident">send_task</span>.<span class="ident">refresh_sends</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="ident">active_sessions</span>, <span class="ident">metrics</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(<span class="ident">send_task</span>)
 	}
 
@@ -433,6 +482,7 @@
 		<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
 		<span class="ident">runtime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RuntimeInfo</span>,
 		<span class="ident">active_sessions</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">SessionIndex</span>, <span class="ident">Hash</span><span class="op">&gt;</span>,
+		<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">new_authorities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_relevant_validators</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="ident">active_sessions</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -447,10 +497,12 @@
 
 		<span class="comment">// Start any new tasks that are needed:</span>
 		<span class="kw">let</span> <span class="ident">new_statuses</span> <span class="op">=</span>
-			<span class="ident">send_requests</span>(<span class="ident">ctx</span>, <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(), <span class="ident">add_authorities</span>, <span class="self">self</span>.<span class="ident">request</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+			<span class="ident">send_requests</span>(<span class="ident">ctx</span>, <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(), <span class="ident">add_authorities</span>, <span class="self">self</span>.<span class="ident">request</span>.<span class="ident">clone</span>(), <span class="ident">metrics</span>)
+				.<span class="kw">await</span><span class="question-mark">?</span>;
 
-		<span class="self">self</span>.<span class="ident">deliveries</span>.<span class="ident">extend</span>(<span class="ident">new_statuses</span>.<span class="ident">into_iter</span>());
 		<span class="self">self</span>.<span class="ident">has_failed_sends</span> <span class="op">=</span> <span class="bool-val">false</span>;
+		<span class="self">self</span>.<span class="ident">send_count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">new_statuses</span>.<span class="ident">len</span>();
+		<span class="self">self</span>.<span class="ident">deliveries</span>.<span class="ident">extend</span>(<span class="ident">new_statuses</span>.<span class="ident">into_iter</span>());
 		<span class="prelude-val">Ok</span>(())
 	}
 
@@ -460,15 +512,38 @@
 	}
 
 	<span class="doccomment">/// Handle a finished response waiting task.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Called by `DisputeSender` upon reception of the corresponding message from our spawned `wait_response_task`.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_finished_send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">authority</span>: <span class="kw-2">&amp;</span><span class="ident">AuthorityDiscoveryId</span>, <span class="ident">result</span>: <span class="ident">TaskResult</span>) {
 		<span class="kw">match</span> <span class="ident">result</span> {
-			<span class="ident">TaskResult::Failed</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="macro">tracing::warn!</span>(
+			<span class="ident">TaskResult::Failed</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="macro">tracing::debug!</span>(
 					<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-					<span class="ident">candidate</span> <span class="op">=</span> <span class="question-mark">?</span><span class="self">self</span>.<span class="ident">request</span>.<span class="number">0</span>.<span class="ident">candidate_receipt</span>.<span class="ident">hash</span>(),
 					<span class="question-mark">?</span><span class="ident">authority</span>,
-					<span class="string">&quot;Could not get our message out! If this keeps happening, then check chain whether the dispute made it there.&quot;</span>
+					<span class="ident">candidate_hash</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">request</span>.<span class="number">0</span>.<span class="ident">candidate_receipt</span>.<span class="ident">hash</span>(),
+					<span class="op">%</span><span class="ident">err</span>,
+					<span class="string">&quot;Error sending dispute statements to node.&quot;</span>
 				);
+
+				<span class="self">self</span>.<span class="ident">failed_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+				<span class="kw">let</span> <span class="ident">error_rate</span> <span class="op">=</span> (<span class="number">100</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">failed_count</span>).<span class="ident">checked_div</span>(<span class="self">self</span>.<span class="ident">send_count</span>).<span class="ident">expect</span>(
+					<span class="string">&quot;We cannot receive a failed request, without having sent one first. qed.&quot;</span>,
+				);
+				<span class="comment">// 10% seems to be a sensible threshold to become alert - note that</span>
+				<span class="comment">// self.send_count gets increased in batches of the full validator set, so we don&#39;t</span>
+				<span class="comment">// need to account for a low send_count.</span>
+				<span class="kw">if</span> <span class="ident">error_rate</span> <span class="op">&gt;</span> <span class="number">10</span> {
+					<span class="macro">tracing::warn!</span>(
+						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+						<span class="ident">candidate_hash</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">request</span>.<span class="number">0</span>.<span class="ident">candidate_receipt</span>.<span class="ident">hash</span>(),
+						<span class="ident">last_authority</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">authority</span>,
+						<span class="ident">last_error</span> <span class="op">=</span> <span class="op">%</span><span class="ident">err</span>,
+						<span class="ident">failed_count</span> <span class="op">=</span> <span class="question-mark">?</span><span class="self">self</span>.<span class="ident">failed_count</span>,
+						<span class="ident">total_attempts</span> <span class="op">=</span> <span class="question-mark">?</span><span class="self">self</span>.<span class="ident">send_count</span>,
+						<span class="string">&quot;Sending our dispute vote failed for more than 10% of total attempts!&quot;</span>
+					);
+				}
+
 				<span class="self">self</span>.<span class="ident">has_failed_sends</span> <span class="op">=</span> <span class="bool-val">true</span>;
 				<span class="comment">// Remove state, so we know what to try again:</span>
 				<span class="self">self</span>.<span class="ident">deliveries</span>.<span class="ident">remove</span>(<span class="ident">authority</span>);
@@ -546,6 +621,7 @@
 	<span class="ident">tx</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">TaskFinish</span><span class="op">&gt;</span>,
 	<span class="ident">receivers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
 	<span class="ident">req</span>: <span class="ident">DisputeRequest</span>,
+	<span class="ident">metrics</span>: <span class="kw-2">&amp;</span><span class="ident">Metrics</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span>, <span class="ident">DeliveryStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statuses</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">receivers</span>.<span class="ident">len</span>());
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reqs</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">receivers</span>.<span class="ident">len</span>());
@@ -561,6 +637,7 @@
 			<span class="ident">req</span>.<span class="number">0</span>.<span class="ident">candidate_receipt</span>.<span class="ident">hash</span>(),
 			<span class="ident">receiver</span>.<span class="ident">clone</span>(),
 			<span class="ident">tx</span>.<span class="ident">clone</span>(),
+			<span class="ident">metrics</span>.<span class="ident">time_dispute_request</span>(),
 		);
 
 		<span class="kw">let</span> (<span class="ident">remote</span>, <span class="ident">remote_handle</span>) <span class="op">=</span> <span class="ident">fut</span>.<span class="ident">remote_handle</span>();
@@ -583,28 +660,13 @@
 	<span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
 	<span class="ident">receiver</span>: <span class="ident">AuthorityDiscoveryId</span>,
 	<span class="kw-2">mut</span> <span class="ident">tx</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">TaskFinish</span><span class="op">&gt;</span>,
+	<span class="ident">_timer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">metrics::prometheus::prometheus::HistogramTimer</span><span class="op">&gt;</span>,
 ) {
 	<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">pending_response</span>.<span class="kw">await</span>;
 	<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result</span> {
-		<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-			<span class="macro">tracing::warn!</span>(
-				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="op">%</span><span class="ident">candidate_hash</span>,
-				<span class="op">%</span><span class="ident">receiver</span>,
-				<span class="op">%</span><span class="ident">err</span>,
-				<span class="string">&quot;Error sending dispute statements to node.&quot;</span>
-			);
-			<span class="ident">TaskFinish</span> { <span class="ident">candidate_hash</span>, <span class="ident">receiver</span>, <span class="ident">result</span>: <span class="ident">TaskResult::Failed</span> }
-		},
-		<span class="prelude-val">Ok</span>(<span class="ident">DisputeResponse::Confirmed</span>) <span class="op">=</span><span class="op">&gt;</span> {
-			<span class="macro">tracing::trace!</span>(
-				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="op">%</span><span class="ident">candidate_hash</span>,
-				<span class="op">%</span><span class="ident">receiver</span>,
-				<span class="string">&quot;Sending dispute message succeeded&quot;</span>
-			);
-			<span class="ident">TaskFinish</span> { <span class="ident">candidate_hash</span>, <span class="ident">receiver</span>, <span class="ident">result</span>: <span class="ident">TaskResult::Succeeded</span> }
-		},
+		<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TaskFinish</span> { <span class="ident">candidate_hash</span>, <span class="ident">receiver</span>, <span class="ident">result</span>: <span class="ident">TaskResult::Failed</span>(<span class="ident">err</span>) },
+		<span class="prelude-val">Ok</span>(<span class="ident">DisputeResponse::Confirmed</span>) <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">TaskFinish</span> { <span class="ident">candidate_hash</span>, <span class="ident">receiver</span>, <span class="ident">result</span>: <span class="ident">TaskResult::Succeeded</span> },
 	};
 	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">feed</span>(<span class="ident">msg</span>).<span class="kw">await</span> {
 		<span class="macro">tracing::debug!</span>(
