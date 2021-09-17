@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["polkadot_runtime_common"] = [{"text":"impl&lt;T:&nbsp;Config&gt; SortedListProvider&lt;&lt;T as Config&gt;::AccountId&gt; for <a class=\"struct\" href=\"polkadot_runtime_common/elections/struct.UseNominatorsAndUpdateBagsList.html\" title=\"struct polkadot_runtime_common::elections::UseNominatorsAndUpdateBagsList\">UseNominatorsAndUpdateBagsList</a>&lt;T&gt;","synthetic":false,"types":["polkadot_runtime_common::elections::UseNominatorsAndUpdateBagsList"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

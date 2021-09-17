@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["LOG_TARGET",""]],"fn":[["percent",""],["test_voter_bags_migration","Test voter bags migration. `currency_unit` is the number of planks per the the runtimes `UNITS` (i.e. number of decimal places per DOT, KSM etc)"]]});

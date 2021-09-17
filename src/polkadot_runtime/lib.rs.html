@@ -1824,6 +1824,14 @@
 <span id="1821">1821</span>
 <span id="1822">1822</span>
 <span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2187,6 +2195,11 @@
 
 	<span class="comment">// miner configs</span>
 	<span class="kw">pub</span> <span class="ident">OffchainRepeat</span>: <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="number">5</span>;
+
+	<span class="doccomment">/// Whilst `UseNominatorsAndUpdateBagsList` or `UseNominatorsMap` is in use, this can still be a</span>
+	<span class="doccomment">/// very large value. Once the `BagsList` is in full motion, staking might open its door to many</span>
+	<span class="doccomment">/// more nominators, and this value should instead be what is a &quot;safe&quot; number (e.g. 22500).</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VoterSnapshotPerBlock</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">22_500</span>;
 }
 
 <span class="macro">sp_npos_elections::generate_solution_type!</span>(
@@ -2232,6 +2245,7 @@
 		<span class="ident">pallet_collective::EnsureProportionAtLeast</span><span class="op">&lt;</span><span class="ident">_2</span>, <span class="ident">_3</span>, <span class="ident">AccountId</span>, <span class="ident">CouncilCollective</span><span class="op">&gt;</span>,
 	<span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_election_provider_multi_phase::WeightInfo</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">VoterSnapshotPerBlock</span> <span class="op">=</span> <span class="ident">VoterSnapshotPerBlock</span>;
 }
 
 <span class="comment">// TODO #6469: This shouldn&#39;t be static, but a lazily cached value, not built unless needed, and</span>
@@ -2292,6 +2306,9 @@
 	<span class="kw">type</span> <span class="ident">NextNewSession</span> <span class="op">=</span> <span class="ident">Session</span>;
 	<span class="kw">type</span> <span class="ident">ElectionProvider</span> <span class="op">=</span> <span class="ident">ElectionProviderMultiPhase</span>;
 	<span class="kw">type</span> <span class="ident">GenesisElectionProvider</span> <span class="op">=</span> <span class="ident">runtime_common::elections::GenesisElectionOf</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+	<span class="comment">// Use the nominator map to iter voter AND no-ops for all SortedListProvider hooks. The migration</span>
+	<span class="comment">// to bags-list is a no-op, but the storage version will be updated.</span>
+	<span class="kw">type</span> <span class="ident">SortedListProvider</span> <span class="op">=</span> <span class="ident">pallet_staking::UseNominatorsMap</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_staking::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 }
 
@@ -2934,7 +2951,6 @@
 
 		<span class="comment">// Election pallet. Only works with staking, but placed here to maintain indices.</span>
 		<span class="ident">ElectionProviderMultiPhase</span>: <span class="ident">pallet_election_provider_multi_phase</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">ValidateUnsigned</span>} <span class="op">=</span> <span class="number">36</span>,
-
 	}
 }
 

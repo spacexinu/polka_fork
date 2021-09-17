@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Runtime",""]],"fn":[["main",""]],"mod":[["voter_bags","Generic remote tests for the voter bags module."]],"struct":[["Cli",""]]});

@@ -1505,6 +1505,54 @@
 <span id="1502">1502</span>
 <span id="1503">1503</span>
 <span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1528,6 +1576,7 @@
 <span class="comment">// `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.</span>
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;256&quot;</span>]</span>
 
+<span class="kw">use</span> <span class="ident">frame_support::traits::OnRuntimeUpgrade</span>;
 <span class="kw">use</span> <span class="ident">pallet_transaction_payment::CurrencyAdapter</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">MaxEncodedLen</span>};
 <span class="kw">use</span> <span class="ident">primitives::v1</span>::{
@@ -1607,6 +1656,9 @@
 
 <span class="comment">// Weights used in the runtime</span>
 <span class="kw">mod</span> <span class="ident">weights</span>;
+
+<span class="comment">// Voter bag threshold definitions.</span>
+<span class="kw">mod</span> <span class="ident">voter_bags</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
@@ -1847,6 +1899,11 @@
 
 	<span class="comment">// miner configs</span>
 	<span class="kw">pub</span> <span class="ident">OffchainRepeat</span>: <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="number">5</span>;
+
+	<span class="doccomment">/// Whilst `UseNominatorsAndUpdateBagsList` or `UseNominatorsMap` is in use, this can still be a</span>
+	<span class="doccomment">/// very large value. Once the `BagsList` is in full motion, staking might open its door to many</span>
+	<span class="doccomment">/// more nominators, and this value should instead be what is a &quot;safe&quot; number (e.g. 22500).</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VoterSnapshotPerBlock</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">22_500</span>;
 }
 
 <span class="macro">sp_npos_elections::generate_solution_type!</span>(
@@ -1888,6 +1945,18 @@
 	<span class="kw">type</span> <span class="ident">BenchmarkingConfig</span> <span class="op">=</span> <span class="ident">runtime_common::elections::BenchmarkConfig</span>;
 	<span class="kw">type</span> <span class="ident">ForceOrigin</span> <span class="op">=</span> <span class="ident">EnsureRoot</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_election_provider_multi_phase::WeightInfo</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">VoterSnapshotPerBlock</span> <span class="op">=</span> <span class="ident">VoterSnapshotPerBlock</span>;
+}
+
+<span class="macro">parameter_types!</span> {
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BagThresholds</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u64</span>] <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">voter_bags::THRESHOLDS</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">pallet_bags_list::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
+	<span class="kw">type</span> <span class="ident">VoteWeightProvider</span> <span class="op">=</span> <span class="ident">Staking</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_bags_list::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">BagThresholds</span> <span class="op">=</span> <span class="ident">BagThresholds</span>;
 }
 
 <span class="macro">pallet_staking_reward_curve::build!</span> {
@@ -1938,6 +2007,9 @@
 	<span class="kw">type</span> <span class="ident">NextNewSession</span> <span class="op">=</span> <span class="ident">Session</span>;
 	<span class="kw">type</span> <span class="ident">ElectionProvider</span> <span class="op">=</span> <span class="ident">ElectionProviderMultiPhase</span>;
 	<span class="kw">type</span> <span class="ident">GenesisElectionProvider</span> <span class="op">=</span> <span class="ident">runtime_common::elections::GenesisElectionOf</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+	<span class="comment">// Use the nominators map to iter voters, but also perform the bags-list migration and keep</span>
+	<span class="comment">// it up-to-date.</span>
+	<span class="kw">type</span> <span class="ident">SortedListProvider</span> <span class="op">=</span> <span class="ident">runtime_common::elections::UseNominatorsAndUpdateBagsList</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::pallet_staking::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 }
 
@@ -2549,6 +2621,9 @@
 		<span class="comment">// Election pallet. Only works with staking, but placed here to maintain indices.</span>
 		<span class="ident">ElectionProviderMultiPhase</span>: <span class="ident">pallet_election_provider_multi_phase</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">ValidateUnsigned</span>} <span class="op">=</span> <span class="number">24</span>,
 
+		<span class="comment">// Provides a semi-sorted list of nominators for staking.</span>
+		<span class="ident">BagsList</span>: <span class="ident">pallet_bags_list</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">25</span>,
+
 		<span class="comment">// Parachains pallets. Start indices at 40 to leave room.</span>
 		<span class="ident">ParachainsOrigin</span>: <span class="ident">parachains_origin</span>::{<span class="ident">Pallet</span>, <span class="ident">Origin</span>} <span class="op">=</span> <span class="number">41</span>,
 		<span class="ident">Configuration</span>: <span class="ident">parachains_configuration</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">42</span>,
@@ -2604,10 +2679,29 @@
 	<span class="ident">frame_system::ChainContext</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
 	<span class="ident">Runtime</span>,
 	<span class="ident">AllPallets</span>,
-	(),
+	(<span class="ident">StakingBagsListMigrationV8</span>,),
 <span class="op">&gt;</span>;
 <span class="doccomment">/// The payload being signed in transactions.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignedPayload</span> <span class="op">=</span> <span class="ident">generic::SignedPayload</span><span class="op">&lt;</span><span class="ident">Call</span>, <span class="ident">SignedExtra</span><span class="op">&gt;</span>;
+
+<span class="comment">// Migration to generate pallet staking&#39;s `SortedListProvider` from pre-existing nominators.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StakingBagsListMigrationV8</span>;
+
+<span class="kw">impl</span> <span class="ident">OnRuntimeUpgrade</span> <span class="kw">for</span> <span class="ident">StakingBagsListMigrationV8</span> {
+	<span class="kw">fn</span> <span class="ident">on_runtime_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">frame_support::weights::Weight</span> {
+		<span class="ident">pallet_staking::migrations::v8::migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>()
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">pre_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_staking::migrations::v8::pre_migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>()
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">post_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_staking::migrations::v8::post_migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>()
+	}
+}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disable-runtime-api&quot;</span>))]</span>
 <span class="macro">sp_api::impl_runtime_apis!</span> {
@@ -2925,6 +3019,7 @@
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::paras_registrar</span>, <span class="ident">Registrar</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="comment">// Substrate</span>
+			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_bags_list</span>, <span class="ident">BagsList</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_election_provider_multi_phase</span>, <span class="ident">ElectionProviderMultiPhase</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_identity</span>, <span class="ident">Identity</span>);
@@ -2989,6 +3084,7 @@
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::paras_registrar</span>, <span class="ident">Registrar</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="comment">// Substrate</span>
+			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_bags_list</span>, <span class="ident">BagsList</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_election_provider_multi_phase</span>, <span class="ident">ElectionProviderMultiPhase</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_identity</span>, <span class="ident">Identity</span>);
