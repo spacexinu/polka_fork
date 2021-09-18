@@ -1168,6 +1168,8 @@
 <span id="1165">1165</span>
 <span id="1166">1166</span>
 <span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1384,7 +1386,7 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ## Events</span>
 		<span class="doccomment">/// The `Registered` event is emitted in case of success.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::register</span>())]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::register</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(
 			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 			<span class="ident">id</span>: <span class="ident">ParaId</span>,
@@ -1402,7 +1404,7 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// The deposit taken can be specified for this registration. Any `ParaId`</span>
 		<span class="doccomment">/// can be registered, including sub-1000 IDs which are System Parachains.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::force_register</span>())]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_register</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_register</span>(
 			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 			<span class="ident">who</span>: <span class="ident">T::AccountId</span>,
@@ -1418,7 +1420,7 @@
 		<span class="doccomment">/// Deregister a Para Id, freeing all data and returning any deposit.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// The caller must be Root, the `para` owner, or the `para` itself. The para must be a parathread.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::deregister</span>())]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::deregister</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="self">Self</span><span class="ident">::ensure_root_para_or_owner</span>(<span class="ident">origin</span>, <span class="ident">id</span>)<span class="question-mark">?</span>;
 			<span class="self">Self</span><span class="ident">::do_deregister</span>(<span class="ident">id</span>)
@@ -1435,7 +1437,7 @@
 		<span class="doccomment">/// `ParaId` to be a long-term identifier of a notional &quot;parachain&quot;. However, their</span>
 		<span class="doccomment">/// scheduling info (i.e. whether they&#39;re a parathread or parachain), auction information</span>
 		<span class="doccomment">/// and the auction deposit are switched.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::swap</span>())]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::swap</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="ident">ParaId</span>, <span class="ident">other</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="self">Self</span><span class="ident">::ensure_root_para_or_owner</span>(<span class="ident">origin</span>, <span class="ident">id</span>)<span class="question-mark">?</span>;
 
@@ -1496,7 +1498,7 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ## Events</span>
 		<span class="doccomment">/// The `Reserved` event is emitted in case of success, which provides the ID reserved for use.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::reserve</span>())]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::reserve</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 			<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">NextFreeParaId</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>().<span class="ident">max</span>(<span class="ident">LOWEST_PUBLIC_ID</span>);
@@ -1830,7 +1832,9 @@
 		<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
 	}
 
-	<span class="kw">impl</span> <span class="ident">configuration::Config</span> <span class="kw">for</span> <span class="ident">Test</span> {}
+	<span class="kw">impl</span> <span class="ident">configuration::Config</span> <span class="kw">for</span> <span class="ident">Test</span> {
+		<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">configuration::weights::WeightInfo</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>;
+	}
 
 	<span class="macro">parameter_types!</span> {
 		<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ParaDeposit</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="number">10</span>;

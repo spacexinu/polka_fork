@@ -190,6 +190,8 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -281,7 +283,9 @@
 
 <span class="kw">impl</span> <span class="ident">shared::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
 
-<span class="kw">impl</span> <span class="ident">configuration::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
+<span class="kw">impl</span> <span class="ident">configuration::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">configuration::weights::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+}
 
 <span class="macro">parameter_types!</span> {
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KsmLocation</span>: <span class="ident">MultiLocation</span> <span class="op">=</span> <span class="ident">Here</span>.<span class="ident">into</span>();
