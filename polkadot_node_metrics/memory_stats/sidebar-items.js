@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["MemoryAllocationSnapshot","Snapshot of collected memory metrics."],["MemoryAllocationTracker","Accessor to the allocator internals."]]});

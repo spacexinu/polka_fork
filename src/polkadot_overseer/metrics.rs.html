@@ -222,16 +222,6 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -254,8 +244,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_metrics::metrics</span>::{<span class="self">self</span>, <span class="ident">prometheus</span>, <span class="ident">Metrics</span> <span class="kw">as</span> <span class="ident">MetricsTrait</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">polkadot_node_metrics::MemoryAllocationSnapshot</span>;
+<span class="kw">use</span> <span class="ident">parity_util_mem::MemoryAllocationSnapshot</span>;
 
 <span class="doccomment">/// Overseer Prometheus metrics.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -270,10 +259,7 @@
 	<span class="ident">signals_sent</span>: <span class="ident">prometheus::GaugeVec</span><span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span>,
 	<span class="ident">signals_received</span>: <span class="ident">prometheus::GaugeVec</span><span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span>,
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
 	<span class="ident">memory_stats_resident</span>: <span class="ident">prometheus::Gauge</span><span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span>,
-
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
 	<span class="ident">memory_stats_allocated</span>: <span class="ident">prometheus::Gauge</span><span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span>,
 }
 
@@ -300,13 +286,10 @@
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">memory_stats_snapshot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">memory_stats</span>: <span class="ident">MemoryAllocationSnapshot</span>) {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">metrics</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
-			<span class="kw">let</span> <span class="ident">MemoryAllocationSnapshot</span> { <span class="ident">resident</span>, <span class="ident">allocated</span> } <span class="op">=</span> <span class="ident">memory_stats</span>;
-
-			<span class="ident">metrics</span>.<span class="ident">memory_stats_allocated</span>.<span class="ident">set</span>(<span class="ident">allocated</span>);
-			<span class="ident">metrics</span>.<span class="ident">memory_stats_resident</span>.<span class="ident">set</span>(<span class="ident">resident</span>);
+			<span class="ident">metrics</span>.<span class="ident">memory_stats_allocated</span>.<span class="ident">set</span>(<span class="ident">memory_stats</span>.<span class="ident">allocated</span>);
+			<span class="ident">metrics</span>.<span class="ident">memory_stats_resident</span>.<span class="ident">set</span>(<span class="ident">memory_stats</span>.<span class="ident">resident</span>);
 		}
 	}
 
@@ -437,7 +420,6 @@
 				<span class="ident">registry</span>,
 			)<span class="question-mark">?</span>,
 
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
 			<span class="ident">memory_stats_allocated</span>: <span class="ident">prometheus::register</span>(
 				<span class="ident">prometheus::Gauge</span>::<span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span><span class="ident">::new</span>(
 					<span class="string">&quot;memory_allocated&quot;</span>,
@@ -445,8 +427,6 @@
 				)<span class="question-mark">?</span>,
 				<span class="ident">registry</span>,
 			)<span class="question-mark">?</span>,
-
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
 			<span class="ident">memory_stats_resident</span>: <span class="ident">prometheus::register</span>(
 				<span class="ident">prometheus::Gauge</span>::<span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span><span class="ident">::new</span>(
 					<span class="string">&quot;memory_resident&quot;</span>,

@@ -72,13 +72,6 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -107,13 +100,6 @@
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unused_imports</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metered_channel</span> <span class="kw">as</span> <span class="ident">metered</span>;
-
-<span class="doccomment">/// Memory allocation stats tracking.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">memory_stats</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;memory-stats&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::memory_stats</span>::{<span class="ident">MemoryAllocationSnapshot</span>, <span class="ident">MemoryAllocationTracker</span>};
 
 <span class="doccomment">/// Cyclic metric collection support.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">metronome</span>;
