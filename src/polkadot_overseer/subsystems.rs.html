@@ -345,6 +345,44 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -367,9 +405,47 @@
 <span class="doccomment">//! In the future, everything should be set up using the generated</span>
 <span class="doccomment">//! overseer builder pattern instead.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::dummy::DummySubsystem</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AllMessages</span>, <span class="ident">OverseerSignal</span>};
+<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_types::errors::SubsystemError</span>;
 <span class="kw">use</span> <span class="ident">polkadot_overseer_all_subsystems_gen::AllSubsystemsGen</span>;
-<span class="kw">use</span> <span class="ident">polkadot_overseer_gen::MapSubsystem</span>;
+<span class="kw">use</span> <span class="ident">polkadot_overseer_gen</span>::{
+	<span class="ident">FromOverseer</span>, <span class="ident">MapSubsystem</span>, <span class="ident">SpawnedSubsystem</span>, <span class="ident">Subsystem</span>, <span class="ident">SubsystemContext</span>,
+};
+
+<span class="doccomment">/// A dummy subsystem that implements [`Subsystem`] for all</span>
+<span class="doccomment">/// types of messages. Used for tests or as a placeholder.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DummySubsystem</span>;
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DummySubsystem</span>
+<span class="kw">where</span>
+	<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span>
+		<span class="ident">Signal</span> <span class="op">=</span> <span class="ident">OverseerSignal</span>,
+		<span class="ident">Error</span> <span class="op">=</span> <span class="ident">SubsystemError</span>,
+		<span class="ident">AllMessages</span> <span class="op">=</span> <span class="ident">AllMessages</span>,
+	<span class="op">&gt;</span>,
+{
+	<span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpawnedSubsystem</span><span class="op">&lt;</span><span class="ident">SubsystemError</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+			<span class="kw">loop</span> {
+				<span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">recv</span>().<span class="kw">await</span> {
+					<span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+					<span class="prelude-val">Ok</span>(<span class="ident">FromOverseer::Signal</span>(<span class="ident">OverseerSignal::Conclude</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+					<span class="prelude-val">Ok</span>(<span class="ident">overseer_msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="macro">tracing::debug!</span>(
+							<span class="ident">target</span>: <span class="string">&quot;dummy-subsystem&quot;</span>,
+							<span class="string">&quot;Discarding a message sent from overseer {:?}&quot;</span>,
+							<span class="ident">overseer_msg</span>
+						);
+						<span class="kw">continue</span>
+					},
+				}
+			}
+		});
+
+		<span class="ident">SpawnedSubsystem</span> { <span class="ident">name</span>: <span class="string">&quot;dummy-subsystem&quot;</span>, <span class="ident">future</span> }
+	}
+}
 
 <span class="doccomment">/// This struct is passed as an argument to create a new instance of an [`Overseer`].</span>
 <span class="doccomment">///</span>

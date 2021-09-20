@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["DummySubsystem","A dummy subsystem that implements [`Subsystem`] for all types of messages. Used for tests or as a placeholder."]]});

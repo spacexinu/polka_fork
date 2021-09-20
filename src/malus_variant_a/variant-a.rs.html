@@ -128,7 +128,6 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-<span id="128">128</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -169,7 +168,7 @@
 <span class="kw">use</span> <span class="ident">polkadot_node_core_candidate_validation::CandidateValidationSubsystem</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem</span>::{
 	<span class="ident">messages</span>::{<span class="ident">AllMessages</span>, <span class="ident">CandidateValidationMessage</span>},
-	<span class="ident">overseer</span>::{<span class="self">self</span>, <span class="ident">OverseerConnector</span>, <span class="ident">OverseerHandle</span>},
+	<span class="ident">overseer</span>::{<span class="self">self</span>, <span class="ident">OverseerHandle</span>},
 	<span class="ident">FromOverseer</span>,
 };
 
@@ -218,7 +217,6 @@
 <span class="kw">impl</span> <span class="ident">OverseerGen</span> <span class="kw">for</span> <span class="ident">BehaveMaleficient</span> {
 	<span class="kw">fn</span> <span class="ident">generate</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Spawner</span>, <span class="ident">RuntimeClient</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">connector</span>: <span class="ident">OverseerConnector</span>,
 		<span class="ident">args</span>: <span class="ident">OverseerGenArgs</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Spawner</span>, <span class="ident">RuntimeClient</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Overseer</span><span class="op">&lt;</span><span class="ident">Spawner</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RuntimeClient</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">OverseerHandle</span>), <span class="ident">Error</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
@@ -246,7 +244,7 @@
 			},
 		);
 
-		<span class="ident">Overseer::new</span>(<span class="ident">leaves</span>, <span class="ident">all_subsystems</span>, <span class="ident">registry</span>, <span class="ident">runtime_client</span>, <span class="ident">spawner</span>, <span class="ident">connector</span>)
+		<span class="ident">Overseer::new</span>(<span class="ident">leaves</span>, <span class="ident">all_subsystems</span>, <span class="ident">registry</span>, <span class="ident">runtime_client</span>, <span class="ident">spawner</span>)
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">into</span>())
 	}
 }
