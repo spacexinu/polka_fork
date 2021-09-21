@@ -193,7 +193,7 @@
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ext</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new</span>()
 		.<span class="ident">mode</span>(<span class="ident">Mode::Online</span>(<span class="ident">OnlineConfig</span> {
 			<span class="ident">transport</span>: <span class="ident">ws_url</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
-			<span class="ident">modules</span>: <span class="macro">vec!</span>[<span class="string">&quot;Staking&quot;</span>.<span class="ident">to_string</span>()],
+			<span class="ident">pallets</span>: <span class="macro">vec!</span>[<span class="string">&quot;Staking&quot;</span>.<span class="ident">to_string</span>()],
 			<span class="ident">at</span>: <span class="prelude-val">None</span>,
 			<span class="ident">state_snapshot</span>: <span class="prelude-val">None</span>,
 		}))

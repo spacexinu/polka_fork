@@ -1023,15 +1023,15 @@
 	<span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">storage::generator::StorageMap</span>, <span class="ident">traits::PalletInfo</span>};
 	<span class="kw">use</span> <span class="ident">sp_core::hashing::twox_128</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modules</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::PalletInfo::name</span>::<span class="op">&lt;</span><span class="ident">EPM::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pallets</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::PalletInfo::name</span>::<span class="op">&lt;</span><span class="ident">EPM::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>()
 		.<span class="ident">expect</span>(<span class="string">&quot;Pallet always has name; qed.&quot;</span>)
 		.<span class="ident">to_string</span>()];
-	<span class="ident">modules</span>.<span class="ident">extend</span>(<span class="ident">additional</span>);
+	<span class="ident">pallets</span>.<span class="ident">extend</span>(<span class="ident">additional</span>);
 	<span class="ident">Builder</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::new</span>()
 		.<span class="ident">mode</span>(<span class="ident">Mode::Online</span>(<span class="ident">OnlineConfig</span> {
 			<span class="ident">transport</span>: <span class="ident">uri</span>.<span class="ident">into</span>(),
 			<span class="ident">at</span>,
-			<span class="ident">modules</span>,
+			<span class="ident">pallets</span>,
 			..<span class="ident">Default::default</span>()
 		}))
 		.<span class="ident">inject_hashed_prefix</span>(<span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="ident">frame_system::BlockHash</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::prefix_hash</span>())
