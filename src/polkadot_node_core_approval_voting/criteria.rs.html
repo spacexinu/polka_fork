@@ -854,6 +854,23 @@
 <span id="851">851</span>
 <span id="852">852</span>
 <span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1093,6 +1110,14 @@
 		<span class="ident">config</span>.<span class="ident">assignment_keys</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span>
 		<span class="ident">config</span>.<span class="ident">validator_groups</span>.<span class="ident">is_empty</span>()
 	{
+		<span class="macro">tracing::trace!</span>(
+			<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+			<span class="ident">n_cores</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">n_cores</span>,
+			<span class="ident">has_assignment_keys</span> <span class="op">=</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">assignment_keys</span>.<span class="ident">is_empty</span>(),
+			<span class="ident">has_validator_groups</span> <span class="op">=</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">validator_groups</span>.<span class="ident">is_empty</span>(),
+			<span class="string">&quot;Not producing assignments because config is degenerate&quot;</span>,
+		);
+
 		<span class="kw">return</span> <span class="ident">HashMap::new</span>()
 	}
 
@@ -1111,7 +1136,10 @@
 		});
 
 		<span class="kw">match</span> <span class="ident">key</span> {
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Default::default</span>(),
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="macro">tracing::trace!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;No assignment key&quot;</span>);
+				<span class="kw">return</span> <span class="ident">Default::default</span>()
+			},
 			<span class="prelude-val">Some</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
 		}
 	};
@@ -1122,6 +1150,12 @@
 		.<span class="ident">filter</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">g</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_in_backing_group</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">validator_groups</span>, <span class="ident">index</span>, <span class="kw-2">*</span><span class="ident">g</span>))
 		.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">c_hash</span>, <span class="ident">core</span>, <span class="kw">_</span>)<span class="op">|</span> (<span class="ident">c_hash</span>, <span class="ident">core</span>))
 		.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+
+	<span class="macro">tracing::trace!</span>(
+		<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+		<span class="ident">assignable_cores</span> <span class="op">=</span> <span class="ident">leaving_cores</span>.<span class="ident">len</span>(),
+		<span class="string">&quot;Assigning to candidates from different backing groups&quot;</span>
+	);
 
 	<span class="kw">let</span> <span class="ident">assignments_key</span>: <span class="kw-2">&amp;</span><span class="ident">sp_application_crypto::sr25519::Pair</span> <span class="op">=</span> <span class="ident">assignments_key</span>.<span class="ident">as_ref</span>();
 	<span class="kw">let</span> <span class="ident">assignments_key</span>: <span class="kw-2">&amp;</span><span class="ident">schnorrkel::Keypair</span> <span class="op">=</span> <span class="ident">assignments_key</span>.<span class="ident">as_ref</span>();
