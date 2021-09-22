@@ -87,6 +87,7 @@ runtime-common = { package = "polkadot-runtime-common", path = "../common", defa
 primitives = { package = "polkadot-primitives", path = "../../primitives", default-features = false }
 
 [dev-dependencies]
+bp-message-dispatch = { path = "../../bridges/primitives/message-dispatch" }
 hex-literal = "0.3.3"
 tiny-keccak = "2.0.2"
 keyring = { package = "sp-keyring", git = "https://github.com/paritytech/substrate", branch = "master" }
