@@ -2088,6 +2088,21 @@
 <span id="2085">2085</span>
 <span id="2086">2086</span>
 <span id="2087">2087</span>
+<span id="2088">2088</span>
+<span id="2089">2089</span>
+<span id="2090">2090</span>
+<span id="2091">2091</span>
+<span id="2092">2092</span>
+<span id="2093">2093</span>
+<span id="2094">2094</span>
+<span id="2095">2095</span>
+<span id="2096">2096</span>
+<span id="2097">2097</span>
+<span id="2098">2098</span>
+<span id="2099">2099</span>
+<span id="2100">2100</span>
+<span id="2101">2101</span>
+<span id="2102">2102</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2131,6 +2146,10 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::Origin</span> <span class="kw">as</span> <span class="ident">ParachainOrigin</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">benchmarking</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">weights</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
 
@@ -2358,6 +2377,14 @@
 	<span class="kw">pub</span> <span class="ident">parachain</span>: <span class="ident">bool</span>,
 }
 
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WeightInfo</span> {
+	<span class="kw">fn</span> <span class="ident">force_set_current_code</span>(<span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+	<span class="kw">fn</span> <span class="ident">force_set_current_head</span>(<span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+	<span class="kw">fn</span> <span class="ident">force_schedule_code_upgrade</span>(<span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+	<span class="kw">fn</span> <span class="ident">force_note_new_head</span>(<span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+	<span class="kw">fn</span> <span class="ident">force_queue_action</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+}
+
 <span class="attribute">#[<span class="ident">frame_support::pallet</span>]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pallet</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -2374,6 +2401,9 @@
 			<span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Origin</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 		<span class="kw">type</span> <span class="ident">Event</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Event</span><span class="op">&gt;</span>;
+
+		<span class="doccomment">/// Weight information for extrinsics in this pallet.</span>
+		<span class="kw">type</span> <span class="ident">WeightInfo</span>: <span class="ident">WeightInfo</span>;
 	}
 
 	<span class="attribute">#[<span class="ident">pallet::event</span>]</span>
@@ -2581,7 +2611,7 @@
 	<span class="attribute">#[<span class="ident">pallet::call</span>]</span>
 	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// Set the storage for the parachain validation code immediately.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">0</span>)]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_set_current_code</span>(<span class="ident">new_code</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>))]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_set_current_code</span>(
 			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 			<span class="ident">para</span>: <span class="ident">ParaId</span>,
@@ -2600,7 +2630,7 @@
 		}
 
 		<span class="doccomment">/// Set the storage for the current parachain head data immediately.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">0</span>)]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_set_current_head</span>(<span class="ident">new_head</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>))]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_set_current_head</span>(
 			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 			<span class="ident">para</span>: <span class="ident">ParaId</span>,
@@ -2613,7 +2643,7 @@
 		}
 
 		<span class="doccomment">/// Schedule an upgrade as if it was scheduled in the given relay parent block.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">0</span>)]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_schedule_code_upgrade</span>(<span class="ident">new_code</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>))]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_schedule_code_upgrade</span>(
 			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 			<span class="ident">para</span>: <span class="ident">ParaId</span>,
@@ -2628,7 +2658,7 @@
 		}
 
 		<span class="doccomment">/// Note a new block head for para within the context of the current block.</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">0</span>)]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_note_new_head</span>(<span class="ident">new_head</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>))]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_note_new_head</span>(
 			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 			<span class="ident">para</span>: <span class="ident">ParaId</span>,
@@ -2644,7 +2674,7 @@
 		<span class="doccomment">/// Put a parachain directly into the next session&#39;s action queue.</span>
 		<span class="doccomment">/// We can&#39;t queue it any sooner than this without going into the</span>
 		<span class="doccomment">/// initializer...</span>
-		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="number">0</span>)]</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_queue_action</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_queue_action</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">para</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="ident">ensure_root</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 			<span class="kw">let</span> <span class="ident">next_session</span> <span class="op">=</span> <span class="ident">shared::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::session_index</span>().<span class="ident">saturating_add</span>(<span class="ident">One::one</span>());

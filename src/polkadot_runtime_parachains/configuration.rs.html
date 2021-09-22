@@ -1164,6 +1164,14 @@
 <span id="1161">1161</span>
 <span id="1162">1162</span>
 <span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1189,7 +1197,7 @@
 <span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">pallet_prelude</span>::<span class="kw-2">*</span>, <span class="ident">weights::constants::WEIGHT_PER_MILLIS</span>};
 <span class="kw">use</span> <span class="ident">frame_system::pallet_prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
-<span class="kw">use</span> <span class="ident">primitives::v1</span>::{<span class="ident">Balance</span>, <span class="ident">SessionIndex</span>, <span class="ident">MAX_CODE_SIZE</span>, <span class="ident">MAX_POV_SIZE</span>};
+<span class="kw">use</span> <span class="ident">primitives::v1</span>::{<span class="ident">Balance</span>, <span class="ident">SessionIndex</span>, <span class="ident">MAX_CODE_SIZE</span>, <span class="ident">MAX_HEAD_DATA_SIZE</span>, <span class="ident">MAX_POV_SIZE</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime::traits::Zero</span>;
 <span class="kw">use</span> <span class="ident">sp_std::prelude</span>::<span class="kw-2">*</span>;
 
@@ -1423,6 +1431,13 @@
 			)
 		}
 
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">max_head_data_size</span> <span class="op">&gt;</span> <span class="ident">MAX_HEAD_DATA_SIZE</span> {
+			<span class="macro">panic!</span>(
+				<span class="string">&quot;`max_head_data_size` ({}) is bigger than allowed by the client ({})&quot;</span>,
+				<span class="self">self</span>.<span class="ident">max_head_data_size</span>, <span class="ident">MAX_HEAD_DATA_SIZE</span>
+			)
+		}
+
 		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">max_pov_size</span> <span class="op">&gt;</span> <span class="ident">MAX_POV_SIZE</span> {
 			<span class="macro">panic!</span>(<span class="string">&quot;`max_pov_size` is bigger than allowed by the client&quot;</span>)
 		}
@@ -1557,6 +1572,7 @@
 		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::set_config_with_u32</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_head_data_size</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">new</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="ident">ensure_root</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+			<span class="macro">ensure!</span>(<span class="ident">new</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_HEAD_DATA_SIZE</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidNewValue</span>);
 			<span class="self">Self</span><span class="ident">::update_config_member</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
 				<span class="ident">sp_std::mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">config</span>.<span class="ident">max_head_data_size</span>, <span class="ident">new</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">new</span>
 			});

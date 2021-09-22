@@ -1413,6 +1413,13 @@
 <span id="1410">1410</span>
 <span id="1411">1411</span>
 <span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1652,6 +1659,13 @@
 <span class="doccomment">/// * checking updates to this stored runtime configuration do not exceed this limit</span>
 <span class="doccomment">/// * when detecting a code decompression bomb in the client</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_CODE_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">3</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
+
+<span class="doccomment">/// Maximum head data size we support right now.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Used for:</span>
+<span class="doccomment">/// * initial genesis for the Parachains configuration</span>
+<span class="doccomment">/// * checking updates to this stored runtime configuration do not exceed this limit</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_HEAD_DATA_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
 
 <span class="doccomment">/// Maximum PoV size we support right now.</span>
 <span class="doccomment">///</span>
