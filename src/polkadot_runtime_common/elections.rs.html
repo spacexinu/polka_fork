@@ -150,6 +150,7 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -198,17 +199,18 @@
 		.<span class="ident">get</span>(<span class="ident">DispatchClass::Normal</span>);
 }
 
-<span class="doccomment">/// The numbers configured here should always be more than the the maximum limits of staking pallet</span>
-<span class="doccomment">/// to ensure election snapshot will not run out of memory.</span>
+<span class="doccomment">/// The numbers configured here could always be more than the the maximum limits of staking pallet</span>
+<span class="doccomment">/// to ensure election snapshot will not run out of memory. For now, we set them to smaller values</span>
+<span class="doccomment">/// since the staking is bounded and the weight pipeline takes hours for this single pallet.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BenchmarkConfig</span>;
 <span class="kw">impl</span> <span class="ident">pallet_election_provider_multi_phase::BenchmarkingConfig</span> <span class="kw">for</span> <span class="ident">BenchmarkConfig</span> {
-	<span class="kw">const</span> <span class="ident">VOTERS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">5_000</span>, <span class="number">10_000</span>];
-	<span class="kw">const</span> <span class="ident">TARGETS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">1_000</span>, <span class="number">2_000</span>];
-	<span class="kw">const</span> <span class="ident">ACTIVE_VOTERS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">1000</span>, <span class="number">4_000</span>];
-	<span class="kw">const</span> <span class="ident">DESIRED_TARGETS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">400</span>, <span class="number">800</span>];
-	<span class="kw">const</span> <span class="ident">SNAPSHOT_MAXIMUM_VOTERS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">25_000</span>;
-	<span class="kw">const</span> <span class="ident">MINER_MAXIMUM_VOTERS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">15_000</span>;
-	<span class="kw">const</span> <span class="ident">MAXIMUM_TARGETS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2000</span>;
+	<span class="kw">const</span> <span class="ident">VOTERS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">1000</span>, <span class="number">2000</span>];
+	<span class="kw">const</span> <span class="ident">TARGETS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">500</span>, <span class="number">1000</span>];
+	<span class="kw">const</span> <span class="ident">ACTIVE_VOTERS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">500</span>, <span class="number">800</span>];
+	<span class="kw">const</span> <span class="ident">DESIRED_TARGETS</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">200</span>, <span class="number">400</span>];
+	<span class="kw">const</span> <span class="ident">SNAPSHOT_MAXIMUM_VOTERS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1000</span>;
+	<span class="kw">const</span> <span class="ident">MINER_MAXIMUM_VOTERS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1000</span>;
+	<span class="kw">const</span> <span class="ident">MAXIMUM_TARGETS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">300</span>;
 }
 
 <span class="doccomment">/// The accuracy type used for genesis election provider;</span>

@@ -241,7 +241,7 @@
 	<span class="comment">// Storage: ElectionProviderMultiPhase SnapshotMetadata (r:0 w:1)</span>
 	<span class="comment">// Storage: ElectionProviderMultiPhase DesiredTargets (r:0 w:1)</span>
 	<span class="comment">// Storage: ElectionProviderMultiPhase Snapshot (r:0 w:1)</span>
-	<span class="kw">fn</span> <span class="ident">create_snapshot_internal</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+	<span class="kw">fn</span> <span class="ident">create_snapshot_internal</span>(<span class="kw">_</span>: <span class="ident">u32</span>, <span class="kw">_</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		(<span class="number">8_835_233_000</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">Weight</span>))
 	}
 	<span class="comment">// Storage: ElectionProviderMultiPhase SignedSubmissionIndices (r:1 w:1)</span>
