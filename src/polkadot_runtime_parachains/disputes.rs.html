@@ -2879,6 +2879,39 @@
 <span id="2876">2876</span>
 <span id="2877">2877</span>
 <span id="2878">2878</span>
+<span id="2879">2879</span>
+<span id="2880">2880</span>
+<span id="2881">2881</span>
+<span id="2882">2882</span>
+<span id="2883">2883</span>
+<span id="2884">2884</span>
+<span id="2885">2885</span>
+<span id="2886">2886</span>
+<span id="2887">2887</span>
+<span id="2888">2888</span>
+<span id="2889">2889</span>
+<span id="2890">2890</span>
+<span id="2891">2891</span>
+<span id="2892">2892</span>
+<span id="2893">2893</span>
+<span id="2894">2894</span>
+<span id="2895">2895</span>
+<span id="2896">2896</span>
+<span id="2897">2897</span>
+<span id="2898">2898</span>
+<span id="2899">2899</span>
+<span id="2900">2900</span>
+<span id="2901">2901</span>
+<span id="2902">2902</span>
+<span id="2903">2903</span>
+<span id="2904">2904</span>
+<span id="2905">2905</span>
+<span id="2906">2906</span>
+<span id="2907">2907</span>
+<span id="2908">2908</span>
+<span id="2909">2909</span>
+<span id="2910">2910</span>
+<span id="2911">2911</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2905,6 +2938,7 @@
 };
 <span class="kw">use</span> <span class="ident">bitvec</span>::{<span class="ident">bitvec</span>, <span class="ident">order::Lsb0</span> <span class="kw">as</span> <span class="ident">BitOrderLsb0</span>};
 <span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">ensure</span>, <span class="ident">traits::Get</span>, <span class="ident">weights::Weight</span>};
+<span class="kw">use</span> <span class="ident">frame_system::pallet_prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">use</span> <span class="ident">primitives::v1</span>::{
 	<span class="ident">byzantine_threshold</span>, <span class="ident">supermajority_threshold</span>, <span class="ident">ApprovalVote</span>, <span class="ident">CandidateHash</span>, <span class="ident">CompactStatement</span>,
@@ -2918,6 +2952,11 @@
 	<span class="ident">DispatchError</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">SaturatedConversion</span>,
 };
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">collections::btree_set::BTreeSet</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">benchmarking</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::Origin</span> <span class="kw">as</span> <span class="ident">ParachainOrigin</span>;
 
 <span class="doccomment">/// Whether the dispute is local or remote.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
@@ -3094,6 +3133,17 @@
 	}
 }
 
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WeightInfo</span> {
+	<span class="kw">fn</span> <span class="ident">force_unfreeze</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+}
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestWeightInfo</span>;
+<span class="kw">impl</span> <span class="ident">WeightInfo</span> <span class="kw">for</span> <span class="ident">TestWeightInfo</span> {
+	<span class="kw">fn</span> <span class="ident">force_unfreeze</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
+		<span class="number">0</span>
+	}
+}
+
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">frame_support::pallet</span>]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pallet</span> {
@@ -3105,6 +3155,9 @@
 		<span class="kw">type</span> <span class="ident">Event</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Event</span><span class="op">&gt;</span>;
 		<span class="kw">type</span> <span class="ident">RewardValidators</span>: <span class="ident">RewardValidators</span>;
 		<span class="kw">type</span> <span class="ident">PunishValidators</span>: <span class="ident">PunishValidators</span>;
+
+		<span class="doccomment">/// Weight information for extrinsics in this pallet.</span>
+		<span class="kw">type</span> <span class="ident">WeightInfo</span>: <span class="ident">WeightInfo</span>;
 	}
 
 	<span class="attribute">#[<span class="ident">pallet::pallet</span>]</span>
@@ -3186,6 +3239,19 @@
 		<span class="ident">DuplicateStatement</span>,
 		<span class="doccomment">/// Too many spam slots used by some specific validator.</span>
 		<span class="ident">PotentialSpam</span>,
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::origin</span>]</span>
+	<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">ParachainOrigin</span>;
+
+	<span class="attribute">#[<span class="ident">pallet::call</span>]</span>
+	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_unfreeze</span>())]</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_unfreeze</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
+			<span class="ident">ensure_root</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+			<span class="ident">Frozen</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::set</span>(<span class="prelude-val">None</span>);
+			<span class="prelude-val">Ok</span>(())
+		}
 	}
 }
 
