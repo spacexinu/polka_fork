@@ -1610,6 +1610,26 @@
 <span id="1610">1610</span>
 <span id="1611">1611</span>
 <span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1864,9 +1884,11 @@
 
 		<span class="ident">Utility</span>: <span class="ident">pallet_utility</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Event</span>} <span class="op">=</span> <span class="number">90</span>,
 		<span class="ident">Proxy</span>: <span class="ident">pallet_proxy</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>} <span class="op">=</span> <span class="number">91</span>,
+		<span class="ident">Multisig</span>: <span class="ident">pallet_multisig</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
 
 		<span class="comment">// Pallet for sending XCM.</span>
 		<span class="ident">XcmPallet</span>: <span class="ident">pallet_xcm</span>::{<span class="ident">Pallet</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Origin</span>} <span class="op">=</span> <span class="number">99</span>,
+
 	}
 }
 
@@ -2695,7 +2717,7 @@
 				<span class="ident">Call::Auctions</span> { .. } <span class="op">|</span>
 					<span class="ident">Call::Crowdloan</span> { .. } <span class="op">|</span>
 					<span class="ident">Call::Registrar</span> { .. } <span class="op">|</span>
-					<span class="ident">Call::Slots</span> { .. }
+					<span class="ident">Call::Multisig</span>(..) <span class="op">|</span> <span class="ident">Call::Slots</span> { .. }
 			),
 		}
 	}
@@ -2749,6 +2771,24 @@
 	<span class="kw">type</span> <span class="ident">MembershipInitialized</span> <span class="op">=</span> <span class="ident">Collective</span>;
 	<span class="kw">type</span> <span class="ident">MembershipChanged</span> <span class="op">=</span> <span class="ident">Collective</span>;
 	<span class="kw">type</span> <span class="ident">MaxMembers</span> <span class="op">=</span> <span class="ident">MaxMembers</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> ();
+}
+
+<span class="macro">parameter_types!</span> {
+	<span class="comment">// One storage item; key size is 32; value is size 4+4+16+32 bytes = 56 bytes.</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DepositBase</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">1</span>, <span class="number">88</span>);
+	<span class="comment">// Additional storage item size of 32 bytes.</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DepositFactor</span>: <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">deposit</span>(<span class="number">0</span>, <span class="number">32</span>);
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxSignatories</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">100</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">pallet_multisig::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
+	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
+	<span class="kw">type</span> <span class="ident">Currency</span> <span class="op">=</span> <span class="ident">Balances</span>;
+	<span class="kw">type</span> <span class="ident">DepositBase</span> <span class="op">=</span> <span class="ident">DepositBase</span>;
+	<span class="kw">type</span> <span class="ident">DepositFactor</span> <span class="op">=</span> <span class="ident">DepositFactor</span>;
+	<span class="kw">type</span> <span class="ident">MaxSignatories</span> <span class="op">=</span> <span class="ident">MaxSignatories</span>;
 	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> ();
 }
 
