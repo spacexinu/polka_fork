@@ -440,6 +440,26 @@
 <span id="440">440</span>
 <span id="441">441</span>
 <span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -737,6 +757,8 @@
 		<span class="ident">UncheckedSignedFullStatement</span>,
 	};
 
+	<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::WrongVariant</span>;
+
 	<span class="doccomment">/// Network messages used by the bitfield distribution subsystem.</span>
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BitfieldDistributionMessage</span> {
@@ -829,6 +851,10 @@
 		<span class="ident">Approvals</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndirectSignedApprovalVote</span><span class="op">&gt;</span>),
 	}
 
+	<span class="doccomment">/// Dummy network message type, so we will receive connect/disconnect events.</span>
+	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GossipSuppportNetworkMessage</span> {}
+
 	<span class="doccomment">/// Network messages used by the collator protocol subsystem</span>
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CollatorProtocolMessage</span> {
@@ -862,6 +888,20 @@
 	<span class="macro">impl_try_from!</span>(<span class="ident">ValidationProtocol</span>, <span class="ident">BitfieldDistribution</span>, <span class="ident">BitfieldDistributionMessage</span>);
 	<span class="macro">impl_try_from!</span>(<span class="ident">ValidationProtocol</span>, <span class="ident">StatementDistribution</span>, <span class="ident">StatementDistributionMessage</span>);
 	<span class="macro">impl_try_from!</span>(<span class="ident">ValidationProtocol</span>, <span class="ident">ApprovalDistribution</span>, <span class="ident">ApprovalDistributionMessage</span>);
+
+	<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ValidationProtocol</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GossipSuppportNetworkMessage</span> {
+		<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">WrongVariant</span>;
+		<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="kw">_</span>: <span class="ident">ValidationProtocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+			<span class="prelude-val">Err</span>(<span class="ident">WrongVariant</span>)
+		}
+	}
+
+	<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValidationProtocol</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GossipSuppportNetworkMessage</span> {
+		<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">WrongVariant</span>;
+		<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValidationProtocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+			<span class="prelude-val">Err</span>(<span class="ident">WrongVariant</span>)
+		}
+	}
 
 	<span class="doccomment">/// All network messages on the collation peer-set.</span>
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>

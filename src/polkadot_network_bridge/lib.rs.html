@@ -1080,6 +1080,27 @@
 <span id="1080">1080</span>
 <span id="1081">1081</span>
 <span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1281,7 +1302,7 @@
 				<span class="ident">prometheus::GaugeVec::new</span>(
 					<span class="ident">prometheus::Opts::new</span>(
 						<span class="string">&quot;parachain_desired_peer_count&quot;</span>,
-						<span class="string">&quot;The number of peers that the local node is expected to connect to on a parachain-related peer-set&quot;</span>,
+						<span class="string">&quot;The number of peers that the local node is expected to connect to on a parachain-related peer-set (either including or not including unresolvable authorities, depending on whether `ConnectToValidators` or `ConnectToValidatorsResolved` was used.)&quot;</span>,
 					),
 					<span class="kw-2">&amp;</span>[<span class="string">&quot;protocol&quot;</span>]
 				)<span class="question-mark">?</span>,
@@ -1634,6 +1655,27 @@
 
 						<span class="ident">network_service</span> <span class="op">=</span> <span class="ident">ns</span>;
 						<span class="ident">authority_discovery_service</span> <span class="op">=</span> <span class="ident">ads</span>;
+					}
+					<span class="ident">NetworkBridgeMessage::ConnectToResolvedValidators</span> {
+						<span class="ident">validator_addrs</span>,
+						<span class="ident">peer_set</span>,
+					} <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="macro">tracing::trace!</span>(
+							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+							<span class="ident">action</span> <span class="op">=</span> <span class="string">&quot;ConnectToPeers&quot;</span>,
+							<span class="ident">peer_set</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">peer_set</span>,
+							<span class="question-mark">?</span><span class="ident">validator_addrs</span>,
+							<span class="string">&quot;Received a resolved validator connection request&quot;</span>,
+						);
+
+						<span class="ident">metrics</span>.<span class="ident">note_desired_peer_count</span>(<span class="ident">peer_set</span>, <span class="ident">validator_addrs</span>.<span class="ident">len</span>());
+
+						<span class="kw">let</span> <span class="ident">all_addrs</span> <span class="op">=</span> <span class="ident">validator_addrs</span>.<span class="ident">into_iter</span>().<span class="ident">flatten</span>().<span class="ident">collect</span>();
+						<span class="ident">network_service</span> <span class="op">=</span> <span class="ident">validator_discovery</span>.<span class="ident">on_resolved_request</span>(
+							<span class="ident">all_addrs</span>,
+							<span class="ident">peer_set</span>,
+							<span class="ident">network_service</span>,
+						).<span class="kw">await</span>;
 					}
 					<span class="ident">NetworkBridgeMessage::NewGossipTopology</span> {
 						<span class="ident">our_neighbors</span>,
