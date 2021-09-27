@@ -1569,6 +1569,54 @@
 <span id="1569">1569</span>
 <span id="1570">1570</span>
 <span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1621,9 +1669,9 @@
 <span class="kw">use</span> <span class="ident">xcm_builder</span>::{
 	<span class="ident">AccountId32Aliases</span>, <span class="ident">AllowTopLevelPaidExecutionFrom</span>, <span class="ident">AllowUnpaidExecutionFrom</span>,
 	<span class="ident">ChildParachainAsNative</span>, <span class="ident">ChildParachainConvertsVia</span>, <span class="ident">ChildSystemParachainAsSuperuser</span>,
-	<span class="ident">CurrencyAdapter</span> <span class="kw">as</span> <span class="ident">XcmCurrencyAdapter</span>, <span class="ident">FixedWeightBounds</span>, <span class="ident">IsChildSystemParachain</span>, <span class="ident">IsConcrete</span>,
-	<span class="ident">LocationInverter</span>, <span class="ident">SignedAccountId32AsNative</span>, <span class="ident">SignedToAccountId32</span>, <span class="ident">SovereignSignedViaLocation</span>,
-	<span class="ident">TakeWeightCredit</span>, <span class="ident">UsingComponents</span>,
+	<span class="ident">CurrencyAdapter</span> <span class="kw">as</span> <span class="ident">XcmCurrencyAdapter</span>, <span class="ident">IsChildSystemParachain</span>, <span class="ident">IsConcrete</span>, <span class="ident">LocationInverter</span>,
+	<span class="ident">SignedAccountId32AsNative</span>, <span class="ident">SignedToAccountId32</span>, <span class="ident">SovereignSignedViaLocation</span>, <span class="ident">TakeWeightCredit</span>,
+	<span class="ident">UsingComponents</span>, <span class="ident">WeightInfoBounds</span>,
 };
 <span class="kw">use</span> <span class="ident">xcm_executor::XcmExecutor</span>;
 
@@ -2523,10 +2571,6 @@
 	<span class="ident">ChildSystemParachainAsSuperuser</span><span class="op">&lt;</span><span class="ident">ParaId</span>, <span class="ident">Origin</span><span class="op">&gt;</span>,
 );
 
-<span class="macro">parameter_types!</span> {
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BaseXcmWeight</span>: <span class="ident">Weight</span> <span class="op">=</span> <span class="number">1_000_000_000</span>;
-}
-
 <span class="doccomment">/// The XCM router. When we want to send an XCM message, we use this type. It amalgamates all of our</span>
 <span class="doccomment">/// individual routers.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">XcmRouter</span> <span class="op">=</span> (
@@ -2535,8 +2579,9 @@
 );
 
 <span class="macro">parameter_types!</span> {
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">Westmint</span>: <span class="ident">MultiLocation</span> <span class="op">=</span> <span class="ident">Parachain</span>(<span class="number">1000</span>).<span class="ident">into</span>();
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WestendForWestmint</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span>
-		(<span class="ident">Wild</span>(<span class="ident">AllOf</span> { <span class="ident">fun</span>: <span class="ident">WildFungible</span>, <span class="ident">id</span>: <span class="ident">Concrete</span>(<span class="ident">WndLocation::get</span>()) }), <span class="ident">Parachain</span>(<span class="number">1000</span>).<span class="ident">into</span>());
+		(<span class="ident">Wild</span>(<span class="ident">AllOf</span> { <span class="ident">fun</span>: <span class="ident">WildFungible</span>, <span class="ident">id</span>: <span class="ident">Concrete</span>(<span class="ident">WndLocation::get</span>()) }), <span class="ident">Westmint::get</span>());
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxInstructions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
 }
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TrustedTeleporters</span> <span class="op">=</span> (<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">WestendForWestmint</span><span class="op">&gt;</span>,);
@@ -2561,7 +2606,7 @@
 	<span class="kw">type</span> <span class="ident">IsTeleporter</span> <span class="op">=</span> <span class="ident">TrustedTeleporters</span>;
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">LocationInverter</span><span class="op">&lt;</span><span class="ident">Ancestry</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Barrier</span> <span class="op">=</span> <span class="ident">Barrier</span>;
-	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">WeightInfoBounds</span><span class="op">&lt;</span><span class="ident">weights::xcm::WestendXcmWeight</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Trader</span> <span class="op">=</span> <span class="ident">UsingComponents</span><span class="op">&lt;</span><span class="ident">WeightToFee</span>, <span class="ident">WndLocation</span>, <span class="ident">AccountId</span>, <span class="ident">Balances</span>, <span class="ident">ToAuthor</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">ResponseHandler</span> <span class="op">=</span> <span class="ident">XcmPallet</span>;
 	<span class="kw">type</span> <span class="ident">AssetTrap</span> <span class="op">=</span> <span class="ident">XcmPallet</span>;
@@ -2587,7 +2632,7 @@
 	<span class="kw">type</span> <span class="ident">XcmExecutor</span> <span class="op">=</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">XcmConfig</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">XcmTeleportFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
 	<span class="kw">type</span> <span class="ident">XcmReserveTransferFilter</span> <span class="op">=</span> <span class="ident">Everything</span>;
-	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">BaseXcmWeight</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Weigher</span> <span class="op">=</span> <span class="ident">WeightInfoBounds</span><span class="op">&lt;</span><span class="ident">weights::xcm::WestendXcmWeight</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>, <span class="ident">Call</span>, <span class="ident">MaxInstructions</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">LocationInverter</span> <span class="op">=</span> <span class="ident">LocationInverter</span><span class="op">&lt;</span><span class="ident">Ancestry</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
 	<span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
@@ -3040,6 +3085,8 @@
 			<span class="kw">use</span> <span class="ident">pallet_offences_benchmarking::Pallet</span> <span class="kw">as</span> <span class="ident">OffencesBench</span>;
 			<span class="kw">use</span> <span class="ident">frame_system_benchmarking::Pallet</span> <span class="kw">as</span> <span class="ident">SystemBench</span>;
 
+			<span class="kw">type</span> <span class="ident">XcmBalances</span> <span class="op">=</span> <span class="ident">pallet_xcm_benchmarks::fungible::Pallet</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">BenchmarkList</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
 			<span class="comment">// Polkadot</span>
@@ -3051,6 +3098,7 @@
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::configuration</span>, <span class="ident">Configuration</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::paras</span>, <span class="ident">Paras</span>);
+
 			<span class="comment">// Substrate</span>
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_bags_list</span>, <span class="ident">BagsList</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
@@ -3068,6 +3116,10 @@
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_timestamp</span>, <span class="ident">Timestamp</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_utility</span>, <span class="ident">Utility</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_vesting</span>, <span class="ident">Vesting</span>);
+
+			<span class="comment">// XCM Benchmarks</span>
+			<span class="comment">// NOTE: Make sure you point to the individual modules below.</span>
+			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_xcm_benchmarks::fungible</span>, <span class="ident">XcmBalances</span>);
 
 			<span class="kw">let</span> <span class="ident">storage_info</span> <span class="op">=</span> <span class="ident">AllPalletsWithSystem::storage_info</span>();
 
@@ -3091,6 +3143,39 @@
 			<span class="kw">impl</span> <span class="ident">pallet_offences_benchmarking::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
 			<span class="kw">impl</span> <span class="ident">frame_system_benchmarking::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
 
+			<span class="kw">use</span> <span class="ident">xcm::latest::MultiAsset</span>;
+
+			<span class="kw">impl</span> <span class="ident">pallet_xcm_benchmarks::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+				<span class="kw">type</span> <span class="ident">XcmConfig</span> <span class="op">=</span> <span class="ident">XcmConfig</span>;
+				<span class="kw">type</span> <span class="ident">AccountIdConverter</span> <span class="op">=</span> <span class="ident">LocationConverter</span>;
+				<span class="kw">fn</span> <span class="ident">valid_destination</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MultiLocation</span>, <span class="ident">sp_runtime::DispatchError</span><span class="op">&gt;</span> {
+					<span class="prelude-val">Ok</span>(<span class="ident">Westmint::get</span>())
+				}
+			}
+
+			<span class="macro">parameter_types!</span> {
+				<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TrustedTeleporter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">MultiLocation</span>, <span class="ident">MultiAsset</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>((
+					<span class="ident">Westmint::get</span>(),
+					<span class="ident">MultiAsset</span> { <span class="ident">fun</span>: <span class="ident">Fungible</span>(<span class="number">1</span> <span class="op">*</span> <span class="ident">UNITS</span>), <span class="ident">id</span>: <span class="ident">Concrete</span>(<span class="ident">WndLocation::get</span>()) },
+				));
+			}
+
+			<span class="kw">impl</span> <span class="ident">pallet_xcm_benchmarks::fungible::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+				<span class="kw">type</span> <span class="ident">TransactAsset</span> <span class="op">=</span> <span class="ident">Balances</span>;
+
+				<span class="kw">type</span> <span class="ident">CheckedAccount</span> <span class="op">=</span> <span class="ident">CheckAccount</span>;
+				<span class="kw">type</span> <span class="ident">TrustedTeleporter</span> <span class="op">=</span> <span class="ident">TrustedTeleporter</span>;
+
+				<span class="kw">fn</span> <span class="ident">get_multi_asset</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MultiAsset</span> {
+					<span class="ident">MultiAsset</span> {
+						<span class="ident">id</span>: <span class="ident">Concrete</span>(<span class="ident">WndLocation::get</span>()),
+						<span class="ident">fun</span>: <span class="ident">Fungible</span>(<span class="number">1</span> <span class="op">*</span> <span class="ident">UNITS</span>),
+					}
+				}
+			}
+
+			<span class="kw">type</span> <span class="ident">XcmBalances</span> <span class="op">=</span> <span class="ident">pallet_xcm_benchmarks::fungible::Pallet</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+
 			<span class="kw">let</span> <span class="ident">whitelist</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TrackedStorageKey</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
 				<span class="comment">// Block Number</span>
 				<span class="macro">hex_literal::hex!</span>(<span class="string">&quot;26aa394eea5630e07c48ae0c9558cef702a5c1b19ab7a04f536c519aca4983ac&quot;</span>).<span class="ident">to_vec</span>().<span class="ident">into</span>(),
@@ -3104,6 +3189,12 @@
 				<span class="macro">hex_literal::hex!</span>(<span class="string">&quot;26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7&quot;</span>).<span class="ident">to_vec</span>().<span class="ident">into</span>(),
 				<span class="comment">// Treasury Account</span>
 				<span class="macro">hex_literal::hex!</span>(<span class="string">&quot;26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da95ecffd7b6c0f78751baa9d281e0bfa3a6d6f646c70792f74727372790000000000000000000000000000000000000000&quot;</span>).<span class="ident">to_vec</span>().<span class="ident">into</span>(),
+				<span class="comment">// Dmp DownwardMessageQueueHeads</span>
+				<span class="macro">hex_literal::hex!</span>(<span class="string">&quot;63f78c98723ddc9073523ef3beefda0c4d7fefc408aac59dbfe80a72ac8e3ce5&quot;</span>).<span class="ident">to_vec</span>().<span class="ident">into</span>(),
+				<span class="comment">// Dmp DownwardMessageQueues</span>
+				<span class="macro">hex_literal::hex!</span>(<span class="string">&quot;63f78c98723ddc9073523ef3beefda0ca95dac46c07a40d91506e7637ec4ba57&quot;</span>).<span class="ident">to_vec</span>().<span class="ident">into</span>(),
+				<span class="comment">// Configuration ActiveConfig</span>
+				<span class="macro">hex_literal::hex!</span>(<span class="string">&quot;06de3d8a54d27e44a9d5ce189618f22db4b49d95320d9021994c850f25b8e385&quot;</span>).<span class="ident">to_vec</span>().<span class="ident">into</span>(),
 			];
 
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batches</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">BenchmarkBatch</span><span class="op">&gt;</span><span class="ident">::new</span>();
@@ -3118,6 +3209,7 @@
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::configuration</span>, <span class="ident">Configuration</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::paras</span>, <span class="ident">Paras</span>);
+
 			<span class="comment">// Substrate</span>
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_bags_list</span>, <span class="ident">BagsList</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
@@ -3135,6 +3227,10 @@
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_timestamp</span>, <span class="ident">Timestamp</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_utility</span>, <span class="ident">Utility</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_vesting</span>, <span class="ident">Vesting</span>);
+
+			<span class="comment">// XCM Benchmarks</span>
+			<span class="comment">// NOTE: Make sure you point to the individual modules below.</span>
+			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_xcm_benchmarks::fungible</span>, <span class="ident">XcmBalances</span>);
 
 			<span class="kw">if</span> <span class="ident">batches</span>.<span class="ident">is_empty</span>() { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Benchmark not found for this pallet.&quot;</span>.<span class="ident">into</span>()) }
 			<span class="prelude-val">Ok</span>(<span class="ident">batches</span>)

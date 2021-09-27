@@ -882,7 +882,7 @@
 
 	<span class="doccomment">/// Returns an error unless all `assets` are contained in `self`. In the case of an error, the first asset in</span>
 	<span class="doccomment">/// `assets` which is not wholly in `self` is returned.</span>
-	<span class="kw">fn</span> <span class="ident">ensure_contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">assets</span>: <span class="kw-2">&amp;</span><span class="ident">MultiAssets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TakeError</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">assets</span>: <span class="kw-2">&amp;</span><span class="ident">MultiAssets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TakeError</span><span class="op">&gt;</span> {
 		<span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span>.<span class="ident">inner</span>().<span class="ident">iter</span>() {
 			<span class="kw">match</span> <span class="ident">asset</span> {
 				<span class="ident">MultiAsset</span> { <span class="ident">fun</span>: <span class="ident">Fungible</span>(<span class="kw-2">ref</span> <span class="ident">amount</span>), <span class="kw-2">ref</span> <span class="ident">id</span> } <span class="op">=</span><span class="op">&gt;</span> {
