@@ -2139,6 +2139,7 @@
 <span id="2139">2139</span>
 <span id="2140">2140</span>
 <span id="2141">2141</span>
+<span id="2142">2142</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3288,6 +3289,7 @@
 <span class="kw">impl</span> <span class="ident">parachains_initializer::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 	<span class="kw">type</span> <span class="ident">Randomness</span> <span class="op">=</span> <span class="ident">pallet_babe::RandomnessFromOneEpochAgo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">ForceOrigin</span> <span class="op">=</span> <span class="ident">EnsureRoot</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::runtime_parachains_initializer::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 }
 
 <span class="macro">parameter_types!</span> {

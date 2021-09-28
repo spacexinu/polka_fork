@@ -2177,6 +2177,9 @@
 <span id="2177">2177</span>
 <span id="2178">2178</span>
 <span id="2179">2179</span>
+<span id="2180">2180</span>
+<span id="2181">2181</span>
+<span id="2182">2182</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3361,6 +3364,7 @@
 <span class="kw">impl</span> <span class="ident">parachains_initializer::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 	<span class="kw">type</span> <span class="ident">Randomness</span> <span class="op">=</span> <span class="ident">pallet_babe::RandomnessFromOneEpochAgo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">ForceOrigin</span> <span class="op">=</span> <span class="ident">EnsureRoot</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">weights::runtime_parachains_initializer::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
 }
 
 <span class="macro">parameter_types!</span> {
@@ -4234,6 +4238,7 @@
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::paras_registrar</span>, <span class="ident">Registrar</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::configuration</span>, <span class="ident">Configuration</span>);
+			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::initializer</span>, <span class="ident">Initializer</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::paras</span>, <span class="ident">Paras</span>);
 			<span class="comment">// Substrate</span>
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_bags_list</span>, <span class="ident">BagsList</span>);
@@ -4310,6 +4315,7 @@
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::paras_registrar</span>, <span class="ident">Registrar</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::configuration</span>, <span class="ident">Configuration</span>);
+			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::initializer</span>, <span class="ident">Initializer</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::paras</span>, <span class="ident">Paras</span>);
 			<span class="comment">// Substrate</span>
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
