@@ -592,11 +592,6 @@
 <span id="592">592</span>
 <span id="593">593</span>
 <span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -619,7 +614,7 @@
 <span class="doccomment">//! This is useful for consensus components which need to stay up-to-date about recent sessions but don&#39;t</span>
 <span class="doccomment">//! care about the state of particular blocks.</span>
 
-<span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{<span class="ident">Hash</span>, <span class="ident">Header</span>, <span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>};
+<span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{<span class="ident">Hash</span>, <span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>};
 
 <span class="kw">use</span> <span class="ident">futures::channel::oneshot</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem</span>::{
@@ -731,7 +726,7 @@
 	}
 
 	<span class="doccomment">/// When inspecting a new import notification, updates the session info cache to match</span>
-	<span class="doccomment">/// the session of the imported block.</span>
+	<span class="doccomment">/// the session of the imported block&#39;s child.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// this only needs to be called on heads where we are directly notified about import, as sessions do</span>
 	<span class="doccomment">/// not change often and import notifications are expected to be typically increasing in session number.</span>
@@ -741,7 +736,6 @@
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">impl</span> <span class="ident">SubsystemContext</span> <span class="op">+</span> <span class="ident">overseer::SubsystemContext</span>),
 		<span class="ident">block_hash</span>: <span class="ident">Hash</span>,
-		<span class="ident">block_header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionWindowUpdate</span>, <span class="ident">SessionsUnavailable</span><span class="op">&gt;</span> {
 		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">window_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
 			<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">SessionWindowUpdate::Unchanged</span>)
@@ -750,11 +744,9 @@
 		<span class="kw">let</span> <span class="ident">session_index</span> <span class="op">=</span> {
 			<span class="kw">let</span> (<span class="ident">s_tx</span>, <span class="ident">s_rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 
-			<span class="comment">// The genesis is guaranteed to be at the beginning of the session and its parent state</span>
-			<span class="comment">// is non-existent. Therefore if we&#39;re at the genesis, we request using its state and</span>
-			<span class="comment">// not the parent.</span>
+			<span class="comment">// We&#39;re requesting session index of a child to populate the cache in advance.</span>
 			<span class="ident">ctx</span>.<span class="ident">send_message</span>(<span class="ident">RuntimeApiMessage::Request</span>(
-				<span class="kw">if</span> <span class="ident">block_header</span>.<span class="ident">number</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="ident">block_hash</span> } <span class="kw">else</span> { <span class="ident">block_header</span>.<span class="ident">parent_hash</span> },
+				<span class="ident">block_hash</span>,
 				<span class="ident">RuntimeApiRequest::SessionIndexForChild</span>(<span class="ident">s_tx</span>),
 			))
 			.<span class="kw">await</span>;
@@ -889,9 +881,10 @@
 	<span class="kw">use</span> <span class="ident">assert_matches::assert_matches</span>;
 	<span class="kw">use</span> <span class="ident">polkadot_node_subsystem::messages</span>::{<span class="ident">AllMessages</span>, <span class="ident">AvailabilityRecoveryMessage</span>};
 	<span class="kw">use</span> <span class="ident">polkadot_node_subsystem_test_helpers::make_subsystem_context</span>;
+	<span class="kw">use</span> <span class="ident">polkadot_primitives::v1::Header</span>;
 	<span class="kw">use</span> <span class="ident">sp_core::testing::TaskExecutor</span>;
 
-	<span class="kw">const</span> <span class="ident">TEST_WINDOW_SIZE</span>: <span class="ident">SessionIndex</span> <span class="op">=</span> <span class="number">6</span>;
+	<span class="kw">const</span> <span class="ident">TEST_WINDOW_SIZE</span>: <span class="ident">SessionIndex</span> <span class="op">=</span> <span class="number">6</span> <span class="op">+</span> <span class="number">1</span>;
 
 	<span class="kw">fn</span> <span class="ident">dummy_session_info</span>(<span class="ident">index</span>: <span class="ident">SessionIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionInfo</span> {
 		<span class="ident">SessionInfo</span> {
@@ -929,9 +922,8 @@
 		<span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">hash</span>();
 
 		<span class="kw">let</span> <span class="ident">test_fut</span> <span class="op">=</span> {
-			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-				<span class="ident">window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">hash</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+				<span class="ident">window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
 				<span class="macro">assert_eq!</span>(<span class="ident">window</span>.<span class="ident">earliest_session</span>, <span class="prelude-val">Some</span>(<span class="ident">expected_start_session</span>));
 				<span class="macro">assert_eq!</span>(
@@ -948,7 +940,7 @@
 					<span class="ident">h</span>,
 					<span class="ident">RuntimeApiRequest::SessionIndexForChild</span>(<span class="ident">s_tx</span>),
 				)) <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="macro">assert_eq!</span>(<span class="ident">h</span>, <span class="ident">header</span>.<span class="ident">parent_hash</span>);
+					<span class="macro">assert_eq!</span>(<span class="ident">h</span>, <span class="ident">hash</span>);
 					<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">s_tx</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">session</span>));
 				}
 			);
@@ -1097,9 +1089,8 @@
 		<span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">hash</span>();
 
 		<span class="kw">let</span> <span class="ident">test_fut</span> <span class="op">=</span> {
-			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-				<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">hash</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="kw">await</span>;
+				<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">hash</span>).<span class="kw">await</span>;
 
 				<span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
 			})
@@ -1112,7 +1103,7 @@
 					<span class="ident">h</span>,
 					<span class="ident">RuntimeApiRequest::SessionIndexForChild</span>(<span class="ident">s_tx</span>),
 				)) <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="macro">assert_eq!</span>(<span class="ident">h</span>, <span class="ident">header</span>.<span class="ident">parent_hash</span>);
+					<span class="macro">assert_eq!</span>(<span class="ident">h</span>, <span class="ident">hash</span>);
 					<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">s_tx</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">session</span>));
 				}
 			);
@@ -1159,9 +1150,8 @@
 		<span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">hash</span>();
 
 		<span class="kw">let</span> <span class="ident">test_fut</span> <span class="op">=</span> {
-			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-				<span class="ident">window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">hash</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+				<span class="ident">window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
 				<span class="macro">assert_eq!</span>(<span class="ident">window</span>.<span class="ident">earliest_session</span>, <span class="prelude-val">Some</span>(<span class="ident">session</span>));
 				<span class="macro">assert_eq!</span>(<span class="ident">window</span>.<span class="ident">session_info</span>, <span class="macro">vec!</span>[<span class="ident">dummy_session_info</span>(<span class="ident">session</span>)]);
