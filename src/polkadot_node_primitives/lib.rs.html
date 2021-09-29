@@ -418,7 +418,6 @@
 <span id="418">418</span>
 <span id="419">419</span>
 <span id="420">420</span>
-<span id="421">421</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -491,8 +490,7 @@
 <span class="doccomment">/// On Polkadot this is 1 day, and on Kusama it&#39;s 6 hours.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Number of sessions we want to consider in disputes.</span>
-<span class="doccomment">/// + 1 for the child&#39;s session.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DISPUTE_WINDOW</span>: <span class="ident">SessionIndex</span> <span class="op">=</span> <span class="number">6</span> <span class="op">+</span> <span class="number">1</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DISPUTE_WINDOW</span>: <span class="ident">SessionIndex</span> <span class="op">=</span> <span class="number">6</span>;
 
 <span class="doccomment">/// The cumulative weight of a block in a fork-choice rule.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BlockWeight</span> <span class="op">=</span> <span class="ident">u32</span>;
