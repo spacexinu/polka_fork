@@ -495,6 +495,7 @@
 <span id="495">495</span>
 <span id="496">496</span>
 <span id="497">497</span>
+<span id="498">498</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -838,12 +839,13 @@
 				<span class="string">&quot;Connectivity seems low, we are only connected to {}% of available validators (see debug logs for details)&quot;</span>, <span class="ident">connected_ratio</span>
 			);
 		}
+		<span class="kw">let</span> <span class="ident">pretty</span> <span class="op">=</span> <span class="ident">PrettyAuthorities</span>(<span class="ident">unconnected_authorities</span>);
 		<span class="macro">tracing::debug!</span>(
 			<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 			<span class="question-mark">?</span><span class="ident">connected_ratio</span>,
 			<span class="question-mark">?</span><span class="ident">absolute_connected</span>,
 			<span class="question-mark">?</span><span class="ident">absolute_resolved</span>,
-			<span class="ident">unconnected_authorities</span> <span class="op">=</span> <span class="op">%</span><span class="ident">PrettyAuthorities</span>(<span class="ident">unconnected_authorities</span>),
+			<span class="ident">unconnected_authorities</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pretty</span>,
 			<span class="string">&quot;Connectivity Report&quot;</span>
 		);
 	}
