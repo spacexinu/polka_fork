@@ -415,7 +415,7 @@
 
 	<span class="doccomment">/// Inform the table about the artifact with the given ID. The state will be set to &quot;preparing&quot;.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function must be used only for brand new artifacts and should never be used for</span>
+	<span class="doccomment">/// This function must be used only for brand-new artifacts and should never be used for</span>
 	<span class="doccomment">/// replacing existing ones.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_preparing</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>) {
 		<span class="comment">// See the precondition.</span>
@@ -424,7 +424,7 @@
 
 	<span class="doccomment">/// Insert an artifact with the given ID as &quot;prepared&quot;.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function must be used only for brand new artifacts and should never be used for</span>
+	<span class="doccomment">/// This function must be used only for brand-new artifacts and should never be used for</span>
 	<span class="doccomment">/// replacing existing ones.</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_prepared</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>, <span class="ident">last_time_needed</span>: <span class="ident">SystemTime</span>) {

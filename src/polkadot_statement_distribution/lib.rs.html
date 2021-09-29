@@ -2133,7 +2133,7 @@
 
 <span class="doccomment">/// The statement distribution subsystem.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StatementDistribution</span> {
-	<span class="doccomment">/// Pointer to a keystore, which is required for determining this nodes validator index.</span>
+	<span class="doccomment">/// Pointer to a keystore, which is required for determining this node&#39;s validator index.</span>
 	<span class="ident">keystore</span>: <span class="ident">SyncCryptoStorePtr</span>,
 	<span class="doccomment">/// Receiver for incoming large statement requests.</span>
 	<span class="ident">req_receiver</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IncomingRequestReceiver</span><span class="op">&lt;</span><span class="ident">request_v1::StatementFetchingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,

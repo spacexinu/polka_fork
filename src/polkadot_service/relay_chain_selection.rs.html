@@ -476,6 +476,7 @@
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
+<span id="479">479</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -652,7 +653,7 @@
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">target_hash</span>: <span class="ident">Hash</span>,
 		<span class="ident">maybe_max_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Hash</span><span class="op">&gt;</span>, <span class="ident">ConsensusError</span><span class="op">&gt;</span> {
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">ConsensusError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">longest_chain_best</span> <span class="op">=</span>
 			<span class="self">self</span>.<span class="ident">longest_chain</span>.<span class="ident">finality_target</span>(<span class="ident">target_hash</span>, <span class="ident">maybe_max_number</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -795,9 +796,9 @@
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">finality_target_with_longest_chain</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">target_hash</span>: <span class="ident">Hash</span>,
-		<span class="ident">best_leaf</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Hash</span><span class="op">&gt;</span>,
+		<span class="ident">best_leaf</span>: <span class="ident">Hash</span>,
 		<span class="ident">maybe_max_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Hash</span><span class="op">&gt;</span>, <span class="ident">ConsensusError</span><span class="op">&gt;</span> {
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">ConsensusError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overseer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">overseer</span>.<span class="ident">clone</span>();
 
 		<span class="kw">let</span> <span class="ident">subchain_head</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disputes&quot;</span>) {
@@ -816,13 +817,14 @@
 
 			<span class="kw">match</span> <span class="ident">best</span> {
 				<span class="comment">// No viable leaves containing the block.</span>
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>)),
+				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">target_hash</span>),
 				<span class="prelude-val">Some</span>(<span class="ident">best</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">best</span>,
 			}
 		} <span class="kw">else</span> {
-			<span class="kw">match</span> <span class="ident">best_leaf</span> {
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>)),
-				<span class="prelude-val">Some</span>(<span class="ident">best_leaf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">best_leaf</span>,
+			<span class="kw">if</span> <span class="ident">best_leaf</span> <span class="op">=</span><span class="op">=</span> <span class="ident">target_hash</span> {
+				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">target_hash</span>)
+			} <span class="kw">else</span> {
+				<span class="ident">best_leaf</span>
 			}
 		};
 
@@ -841,7 +843,7 @@
 							<span class="string">&quot;`finality_target` max number is less than target number&quot;</span>,
 						);
 					}
-					<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>))
+					<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">target_hash</span>)
 				}
 				<span class="comment">// find the current number.</span>
 				<span class="kw">let</span> <span class="ident">subchain_header</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block_header</span>(<span class="ident">subchain_head</span>)<span class="question-mark">?</span>;
@@ -902,7 +904,7 @@
 					<span class="ident">subchain_number</span>,
 					<span class="string">&quot;Mismatch of anticipated block descriptions and block number difference.&quot;</span>,
 				);
-				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>))
+				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">target_hash</span>)
 			}
 			<span class="comment">// 3. Constrain according to disputes:</span>
 			<span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
@@ -937,7 +939,7 @@
 
 			<span class="kw">if</span> <span class="ident">safe_target</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">target_number</span> {
 				<span class="comment">// Minimal vote needs to be on the target number.</span>
-				<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">target_hash</span>))
+				<span class="prelude-val">Ok</span>(<span class="ident">target_hash</span>)
 			} <span class="kw">else</span> {
 				<span class="comment">// Otherwise we&#39;re looking for a descendant.</span>
 				<span class="kw">let</span> <span class="ident">initial_leaf_header</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block_header</span>(<span class="ident">initial_leaf</span>)<span class="question-mark">?</span>;
@@ -948,10 +950,10 @@
 				)
 				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ConsensusError::ChainLookup</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>)))<span class="question-mark">?</span>;
 
-				<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">forced_target</span>))
+				<span class="prelude-val">Ok</span>(<span class="ident">forced_target</span>)
 			}
 		} <span class="kw">else</span> {
-			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">subchain_head</span>))
+			<span class="prelude-val">Ok</span>(<span class="ident">subchain_head</span>)
 		}
 	}
 }

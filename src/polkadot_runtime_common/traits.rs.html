@@ -382,7 +382,7 @@
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">LeaseError</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Return the amount of balance currently held in reserve on `leaser`&#39;s account for leasing `para`. This won&#39;t</span>
-	<span class="doccomment">/// go down outside of a lease period.</span>
+	<span class="doccomment">/// go down outside a lease period.</span>
 	<span class="kw">fn</span> <span class="ident">deposit_held</span>(
 		<span class="ident">para</span>: <span class="ident">ParaId</span>,
 		<span class="ident">leaser</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::AccountId</span>,

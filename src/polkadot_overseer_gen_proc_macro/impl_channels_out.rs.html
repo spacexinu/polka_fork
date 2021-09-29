@@ -124,8 +124,6 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -223,8 +221,6 @@
 				<span class="ident">signals_received</span>: <span class="ident">usize</span>,
 				<span class="ident">message</span>: #<span class="ident">message_wrapper</span>,
 			) {
-				<span class="kw">use</span> <span class="ident">::std::sync::mpsc::TrySendError</span>;
-
 				<span class="kw">let</span> <span class="ident">res</span>: <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">message</span> {
 				#(
 					#<span class="ident">message_wrapper</span> :: #<span class="ident">consumes_variant</span> (<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {

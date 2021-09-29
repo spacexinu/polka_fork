@@ -1025,7 +1025,7 @@
 		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>, <span class="ident">interior</span>: <span class="ident">Junctions::Here</span> }
 	}
 
-	<span class="doccomment">/// Whether or not the `MultiLocation` has no parents and has a `Here` interior.</span>
+	<span class="doccomment">/// Whether the `MultiLocation` has no parents and has a `Here` interior.</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_here</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">parents</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">interior</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
 	}
@@ -1045,7 +1045,7 @@
 		<span class="self">self</span>.<span class="ident">parents</span>
 	}
 
-	<span class="doccomment">/// Returns boolean indicating whether or not `self` contains only the specified amount of</span>
+	<span class="doccomment">/// Returns boolean indicating whether `self` contains only the specified amount of</span>
 	<span class="doccomment">/// parents and no interior junctions.</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">contains_parents_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">interior</span>, <span class="ident">Junctions::Here</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">parents</span> <span class="op">=</span><span class="op">=</span> <span class="ident">count</span>

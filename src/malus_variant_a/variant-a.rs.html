@@ -119,13 +119,6 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -153,10 +146,10 @@
 
 <span class="kw">use</span> <span class="ident">color_eyre::eyre</span>;
 <span class="kw">use</span> <span class="ident">polkadot_cli</span>::{
-	<span class="ident">create_default_subsystems</span>,
+	<span class="ident">prepared_overseer_builder</span>,
 	<span class="ident">service</span>::{
-		<span class="ident">AuthorityDiscoveryApi</span>, <span class="ident">AuxStore</span>, <span class="ident">BabeApi</span>, <span class="ident">Block</span>, <span class="ident">Error</span>, <span class="ident">HeaderBackend</span>, <span class="ident">Overseer</span>,
-		<span class="ident">OverseerGen</span>, <span class="ident">OverseerGenArgs</span>, <span class="ident">ParachainHost</span>, <span class="ident">ProvideRuntimeApi</span>, <span class="ident">SpawnNamed</span>,
+		<span class="ident">AuthorityDiscoveryApi</span>, <span class="ident">AuxStore</span>, <span class="ident">BabeApi</span>, <span class="ident">Block</span>, <span class="ident">Error</span>, <span class="ident">HeaderBackend</span>, <span class="ident">OverseerGen</span>,
+		<span class="ident">OverseerGenArgs</span>, <span class="ident">ParachainHost</span>, <span class="ident">ProvideRuntimeApi</span>, <span class="ident">SpawnNamed</span>,
 	},
 	<span class="ident">Cli</span>,
 };
@@ -166,7 +159,7 @@
 <span class="kw">use</span> <span class="ident">polkadot_node_core_candidate_validation::CandidateValidationSubsystem</span>;
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem</span>::{
 	<span class="ident">messages</span>::{<span class="ident">AllMessages</span>, <span class="ident">CandidateValidationMessage</span>},
-	<span class="ident">overseer</span>::{<span class="self">self</span>, <span class="ident">OverseerConnector</span>, <span class="ident">OverseerHandle</span>},
+	<span class="ident">overseer</span>::{<span class="self">self</span>, <span class="ident">Overseer</span>, <span class="ident">OverseerConnector</span>, <span class="ident">OverseerHandle</span>},
 	<span class="ident">FromOverseer</span>,
 };
 
@@ -223,15 +216,10 @@
 		<span class="ident">RuntimeClient::Api</span>: <span class="ident">ParachainHost</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">BabeApi</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">AuthorityDiscoveryApi</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
 		<span class="ident">Spawner</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">SpawnNamed</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 	{
-		<span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">spawner</span>.<span class="ident">clone</span>();
-		<span class="kw">let</span> <span class="ident">leaves</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">leaves</span>.<span class="ident">clone</span>();
-		<span class="kw">let</span> <span class="ident">runtime_client</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">runtime_client</span>.<span class="ident">clone</span>();
-		<span class="kw">let</span> <span class="ident">registry</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">registry</span>.<span class="ident">clone</span>();
 		<span class="kw">let</span> <span class="ident">candidate_validation_config</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">candidate_validation_config</span>.<span class="ident">clone</span>();
-		<span class="comment">// modify the subsystem(s) as needed:</span>
-		<span class="kw">let</span> <span class="ident">all_subsystems</span> <span class="op">=</span> <span class="ident">create_default_subsystems</span>(<span class="ident">args</span>)<span class="question-mark">?</span>.<span class="ident">replace_candidate_validation</span>(
-			<span class="comment">// create the filtered subsystem</span>
-			<span class="op">|</span><span class="ident">orig</span>: <span class="ident">CandidateValidationSubsystem</span><span class="op">|</span> {
+
+		<span class="ident">prepared_overseer_builder</span>(<span class="ident">args</span>)<span class="question-mark">?</span>
+			.<span class="ident">replace_candidate_validation</span>(<span class="op">|</span><span class="ident">orig</span>: <span class="ident">CandidateValidationSubsystem</span><span class="op">|</span> {
 				<span class="ident">InterceptedSubsystem::new</span>(
 					<span class="ident">CandidateValidationSubsystem::with_config</span>(
 						<span class="ident">candidate_validation_config</span>,
@@ -240,10 +228,8 @@
 					),
 					<span class="ident">Skippy::default</span>(),
 				)
-			},
-		);
-
-		<span class="ident">Overseer::new</span>(<span class="ident">leaves</span>, <span class="ident">all_subsystems</span>, <span class="ident">registry</span>, <span class="ident">runtime_client</span>, <span class="ident">spawner</span>, <span class="ident">connector</span>)
+			})
+			.<span class="ident">build_with_connector</span>(<span class="ident">connector</span>)
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">into</span>())
 	}
 }

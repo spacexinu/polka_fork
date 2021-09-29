@@ -71,7 +71,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">service</span>::{<span class="self">self</span>, <span class="ident">Block</span>, <span class="ident">CoreApi</span>, <span class="ident">IdentifyVariant</span>, <span class="ident">ProvideRuntimeApi</span>, <span class="ident">TFullClient</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;malus&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">service::create_default_subsystems</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">service::overseer::prepared_overseer_builder</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cli&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cli</span>::<span class="kw-2">*</span>;

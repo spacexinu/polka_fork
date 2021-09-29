@@ -1,3 +1,4 @@
 (function() {var implementors = {};
 implementors["malus_variant_a"] = [{"text":"impl <a class=\"trait\" href=\"polkadot_service/overseer/trait.OverseerGen.html\" title=\"trait polkadot_service::overseer::OverseerGen\">OverseerGen</a> for <a class=\"struct\" href=\"malus_variant_a/struct.BehaveMaleficient.html\" title=\"struct malus_variant_a::BehaveMaleficient\">BehaveMaleficient</a>","synthetic":false,"types":["malus_variant_a::BehaveMaleficient"]}];
+implementors["polkadot_service"] = [];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
