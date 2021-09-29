@@ -269,6 +269,12 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -418,7 +424,12 @@
 	<span class="doccomment">/// Execute some XCM `message` from `origin` using no more than `weight_limit` weight. The weight limit is</span>
 	<span class="doccomment">/// a basic hard-limit and the implementation may place further restrictions or requirements on weight and</span>
 	<span class="doccomment">/// other aspects.</span>
-	<span class="kw">fn</span> <span class="ident">execute_xcm</span>(<span class="ident">origin</span>: <span class="ident">MultiLocation</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>, <span class="ident">weight_limit</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Outcome</span> {
+	<span class="kw">fn</span> <span class="ident">execute_xcm</span>(
+		<span class="ident">origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
+		<span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>,
+		<span class="ident">weight_limit</span>: <span class="ident">Weight</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Outcome</span> {
+		<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">origin</span>.<span class="ident">into</span>();
 		<span class="macro">log::debug!</span>(
 			<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm&quot;</span>,
 			<span class="string">&quot;origin: {:?}, message: {:?}, weight_limit: {:?}&quot;</span>,
@@ -434,7 +445,7 @@
 	<span class="doccomment">/// Some amount of `weight_credit` may be provided which, depending on the implementation, may allow</span>
 	<span class="doccomment">/// execution without associated payment.</span>
 	<span class="kw">fn</span> <span class="ident">execute_xcm_in_credit</span>(
-		<span class="ident">origin</span>: <span class="ident">MultiLocation</span>,
+		<span class="ident">origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
 		<span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>,
 		<span class="ident">weight_limit</span>: <span class="ident">Weight</span>,
 		<span class="ident">weight_credit</span>: <span class="ident">Weight</span>,
@@ -443,7 +454,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">ExecuteXcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> () {
 	<span class="kw">fn</span> <span class="ident">execute_xcm_in_credit</span>(
-		<span class="ident">_origin</span>: <span class="ident">MultiLocation</span>,
+		<span class="ident">_origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
 		<span class="ident">_message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
 		<span class="ident">_weight_limit</span>: <span class="ident">Weight</span>,
 		<span class="ident">_weight_credit</span>: <span class="ident">Weight</span>,
@@ -467,15 +478,16 @@
 <span class="doccomment">/// /// A sender that only passes the message through and does nothing.</span>
 <span class="doccomment">/// struct Sender1;</span>
 <span class="doccomment">/// impl SendXcm for Sender1 {</span>
-<span class="doccomment">///     fn send_xcm(destination: MultiLocation, message: Xcm&lt;()&gt;) -&gt; Result {</span>
-<span class="doccomment">///         return Err(Error::CannotReachDestination(destination, message))</span>
+<span class="doccomment">///     fn send_xcm(destination: impl Into&lt;MultiLocation&gt;, message: Xcm&lt;()&gt;) -&gt; Result {</span>
+<span class="doccomment">///         return Err(Error::CannotReachDestination(destination.into(), message))</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// /// A sender that accepts a message that has an X2 junction, otherwise stops the routing.</span>
 <span class="doccomment">/// struct Sender2;</span>
 <span class="doccomment">/// impl SendXcm for Sender2 {</span>
-<span class="doccomment">///     fn send_xcm(destination: MultiLocation, message: Xcm&lt;()&gt;) -&gt; Result {</span>
+<span class="doccomment">///     fn send_xcm(destination: impl Into&lt;MultiLocation&gt;, message: Xcm&lt;()&gt;) -&gt; Result {</span>
+<span class="doccomment">///         let destination = destination.into();</span>
 <span class="doccomment">///         if matches!(destination.interior(), Junctions::X2(j1, j2))</span>
 <span class="doccomment">///             &amp;&amp; destination.parent_count() == 0</span>
 <span class="doccomment">///         {</span>
@@ -489,7 +501,8 @@
 <span class="doccomment">/// /// A sender that accepts a message from an X1 parent junction, passing through otherwise.</span>
 <span class="doccomment">/// struct Sender3;</span>
 <span class="doccomment">/// impl SendXcm for Sender3 {</span>
-<span class="doccomment">///     fn send_xcm(destination: MultiLocation, message: Xcm&lt;()&gt;) -&gt; Result {</span>
+<span class="doccomment">///     fn send_xcm(destination: impl Into&lt;MultiLocation&gt;, message: Xcm&lt;()&gt;) -&gt; Result {</span>
+<span class="doccomment">///         let destination = destination.into();</span>
 <span class="doccomment">///         if matches!(destination.interior(), Junctions::Here)</span>
 <span class="doccomment">///             &amp;&amp; destination.parent_count() == 1</span>
 <span class="doccomment">///         {</span>
@@ -504,17 +517,16 @@
 <span class="doccomment">/// # fn main() {</span>
 <span class="doccomment">/// let call: Vec&lt;u8&gt; = ().encode();</span>
 <span class="doccomment">/// let message = Xcm::Transact { origin_type: OriginKind::Superuser, require_weight_at_most: 0, call: call.into() };</span>
-<span class="doccomment">/// let destination: MultiLocation = Parent.into();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert!(</span>
 <span class="doccomment">///     // Sender2 will block this.</span>
-<span class="doccomment">///     &lt;(Sender1, Sender2, Sender3) as SendXcm&gt;::send_xcm(destination.clone(), message.clone())</span>
+<span class="doccomment">///     &lt;(Sender1, Sender2, Sender3) as SendXcm&gt;::send_xcm(Parent, message.clone())</span>
 <span class="doccomment">///         .is_err()</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert!(</span>
 <span class="doccomment">///     // Sender3 will catch this.</span>
-<span class="doccomment">///     &lt;(Sender1, Sender3) as SendXcm&gt;::send_xcm(destination.clone(), message.clone())</span>
+<span class="doccomment">///     &lt;(Sender1, Sender3) as SendXcm&gt;::send_xcm(Parent, message.clone())</span>
 <span class="doccomment">///         .is_ok()</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// # }</span>
@@ -525,12 +537,12 @@
 	<span class="doccomment">/// If it is not a destination which can be reached with this type but possibly could by others, then it *MUST*</span>
 	<span class="doccomment">/// return `CannotReachDestination`. Any other error will cause the tuple implementation to exit early without</span>
 	<span class="doccomment">/// trying other type fields.</span>
-	<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="ident">MultiLocation</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span>;
+	<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span>;
 }
 
 <span class="attribute">#[<span class="ident">impl_trait_for_tuples::impl_for_tuples</span>(<span class="number">30</span>)]</span>
 <span class="kw">impl</span> <span class="ident">SendXcm</span> <span class="kw">for</span> <span class="ident">Tuple</span> {
-	<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="ident">MultiLocation</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
+	<span class="kw">fn</span> <span class="ident">send_xcm</span>(<span class="ident">destination</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
 		<span class="macro">for_tuples!</span>( #(
 			<span class="comment">// we shadow `destination` and `message` in each expansion for the next one.</span>
 			<span class="kw">let</span> (<span class="ident">destination</span>, <span class="ident">message</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">Tuple::send_xcm</span>(<span class="ident">destination</span>, <span class="ident">message</span>) {
@@ -538,7 +550,7 @@
 				<span class="ident">o</span> @ <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">o</span>,
 			};
 		)<span class="op">*</span> );
-		<span class="prelude-val">Err</span>(<span class="ident">Error::CannotReachDestination</span>(<span class="ident">destination</span>, <span class="ident">message</span>))
+		<span class="prelude-val">Err</span>(<span class="ident">Error::CannotReachDestination</span>(<span class="ident">destination</span>.<span class="ident">into</span>(), <span class="ident">message</span>))
 	}
 }
 </pre></div>

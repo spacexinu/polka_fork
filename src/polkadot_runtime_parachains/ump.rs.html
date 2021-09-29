@@ -1041,7 +1041,6 @@
 <span id="1041">1041</span>
 <span id="1042">1042</span>
 <span id="1043">1043</span>
-<span id="1044">1044</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1136,7 +1135,7 @@
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, (<span class="ident">MessageId</span>, <span class="ident">Weight</span>)<span class="op">&gt;</span> {
 		<span class="kw">use</span> <span class="ident">parity_scale_codec::DecodeLimit</span>;
 		<span class="kw">use</span> <span class="ident">xcm</span>::{
-			<span class="ident">latest</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">XcmError</span>, <span class="ident">Junction</span>, <span class="ident">MultiLocation</span>, <span class="ident">Xcm</span>},
+			<span class="ident">latest</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">XcmError</span>, <span class="ident">Junction</span>, <span class="ident">Xcm</span>},
 			<span class="ident">VersionedXcm</span>,
 		};
 
@@ -1156,9 +1155,8 @@
 				<span class="prelude-val">Ok</span>(<span class="number">0</span>)
 			},
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">xcm_message</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">xcm_junction</span>: <span class="ident">Junction</span> <span class="op">=</span> <span class="ident">Junction::Parachain</span>(<span class="ident">origin</span>.<span class="ident">into</span>());
-				<span class="kw">let</span> <span class="ident">xcm_location</span>: <span class="ident">MultiLocation</span> <span class="op">=</span> <span class="ident">xcm_junction</span>.<span class="ident">into</span>();
-				<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">XcmExecutor::execute_xcm</span>(<span class="ident">xcm_location</span>, <span class="ident">xcm_message</span>, <span class="ident">max_weight</span>);
+				<span class="kw">let</span> <span class="ident">xcm_junction</span> <span class="op">=</span> <span class="ident">Junction::Parachain</span>(<span class="ident">origin</span>.<span class="ident">into</span>());
+				<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">XcmExecutor::execute_xcm</span>(<span class="ident">xcm_junction</span>, <span class="ident">xcm_message</span>, <span class="ident">max_weight</span>);
 				<span class="kw">match</span> <span class="ident">outcome</span> {
 					<span class="ident">Outcome::Error</span>(<span class="ident">XcmError::WeightLimitReached</span>(<span class="ident">required</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">id</span>, <span class="ident">required</span>)),
 					<span class="ident">outcome</span> <span class="op">=</span><span class="op">&gt;</span> {

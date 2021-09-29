@@ -444,7 +444,7 @@
 		<span class="ident">Relay::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">RelayChainPalletXcm::send_xcm</span>(
 				<span class="ident">Here</span>,
-				<span class="ident">Parachain</span>(<span class="number">1</span>).<span class="ident">into</span>(),
+				<span class="ident">Parachain</span>(<span class="number">1</span>),
 				<span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">Transact</span> {
 					<span class="ident">origin_type</span>: <span class="ident">OriginKind::SovereignAccount</span>,
 					<span class="ident">require_weight_at_most</span>: <span class="ident">INITIAL_BALANCE</span> <span class="kw">as</span> <span class="ident">u64</span>,
@@ -471,7 +471,7 @@
 		<span class="ident">ParaA::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(
 				<span class="ident">Here</span>,
-				<span class="ident">Parent</span>.<span class="ident">into</span>(),
+				<span class="ident">Parent</span>,
 				<span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">Transact</span> {
 					<span class="ident">origin_type</span>: <span class="ident">OriginKind::SovereignAccount</span>,
 					<span class="ident">require_weight_at_most</span>: <span class="ident">INITIAL_BALANCE</span> <span class="kw">as</span> <span class="ident">u64</span>,
@@ -499,7 +499,7 @@
 		<span class="ident">ParaA::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(
 				<span class="ident">Here</span>,
-				<span class="ident">MultiLocation::new</span>(<span class="number">1</span>, <span class="ident">X1</span>(<span class="ident">Parachain</span>(<span class="number">2</span>))),
+				(<span class="ident">Parent</span>, <span class="ident">Parachain</span>(<span class="number">2</span>)),
 				<span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">Transact</span> {
 					<span class="ident">origin_type</span>: <span class="ident">OriginKind::SovereignAccount</span>,
 					<span class="ident">require_weight_at_most</span>: <span class="ident">INITIAL_BALANCE</span> <span class="kw">as</span> <span class="ident">u64</span>,
@@ -566,7 +566,7 @@
 				},
 			]);
 			<span class="comment">// Send withdraw and deposit</span>
-			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(<span class="ident">Here</span>, <span class="ident">Parent</span>.<span class="ident">into</span>(), <span class="ident">message</span>.<span class="ident">clone</span>()));
+			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(<span class="ident">Here</span>, <span class="ident">Parent</span>, <span class="ident">message</span>.<span class="ident">clone</span>()));
 		});
 
 		<span class="ident">Relay::execute_with</span>(<span class="op">|</span><span class="op">|</span> {
@@ -608,7 +608,7 @@
 				},
 			]);
 			<span class="comment">// Send withdraw and deposit with query holding</span>
-			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(<span class="ident">Here</span>, <span class="ident">Parent</span>.<span class="ident">into</span>(), <span class="ident">message</span>.<span class="ident">clone</span>(),));
+			<span class="macro">assert_ok!</span>(<span class="ident">ParachainPalletXcm::send_xcm</span>(<span class="ident">Here</span>, <span class="ident">Parent</span>, <span class="ident">message</span>.<span class="ident">clone</span>(),));
 		});
 
 		<span class="comment">// Check that transfer was executed</span>

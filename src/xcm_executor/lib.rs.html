@@ -464,6 +464,8 @@
 <span id="464">464</span>
 <span id="465">465</span>
 <span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -534,11 +536,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Config</span>: <span class="ident">config::Config</span><span class="op">&gt;</span> <span class="ident">ExecuteXcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">execute_xcm_in_credit</span>(
-		<span class="ident">origin</span>: <span class="ident">MultiLocation</span>,
+		<span class="ident">origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
 		<span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">Config::Call</span><span class="op">&gt;</span>,
 		<span class="ident">weight_limit</span>: <span class="ident">Weight</span>,
 		<span class="kw-2">mut</span> <span class="ident">weight_credit</span>: <span class="ident">Weight</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Outcome</span> {
+		<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">origin</span>.<span class="ident">into</span>();
 		<span class="macro">log::trace!</span>(
 			<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm_in_credit&quot;</span>,
 			<span class="string">&quot;origin: {:?}, message: {:?}, weight_limit: {:?}, weight_credit: {:?}&quot;</span>,
@@ -616,7 +619,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Config</span>: <span class="ident">config::Config</span><span class="op">&gt;</span> <span class="ident">XcmExecutor</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">origin</span>: <span class="ident">MultiLocation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">origin</span>.<span class="ident">into</span>();
 		<span class="self">Self</span> {
 			<span class="ident">holding</span>: <span class="ident">Assets::new</span>(),
 			<span class="ident">origin</span>: <span class="prelude-val">Some</span>(<span class="ident">origin</span>.<span class="ident">clone</span>()),

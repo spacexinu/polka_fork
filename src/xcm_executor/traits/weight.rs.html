@@ -126,7 +126,7 @@
 <span class="doccomment">/// message.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UniversalWeigher</span> {
 	<span class="doccomment">/// Get the upper limit of weight required for `dest` to execute `message`.</span>
-	<span class="kw">fn</span> <span class="ident">weigh</span>(<span class="ident">dest</span>: <span class="ident">MultiLocation</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span>;
+	<span class="kw">fn</span> <span class="ident">weigh</span>(<span class="ident">dest</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>, <span class="ident">message</span>: <span class="ident">Xcm</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Charge for weight in order to execute XCM.</span>

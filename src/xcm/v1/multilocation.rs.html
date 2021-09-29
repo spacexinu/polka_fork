@@ -1264,8 +1264,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParentThen</span>(<span class="ident">Junctions</span>);
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ParentThen</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MultiLocation</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ParentThen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="number">1</span>, <span class="ident">interior</span>: <span class="ident">x</span>.<span class="number">0</span> }
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ParentThen</span>(<span class="ident">interior</span>): <span class="ident">ParentThen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="number">1</span>, <span class="ident">interior</span> }
 	}
 }
 
@@ -1273,8 +1273,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ancestor</span>(<span class="ident">u8</span>);
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Ancestor</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MultiLocation</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">Ancestor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="ident">x</span>.<span class="number">0</span>, <span class="ident">interior</span>: <span class="ident">Junctions::Here</span> }
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">Ancestor</span>(<span class="ident">parents</span>): <span class="ident">Ancestor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>, <span class="ident">interior</span>: <span class="ident">Junctions::Here</span> }
 	}
 }
 
@@ -1282,8 +1282,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AncestorThen</span>(<span class="ident">u8</span>, <span class="ident">Junctions</span>);
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AncestorThen</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MultiLocation</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">AncestorThen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="ident">x</span>.<span class="number">0</span>, <span class="ident">interior</span>: <span class="ident">x</span>.<span class="number">1</span> }
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">AncestorThen</span>(<span class="ident">parents</span>, <span class="ident">interior</span>): <span class="ident">AncestorThen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>, <span class="ident">interior</span> }
 	}
 }
 

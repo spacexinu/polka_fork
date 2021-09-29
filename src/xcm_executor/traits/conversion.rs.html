@@ -202,6 +202,13 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -349,9 +356,9 @@
 <span class="doccomment">/// // A convertor that will bump the para id and pass it to the next one.</span>
 <span class="doccomment">/// struct BumpParaId;</span>
 <span class="doccomment">/// impl ConvertOrigin&lt;u32&gt; for BumpParaId {</span>
-<span class="doccomment">/// 	fn convert_origin(origin: MultiLocation, _: OriginKind) -&gt; Result&lt;u32, MultiLocation&gt; {</span>
-<span class="doccomment">/// 		match origin.interior() {</span>
-<span class="doccomment">/// 			Junctions::X1(Junction::Parachain(id)) if origin.parent_count() == 0 =&gt; {</span>
+<span class="doccomment">/// 	fn convert_origin(origin: impl Into&lt;MultiLocation&gt;, _: OriginKind) -&gt; Result&lt;u32, MultiLocation&gt; {</span>
+<span class="doccomment">/// 		match origin.into() {</span>
+<span class="doccomment">/// 			MultiLocation { parents: 0, interior: Junctions::X1(Junction::Parachain(id)) } =&gt; {</span>
 <span class="doccomment">/// 				Err(Junctions::X1(Junction::Parachain(id + 1)).into())</span>
 <span class="doccomment">/// 			}</span>
 <span class="doccomment">/// 			_ =&gt; unreachable!()</span>
@@ -361,12 +368,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// struct AcceptPara7;</span>
 <span class="doccomment">/// impl ConvertOrigin&lt;u32&gt; for AcceptPara7 {</span>
-<span class="doccomment">/// 	fn convert_origin(origin: MultiLocation, _: OriginKind) -&gt; Result&lt;u32, MultiLocation&gt; {</span>
-<span class="doccomment">/// 		match origin.interior() {</span>
-<span class="doccomment">/// 			Junctions::X1(Junction::Parachain(id)) if id == &amp;7 &amp;&amp; origin.parent_count() == 0 =&gt; {</span>
+<span class="doccomment">/// 	fn convert_origin(origin: impl Into&lt;MultiLocation&gt;, _: OriginKind) -&gt; Result&lt;u32, MultiLocation&gt; {</span>
+<span class="doccomment">/// 		match origin.into() {</span>
+<span class="doccomment">/// 			MultiLocation { parents: 0, interior: Junctions::X1(Junction::Parachain(id)) } if id == 7 =&gt; {</span>
 <span class="doccomment">/// 				Ok(7)</span>
 <span class="doccomment">/// 			}</span>
-<span class="doccomment">/// 			_ =&gt; Err(origin)</span>
+<span class="doccomment">/// 			o =&gt; Err(o)</span>
 <span class="doccomment">/// 		}</span>
 <span class="doccomment">/// 	}</span>
 <span class="doccomment">/// }</span>
@@ -380,18 +387,25 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConvertOrigin</span><span class="op">&lt;</span><span class="ident">Origin</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Attempt to convert `origin` to the generic `Origin` whilst consuming it.</span>
-	<span class="kw">fn</span> <span class="ident">convert_origin</span>(<span class="ident">origin</span>: <span class="ident">MultiLocation</span>, <span class="ident">kind</span>: <span class="ident">OriginKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">MultiLocation</span><span class="op">&gt;</span>;
+	<span class="kw">fn</span> <span class="ident">convert_origin</span>(
+		<span class="ident">origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
+		<span class="ident">kind</span>: <span class="ident">OriginKind</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Origin</span>, <span class="ident">MultiLocation</span><span class="op">&gt;</span>;
 }
 
 <span class="attribute">#[<span class="ident">impl_trait_for_tuples::impl_for_tuples</span>(<span class="number">30</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ConvertOrigin</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Tuple</span> {
-	<span class="kw">fn</span> <span class="ident">convert_origin</span>(<span class="ident">origin</span>: <span class="ident">MultiLocation</span>, <span class="ident">kind</span>: <span class="ident">OriginKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">MultiLocation</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">convert_origin</span>(
+		<span class="ident">origin</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span>,
+		<span class="ident">kind</span>: <span class="ident">OriginKind</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">MultiLocation</span><span class="op">&gt;</span> {
 		<span class="macro">for_tuples!</span>( #(
 			<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Tuple::convert_origin</span>(<span class="ident">origin</span>, <span class="ident">kind</span>) {
 				<span class="prelude-val">Err</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>,
 				<span class="ident">r</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">r</span>
 			};
 		)<span class="op">*</span> );
+		<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="ident">origin</span>.<span class="ident">into</span>();
 		<span class="macro">log::trace!</span>(
 			<span class="ident">target</span>: <span class="string">&quot;xcm::convert_origin&quot;</span>,
 			<span class="string">&quot;could not convert: origin: {:?}, kind: {:?}&quot;</span>,
