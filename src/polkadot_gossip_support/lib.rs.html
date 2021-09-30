@@ -493,9 +493,6 @@
 <span id="493">493</span>
 <span id="494">494</span>
 <span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -707,6 +704,7 @@
 						<span class="op">%</span><span class="ident">session_index</span>,
 						<span class="string">&quot;New session detected&quot;</span>,
 					);
+					<span class="self">self</span>.<span class="ident">last_session_index</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">session_index</span>);
 				}
 
 				<span class="kw">let</span> <span class="ident">all_authorities</span> <span class="op">=</span> <span class="ident">determine_relevant_authorities</span>(<span class="ident">ctx</span>, <span class="ident">relay_parent</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -717,10 +715,9 @@
 					<span class="ident">authorities</span>
 				};
 
-				<span class="self">self</span>.<span class="ident">issue_connection_request</span>(<span class="ident">ctx</span>, <span class="ident">other_authorities</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+				<span class="self">self</span>.<span class="ident">issue_connection_request</span>(<span class="ident">ctx</span>, <span class="ident">other_authorities</span>).<span class="kw">await</span>;
 
 				<span class="kw">if</span> <span class="ident">is_new_session</span> {
-					<span class="self">self</span>.<span class="ident">last_session_index</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">session_index</span>);
 					<span class="ident">update_gossip_topology</span>(<span class="ident">ctx</span>, <span class="ident">our_index</span>, <span class="ident">all_authorities</span>, <span class="ident">relay_parent</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 				}
 			}
@@ -733,8 +730,7 @@
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
 		<span class="ident">authorities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">util::Error</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
+	) <span class="kw">where</span>
 		<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">GossipSupportMessage</span><span class="op">&gt;</span>,
 		<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">GossipSupportMessage</span><span class="op">&gt;</span>,
 	{
@@ -794,8 +790,6 @@
 			<span class="self">self</span>.<span class="ident">last_failure</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 			<span class="self">self</span>.<span class="ident">failure_start</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 		};
-
-		<span class="prelude-val">Ok</span>(())
 	}
 
 	<span class="kw">fn</span> <span class="ident">handle_connect_disconnect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ev</span>: <span class="ident">NetworkBridgeEvent</span><span class="op">&lt;</span><span class="ident">GossipSuppportNetworkMessage</span><span class="op">&gt;</span>) {
