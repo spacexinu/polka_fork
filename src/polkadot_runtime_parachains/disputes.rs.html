@@ -3372,6 +3372,11 @@
 <span id="3372">3372</span>
 <span id="3373">3373</span>
 <span id="3374">3374</span>
+<span id="3375">3375</span>
+<span id="3376">3376</span>
+<span id="3377">3377</span>
+<span id="3378">3378</span>
+<span id="3379">3379</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3679,8 +3684,8 @@
 		<span class="ident">DisputeTimedOut</span>(<span class="ident">CandidateHash</span>),
 		<span class="doccomment">/// A dispute has concluded with supermajority against a candidate.</span>
 		<span class="doccomment">/// Block authors should no longer build on top of this head and should</span>
-		<span class="doccomment">/// instead revert to the block at the given height which is the last</span>
-		<span class="doccomment">/// known valid block in this chain.</span>
+		<span class="doccomment">/// instead revert the block at the given height. This should be the</span>
+		<span class="doccomment">/// number of the child of the last known valid block in the chain.</span>
 		<span class="ident">Revert</span>(<span class="ident">T::BlockNumber</span>),
 	}
 
@@ -4502,9 +4507,14 @@
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">revert_and_freeze</span>(<span class="ident">revert_to</span>: <span class="ident">T::BlockNumber</span>) {
 		<span class="kw">if</span> <span class="self">Self</span><span class="ident">::last_valid_block</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">last</span><span class="op">|</span> <span class="ident">last</span> <span class="op">&gt;</span> <span class="ident">revert_to</span>) {
 			<span class="ident">Frozen</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::set</span>(<span class="prelude-val">Some</span>(<span class="ident">revert_to</span>));
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event::Revert</span>(<span class="ident">revert_to</span>));
+
+			<span class="comment">// The `Revert` log is about reverting a block, not reverting to a block.</span>
+			<span class="comment">// If we want to revert to block X in the current chain, we need to revert</span>
+			<span class="comment">// block X+1.</span>
+			<span class="kw">let</span> <span class="ident">revert</span> <span class="op">=</span> <span class="ident">revert_to</span> <span class="op">+</span> <span class="ident">One::one</span>();
+			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event::Revert</span>(<span class="ident">revert</span>));
 			<span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::deposit_log</span>(
-				<span class="ident">ConsensusLog::Revert</span>(<span class="ident">revert_to</span>.<span class="ident">saturated_into</span>()).<span class="ident">into</span>(),
+				<span class="ident">ConsensusLog::Revert</span>(<span class="ident">revert</span>.<span class="ident">saturated_into</span>()).<span class="ident">into</span>(),
 			);
 		}
 	}
@@ -5659,8 +5669,8 @@
 			<span class="ident">Pallet</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::revert_and_freeze</span>(<span class="number">0</span>);
 
 			<span class="macro">assert_eq!</span>(<span class="ident">Frozen</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::get</span>(), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-			<span class="macro">assert_eq!</span>(<span class="ident">System::digest</span>().<span class="ident">logs</span>[<span class="number">0</span>], <span class="ident">ConsensusLog::Revert</span>(<span class="number">0</span>).<span class="ident">into</span>());
-			<span class="ident">System::assert_has_event</span>(<span class="ident">Event::Revert</span>(<span class="number">0</span>).<span class="ident">into</span>());
+			<span class="macro">assert_eq!</span>(<span class="ident">System::digest</span>().<span class="ident">logs</span>[<span class="number">0</span>], <span class="ident">ConsensusLog::Revert</span>(<span class="number">1</span>).<span class="ident">into</span>());
+			<span class="ident">System::assert_has_event</span>(<span class="ident">Event::Revert</span>(<span class="number">1</span>).<span class="ident">into</span>());
 		})
 	}
 
