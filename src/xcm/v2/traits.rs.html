@@ -406,90 +406,90 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">TypeInfo</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-	<span class="ident">Undefined</span>,
+	<span class="comment">// Errors that happen due to instructions being executed. These alone are defined in the</span>
+	<span class="comment">// XCM specification.</span>
 	<span class="doccomment">/// An arithmetic overflow happened.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>)]</span>
 	<span class="ident">Overflow</span>,
-	<span class="doccomment">/// The operation is intentionally unsupported.</span>
+	<span class="doccomment">/// The instruction is intentionally unsupported.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">1</span>)]</span>
 	<span class="ident">Unimplemented</span>,
-	<span class="ident">UnhandledXcmVersion</span>,
-	<span class="doccomment">/// The implementation does not handle a given XCM.</span>
-	<span class="ident">UnhandledXcmMessage</span>,
-	<span class="doccomment">/// The implementation does not handle an effect present in an XCM.</span>
-	<span class="ident">UnhandledEffect</span>,
-	<span class="ident">EscalationOfPrivilege</span>,
+	<span class="doccomment">/// Origin Register does not contain a value value for a reserve transfer notification.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">2</span>)]</span>
 	<span class="ident">UntrustedReserveLocation</span>,
+	<span class="doccomment">/// Origin Register does not contain a value value for a teleport notification.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">3</span>)]</span>
 	<span class="ident">UntrustedTeleportLocation</span>,
-	<span class="ident">DestinationBufferOverflow</span>,
+	<span class="doccomment">/// `MultiLocation` value too large to descend further.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">4</span>)]</span>
 	<span class="ident">MultiLocationFull</span>,
+	<span class="doccomment">/// `MultiLocation` value ascend more parents than known ancestors of local location.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">5</span>)]</span>
 	<span class="ident">MultiLocationNotInvertible</span>,
-	<span class="ident">FailedToDecode</span>,
+	<span class="doccomment">/// The Origin Register does not contain a valid value for instruction.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">6</span>)]</span>
 	<span class="ident">BadOrigin</span>,
-	<span class="ident">ExceedsMaxMessageSize</span>,
-	<span class="doccomment">/// An asset transaction (like withdraw or deposit) failed.</span>
-	<span class="doccomment">/// See implementers of the `TransactAsset` trait for sources.</span>
-	<span class="doccomment">/// Causes can include type conversion failures between id or balance types.</span>
-	<span class="ident">FailedToTransactAsset</span>(<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">skip</span>)]</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
-	<span class="doccomment">/// Execution of the XCM would potentially result in a greater weight used than the pre-specified</span>
-	<span class="doccomment">/// weight limit. The amount that is potentially required is the parameter.</span>
-	<span class="ident">WeightLimitReached</span>(<span class="ident">Weight</span>),
-	<span class="doccomment">/// An asset wildcard was passed where it was not expected (e.g. as the asset to withdraw in a</span>
-	<span class="doccomment">/// `WithdrawAsset` XCM).</span>
-	<span class="ident">Wildcard</span>,
-	<span class="doccomment">/// The case where an XCM message has specified a optional weight limit and the weight required for</span>
-	<span class="doccomment">/// processing is too great.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Used by:</span>
-	<span class="doccomment">/// - `Transact`</span>
-	<span class="ident">TooMuchWeightRequired</span>,
-	<span class="doccomment">/// The fees specified by the XCM message were not found in the holding register.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Used by:</span>
-	<span class="doccomment">/// - `BuyExecution`</span>
-	<span class="ident">NotHoldingFees</span>,
-	<span class="doccomment">/// The weight of an XCM message is not computable ahead of execution. This generally means at least part</span>
-	<span class="doccomment">/// of the message is invalid, which could be due to it containing overly nested structures or an invalid</span>
-	<span class="doccomment">/// nested data segment (e.g. for the call in `Transact`).</span>
-	<span class="ident">WeightNotComputable</span>,
-	<span class="doccomment">/// The XCM did not pass the barrier condition for execution. The barrier condition differs on different</span>
-	<span class="doccomment">/// chains and in different circumstances, but generally it means that the conditions surrounding the message</span>
-	<span class="doccomment">/// were not such that the chain considers the message worth spending time executing. Since most chains</span>
-	<span class="doccomment">/// lift the barrier to execution on appropriate payment, presentation of an NFT voucher, or based on the</span>
-	<span class="doccomment">/// message origin, it means that none of those were the case.</span>
-	<span class="ident">Barrier</span>,
-	<span class="doccomment">/// Indicates that it is not possible for a location to have an asset be withdrawn or transferred from its</span>
-	<span class="doccomment">/// ownership. This probably means it doesn&#39;t own (enough of) it, but may also indicate that it is under a</span>
-	<span class="doccomment">/// lock, hold, freeze or is otherwise unavailable.</span>
-	<span class="ident">NotWithdrawable</span>,
-	<span class="doccomment">/// Indicates that the consensus system cannot deposit an asset under the ownership of a particular location.</span>
-	<span class="ident">LocationCannotHold</span>,
-	<span class="doccomment">/// The assets given to purchase weight is are insufficient for the weight desired.</span>
-	<span class="ident">TooExpensive</span>,
+	<span class="doccomment">/// The location parameter is not a valid value for the instruction.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">7</span>)]</span>
+	<span class="ident">InvalidLocation</span>,
 	<span class="doccomment">/// The given asset is not handled.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">8</span>)]</span>
 	<span class="ident">AssetNotFound</span>,
-	<span class="doccomment">/// The given message cannot be translated into a format that the destination can be expected to interpret.</span>
+	<span class="doccomment">/// An asset transaction (like withdraw or deposit) failed (typically due to type conversions).</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">9</span>)]</span>
+	<span class="ident">FailedToTransactAsset</span>(<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">skip</span>)]</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+	<span class="doccomment">/// An asset cannot be withdrawn, potentially due to lack of ownership, availability or rights.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">10</span>)]</span>
+	<span class="ident">NotWithdrawable</span>,
+	<span class="doccomment">/// An asset cannot be deposited under the ownership of a particular location.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">11</span>)]</span>
+	<span class="ident">LocationCannotHold</span>,
+	<span class="doccomment">/// Attempt to send a message greater than the maximum supported by the transport protocol.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">12</span>)]</span>
+	<span class="ident">ExceedsMaxMessageSize</span>,
+	<span class="doccomment">/// The given message cannot be translated into a format supported by the destination.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">13</span>)]</span>
 	<span class="ident">DestinationUnsupported</span>,
-	<span class="doccomment">/// `execute_xcm` has been called too many times recursively.</span>
-	<span class="ident">RecursionLimitReached</span>,
 	<span class="doccomment">/// Destination is routable, but there is some issue with the transport mechanism.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A human-readable explanation of the specific issue is provided.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">14</span>)]</span>
 	<span class="ident">Transport</span>(<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">skip</span>)]</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
 	<span class="doccomment">/// Destination is known to be unroutable.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">15</span>)]</span>
 	<span class="ident">Unroutable</span>,
-	<span class="doccomment">/// The weight required was not specified when it should have been.</span>
-	<span class="ident">UnknownWeightRequired</span>,
-	<span class="doccomment">/// An error was intentionally forced. A code is included.</span>
-	<span class="ident">Trap</span>(<span class="ident">u64</span>),
-	<span class="doccomment">/// The given claim could not be recognized/found.</span>
+	<span class="doccomment">/// Used by `ClaimAsset` when the given claim could not be recognized/found.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">16</span>)]</span>
 	<span class="ident">UnknownClaim</span>,
-	<span class="doccomment">/// The location given was invalid for some reason specific to the operation at hand.</span>
-	<span class="ident">InvalidLocation</span>,
-}
+	<span class="doccomment">/// Used by `Transact` when the functor cannot be decoded.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">17</span>)]</span>
+	<span class="ident">FailedToDecode</span>,
+	<span class="doccomment">/// Used by `Transact` to indicate that the given weight limit could be breached by the functor.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">18</span>)]</span>
+	<span class="ident">TooMuchWeightRequired</span>,
+	<span class="doccomment">/// Used by `BuyExecution` when the Holding Register does not contain payable fees.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">19</span>)]</span>
+	<span class="ident">NotHoldingFees</span>,
+	<span class="doccomment">/// Used by `BuyExecution` when the fees declared to purchase weight are insufficient.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">20</span>)]</span>
+	<span class="ident">TooExpensive</span>,
+	<span class="doccomment">/// Used by the `Trap` instruction to force an error intentionally. Its code is included.</span>
+	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">21</span>)]</span>
+	<span class="ident">Trap</span>(<span class="ident">u64</span>),
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: ()) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span><span class="ident">::Undefined</span>
-	}
+	<span class="comment">// Errors that happen prior to instructions being executed. These fall outside of the XCM spec.</span>
+	<span class="doccomment">/// XCM version not able to be handled.</span>
+	<span class="ident">UnhandledXcmVersion</span>,
+	<span class="doccomment">/// Execution of the XCM would potentially result in a greater weight used than weight limit.</span>
+	<span class="ident">WeightLimitReached</span>(<span class="ident">Weight</span>),
+	<span class="doccomment">/// The XCM did not pass the barrier condition for execution.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// The barrier condition differs on different chains and in different circumstances, but</span>
+	<span class="doccomment">/// generally it means that the conditions surrounding the message were not such that the chain</span>
+	<span class="doccomment">/// considers the message worth spending time executing. Since most chains lift the barrier to</span>
+	<span class="doccomment">/// execution on appropriate payment, presentation of an NFT voucher, or based on the message</span>
+	<span class="doccomment">/// origin, it means that none of those were the case.</span>
+	<span class="ident">Barrier</span>,
+	<span class="doccomment">/// The weight of an XCM message is not computable ahead of execution.</span>
+	<span class="ident">WeightNotComputable</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SendError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {

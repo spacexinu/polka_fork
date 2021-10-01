@@ -362,7 +362,7 @@
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block_builder</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">init_polkadot_block_builder</span>();
 
-	<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">Ok</span>(()));
+	<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">None</span>);
 	<span class="kw">let</span> <span class="ident">max_weight</span> <span class="op">=</span> <span class="number">1_000_000</span>;
 	<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span> }]);
 	<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">VersionedXcm::from</span>(<span class="ident">msg</span>));
@@ -393,13 +393,13 @@
 				<span class="ident">r</span>.<span class="ident">event</span>,
 				<span class="ident">polkadot_test_runtime::Event::Xcm</span>(<span class="ident">pallet_xcm::Event::ResponseReady</span>(
 					<span class="ident">q</span>,
-					<span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">Ok</span>(())),
+					<span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">None</span>),
 				)) <span class="kw">if</span> <span class="ident">q</span> <span class="op">=</span><span class="op">=</span> <span class="ident">query_id</span>,
 			)));
 			<span class="macro">assert_eq!</span>(
 				<span class="ident">polkadot_test_runtime::Xcm::query</span>(<span class="ident">query_id</span>),
 				<span class="prelude-val">Some</span>(<span class="ident">QueryStatus::Ready</span> {
-					<span class="ident">response</span>: <span class="ident">VersionedResponse::V2</span>(<span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">Ok</span>(()))),
+					<span class="ident">response</span>: <span class="ident">VersionedResponse::V2</span>(<span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">None</span>)),
 					<span class="ident">at</span>: <span class="number">2u32</span>.<span class="ident">into</span>()
 				}),
 			)
@@ -451,7 +451,7 @@
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block_builder</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">init_polkadot_block_builder</span>();
 
-	<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">Ok</span>(()));
+	<span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">None</span>);
 	<span class="kw">let</span> <span class="ident">max_weight</span> <span class="op">=</span> <span class="number">1_000_000</span>;
 	<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">Xcm</span>(<span class="macro">vec!</span>[<span class="ident">QueryResponse</span> { <span class="ident">query_id</span>, <span class="ident">response</span>, <span class="ident">max_weight</span> }]);
 
@@ -482,7 +482,7 @@
 				<span class="ident">TestNotifier</span>(<span class="ident">ResponseReceived</span>(
 					<span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="number">0</span>, <span class="ident">interior</span>: <span class="ident">X1</span>(<span class="ident">Junction::AccountId32</span> { .. }) },
 					<span class="ident">q</span>,
-					<span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">Ok</span>(())),
+					<span class="ident">Response::ExecutionResult</span>(<span class="prelude-val">None</span>),
 				)) <span class="kw">if</span> <span class="ident">q</span> <span class="op">=</span><span class="op">=</span> <span class="ident">query_id</span>,
 			)));
 		});
