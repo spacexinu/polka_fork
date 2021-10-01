@@ -1378,7 +1378,6 @@
 <span id="1378">1378</span>
 <span id="1379">1379</span>
 <span id="1380">1380</span>
-<span id="1381">1381</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2456,19 +2455,18 @@
 				},
 			}
 		},
-		<span class="ident">AvailabilityStoreMessage::StoreAvailableData</span>(
-			<span class="ident">candidate</span>,
-			<span class="ident">_our_index</span>,
+		<span class="ident">AvailabilityStoreMessage::StoreAvailableData</span> {
+			<span class="ident">candidate_hash</span>,
 			<span class="ident">n_validators</span>,
 			<span class="ident">available_data</span>,
 			<span class="ident">tx</span>,
-		) <span class="op">=</span><span class="op">&gt;</span> {
+		} <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="ident">subsystem</span>.<span class="ident">metrics</span>.<span class="ident">on_chunks_received</span>(<span class="ident">n_validators</span> <span class="kw">as</span> <span class="kw">_</span>);
 
 			<span class="kw">let</span> <span class="ident">_timer</span> <span class="op">=</span> <span class="ident">subsystem</span>.<span class="ident">metrics</span>.<span class="ident">time_store_available_data</span>();
 
 			<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span>
-				<span class="ident">store_available_data</span>(<span class="kw-2">&amp;</span><span class="ident">subsystem</span>, <span class="ident">candidate</span>, <span class="ident">n_validators</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">available_data</span>);
+				<span class="ident">store_available_data</span>(<span class="kw-2">&amp;</span><span class="ident">subsystem</span>, <span class="ident">candidate_hash</span>, <span class="ident">n_validators</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">available_data</span>);
 
 			<span class="kw">match</span> <span class="ident">res</span> {
 				<span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {

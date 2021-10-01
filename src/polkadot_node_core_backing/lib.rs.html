@@ -1390,21 +1390,6 @@
 <span id="1390">1390</span>
 <span id="1391">1391</span>
 <span id="1392">1392</span>
-<span id="1393">1393</span>
-<span id="1394">1394</span>
-<span id="1395">1395</span>
-<span id="1396">1396</span>
-<span id="1397">1397</span>
-<span id="1398">1398</span>
-<span id="1399">1399</span>
-<span id="1400">1400</span>
-<span id="1401">1401</span>
-<span id="1402">1402</span>
-<span id="1403">1403</span>
-<span id="1404">1404</span>
-<span id="1405">1405</span>
-<span id="1406">1406</span>
-<span id="1407">1407</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1702,20 +1687,18 @@
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">store_available_data</span>(
 	<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">JobSender</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">SubsystemSender</span><span class="op">&gt;</span>,
-	<span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span>,
 	<span class="ident">n_validators</span>: <span class="ident">u32</span>,
 	<span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
 	<span class="ident">available_data</span>: <span class="ident">AvailableData</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 	<span class="ident">sender</span>
-		.<span class="ident">send_message</span>(<span class="ident">AvailabilityStoreMessage::StoreAvailableData</span>(
+		.<span class="ident">send_message</span>(<span class="ident">AvailabilityStoreMessage::StoreAvailableData</span> {
 			<span class="ident">candidate_hash</span>,
-			<span class="ident">id</span>,
 			<span class="ident">n_validators</span>,
 			<span class="ident">available_data</span>,
 			<span class="ident">tx</span>,
-		))
+		})
 		.<span class="kw">await</span>;
 
 	<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Error::StoreAvailableData</span>)<span class="question-mark">?</span>;
@@ -1729,7 +1712,6 @@
 <span class="comment">// This returns `Err()` iff there is an internal error. Otherwise, it returns either `Ok(Ok(()))` or `Ok(Err(_))`.</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">make_pov_available</span>(
 	<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">JobSender</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">SubsystemSender</span><span class="op">&gt;</span>,
-	<span class="ident">validator_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span>,
 	<span class="ident">n_validators</span>: <span class="ident">usize</span>,
 	<span class="ident">pov</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">PoV</span><span class="op">&gt;</span>,
 	<span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
@@ -1755,14 +1737,7 @@
 	{
 		<span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">child</span>(<span class="string">&quot;store-data&quot;</span>).<span class="ident">with_candidate</span>(<span class="ident">candidate_hash</span>));
 
-		<span class="ident">store_available_data</span>(
-			<span class="ident">sender</span>,
-			<span class="ident">validator_index</span>,
-			<span class="ident">n_validators</span> <span class="kw">as</span> <span class="ident">u32</span>,
-			<span class="ident">candidate_hash</span>,
-			<span class="ident">available_data</span>,
-		)
-		.<span class="kw">await</span><span class="question-mark">?</span>;
+		<span class="ident">store_available_data</span>(<span class="ident">sender</span>, <span class="ident">n_validators</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">candidate_hash</span>, <span class="ident">available_data</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 	}
 
 	<span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(()))
@@ -1817,7 +1792,6 @@
 	<span class="ident">candidate</span>: <span class="ident">CandidateReceipt</span>,
 	<span class="ident">relay_parent</span>: <span class="ident">Hash</span>,
 	<span class="ident">pov</span>: <span class="ident">PoVData</span>,
-	<span class="ident">validator_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span>,
 	<span class="ident">n_validators</span>: <span class="ident">usize</span>,
 	<span class="ident">span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">jaeger::Span</span><span class="op">&gt;</span>,
 	<span class="ident">make_command</span>: <span class="ident">F</span>,
@@ -1835,7 +1809,6 @@
 		<span class="ident">candidate</span>,
 		<span class="ident">relay_parent</span>,
 		<span class="ident">pov</span>,
-		<span class="ident">validator_index</span>,
 		<span class="ident">n_validators</span>,
 		<span class="ident">span</span>,
 		<span class="ident">make_command</span>,
@@ -1892,7 +1865,6 @@
 			} <span class="kw">else</span> {
 				<span class="kw">let</span> <span class="ident">erasure_valid</span> <span class="op">=</span> <span class="ident">make_pov_available</span>(
 					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sender</span>,
-					<span class="ident">validator_index</span>,
 					<span class="ident">n_validators</span>,
 					<span class="ident">pov</span>.<span class="ident">clone</span>(),
 					<span class="ident">candidate</span>.<span class="ident">hash</span>(),
@@ -2127,7 +2099,6 @@
 				<span class="ident">candidate</span>: <span class="ident">candidate</span>.<span class="ident">clone</span>(),
 				<span class="ident">relay_parent</span>: <span class="self">self</span>.<span class="ident">parent</span>,
 				<span class="ident">pov</span>: <span class="ident">PoVData::Ready</span>(<span class="ident">pov</span>),
-				<span class="ident">validator_index</span>: <span class="self">self</span>.<span class="ident">table_context</span>.<span class="ident">validator</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">index</span>()),
 				<span class="ident">n_validators</span>: <span class="self">self</span>.<span class="ident">table_context</span>.<span class="ident">validators</span>.<span class="ident">len</span>(),
 				<span class="ident">span</span>,
 				<span class="ident">make_command</span>: <span class="ident">ValidatedCandidateCommand::Second</span>,
@@ -2441,7 +2412,6 @@
 				<span class="ident">candidate</span>: <span class="ident">attesting</span>.<span class="ident">candidate</span>,
 				<span class="ident">relay_parent</span>: <span class="self">self</span>.<span class="ident">parent</span>,
 				<span class="ident">pov</span>,
-				<span class="ident">validator_index</span>: <span class="self">self</span>.<span class="ident">table_context</span>.<span class="ident">validator</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">index</span>()),
 				<span class="ident">n_validators</span>: <span class="self">self</span>.<span class="ident">table_context</span>.<span class="ident">validators</span>.<span class="ident">len</span>(),
 				<span class="ident">span</span>,
 				<span class="ident">make_command</span>: <span class="ident">ValidatedCandidateCommand::Attest</span>,
