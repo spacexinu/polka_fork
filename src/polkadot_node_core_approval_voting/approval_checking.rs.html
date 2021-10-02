@@ -1296,6 +1296,81 @@
 <span id="1296">1296</span>
 <span id="1297">1297</span>
 <span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
+<span id="1321">1321</span>
+<span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
+<span id="1343">1343</span>
+<span id="1344">1344</span>
+<span id="1345">1345</span>
+<span id="1346">1346</span>
+<span id="1347">1347</span>
+<span id="1348">1348</span>
+<span id="1349">1349</span>
+<span id="1350">1350</span>
+<span id="1351">1351</span>
+<span id="1352">1352</span>
+<span id="1353">1353</span>
+<span id="1354">1354</span>
+<span id="1355">1355</span>
+<span id="1356">1356</span>
+<span id="1357">1357</span>
+<span id="1358">1358</span>
+<span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1357,6 +1432,8 @@
 		<span class="doccomment">/// event that there are some assignments that don&#39;t have corresponding approval votes. If this</span>
 		<span class="doccomment">/// is `None`, all assignments have approvals.</span>
 		<span class="ident">next_no_show</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>,
+		<span class="doccomment">/// The last tick at which a needed assignment was received.</span>
+		<span class="ident">last_assignment_tick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>,
 	},
 }
 
@@ -1365,18 +1442,22 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Check</span> {
 	<span class="doccomment">/// The candidate is unapproved.</span>
 	<span class="ident">Unapproved</span>,
-	<span class="doccomment">/// The candidate is approved, with the given amount of no-shows.</span>
-	<span class="ident">Approved</span>(<span class="ident">usize</span>),
+	<span class="doccomment">/// The candidate is approved, with the given amount of no-shows,</span>
+	<span class="doccomment">/// with the last counted assignment being received at the given</span>
+	<span class="doccomment">/// tick.</span>
+	<span class="ident">Approved</span>(<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>),
 	<span class="doccomment">/// The candidate is approved by one third of all validators.</span>
 	<span class="ident">ApprovedOneThird</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Check</span> {
-	<span class="doccomment">/// Whether the candidate is approved.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_approved</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="doccomment">/// Whether the candidate is approved and all relevant assignments</span>
+	<span class="doccomment">/// have at most the given assignment tick.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_approved</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_assignment_tick</span>: <span class="ident">Tick</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
 			<span class="ident">Check::Unapproved</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-			<span class="ident">Check::Approved</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+			<span class="ident">Check::Approved</span>(<span class="kw">_</span>, <span class="ident">last_assignment_tick</span>) <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">last_assignment_tick</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_assignment_tick</span>),
 			<span class="ident">Check::ApprovedOneThird</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 		}
 	}
@@ -1384,7 +1465,7 @@
 	<span class="doccomment">/// The number of known no-shows in this computation.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">known_no_shows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-			<span class="ident">Check::Approved</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
+			<span class="ident">Check::Approved</span>(<span class="ident">n</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
 		}
 	}
@@ -1406,7 +1487,7 @@
 	<span class="kw">match</span> <span class="ident">required</span> {
 		<span class="ident">RequiredTranches::Pending</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Check::Unapproved</span>,
 		<span class="ident">RequiredTranches::All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Check::Unapproved</span>,
-		<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>, <span class="ident">tolerated_missing</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>, <span class="ident">tolerated_missing</span>, <span class="ident">last_assignment_tick</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="comment">// whether all assigned validators up to `needed` less no_shows have approved.</span>
 			<span class="comment">// e.g. if we had 5 tranches and 1 no-show, we would accept all validators in</span>
 			<span class="comment">// tranches 0..=5 except for 1 approving. In that example, we also accept all</span>
@@ -1429,7 +1510,7 @@
 			<span class="comment">// that will surpass a minimum amount of checks.</span>
 			<span class="comment">// shouldn&#39;t typically go above, since all no-shows are supposed to be covered.</span>
 			<span class="kw">if</span> <span class="ident">n_approved</span> <span class="op">+</span> <span class="ident">tolerated_missing</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n_assigned</span> {
-				<span class="ident">Check::Approved</span>(<span class="ident">tolerated_missing</span>)
+				<span class="ident">Check::Approved</span>(<span class="ident">tolerated_missing</span>, <span class="ident">last_assignment_tick</span>)
 			} <span class="kw">else</span> {
 				<span class="ident">Check::Unapproved</span>
 			}
@@ -1469,6 +1550,8 @@
 	<span class="ident">uncovered</span>: <span class="ident">usize</span>,
 	<span class="doccomment">/// The next tick at which a no-show would occur, if any.</span>
 	<span class="ident">next_no_show</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// The last tick at which a considered assignment was received.</span>
+	<span class="ident">last_assignment_tick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
@@ -1491,6 +1574,7 @@
 				<span class="ident">needed</span>: <span class="ident">tranche</span>,
 				<span class="ident">tolerated_missing</span>: <span class="self">self</span>.<span class="ident">covered</span>,
 				<span class="ident">next_no_show</span>: <span class="self">self</span>.<span class="ident">next_no_show</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="self">self</span>.<span class="ident">last_assignment_tick</span>,
 			}
 		}
 
@@ -1525,6 +1609,7 @@
 		<span class="ident">new_assignments</span>: <span class="ident">usize</span>,
 		<span class="ident">new_no_shows</span>: <span class="ident">usize</span>,
 		<span class="ident">next_no_show</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>,
+		<span class="ident">last_assignment_tick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tick</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
 		<span class="kw">let</span> <span class="ident">new_covered</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">depth</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
 			<span class="ident">new_assignments</span>
@@ -1545,6 +1630,7 @@
 		};
 		<span class="kw">let</span> <span class="ident">uncovered</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uncovered</span> <span class="op">+</span> <span class="ident">new_no_shows</span>;
 		<span class="kw">let</span> <span class="ident">next_no_show</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::min_prefer_some</span>(<span class="self">self</span>.<span class="ident">next_no_show</span>, <span class="ident">next_no_show</span>);
+		<span class="kw">let</span> <span class="ident">last_assignment_tick</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="self">self</span>.<span class="ident">last_assignment_tick</span>, <span class="ident">last_assignment_tick</span>);
 
 		<span class="kw">let</span> (<span class="ident">depth</span>, <span class="ident">covering</span>, <span class="ident">uncovered</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">covering</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
 			<span class="kw">if</span> <span class="ident">uncovered</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
@@ -1556,7 +1642,15 @@
 			(<span class="self">self</span>.<span class="ident">depth</span>, <span class="ident">covering</span>, <span class="ident">uncovered</span>)
 		};
 
-		<span class="ident">State</span> { <span class="ident">assignments</span>, <span class="ident">depth</span>, <span class="ident">covered</span>, <span class="ident">covering</span>, <span class="ident">uncovered</span>, <span class="ident">next_no_show</span> }
+		<span class="ident">State</span> {
+			<span class="ident">assignments</span>,
+			<span class="ident">depth</span>,
+			<span class="ident">covered</span>,
+			<span class="ident">covering</span>,
+			<span class="ident">uncovered</span>,
+			<span class="ident">next_no_show</span>,
+			<span class="ident">last_assignment_tick</span>,
+		}
 	}
 }
 
@@ -1655,6 +1749,7 @@
 		<span class="ident">covering</span>: <span class="ident">needed_approvals</span>,
 		<span class="ident">uncovered</span>: <span class="number">0</span>,
 		<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+		<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>,
 	};
 
 	<span class="comment">// The `ApprovalEntry` doesn&#39;t have any data for empty tranches. We still want to iterate over</span>
@@ -1683,6 +1778,11 @@
 				.<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">v_index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">v_index</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">n_validators</span> <span class="kw">as</span> <span class="ident">u32</span>)
 				.<span class="ident">count</span>();
 
+			<span class="comment">// Get the latest tick of valid validator assignments.</span>
+			<span class="kw">let</span> <span class="ident">last_assignment_tick</span> <span class="op">=</span> <span class="ident">assignments</span>.<span class="ident">iter</span>()
+				.<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">t</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">t</span>)
+				.<span class="ident">max</span>();
+
 			<span class="comment">// count no-shows. An assignment is a no-show if there is no corresponding approval vote</span>
 			<span class="comment">// after a fixed duration.</span>
 			<span class="comment">//</span>
@@ -1696,7 +1796,7 @@
 				<span class="ident">drifted_tick_now</span>,
 			);
 
-			<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">advance</span>(<span class="ident">n_assignments</span>, <span class="ident">no_shows</span>, <span class="ident">next_no_show</span>);
+			<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">advance</span>(<span class="ident">n_assignments</span>, <span class="ident">no_shows</span>, <span class="ident">next_no_show</span>, <span class="ident">last_assignment_tick</span>);
 			<span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">output</span>(<span class="ident">tranche</span>, <span class="ident">needed_approvals</span>, <span class="ident">n_validators</span>, <span class="ident">no_show_duration</span>);
 
 			<span class="kw-2">*</span><span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">output</span> {
@@ -1758,7 +1858,7 @@
 				<span class="ident">clock_drift</span>: <span class="number">0</span>,
 			},
 		)
-		.<span class="ident">is_approved</span>());
+		.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1801,21 +1901,36 @@
 		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(
 			<span class="kw-2">&amp;</span><span class="ident">candidate</span>,
 			<span class="kw-2">&amp;</span><span class="ident">approval_entry</span>,
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">0</span>, <span class="ident">tolerated_missing</span>: <span class="number">0</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">0</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">0</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>
+			},
 		)
-		.<span class="ident">is_approved</span>());
+		.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(
 			<span class="kw-2">&amp;</span><span class="ident">candidate</span>,
 			<span class="kw-2">&amp;</span><span class="ident">approval_entry</span>,
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">1</span>, <span class="ident">tolerated_missing</span>: <span class="number">0</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">1</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">0</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>
+			},
 		)
-		.<span class="ident">is_approved</span>());
+		.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(
 			<span class="kw-2">&amp;</span><span class="ident">candidate</span>,
 			<span class="kw-2">&amp;</span><span class="ident">approval_entry</span>,
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">1</span>, <span class="ident">tolerated_missing</span>: <span class="number">2</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">1</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">2</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>
+			},
 		)
-		.<span class="ident">is_approved</span>());
+		.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1855,8 +1970,12 @@
 		}
 		.<span class="ident">into</span>();
 
-		<span class="kw">let</span> <span class="ident">exact_all</span> <span class="op">=</span>
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">10</span>, <span class="ident">tolerated_missing</span>: <span class="number">0</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> };
+		<span class="kw">let</span> <span class="ident">exact_all</span> <span class="op">=</span> <span class="ident">RequiredTranches::Exact</span> {
+			<span class="ident">needed</span>: <span class="number">10</span>,
+			<span class="ident">tolerated_missing</span>: <span class="number">0</span>,
+			<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+			<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>,
+		};
 
 		<span class="kw">let</span> <span class="ident">pending_all</span> <span class="op">=</span> <span class="ident">RequiredTranches::Pending</span> {
 			<span class="ident">considered</span>: <span class="number">5</span>,
@@ -1865,20 +1984,27 @@
 			<span class="ident">clock_drift</span>: <span class="number">12</span>,
 		};
 
-		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">RequiredTranches::All</span>,).<span class="ident">is_approved</span>());
+		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">RequiredTranches::All</span>,)
+			.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 
-		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">exact_all</span>.<span class="ident">clone</span>(),).<span class="ident">is_approved</span>());
+		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">exact_all</span>.<span class="ident">clone</span>(),)
+			.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 
-		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">pending_all</span>.<span class="ident">clone</span>(),).<span class="ident">is_approved</span>());
+		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">pending_all</span>.<span class="ident">clone</span>(),)
+			.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 
 		<span class="comment">// This creates a set of 4/10 approvals, which is always an approval.</span>
 		<span class="ident">candidate</span>.<span class="ident">mark_approval</span>(<span class="ident">ValidatorIndex</span>(<span class="number">3</span>));
 
-		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">RequiredTranches::All</span>,).<span class="ident">is_approved</span>());
+		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">RequiredTranches::All</span>,)
+			.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 
-		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">exact_all</span>,).<span class="ident">is_approved</span>());
+		<span class="macro">assert!</span>(
+			<span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">exact_all</span>,).<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>())
+		);
 
-		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">pending_all</span>,).<span class="ident">is_approved</span>());
+		<span class="macro">assert!</span>(<span class="ident">check_approval</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>, <span class="kw-2">&amp;</span><span class="ident">approval_entry</span>, <span class="ident">pending_all</span>,)
+			.<span class="ident">is_approved</span>(<span class="ident">Tick::max_value</span>()));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1916,7 +2042,12 @@
 				<span class="ident">no_show_duration</span>,
 				<span class="ident">needed_approvals</span>,
 			),
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">1</span>, <span class="ident">tolerated_missing</span>: <span class="number">0</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">1</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">0</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>)
+			},
 		);
 	}
 
@@ -2119,6 +2250,7 @@
 				<span class="ident">needed</span>: <span class="number">1</span>,
 				<span class="ident">tolerated_missing</span>: <span class="number">0</span>,
 				<span class="ident">next_no_show</span>: <span class="prelude-val">Some</span>(<span class="ident">block_tick</span> <span class="op">+</span> <span class="ident">no_show_duration</span> <span class="op">+</span> <span class="number">1</span>),
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">Some</span>(<span class="ident">block_tick</span> <span class="op">+</span> <span class="number">1</span>),
 			},
 		);
 
@@ -2137,6 +2269,7 @@
 				<span class="ident">needed</span>: <span class="number">2</span>,
 				<span class="ident">tolerated_missing</span>: <span class="number">1</span>,
 				<span class="ident">next_no_show</span>: <span class="prelude-val">Some</span>(<span class="ident">block_tick</span> <span class="op">+</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">no_show_duration</span> <span class="op">+</span> <span class="number">2</span>),
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">Some</span>(<span class="ident">block_tick</span> <span class="op">+</span> <span class="ident">no_show_duration</span> <span class="op">+</span> <span class="number">2</span>),
 			},
 		);
 
@@ -2204,7 +2337,12 @@
 				<span class="ident">no_show_duration</span>,
 				<span class="ident">needed_approvals</span>,
 			),
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">2</span>, <span class="ident">tolerated_missing</span>: <span class="number">1</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">2</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">1</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">Some</span>(<span class="ident">block_tick</span> <span class="op">+</span> <span class="ident">no_show_duration</span> <span class="op">+</span> <span class="number">2</span>)
+			},
 		);
 
 		<span class="comment">// Even though tranche 2 has 2 validators, it only covers 1 no-show.</span>
@@ -2242,7 +2380,12 @@
 				<span class="ident">no_show_duration</span>,
 				<span class="ident">needed_approvals</span>,
 			),
-			<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">3</span>, <span class="ident">tolerated_missing</span>: <span class="number">2</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">3</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">2</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">Some</span>(<span class="ident">block_tick</span> <span class="op">+</span> <span class="ident">no_show_duration</span> <span class="op">+</span> <span class="number">2</span>),
+			},
 		);
 	}
 
@@ -2555,45 +2698,52 @@
 			<span class="ident">exp_next_no_show</span>: <span class="prelude-val">None</span>,
 		})
 	}
-}
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">depth_0_covering_not_treated_as_such</span>() {
-	<span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span> {
-		<span class="ident">assignments</span>: <span class="number">0</span>,
-		<span class="ident">depth</span>: <span class="number">0</span>,
-		<span class="ident">covered</span>: <span class="number">0</span>,
-		<span class="ident">covering</span>: <span class="number">10</span>,
-		<span class="ident">uncovered</span>: <span class="number">0</span>,
-		<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
-	};
-
-	<span class="macro">assert_eq!</span>(
-		<span class="ident">state</span>.<span class="ident">output</span>(<span class="number">0</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">20</span>),
-		<span class="ident">RequiredTranches::Pending</span> {
-			<span class="ident">considered</span>: <span class="number">0</span>,
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">depth_0_covering_not_treated_as_such</span>() {
+		<span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span> {
+			<span class="ident">assignments</span>: <span class="number">0</span>,
+			<span class="ident">depth</span>: <span class="number">0</span>,
+			<span class="ident">covered</span>: <span class="number">0</span>,
+			<span class="ident">covering</span>: <span class="number">10</span>,
+			<span class="ident">uncovered</span>: <span class="number">0</span>,
 			<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
-			<span class="ident">maximum_broadcast</span>: <span class="ident">DelayTranche::max_value</span>(),
-			<span class="ident">clock_drift</span>: <span class="number">0</span>,
-		},
-	);
-}
+			<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>,
+		};
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">depth_0_issued_as_exact_even_when_all</span>() {
-	<span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span> {
-		<span class="ident">assignments</span>: <span class="number">10</span>,
-		<span class="ident">depth</span>: <span class="number">0</span>,
-		<span class="ident">covered</span>: <span class="number">0</span>,
-		<span class="ident">covering</span>: <span class="number">0</span>,
-		<span class="ident">uncovered</span>: <span class="number">0</span>,
-		<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
-	};
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">state</span>.<span class="ident">output</span>(<span class="number">0</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">20</span>),
+			<span class="ident">RequiredTranches::Pending</span> {
+				<span class="ident">considered</span>: <span class="number">0</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">maximum_broadcast</span>: <span class="ident">DelayTranche::max_value</span>(),
+				<span class="ident">clock_drift</span>: <span class="number">0</span>,
+			},
+		);
+	}
 
-	<span class="macro">assert_eq!</span>(
-		<span class="ident">state</span>.<span class="ident">output</span>(<span class="number">0</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">20</span>),
-		<span class="ident">RequiredTranches::Exact</span> { <span class="ident">needed</span>: <span class="number">0</span>, <span class="ident">tolerated_missing</span>: <span class="number">0</span>, <span class="ident">next_no_show</span>: <span class="prelude-val">None</span> },
-	);
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">depth_0_issued_as_exact_even_when_all</span>() {
+		<span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span> {
+			<span class="ident">assignments</span>: <span class="number">10</span>,
+			<span class="ident">depth</span>: <span class="number">0</span>,
+			<span class="ident">covered</span>: <span class="number">0</span>,
+			<span class="ident">covering</span>: <span class="number">0</span>,
+			<span class="ident">uncovered</span>: <span class="number">0</span>,
+			<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+			<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>,
+		};
+
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">state</span>.<span class="ident">output</span>(<span class="number">0</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">20</span>),
+			<span class="ident">RequiredTranches::Exact</span> {
+				<span class="ident">needed</span>: <span class="number">0</span>,
+				<span class="ident">tolerated_missing</span>: <span class="number">0</span>,
+				<span class="ident">next_no_show</span>: <span class="prelude-val">None</span>,
+				<span class="ident">last_assignment_tick</span>: <span class="prelude-val">None</span>
+			},
+		);
+	}
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_node_core_approval_voting" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
