@@ -1880,6 +1880,14 @@
 <span id="1880">1880</span>
 <span id="1881">1881</span>
 <span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3441,7 +3449,10 @@
 		<span class="ident">authority_discovery</span>: <span class="ident">rococo_runtime::AuthorityDiscoveryConfig</span> { <span class="ident">keys</span>: <span class="macro">vec!</span>[] },
 		<span class="ident">sudo</span>: <span class="ident">rococo_runtime::SudoConfig</span> { <span class="ident">key</span>: <span class="ident">root_key</span>.<span class="ident">clone</span>() },
 		<span class="ident">configuration</span>: <span class="ident">rococo_runtime::ConfigurationConfig</span> {
-			<span class="ident">config</span>: <span class="ident">default_parachains_host_configuration</span>(),
+			<span class="ident">config</span>: <span class="ident">polkadot_runtime_parachains::configuration::HostConfiguration</span> {
+				<span class="ident">max_validators_per_core</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+				..<span class="ident">default_parachains_host_configuration</span>()
+			},
 		},
 		<span class="ident">hrmp</span>: <span class="ident">Default::default</span>(),
 		<span class="ident">paras</span>: <span class="ident">rococo_runtime::ParasConfig</span> { <span class="ident">paras</span>: <span class="macro">vec!</span>[] },
@@ -3703,13 +3714,18 @@
 <span class="kw">fn</span> <span class="ident">rococo_local_testnet_genesis</span>(<span class="ident">wasm_binary</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">rococo_runtime::GenesisConfig</span> {
 	<span class="ident">rococo_testnet_genesis</span>(
 		<span class="ident">wasm_binary</span>,
-		<span class="macro">vec!</span>[<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Alice&quot;</span>), <span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Bob&quot;</span>)],
+		<span class="macro">vec!</span>[
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Alice&quot;</span>),
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Bob&quot;</span>),
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Charlie&quot;</span>),
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Dave&quot;</span>),
+		],
 		<span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519::Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>),
 		<span class="prelude-val">None</span>,
 	)
 }
 
-<span class="doccomment">/// Rococo local testnet config (multivalidator Alice + Bob)</span>
+<span class="doccomment">/// Rococo local testnet config (multivalidator Alice + Bob + Charlie + Dave)</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rococo-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rococo_local_testnet_config</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RococoChainSpec</span>, <span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">wasm_binary</span> <span class="op">=</span> <span class="ident">rococo::WASM_BINARY</span>.<span class="ident">ok_or</span>(<span class="string">&quot;Rococo development wasm not available&quot;</span>)<span class="question-mark">?</span>;
