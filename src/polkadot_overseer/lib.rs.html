@@ -778,6 +778,8 @@
 <span id="778">778</span>
 <span id="779">779</span>
 <span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1455,7 +1457,9 @@
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">ActiveLeavesUpdate::default</span>();
 
 		<span class="self">self</span>.<span class="ident">active_leaves</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">h</span>, <span class="ident">n</span><span class="op">|</span> {
-			<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">block</span>.<span class="ident">number</span> {
+			<span class="comment">// prune all orphaned leaves, but don&#39;t prune</span>
+			<span class="comment">// the finalized block if it is itself a leaf.</span>
+			<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">block</span>.<span class="ident">number</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">h</span> <span class="op">!</span><span class="op">=</span> <span class="ident">block</span>.<span class="ident">hash</span> {
 				<span class="ident">update</span>.<span class="ident">deactivated</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">h</span>);
 				<span class="bool-val">false</span>
 			} <span class="kw">else</span> {
