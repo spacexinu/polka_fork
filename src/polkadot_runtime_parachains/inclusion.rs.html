@@ -2693,6 +2693,18 @@
 <span id="2693">2693</span>
 <span id="2694">2694</span>
 <span id="2695">2695</span>
+<span id="2696">2696</span>
+<span id="2697">2697</span>
+<span id="2698">2698</span>
+<span id="2699">2699</span>
+<span id="2700">2700</span>
+<span id="2701">2701</span>
+<span id="2702">2702</span>
+<span id="2703">2703</span>
+<span id="2704">2704</span>
+<span id="2705">2705</span>
+<span id="2706">2706</span>
+<span id="2707">2707</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2936,8 +2948,10 @@
 		<span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="op">&lt;</span><span class="ident">AvailabilityBitfields</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::drain</span>() {}
 	}
 
-	<span class="doccomment">/// Process a set of incoming bitfields. Return a `vec` of cores freed by candidates</span>
-	<span class="doccomment">/// becoming available.</span>
+	<span class="doccomment">/// Process a set of incoming bitfields.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Returns a `Vec` of `CandidateHash`es and their respective `AvailabilityCore`s that became available,</span>
+	<span class="doccomment">/// and cores free.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">process_bitfields</span>(
 		<span class="ident">expected_bits</span>: <span class="ident">usize</span>,
 		<span class="ident">unchecked_bitfields</span>: <span class="ident">UncheckedSignedAvailabilityBitfields</span>,
@@ -2946,10 +2960,12 @@
 		<span class="kw">let</span> <span class="ident">validators</span> <span class="op">=</span> <span class="ident">shared::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::active_validator_keys</span>();
 		<span class="kw">let</span> <span class="ident">session_index</span> <span class="op">=</span> <span class="ident">shared::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::session_index</span>();
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">assigned_paras_record</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">expected_bits</span>)
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">assigned_paras_record</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">expected_bits</span>)
 			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">bit_index</span><span class="op">|</span> <span class="ident">core_lookup</span>(<span class="ident">CoreIndex::from</span>(<span class="ident">bit_index</span> <span class="kw">as</span> <span class="ident">u32</span>)))
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">core_para</span><span class="op">|</span> <span class="ident">core_para</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> (<span class="ident">p</span>, <span class="ident">PendingAvailability</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>))))
-			.<span class="ident">collect</span>();
+			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">opt_para_id</span><span class="op">|</span> {
+				<span class="ident">opt_para_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">para_id</span><span class="op">|</span> (<span class="ident">para_id</span>, <span class="ident">PendingAvailability</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(<span class="kw-2">&amp;</span><span class="ident">para_id</span>)))
+			})
+			.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
 		<span class="comment">// do sanity checks on the bitfields:</span>
 		<span class="comment">// 1. no more than one bitfield per validator</span>
@@ -3016,17 +3032,25 @@
 			<span class="kw">for</span> (<span class="ident">bit_idx</span>, <span class="kw">_</span>) <span class="kw">in</span>
 				<span class="ident">signed_bitfield</span>.<span class="ident">payload</span>().<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">is_av</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">is_av</span>)
 			{
-				<span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">pending_availability</span>) <span class="op">=</span> <span class="ident">assigned_paras_record</span>[<span class="ident">bit_idx</span>]
-					.<span class="ident">as_mut</span>()
-					.<span class="ident">expect</span>(<span class="string">&quot;validator bitfields checked not to contain bits corresponding to unoccupied cores; qed&quot;</span>);
+				<span class="kw">let</span> <span class="ident">pending_availability</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">pending_availability</span>)) <span class="op">=</span>
+					<span class="ident">assigned_paras_record</span>[<span class="ident">bit_idx</span>].<span class="ident">as_mut</span>()
+				{
+					<span class="ident">pending_availability</span>
+				} <span class="kw">else</span> {
+					<span class="comment">// For honest validators, this happens in case of unoccupied cores,</span>
+					<span class="comment">// which in turn happens in case of a disputed candidate.</span>
+					<span class="comment">// A malicious one might include arbitrary indices, but they are represented</span>
+					<span class="comment">// by `None` values and will be sorted out in the next if case.</span>
+					<span class="kw">continue</span>
+				};
 
 				<span class="comment">// defensive check - this is constructed by loading the availability bitfield record,</span>
 				<span class="comment">// which is always `Some` if the core is occupied - that&#39;s why we&#39;re here.</span>
 				<span class="kw">let</span> <span class="ident">val_idx</span> <span class="op">=</span> <span class="ident">signed_bitfield</span>.<span class="ident">validator_index</span>().<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>;
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">bit</span>) <span class="op">=</span> <span class="ident">pending_availability</span>
-					.<span class="ident">as_mut</span>()
-					.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">availability_votes</span>.<span class="ident">get_mut</span>(<span class="ident">val_idx</span>))
-				{
+				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">bit</span>) <span class="op">=</span>
+					<span class="ident">pending_availability</span>.<span class="ident">as_mut</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">candidate_pending_availability</span><span class="op">|</span> {
+						<span class="ident">candidate_pending_availability</span>.<span class="ident">availability_votes</span>.<span class="ident">get_mut</span>(<span class="ident">val_idx</span>)
+					}) {
 					<span class="kw-2">*</span><span class="ident">bit</span> <span class="op">=</span> <span class="bool-val">true</span>;
 				} <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
 					<span class="macro">ensure!</span>(<span class="bool-val">false</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InternalError</span>);

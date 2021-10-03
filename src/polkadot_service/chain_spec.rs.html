@@ -3714,18 +3714,13 @@
 <span class="kw">fn</span> <span class="ident">rococo_local_testnet_genesis</span>(<span class="ident">wasm_binary</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">rococo_runtime::GenesisConfig</span> {
 	<span class="ident">rococo_testnet_genesis</span>(
 		<span class="ident">wasm_binary</span>,
-		<span class="macro">vec!</span>[
-			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Alice&quot;</span>),
-			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Bob&quot;</span>),
-			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Charlie&quot;</span>),
-			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Dave&quot;</span>),
-		],
+		<span class="macro">vec!</span>[<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Alice&quot;</span>), <span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Bob&quot;</span>)],
 		<span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519::Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>),
 		<span class="prelude-val">None</span>,
 	)
 }
 
-<span class="doccomment">/// Rococo local testnet config (multivalidator Alice + Bob + Charlie + Dave)</span>
+<span class="doccomment">/// Rococo local testnet config (multivalidator Alice + Bob)</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rococo-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rococo_local_testnet_config</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RococoChainSpec</span>, <span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">wasm_binary</span> <span class="op">=</span> <span class="ident">rococo::WASM_BINARY</span>.<span class="ident">ok_or</span>(<span class="string">&quot;Rococo development wasm not available&quot;</span>)<span class="question-mark">?</span>;
@@ -3747,18 +3742,23 @@
 	))
 }
 
-<span class="doccomment">/// Wococo is a temporary testnet that uses the same runtime as rococo.</span>
+<span class="doccomment">/// Wococo is a temporary testnet that uses almost the same runtime as rococo.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rococo-native&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">wococo_local_testnet_genesis</span>(<span class="ident">wasm_binary</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">rococo_runtime::GenesisConfig</span> {
 	<span class="ident">rococo_testnet_genesis</span>(
 		<span class="ident">wasm_binary</span>,
-		<span class="macro">vec!</span>[<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Alice&quot;</span>), <span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Bob&quot;</span>)],
+		<span class="macro">vec!</span>[
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Alice&quot;</span>),
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Bob&quot;</span>),
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Charlie&quot;</span>),
+			<span class="ident">get_authority_keys_from_seed</span>(<span class="string">&quot;Dave&quot;</span>),
+		],
 		<span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519::Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>),
 		<span class="prelude-val">None</span>,
 	)
 }
 
-<span class="doccomment">/// Wococo local testnet config (multivalidator Alice + Bob)</span>
+<span class="doccomment">/// Wococo local testnet config (multivalidator Alice + Bob + Charlie + Dave)</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rococo-native&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wococo_local_testnet_config</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RococoChainSpec</span>, <span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">wasm_binary</span> <span class="op">=</span> <span class="ident">rococo::WASM_BINARY</span>.<span class="ident">ok_or</span>(<span class="string">&quot;Wococo development wasm not available&quot;</span>)<span class="question-mark">?</span>;
