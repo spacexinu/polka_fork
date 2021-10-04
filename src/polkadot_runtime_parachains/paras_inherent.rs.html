@@ -501,6 +501,14 @@
 <span id="501">501</span>
 <span id="502">502</span>
 <span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -677,7 +685,7 @@
 
 			<span class="comment">// Handle disputes logic.</span>
 			<span class="kw">let</span> <span class="ident">current_session</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">shared::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::session_index</span>();
-			<span class="kw">let</span> <span class="ident">freed_disputed</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw">_</span>, <span class="ident">FreedReason</span>)<span class="op">&gt;</span> <span class="op">=</span> {
+			{
 				<span class="kw">let</span> <span class="ident">new_current_dispute_sets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">disputes</span>
 					.<span class="ident">iter</span>()
 					.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">session</span> <span class="op">=</span><span class="op">=</span> <span class="ident">current_session</span>)
@@ -691,7 +699,7 @@
 					<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">MINIMAL_INCLUSION_INHERENT_WEIGHT</span>).<span class="ident">into</span>())
 				}
 
-				<span class="kw">if</span> <span class="op">!</span><span class="ident">new_current_dispute_sets</span>.<span class="ident">is_empty</span>() {
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freed_disputed</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">new_current_dispute_sets</span>.<span class="ident">is_empty</span>() {
 					<span class="kw">let</span> <span class="ident">concluded_invalid_disputes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">new_current_dispute_sets</span>
 						.<span class="ident">iter</span>()
 						.<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">T::DisputesHandler::concluded_invalid</span>(<span class="kw-2">*</span><span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">c</span>))
@@ -704,6 +712,13 @@
 						.<span class="ident">collect</span>()
 				} <span class="kw">else</span> {
 					<span class="ident">Vec::new</span>()
+				};
+
+				<span class="kw">if</span> <span class="op">!</span><span class="ident">freed_disputed</span>.<span class="ident">is_empty</span>() {
+					<span class="comment">// unstable sort is fine, because core indices are unique</span>
+					<span class="comment">// i.e. the same candidate can&#39;t occupy 2 cores at once.</span>
+					<span class="ident">freed_disputed</span>.<span class="ident">sort_unstable_by_key</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="number">0</span>); <span class="comment">// sort by core index</span>
+					<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::free_cores</span>(<span class="ident">freed_disputed</span>);
 				}
 			};
 
@@ -731,12 +746,13 @@
 			};
 
 			<span class="comment">// Schedule paras again, given freed cores, and reasons for freeing.</span>
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freed</span> <span class="op">=</span> <span class="ident">freed_disputed</span>
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freed</span> <span class="op">=</span> <span class="ident">freed_concluded</span>
 				.<span class="ident">into_iter</span>()
-				.<span class="ident">chain</span>(<span class="ident">freed_concluded</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">c</span>, <span class="ident">_hash</span>)<span class="op">|</span> (<span class="ident">c</span>, <span class="ident">FreedReason::Concluded</span>)))
+				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">c</span>, <span class="ident">_hash</span>)<span class="op">|</span> (<span class="ident">c</span>, <span class="ident">FreedReason::Concluded</span>))
 				.<span class="ident">chain</span>(<span class="ident">freed_timeout</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="ident">c</span>, <span class="ident">FreedReason::TimedOut</span>)))
 				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
+			<span class="comment">// unstable sort is fine, because core indices are unique.</span>
 			<span class="ident">freed</span>.<span class="ident">sort_unstable_by_key</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="number">0</span>); <span class="comment">// sort by core index</span>
 
 			<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::clear</span>();

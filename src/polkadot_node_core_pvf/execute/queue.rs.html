@@ -343,6 +343,18 @@
 <span id="343">343</span>
 <span id="344">344</span>
 <span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -384,11 +396,17 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ToQueue</span> {
-	<span class="ident">Enqueue</span> { <span class="ident">artifact</span>: <span class="ident">ArtifactPathId</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">result_tx</span>: <span class="ident">ResultSender</span> },
+	<span class="ident">Enqueue</span> {
+		<span class="ident">artifact</span>: <span class="ident">ArtifactPathId</span>,
+		<span class="ident">execution_timeout</span>: <span class="ident">Duration</span>,
+		<span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+		<span class="ident">result_tx</span>: <span class="ident">ResultSender</span>,
+	},
 }
 
 <span class="kw">struct</span> <span class="ident">ExecuteJob</span> {
 	<span class="ident">artifact</span>: <span class="ident">ArtifactPathId</span>,
+	<span class="ident">execution_timeout</span>: <span class="ident">Duration</span>,
 	<span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 	<span class="ident">result_tx</span>: <span class="ident">ResultSender</span>,
 }
@@ -513,14 +531,14 @@
 }
 
 <span class="kw">fn</span> <span class="ident">handle_to_queue</span>(<span class="ident">queue</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Queue</span>, <span class="ident">to_queue</span>: <span class="ident">ToQueue</span>) {
-	<span class="kw">let</span> <span class="ident">ToQueue::Enqueue</span> { <span class="ident">artifact</span>, <span class="ident">params</span>, <span class="ident">result_tx</span> } <span class="op">=</span> <span class="ident">to_queue</span>;
+	<span class="kw">let</span> <span class="ident">ToQueue::Enqueue</span> { <span class="ident">artifact</span>, <span class="ident">execution_timeout</span>, <span class="ident">params</span>, <span class="ident">result_tx</span> } <span class="op">=</span> <span class="ident">to_queue</span>;
 	<span class="macro">tracing::debug!</span>(
 		<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 		<span class="ident">validation_code_hash</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">artifact</span>.<span class="ident">id</span>.<span class="ident">code_hash</span>,
 		<span class="string">&quot;enqueueing an artifact for execution&quot;</span>,
 	);
 	<span class="ident">queue</span>.<span class="ident">metrics</span>.<span class="ident">execute_enqueued</span>();
-	<span class="kw">let</span> <span class="ident">job</span> <span class="op">=</span> <span class="ident">ExecuteJob</span> { <span class="ident">artifact</span>, <span class="ident">params</span>, <span class="ident">result_tx</span> };
+	<span class="kw">let</span> <span class="ident">job</span> <span class="op">=</span> <span class="ident">ExecuteJob</span> { <span class="ident">artifact</span>, <span class="ident">execution_timeout</span>, <span class="ident">params</span>, <span class="ident">result_tx</span> };
 
 	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">available</span>) <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">workers</span>.<span class="ident">find_available</span>() {
 		<span class="ident">assign</span>(<span class="ident">queue</span>, <span class="ident">available</span>, <span class="ident">job</span>);
@@ -672,7 +690,13 @@
 	<span class="ident">queue</span>.<span class="ident">mux</span>.<span class="ident">push</span>(
 		<span class="kw">async</span> <span class="kw">move</span> {
 			<span class="kw">let</span> <span class="ident">_timer</span> <span class="op">=</span> <span class="ident">execution_timer</span>;
-			<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::worker::start_work</span>(<span class="ident">idle</span>, <span class="ident">job</span>.<span class="ident">artifact</span>.<span class="ident">clone</span>(), <span class="ident">job</span>.<span class="ident">params</span>).<span class="kw">await</span>;
+			<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::worker::start_work</span>(
+				<span class="ident">idle</span>,
+				<span class="ident">job</span>.<span class="ident">artifact</span>.<span class="ident">clone</span>(),
+				<span class="ident">job</span>.<span class="ident">execution_timeout</span>,
+				<span class="ident">job</span>.<span class="ident">params</span>,
+			)
+			.<span class="kw">await</span>;
 			<span class="ident">QueueEvent::StartWork</span>(<span class="ident">worker</span>, <span class="ident">outcome</span>, <span class="ident">job</span>.<span class="ident">artifact</span>.<span class="ident">id</span>, <span class="ident">job</span>.<span class="ident">result_tx</span>)
 		}
 		.<span class="ident">boxed</span>(),

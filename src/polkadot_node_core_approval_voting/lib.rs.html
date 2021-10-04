@@ -2503,6 +2503,7 @@
 <span id="2503">2503</span>
 <span id="2504">2504</span>
 <span id="2505">2505</span>
+<span id="2506">2506</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2533,7 +2534,7 @@
 	<span class="ident">approval</span>::{
 		<span class="ident">BlockApprovalMeta</span>, <span class="ident">DelayTranche</span>, <span class="ident">IndirectAssignmentCert</span>, <span class="ident">IndirectSignedApprovalVote</span>,
 	},
-	<span class="ident">SignedDisputeStatement</span>, <span class="ident">ValidationResult</span>,
+	<span class="ident">SignedDisputeStatement</span>, <span class="ident">ValidationResult</span>, <span class="ident">APPROVAL_EXECUTION_TIMEOUT</span>,
 };
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem</span>::{
 	<span class="ident">errors::RecoveryError</span>,
@@ -4741,6 +4742,7 @@
 					<span class="ident">validation_code</span>,
 					<span class="ident">candidate</span>.<span class="ident">descriptor</span>.<span class="ident">clone</span>(),
 					<span class="ident">available_data</span>.<span class="ident">pov</span>,
+					<span class="ident">APPROVAL_EXECUTION_TIMEOUT</span>,
 					<span class="ident">val_tx</span>,
 				)
 				.<span class="ident">into</span>(),

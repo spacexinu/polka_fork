@@ -418,6 +418,17 @@
 <span id="418">418</span>
 <span id="419">419</span>
 <span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -443,7 +454,7 @@
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">pin::Pin</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">pin::Pin</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">use</span> <span class="ident">bounded_vec::BoundedVec</span>;
 <span class="kw">use</span> <span class="ident">futures::Future</span>;
@@ -491,6 +502,17 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Number of sessions we want to consider in disputes.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DISPUTE_WINDOW</span>: <span class="ident">SessionIndex</span> <span class="op">=</span> <span class="number">6</span>;
+
+<span class="doccomment">/// The amount of time to spend on execution during backing.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BACKING_EXECUTION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">2</span>);
+
+<span class="doccomment">/// The amount of time to spend on execution during approval or disputes.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is deliberately much longer than the backing execution timeout to</span>
+<span class="doccomment">/// ensure that in the absence of extremely large disparities between hardware,</span>
+<span class="doccomment">/// blocks that pass backing are considerd executable by approval checkers or</span>
+<span class="doccomment">/// dispute participants.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">APPROVAL_EXECUTION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">6</span>);
 
 <span class="doccomment">/// The cumulative weight of a block in a fork-choice rule.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BlockWeight</span> <span class="op">=</span> <span class="ident">u32</span>;

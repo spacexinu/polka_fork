@@ -250,7 +250,6 @@
 <span id="250">250</span>
 <span id="251">251</span>
 <span id="252">252</span>
-<span id="253">253</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -288,8 +287,6 @@
 <span class="kw">use</span> <span class="ident">polkadot_parachain::primitives::ValidationResult</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
 
-<span class="kw">const</span> <span class="ident">EXECUTION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">3</span>);
-
 <span class="doccomment">/// Spawns a new worker with the given program path that acts as the worker and the spawn timeout.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The program should be able to handle `&lt;program-path&gt; execute-worker &lt;socket-path&gt;` invocation.</span>
@@ -323,6 +320,7 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_work</span>(
 	<span class="ident">worker</span>: <span class="ident">IdleWorker</span>,
 	<span class="ident">artifact</span>: <span class="ident">ArtifactPathId</span>,
+	<span class="ident">execution_timeout</span>: <span class="ident">Duration</span>,
 	<span class="ident">validation_params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Outcome</span> {
 	<span class="kw">let</span> <span class="ident">IdleWorker</span> { <span class="kw-2">mut</span> <span class="ident">stream</span>, <span class="ident">pid</span> } <span class="op">=</span> <span class="ident">worker</span>;
@@ -362,7 +360,7 @@
 				<span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">response</span>,
 			}
 		},
-		<span class="kw">_</span> <span class="op">=</span> <span class="ident">Delay::new</span>(<span class="ident">EXECUTION_TIMEOUT</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="kw">_</span> <span class="op">=</span> <span class="ident">Delay::new</span>(<span class="ident">execution_timeout</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::warn!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 				<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,

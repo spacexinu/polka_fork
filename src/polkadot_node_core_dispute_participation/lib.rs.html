@@ -365,6 +365,11 @@
 <span id="365">365</span>
 <span id="366">366</span>
 <span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -390,7 +395,7 @@
 
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel::oneshot</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
-<span class="kw">use</span> <span class="ident">polkadot_node_primitives::ValidationResult</span>;
+<span class="kw">use</span> <span class="ident">polkadot_node_primitives</span>::{<span class="ident">ValidationResult</span>, <span class="ident">APPROVAL_EXECUTION_TIMEOUT</span>};
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem</span>::{
 	<span class="ident">errors</span>::{<span class="ident">RecoveryError</span>, <span class="ident">RuntimeApiError</span>},
 	<span class="ident">messages</span>::{
@@ -637,11 +642,16 @@
 
 	<span class="comment">// we issue a request to validate the candidate with the provided exhaustive</span>
 	<span class="comment">// parameters</span>
+	<span class="comment">//</span>
+	<span class="comment">// We use the approval execution timeout because this is intended to</span>
+	<span class="comment">// be run outside of backing and therefore should be subject to the</span>
+	<span class="comment">// same level of leeway.</span>
 	<span class="ident">ctx</span>.<span class="ident">send_message</span>(<span class="ident">CandidateValidationMessage::ValidateFromExhaustive</span>(
 		<span class="ident">available_data</span>.<span class="ident">validation_data</span>,
 		<span class="ident">validation_code</span>,
 		<span class="ident">candidate_receipt</span>.<span class="ident">descriptor</span>.<span class="ident">clone</span>(),
 		<span class="ident">available_data</span>.<span class="ident">pov</span>,
+		<span class="ident">APPROVAL_EXECUTION_TIMEOUT</span>,
 		<span class="ident">validation_tx</span>,
 	))
 	.<span class="kw">await</span>;

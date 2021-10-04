@@ -1390,6 +1390,12 @@
 <span id="1390">1390</span>
 <span id="1391">1391</span>
 <span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1425,6 +1431,7 @@
 
 <span class="kw">use</span> <span class="ident">polkadot_node_primitives</span>::{
 	<span class="ident">AvailableData</span>, <span class="ident">PoV</span>, <span class="ident">SignedDisputeStatement</span>, <span class="ident">SignedFullStatement</span>, <span class="ident">Statement</span>, <span class="ident">ValidationResult</span>,
+	<span class="ident">BACKING_EXECUTION_TIMEOUT</span>,
 };
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem_util</span>::{
 	<span class="self">self</span> <span class="kw">as</span> <span class="ident">util</span>,
@@ -1773,7 +1780,12 @@
 	<span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 
 	<span class="ident">sender</span>
-		.<span class="ident">send_message</span>(<span class="ident">CandidateValidationMessage::ValidateFromChainState</span>(<span class="ident">candidate</span>, <span class="ident">pov</span>, <span class="ident">tx</span>))
+		.<span class="ident">send_message</span>(<span class="ident">CandidateValidationMessage::ValidateFromChainState</span>(
+			<span class="ident">candidate</span>,
+			<span class="ident">pov</span>,
+			<span class="ident">BACKING_EXECUTION_TIMEOUT</span>,
+			<span class="ident">tx</span>,
+		))
 		.<span class="kw">await</span>;
 
 	<span class="kw">match</span> <span class="ident">rx</span>.<span class="kw">await</span> {
