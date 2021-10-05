@@ -2066,6 +2066,53 @@
 <span id="2066">2066</span>
 <span id="2067">2067</span>
 <span id="2068">2068</span>
+<span id="2069">2069</span>
+<span id="2070">2070</span>
+<span id="2071">2071</span>
+<span id="2072">2072</span>
+<span id="2073">2073</span>
+<span id="2074">2074</span>
+<span id="2075">2075</span>
+<span id="2076">2076</span>
+<span id="2077">2077</span>
+<span id="2078">2078</span>
+<span id="2079">2079</span>
+<span id="2080">2080</span>
+<span id="2081">2081</span>
+<span id="2082">2082</span>
+<span id="2083">2083</span>
+<span id="2084">2084</span>
+<span id="2085">2085</span>
+<span id="2086">2086</span>
+<span id="2087">2087</span>
+<span id="2088">2088</span>
+<span id="2089">2089</span>
+<span id="2090">2090</span>
+<span id="2091">2091</span>
+<span id="2092">2092</span>
+<span id="2093">2093</span>
+<span id="2094">2094</span>
+<span id="2095">2095</span>
+<span id="2096">2096</span>
+<span id="2097">2097</span>
+<span id="2098">2098</span>
+<span id="2099">2099</span>
+<span id="2100">2100</span>
+<span id="2101">2101</span>
+<span id="2102">2102</span>
+<span id="2103">2103</span>
+<span id="2104">2104</span>
+<span id="2105">2105</span>
+<span id="2106">2106</span>
+<span id="2107">2107</span>
+<span id="2108">2108</span>
+<span id="2109">2109</span>
+<span id="2110">2110</span>
+<span id="2111">2111</span>
+<span id="2112">2112</span>
+<span id="2113">2113</span>
+<span id="2114">2114</span>
+<span id="2115">2115</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2141,8 +2188,11 @@
 };
 <span class="kw">use</span> <span class="ident">sp_std::vec::Vec</span>;
 
-<span class="kw">type</span> <span class="ident">CurrencyOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Auctioneer</span> <span class="kw">as</span> <span class="ident">Auctioneer</span><span class="op">&gt;</span><span class="ident">::Currency</span>;
-<span class="kw">type</span> <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Auctioneer</span> <span class="kw">as</span> <span class="ident">Auctioneer</span><span class="op">&gt;</span><span class="ident">::LeasePeriod</span>;
+<span class="kw">type</span> <span class="ident">CurrencyOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
+	<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Auctioneer</span> <span class="kw">as</span> <span class="ident">Auctioneer</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Currency</span>;
+<span class="kw">type</span> <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Auctioneer</span> <span class="kw">as</span> <span class="ident">Auctioneer</span><span class="op">&lt;</span>
+	<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockNumber</span>,
+<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::LeasePeriod</span>;
 <span class="kw">type</span> <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">CurrencyOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
@@ -2272,8 +2322,8 @@
 
 		<span class="doccomment">/// The type representing the auctioning system.</span>
 		<span class="kw">type</span> <span class="ident">Auctioneer</span>: <span class="ident">Auctioneer</span><span class="op">&lt;</span>
+			<span class="self">Self</span><span class="ident">::BlockNumber</span>,
 			<span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span>,
-			<span class="ident">BlockNumber</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::BlockNumber</span>,
 			<span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::BlockNumber</span>,
 		<span class="op">&gt;</span>;
 
@@ -2382,6 +2432,8 @@
 		<span class="ident">AlreadyInNewRaise</span>,
 		<span class="doccomment">/// No contributions allowed during the VRF delay</span>
 		<span class="ident">VrfDelayInProgress</span>,
+		<span class="doccomment">/// A lease period has not started yet, due to an offset in the starting block.</span>
+		<span class="ident">NoLeasePeriod</span>,
 	}
 
 	<span class="attribute">#[<span class="ident">pallet::hooks</span>]</span>
@@ -2434,20 +2486,31 @@
 			<span class="ident">verifier</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MultiSigner</span><span class="op">&gt;</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="kw">let</span> <span class="ident">depositor</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
 
 			<span class="macro">ensure!</span>(<span class="ident">first_period</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">last_period</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::LastPeriodBeforeFirstPeriod</span>);
 			<span class="kw">let</span> <span class="ident">last_period_limit</span> <span class="op">=</span> <span class="ident">first_period</span>
 				.<span class="ident">checked_add</span>(<span class="kw-2">&amp;</span>((<span class="ident">SlotRange::LEASE_PERIODS_PER_SLOT</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">-</span> <span class="number">1</span>).<span class="ident">into</span>())
 				.<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::FirstPeriodTooFarInFuture</span>)<span class="question-mark">?</span>;
 			<span class="macro">ensure!</span>(<span class="ident">last_period</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">last_period_limit</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::LastPeriodTooFarInFuture</span>);
-			<span class="macro">ensure!</span>(<span class="ident">end</span> <span class="op">&gt;</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::CannotEndInPast</span>);
-			<span class="kw">let</span> <span class="ident">last_possible_win_date</span> <span class="op">=</span> (<span class="ident">first_period</span>.<span class="ident">saturating_add</span>(<span class="ident">One::one</span>()))
-				.<span class="ident">saturating_mul</span>(<span class="ident">T::Auctioneer::lease_period</span>());
-			<span class="macro">ensure!</span>(<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">last_possible_win_date</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::EndTooFarInFuture</span>);
-			<span class="macro">ensure!</span>(
-				<span class="ident">first_period</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>(),
-				<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::FirstPeriodInPast</span>
-			);
+			<span class="macro">ensure!</span>(<span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">now</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::CannotEndInPast</span>);
+
+			<span class="comment">// Here we check the lease period on the ending block is at most the first block of the</span>
+			<span class="comment">// period after `first_period`. If it would be larger, there is no way we could win an</span>
+			<span class="comment">// active auction, thus it would make no sense to have a crowdloan this long.</span>
+			<span class="kw">let</span> (<span class="ident">lease_period_at_end</span>, <span class="ident">is_first_block</span>) <span class="op">=</span>
+				<span class="ident">T::Auctioneer::lease_period_index</span>(<span class="ident">end</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NoLeasePeriod</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">adjusted_lease_period_at_end</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_first_block</span> {
+				<span class="ident">lease_period_at_end</span>.<span class="ident">saturating_sub</span>(<span class="ident">One::one</span>())
+			} <span class="kw">else</span> {
+				<span class="ident">lease_period_at_end</span>
+			};
+			<span class="macro">ensure!</span>(<span class="ident">adjusted_lease_period_at_end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">first_period</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::EndTooFarInFuture</span>);
+
+			<span class="comment">// Can&#39;t start a crowdloan for a lease period that already passed.</span>
+			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">current_lease_period</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>(<span class="ident">now</span>) {
+				<span class="macro">ensure!</span>(<span class="ident">first_period</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">current_lease_period</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::FirstPeriodInPast</span>);
+			}
 
 			<span class="comment">// There should not be an existing fund.</span>
 			<span class="macro">ensure!</span>(<span class="op">!</span><span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::contains_key</span>(<span class="ident">index</span>), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::FundNotEnded</span>);
@@ -2508,7 +2571,9 @@
 			<span class="macro">ensure!</span>(<span class="ident">now</span> <span class="op">&lt;</span> <span class="ident">fund</span>.<span class="ident">end</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ContributionPeriodOver</span>);
 
 			<span class="comment">// Make sure crowdloan is in a valid lease period</span>
-			<span class="kw">let</span> <span class="ident">current_lease_period</span> <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>();
+			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
+			<span class="kw">let</span> (<span class="ident">current_lease_period</span>, <span class="kw">_</span>) <span class="op">=</span>
+				<span class="ident">T::Auctioneer::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NoLeasePeriod</span>)<span class="question-mark">?</span>;
 			<span class="macro">ensure!</span>(<span class="ident">current_lease_period</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">fund</span>.<span class="ident">first_period</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ContributionPeriodOver</span>);
 
 			<span class="comment">// Make sure crowdloan has not already won.</span>
@@ -2820,7 +2885,8 @@
 		<span class="comment">// `fund.end` can represent the end of a failed crowdloan or the beginning of retirement</span>
 		<span class="comment">// If the current lease period is past the first period they are trying to bid for, then</span>
 		<span class="comment">// it is already too late to win the bid.</span>
-		<span class="kw">let</span> <span class="ident">current_lease_period</span> <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>();
+		<span class="kw">let</span> (<span class="ident">current_lease_period</span>, <span class="kw">_</span>) <span class="op">=</span>
+			<span class="ident">T::Auctioneer::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NoLeasePeriod</span>)<span class="question-mark">?</span>;
 		<span class="macro">ensure!</span>(
 			<span class="ident">now</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">fund</span>.<span class="ident">end</span> <span class="op">|</span><span class="op">|</span> <span class="ident">current_lease_period</span> <span class="op">&gt;</span> <span class="ident">fund</span>.<span class="ident">first_period</span>,
 			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::FundNotEnded</span>
@@ -3000,14 +3066,16 @@
 	}
 
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestAuctioneer</span>;
-	<span class="kw">impl</span> <span class="ident">Auctioneer</span> <span class="kw">for</span> <span class="ident">TestAuctioneer</span> {
+	<span class="kw">impl</span> <span class="ident">Auctioneer</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestAuctioneer</span> {
 		<span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">u64</span>;
-		<span class="kw">type</span> <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">BlockNumber</span>;
 		<span class="kw">type</span> <span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="ident">u64</span>;
 		<span class="kw">type</span> <span class="ident">Currency</span> <span class="op">=</span> <span class="ident">Balances</span>;
 
 		<span class="kw">fn</span> <span class="ident">new_auction</span>(<span class="ident">duration</span>: <span class="ident">u64</span>, <span class="ident">lease_period_index</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-			<span class="macro">assert!</span>(<span class="ident">lease_period_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">Self</span><span class="ident">::lease_period_index</span>());
+			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">System::block_number</span>();
+			<span class="kw">let</span> (<span class="ident">current_lease_period</span>, <span class="kw">_</span>) <span class="op">=</span>
+				<span class="self">Self</span><span class="ident">::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="string">&quot;no lease period yet&quot;</span>)<span class="question-mark">?</span>;
+			<span class="macro">assert!</span>(<span class="ident">lease_period_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">current_lease_period</span>);
 
 			<span class="kw">let</span> <span class="ident">ending</span> <span class="op">=</span> <span class="ident">System::block_number</span>().<span class="ident">saturating_add</span>(<span class="ident">duration</span>);
 			<span class="ident">AUCTION</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">p</span>.<span class="ident">borrow_mut</span>() <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">lease_period_index</span>, <span class="ident">ending</span>)));
@@ -3060,12 +3128,17 @@
 			<span class="prelude-val">Ok</span>(())
 		}
 
-		<span class="kw">fn</span> <span class="ident">lease_period_index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-			<span class="ident">System::block_number</span>() <span class="op">/</span> <span class="self">Self</span><span class="ident">::lease_period</span>()
+		<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+			<span class="kw">let</span> (<span class="ident">lease_period_length</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">checked_sub</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
+
+			<span class="kw">let</span> <span class="ident">lease_period</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">/</span> <span class="ident">lease_period_length</span>;
+			<span class="kw">let</span> <span class="ident">first_block</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">%</span> <span class="ident">lease_period_length</span>).<span class="ident">is_zero</span>();
+			<span class="prelude-val">Some</span>((<span class="ident">lease_period</span>, <span class="ident">first_block</span>))
 		}
 
-		<span class="kw">fn</span> <span class="ident">lease_period</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-			<span class="number">20</span>
+		<span class="kw">fn</span> <span class="ident">lease_period_length</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+			(<span class="number">20</span>, <span class="number">0</span>)
 		}
 
 		<span class="kw">fn</span> <span class="ident">has_won_an_auction</span>(<span class="ident">para</span>: <span class="ident">ParaId</span>, <span class="ident">bidder</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -3436,7 +3509,8 @@
 			<span class="kw">let</span> <span class="ident">para_3</span> <span class="op">=</span> <span class="ident">new_para</span>();
 			<span class="macro">assert_ok!</span>(<span class="ident">Crowdloan::create</span>(<span class="ident">Origin::signed</span>(<span class="number">1</span>), <span class="ident">para_3</span>, <span class="number">1000</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">40</span>, <span class="prelude-val">None</span>));
 			<span class="ident">run_to_block</span>(<span class="number">40</span>);
-			<span class="macro">assert_eq!</span>(<span class="ident">TestAuctioneer::lease_period_index</span>(), <span class="number">2</span>);
+			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">System::block_number</span>();
+			<span class="macro">assert_eq!</span>(<span class="ident">TestAuctioneer::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">unwrap</span>().<span class="number">0</span>, <span class="number">2</span>);
 			<span class="macro">assert_noop!</span>(
 				<span class="ident">Crowdloan::contribute</span>(<span class="ident">Origin::signed</span>(<span class="number">1</span>), <span class="ident">para_3</span>, <span class="number">49</span>, <span class="prelude-val">None</span>),
 				<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::ContributionPeriodOver</span>
@@ -3911,7 +3985,11 @@
 
 	<span class="kw">fn</span> <span class="ident">create_fund</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">end</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParaId</span> {
 		<span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">BalanceOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::max_value</span>();
-		<span class="kw">let</span> <span class="ident">lease_period_index</span> <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>();
+		<span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+		<span class="comment">// Set to the very beginning of lease period index 0.</span>
+		<span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::set_block_number</span>(<span class="ident">offset</span>);
+		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
+		<span class="kw">let</span> (<span class="ident">lease_period_index</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">unwrap_or_default</span>();
 		<span class="kw">let</span> <span class="ident">first_period</span> <span class="op">=</span> <span class="ident">lease_period_index</span>;
 		<span class="kw">let</span> <span class="ident">last_period</span> <span class="op">=</span>
 			<span class="ident">lease_period_index</span> <span class="op">+</span> ((<span class="ident">SlotRange::LEASE_PERIODS_PER_SLOT</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">-</span> <span class="number">1</span>).<span class="ident">into</span>();
@@ -3963,7 +4041,8 @@
 			<span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">BalanceOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::max_value</span>();
 			<span class="kw">let</span> <span class="ident">first_period</span> <span class="op">=</span> <span class="number">0u32</span>.<span class="ident">into</span>();
 			<span class="kw">let</span> <span class="ident">last_period</span> <span class="op">=</span> <span class="number">3u32</span>.<span class="ident">into</span>();
-			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period</span>();
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
 
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="kw">let</span> <span class="ident">head_data</span> <span class="op">=</span> <span class="ident">T::Registrar::worst_head_data</span>();
@@ -3982,7 +4061,9 @@
 
 		<span class="comment">// Contribute has two arms: PreEnding and Ending, but both are equal complexity.</span>
 		<span class="ident">contribute</span> {
-			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1</span>, <span class="number">100u32</span>.<span class="ident">into</span>());
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
+			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1</span>, <span class="ident">end</span>);
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="kw">let</span> <span class="ident">contribution</span> <span class="op">=</span> <span class="ident">T::MinContribution::get</span>();
 			<span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::make_free_balance_be</span>(<span class="kw-2">&amp;</span><span class="ident">caller</span>, <span class="ident">BalanceOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::max_value</span>());
@@ -4000,7 +4081,9 @@
 		}
 
 		<span class="ident">withdraw</span> {
-			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1337</span>, <span class="number">100u32</span>.<span class="ident">into</span>());
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
+			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1337</span>, <span class="ident">end</span>);
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="kw">let</span> <span class="ident">contributor</span> <span class="op">=</span> <span class="ident">account</span>(<span class="string">&quot;contributor&quot;</span>, <span class="number">0</span>, <span class="number">0</span>);
 			<span class="ident">contribute_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">contributor</span>, <span class="ident">fund_index</span>);
@@ -4014,7 +4097,9 @@
 		<span class="attribute">#[<span class="ident">skip_meta</span>]</span>
 		<span class="ident">refund</span> {
 			<span class="kw">let</span> <span class="ident">k</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">T::RemoveKeysLimit::get</span>();
-			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1337</span>, <span class="number">100u32</span>.<span class="ident">into</span>());
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
+			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1337</span>, <span class="ident">end</span>);
 
 			<span class="comment">// Dissolve will remove at most `RemoveKeysLimit` at once.</span>
 			<span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">k</span> {
@@ -4029,7 +4114,9 @@
 		}
 
 		<span class="ident">dissolve</span> {
-			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1337</span>, <span class="number">100u32</span>.<span class="ident">into</span>());
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
+			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1337</span>, <span class="ident">end</span>);
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::set_block_number</span>(<span class="ident">T::BlockNumber::max_value</span>());
 		}: <span class="kw">_</span>(<span class="ident">RawOrigin::Signed</span>(<span class="ident">caller</span>.<span class="ident">clone</span>()), <span class="ident">fund_index</span>)
@@ -4042,7 +4129,8 @@
 			<span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">BalanceOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::max_value</span>();
 			<span class="kw">let</span> <span class="ident">first_period</span> <span class="op">=</span> <span class="number">0u32</span>.<span class="ident">into</span>();
 			<span class="kw">let</span> <span class="ident">last_period</span> <span class="op">=</span> <span class="number">3u32</span>.<span class="ident">into</span>();
-			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period</span>();
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
 
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="kw">let</span> <span class="ident">head_data</span> <span class="op">=</span> <span class="ident">T::Registrar::worst_head_data</span>();
@@ -4066,7 +4154,9 @@
 		}
 
 		<span class="ident">add_memo</span> {
-			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1</span>, <span class="number">100u32</span>.<span class="ident">into</span>());
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
+			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1</span>, <span class="ident">end</span>);
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="ident">contribute_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">caller</span>, <span class="ident">fund_index</span>);
 			<span class="kw">let</span> <span class="ident">worst_memo</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">42</span>; <span class="ident">T::MaxMemoLength::get</span>().<span class="ident">into</span>()];
@@ -4080,7 +4170,9 @@
 		}
 
 		<span class="ident">poke</span> {
-			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1</span>, <span class="number">100u32</span>.<span class="ident">into</span>());
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span>;
+			<span class="kw">let</span> <span class="ident">fund_index</span> <span class="op">=</span> <span class="ident">create_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="number">1</span>, <span class="ident">end</span>);
 			<span class="kw">let</span> <span class="ident">caller</span>: <span class="ident">T::AccountId</span> <span class="op">=</span> <span class="ident">whitelisted_caller</span>();
 			<span class="ident">contribute_fund</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">caller</span>, <span class="ident">fund_index</span>);
 			<span class="ident">NewRaise</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::kill</span>();
@@ -4097,7 +4189,8 @@
 		<span class="ident">on_initialize</span> {
 			<span class="comment">// We test the complexity over different number of new raise</span>
 			<span class="kw">let</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">2</span> .. <span class="number">100</span>;
-			<span class="kw">let</span> <span class="ident">end_block</span>: <span class="ident">T::BlockNumber</span> <span class="op">=</span> <span class="number">100u32</span>.<span class="ident">into</span>();
+			<span class="kw">let</span> (<span class="ident">lpl</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">end_block</span> <span class="op">=</span> <span class="ident">lpl</span> <span class="op">+</span> <span class="ident">offset</span> <span class="op">-</span> <span class="number">1u32</span>.<span class="ident">into</span>();
 
 			<span class="kw">let</span> <span class="ident">pubkey</span> <span class="op">=</span> <span class="ident">crypto::create_ed25519_pubkey</span>(<span class="string">b&quot;//verifier&quot;</span>.<span class="ident">to_vec</span>());
 
@@ -4112,7 +4205,8 @@
 				<span class="ident">Crowdloan</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::contribute</span>(<span class="ident">RawOrigin::Signed</span>(<span class="ident">contributor</span>).<span class="ident">into</span>(), <span class="ident">fund_index</span>, <span class="ident">contribution</span>, <span class="prelude-val">Some</span>(<span class="ident">sig</span>))<span class="question-mark">?</span>;
 			}
 
-			<span class="kw">let</span> <span class="ident">lease_period_index</span> <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>();
+			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
+			<span class="kw">let</span> (<span class="ident">lease_period_index</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">T::Auctioneer::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">unwrap_or_default</span>();
 			<span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">end_block</span>
 				.<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>())
 				.<span class="ident">ok_or</span>(<span class="string">&quot;duration of auction less than zero&quot;</span>)<span class="question-mark">?</span>;
@@ -4131,7 +4225,7 @@
 
 	<span class="macro">impl_benchmark_test_suite!</span>(
 		<span class="ident">Crowdloan</span>,
-		<span class="kw">crate</span><span class="ident">::integration_tests::new_test_ext</span>(),
+		<span class="kw">crate</span><span class="ident">::integration_tests::new_test_ext_with_offset</span>(<span class="number">10</span>),
 		<span class="kw">crate</span><span class="ident">::integration_tests::Test</span>,
 	);
 }

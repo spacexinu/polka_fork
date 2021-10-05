@@ -1872,6 +1872,25 @@
 <span id="1872">1872</span>
 <span id="1873">1873</span>
 <span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2019-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1909,8 +1928,9 @@
 <span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">CheckedSub</span>, <span class="ident">One</span>, <span class="ident">Saturating</span>, <span class="ident">Zero</span>};
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">mem::swap</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
-<span class="kw">type</span> <span class="ident">CurrencyOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Leaser</span> <span class="kw">as</span> <span class="ident">Leaser</span><span class="op">&gt;</span><span class="ident">::Currency</span>;
-<span class="kw">type</span> <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Leaser</span> <span class="kw">as</span> <span class="ident">Leaser</span><span class="op">&gt;</span><span class="ident">::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span>
+<span class="kw">type</span> <span class="ident">CurrencyOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
+	<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Leaser</span> <span class="kw">as</span> <span class="ident">Leaser</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Currency</span>;
+<span class="kw">type</span> <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Leaser</span> <span class="kw">as</span> <span class="ident">Leaser</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span>
 	<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::AccountId</span>,
 <span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span>;
 
@@ -1940,7 +1960,9 @@
 <span class="doccomment">/// An auction index. We count auctions in this type.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AuctionIndex</span> <span class="op">=</span> <span class="ident">u32</span>;
 
-<span class="kw">type</span> <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Leaser</span> <span class="kw">as</span> <span class="ident">Leaser</span><span class="op">&gt;</span><span class="ident">::LeasePeriod</span>;
+<span class="kw">type</span> <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
+	<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Leaser</span> <span class="kw">as</span> <span class="ident">Leaser</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::LeasePeriod</span>;
+
 <span class="comment">// Winning data type. This encodes the top bidders of each range together with their bid.</span>
 <span class="kw">type</span> <span class="ident">WinningData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> [<span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::AccountId</span>, <span class="ident">ParaId</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
 	<span class="ident">SlotRange::SLOT_RANGE_COUNT</span>];
@@ -1966,7 +1988,11 @@
 		<span class="kw">type</span> <span class="ident">Event</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Event</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The type representing the leasing system.</span>
-		<span class="kw">type</span> <span class="ident">Leaser</span>: <span class="ident">Leaser</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span>, <span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Leaser</span>: <span class="ident">Leaser</span><span class="op">&lt;</span>
+			<span class="self">Self</span><span class="ident">::BlockNumber</span>,
+			<span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span>,
+			<span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::BlockNumber</span>,
+		<span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The parachain registrar type.</span>
 		<span class="kw">type</span> <span class="ident">Registrar</span>: <span class="ident">Registrar</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span>;
@@ -2174,9 +2200,8 @@
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Auctioneer</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Auctioneer</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">T::AccountId</span>;
-	<span class="kw">type</span> <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">T::BlockNumber</span>;
 	<span class="kw">type</span> <span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="ident">T::BlockNumber</span>;
 	<span class="kw">type</span> <span class="ident">Currency</span> <span class="op">=</span> <span class="ident">CurrencyOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
@@ -2188,7 +2213,7 @@
 	}
 
 	<span class="comment">// Returns the status of the auction given the current block number.</span>
-	<span class="kw">fn</span> <span class="ident">auction_status</span>(<span class="ident">now</span>: <span class="self">Self</span><span class="ident">::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuctionStatus</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">auction_status</span>(<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuctionStatus</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">early_end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">AuctionInfo</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>() {
 			<span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">early_end</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">early_end</span>,
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">AuctionStatus::NotStarted</span>,
@@ -2221,12 +2246,13 @@
 		<span class="self">Self</span><span class="ident">::handle_bid</span>(<span class="ident">bidder</span>, <span class="ident">para</span>, <span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(), <span class="ident">first_slot</span>, <span class="ident">last_slot</span>, <span class="ident">amount</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">lease_period_index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span> {
-		<span class="ident">T::Leaser::lease_period_index</span>()
+	<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span><span class="ident">::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+		<span class="ident">T::Leaser::lease_period_index</span>(<span class="ident">b</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">lease_period</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span> {
-		<span class="ident">T::Leaser::lease_period</span>()
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>, <span class="ident">test</span>))]</span>
+	<span class="kw">fn</span> <span class="ident">lease_period_length</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T::BlockNumber</span>, <span class="ident">T::BlockNumber</span>) {
+		<span class="ident">T::Leaser::lease_period_length</span>()
 	}
 
 	<span class="kw">fn</span> <span class="ident">has_won_an_auction</span>(<span class="ident">para</span>: <span class="ident">ParaId</span>, <span class="ident">bidder</span>: <span class="kw-2">&amp;</span><span class="ident">T::AccountId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -2249,10 +2275,11 @@
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 		<span class="kw">let</span> <span class="ident">maybe_auction</span> <span class="op">=</span> <span class="ident">AuctionInfo</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>();
 		<span class="macro">ensure!</span>(<span class="ident">maybe_auction</span>.<span class="ident">is_none</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AuctionInProgress</span>);
-		<span class="macro">ensure!</span>(
-			<span class="ident">lease_period_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::Leaser::lease_period_index</span>(),
-			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::LeasePeriodInPast</span>
-		);
+		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">current_lease_period</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">T::Leaser::lease_period_index</span>(<span class="ident">now</span>) {
+			<span class="comment">// If there is no active lease period, then we don&#39;t need to make this check.</span>
+			<span class="macro">ensure!</span>(<span class="ident">lease_period_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">current_lease_period</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::LeasePeriodInPast</span>);
+		}
 
 		<span class="comment">// Bump the counter.</span>
 		<span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::mutate</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> {
@@ -2442,7 +2469,9 @@
 			<span class="kw">let</span> <span class="ident">period_count</span> <span class="op">=</span> <span class="ident">LeasePeriodOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">range</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
 
 			<span class="kw">match</span> <span class="ident">T::Leaser::lease_out</span>(<span class="ident">para</span>, <span class="kw-2">&amp;</span><span class="ident">leaser</span>, <span class="ident">amount</span>, <span class="ident">period_begin</span>, <span class="ident">period_count</span>) {
-				<span class="prelude-val">Err</span>(<span class="ident">LeaseError::ReserveFailed</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">LeaseError::AlreadyEnded</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="prelude-val">Err</span>(<span class="ident">LeaseError::ReserveFailed</span>) <span class="op">|</span>
+				<span class="prelude-val">Err</span>(<span class="ident">LeaseError::AlreadyEnded</span>) <span class="op">|</span>
+				<span class="prelude-val">Err</span>(<span class="ident">LeaseError::NoLeasePeriod</span>) <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="comment">// Should never happen since we just unreserved this amount (and our offset is from the</span>
 					<span class="comment">// present period). But if it does, there&#39;s not much we can do.</span>
 				},
@@ -2610,7 +2639,7 @@
 	}
 
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestLeaser</span>;
-	<span class="kw">impl</span> <span class="ident">Leaser</span> <span class="kw">for</span> <span class="ident">TestLeaser</span> {
+	<span class="kw">impl</span> <span class="ident">Leaser</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestLeaser</span> {
 		<span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">u64</span>;
 		<span class="kw">type</span> <span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="ident">BlockNumber</span>;
 		<span class="kw">type</span> <span class="ident">Currency</span> <span class="op">=</span> <span class="ident">Balances</span>;
@@ -2624,7 +2653,10 @@
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">LeaseError</span><span class="op">&gt;</span> {
 			<span class="ident">LEASES</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> {
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">leases</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">borrow_mut</span>();
-				<span class="kw">if</span> <span class="ident">period_begin</span> <span class="op">&lt;</span> <span class="self">Self</span><span class="ident">::lease_period_index</span>() {
+				<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">System::block_number</span>();
+				<span class="kw">let</span> (<span class="ident">current_lease_period</span>, <span class="kw">_</span>) <span class="op">=</span>
+					<span class="self">Self</span><span class="ident">::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="ident">LeaseError::NoLeasePeriod</span>)<span class="question-mark">?</span>;
+				<span class="kw">if</span> <span class="ident">period_begin</span> <span class="op">&lt;</span> <span class="ident">current_lease_period</span> {
 					<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">LeaseError::AlreadyEnded</span>)
 				}
 				<span class="kw">for</span> <span class="ident">period</span> <span class="kw">in</span> <span class="ident">period_begin</span>..(<span class="ident">period_begin</span> <span class="op">+</span> <span class="ident">period_count</span>) {
@@ -2654,12 +2686,18 @@
 				.<span class="ident">unwrap_or_default</span>()
 		}
 
-		<span class="kw">fn</span> <span class="ident">lease_period</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span> {
-			<span class="number">10</span>
+		<span class="kw">fn</span> <span class="ident">lease_period_length</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BlockNumber</span>, <span class="ident">BlockNumber</span>) {
+			(<span class="number">10</span>, <span class="number">0</span>)
 		}
 
-		<span class="kw">fn</span> <span class="ident">lease_period_index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span> {
-			(<span class="ident">System::block_number</span>() <span class="op">/</span> <span class="self">Self</span><span class="ident">::lease_period</span>()).<span class="ident">into</span>()
+		<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span><span class="ident">::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+			<span class="kw">let</span> (<span class="ident">lease_period_length</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::lease_period_length</span>();
+			<span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">checked_sub</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
+
+			<span class="kw">let</span> <span class="ident">lease_period</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">/</span> <span class="ident">lease_period_length</span>;
+			<span class="kw">let</span> <span class="ident">first_block</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">%</span> <span class="ident">lease_period_length</span>).<span class="ident">is_zero</span>();
+
+			<span class="prelude-val">Some</span>((<span class="ident">lease_period</span>, <span class="ident">first_block</span>))
 		}
 
 		<span class="kw">fn</span> <span class="ident">already_leased</span>(

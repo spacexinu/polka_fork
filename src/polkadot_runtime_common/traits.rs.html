@@ -252,6 +252,12 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -349,10 +355,12 @@
 	<span class="ident">AlreadyLeased</span>,
 	<span class="doccomment">/// The period to be leased has already ended.</span>
 	<span class="ident">AlreadyEnded</span>,
+	<span class="doccomment">/// A lease period has not started yet, due to an offset in the starting block.</span>
+	<span class="ident">NoLeasePeriod</span>,
 }
 
 <span class="doccomment">/// Lease manager. Used by the auction module to handle parachain slot leases.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Leaser</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Leaser</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// An account identifier for a leaser.</span>
 	<span class="kw">type</span> <span class="ident">AccountId</span>;
 
@@ -388,11 +396,16 @@
 		<span class="ident">leaser</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::AccountId</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span>;
 
-	<span class="doccomment">/// The lease period. This is constant, but can&#39;t be a `const` due to it being a runtime configurable quantity.</span>
-	<span class="kw">fn</span> <span class="ident">lease_period</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span>;
+	<span class="doccomment">/// The length of a lease period, and any offset which may be introduced.</span>
+	<span class="doccomment">/// This is only used in benchmarking to automate certain calls.</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>, <span class="ident">test</span>))]</span>
+	<span class="kw">fn</span> <span class="ident">lease_period_length</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BlockNumber</span>, <span class="ident">BlockNumber</span>);
 
-	<span class="doccomment">/// Returns the current lease period.</span>
-	<span class="kw">fn</span> <span class="ident">lease_period_index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span>;
+	<span class="doccomment">/// Returns the lease period at `block`, and if this is the first block of a new lease period.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Will return `None` if the first lease period has not started yet, for example when an offset</span>
+	<span class="doccomment">/// is placed.</span>
+	<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">block</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span><span class="ident">::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Returns true if the parachain already has a lease in any of lease periods in the inclusive</span>
 	<span class="doccomment">/// range `[first_period, last_period]`, intersected with the unbounded range [`current_lease_period`..] .</span>
@@ -444,12 +457,9 @@
 	}
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Auctioneer</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Auctioneer</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// An account identifier for a leaser.</span>
 	<span class="kw">type</span> <span class="ident">AccountId</span>;
-
-	<span class="doccomment">/// The measurement type for counting blocks.</span>
-	<span class="kw">type</span> <span class="ident">BlockNumber</span>;
 
 	<span class="doccomment">/// The measurement type for counting lease periods (generally the same as `BlockNumber`).</span>
 	<span class="kw">type</span> <span class="ident">LeasePeriod</span>;
@@ -462,13 +472,10 @@
 	<span class="doccomment">/// This can only happen when there isn&#39;t already an auction in progress. Accepts the `duration`</span>
 	<span class="doccomment">/// of this auction and the `lease_period_index` of the initial lease period of the four that</span>
 	<span class="doccomment">/// are to be auctioned.</span>
-	<span class="kw">fn</span> <span class="ident">new_auction</span>(
-		<span class="ident">duration</span>: <span class="self">Self</span><span class="ident">::BlockNumber</span>,
-		<span class="ident">lease_period_index</span>: <span class="self">Self</span><span class="ident">::LeasePeriod</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
+	<span class="kw">fn</span> <span class="ident">new_auction</span>(<span class="ident">duration</span>: <span class="ident">BlockNumber</span>, <span class="ident">lease_period_index</span>: <span class="self">Self</span><span class="ident">::LeasePeriod</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
 
 	<span class="doccomment">/// Given the current block number, return the current auction status.</span>
-	<span class="kw">fn</span> <span class="ident">auction_status</span>(<span class="ident">now</span>: <span class="self">Self</span><span class="ident">::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuctionStatus</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span>;
+	<span class="kw">fn</span> <span class="ident">auction_status</span>(<span class="ident">now</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuctionStatus</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Place a bid in the current auction.</span>
 	<span class="doccomment">///</span>
@@ -489,11 +496,16 @@
 		<span class="ident">amount</span>: <span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
 
-	<span class="doccomment">/// Returns the current lease period.</span>
-	<span class="kw">fn</span> <span class="ident">lease_period_index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span>;
+	<span class="doccomment">/// The length of a lease period, and any offset which may be introduced.</span>
+	<span class="doccomment">/// This is only used in benchmarking to automate certain calls.</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>, <span class="ident">test</span>))]</span>
+	<span class="kw">fn</span> <span class="ident">lease_period_length</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BlockNumber</span>, <span class="ident">BlockNumber</span>);
 
-	<span class="doccomment">/// Returns the length of a lease period.</span>
-	<span class="kw">fn</span> <span class="ident">lease_period</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeasePeriod</span>;
+	<span class="doccomment">/// Returns the lease period at `block`, and if this is the first block of a new lease period.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Will return `None` if the first lease period has not started yet, for example when an offset</span>
+	<span class="doccomment">/// is placed.</span>
+	<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">block</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span><span class="ident">::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Check if the para and user combination has won an auction in the past.</span>
 	<span class="kw">fn</span> <span class="ident">has_won_an_auction</span>(<span class="ident">para</span>: <span class="ident">ParaId</span>, <span class="ident">bidder</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::AccountId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
