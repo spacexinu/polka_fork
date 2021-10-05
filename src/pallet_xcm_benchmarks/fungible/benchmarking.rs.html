@@ -215,8 +215,6 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -236,9 +234,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">account_and_location</span>, <span class="ident">new_executor</span>, <span class="ident">worst_case_holding</span>, <span class="ident">AssetTransactorOf</span>, <span class="ident">XcmCallOf</span>};
-<span class="kw">use</span> <span class="ident">frame_benchmarking</span>::{
-	<span class="ident">benchmarks_instance_pallet</span>, <span class="ident">impl_benchmark_test_suite</span>, <span class="ident">BenchmarkError</span>, <span class="ident">BenchmarkResult</span>,
-};
+<span class="kw">use</span> <span class="ident">frame_benchmarking</span>::{<span class="ident">benchmarks_instance_pallet</span>, <span class="ident">BenchmarkError</span>, <span class="ident">BenchmarkResult</span>};
 <span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">pallet_prelude::Get</span>, <span class="ident">traits::fungible::Inspect</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime::traits::Zero</span>;
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">vec</span>};
@@ -430,13 +426,13 @@
 			<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">T::TransactAsset::balance</span>(<span class="kw-2">&amp;</span><span class="ident">checked_account</span>).<span class="ident">is_zero</span>());
 		}
 	}
-}
 
-<span class="macro">impl_benchmark_test_suite!</span>(
-	<span class="ident">Pallet</span>,
-	<span class="kw">crate</span><span class="ident">::fungible::mock::new_test_ext</span>(),
-	<span class="kw">crate</span><span class="ident">::fungible::mock::Test</span>
-);
+	<span class="macro">impl_benchmark_test_suite!</span>(
+		<span class="ident">Pallet</span>,
+		<span class="kw">crate</span><span class="ident">::fungible::mock::new_test_ext</span>(),
+		<span class="kw">crate</span><span class="ident">::fungible::mock::Test</span>
+	);
+}
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="pallet_xcm_benchmarks" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>

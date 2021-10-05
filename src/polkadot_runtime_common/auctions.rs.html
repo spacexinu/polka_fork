@@ -3602,7 +3602,7 @@
 	<span class="kw">use</span> <span class="ident">frame_system::RawOrigin</span>;
 	<span class="kw">use</span> <span class="ident">sp_runtime</span>::{<span class="ident">traits::Bounded</span>, <span class="ident">SaturatedConversion</span>};
 
-	<span class="kw">use</span> <span class="ident">frame_benchmarking</span>::{<span class="ident">account</span>, <span class="ident">benchmarks</span>, <span class="ident">impl_benchmark_test_suite</span>, <span class="ident">whitelisted_caller</span>};
+	<span class="kw">use</span> <span class="ident">frame_benchmarking</span>::{<span class="ident">account</span>, <span class="ident">benchmarks</span>, <span class="ident">whitelisted_caller</span>};
 
 	<span class="kw">fn</span> <span class="ident">assert_last_event</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span>(<span class="ident">generic_event</span>: <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::Event</span>) {
 		<span class="kw">let</span> <span class="ident">events</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::events</span>();
@@ -3777,13 +3777,13 @@
 		<span class="ident">verify</span> {
 			<span class="macro">assert!</span>(<span class="ident">AuctionInfo</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>().<span class="ident">is_none</span>());
 		}
-	}
 
-	<span class="macro">impl_benchmark_test_suite!</span>(
-		<span class="ident">Auctions</span>,
-		<span class="kw">crate</span><span class="ident">::integration_tests::new_test_ext</span>(),
-		<span class="kw">crate</span><span class="ident">::integration_tests::Test</span>,
-	);
+		<span class="macro">impl_benchmark_test_suite!</span>(
+			<span class="ident">Auctions</span>,
+			<span class="kw">crate</span><span class="ident">::integration_tests::new_test_ext</span>(),
+			<span class="kw">crate</span><span class="ident">::integration_tests::Test</span>,
+		);
+	}
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_runtime_common" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
