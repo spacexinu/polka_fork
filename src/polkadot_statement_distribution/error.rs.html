@@ -118,6 +118,14 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -208,8 +216,12 @@
 	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Relay parent could not be found in active heads&quot;</span>)]</span>
 	<span class="ident">NoSuchHead</span>(<span class="ident">Hash</span>),
 
+	<span class="doccomment">/// Received message from actually disconnected peer.</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Message from not connected peer&quot;</span>)]</span>
+	<span class="ident">NoSuchPeer</span>(<span class="ident">PeerId</span>),
+
 	<span class="doccomment">/// Peer requested statement data for candidate that was never announced to it.</span>
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Peer requested data for candidate it never received a notification for&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Peer requested data for candidate it never received a notification for (malicious?)&quot;</span>)]</span>
 	<span class="ident">RequestedUnannouncedCandidate</span>(<span class="ident">PeerId</span>, <span class="ident">CandidateHash</span>),
 
 	<span class="doccomment">/// A large statement status was requested, which could not be found.</span>
@@ -233,7 +245,11 @@
 	<span class="kw">match</span> <span class="ident">result</span> {
 		<span class="prelude-val">Err</span>(<span class="ident">Error::Fatal</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">f</span>),
 		<span class="prelude-val">Err</span>(<span class="ident">Error::NonFatal</span>(<span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-			<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">error</span>, <span class="ident">ctx</span>);
+			<span class="kw">match</span> <span class="ident">error</span> {
+				<span class="ident">NonFatal::RequestedUnannouncedCandidate</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span>
+					<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="ident">error</span> <span class="op">=</span> <span class="op">%</span><span class="ident">error</span>, <span class="ident">ctx</span>),
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">tracing::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="ident">error</span> <span class="op">=</span> <span class="op">%</span><span class="ident">error</span>, <span class="ident">ctx</span>),
+			}
 			<span class="prelude-val">Ok</span>(())
 		},
 		<span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),

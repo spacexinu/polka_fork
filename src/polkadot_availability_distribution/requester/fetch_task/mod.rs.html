@@ -780,7 +780,7 @@
 				<span class="prelude-val">Err</span>(<span class="ident">TaskError::PeerError</span>)
 			},
 			<span class="prelude-val">Err</span>(<span class="ident">RequestError::NetworkError</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="macro">tracing::warn!</span>(
+				<span class="macro">tracing::debug!</span>(
 					<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 					<span class="ident">origin</span><span class="op">=</span> <span class="question-mark">?</span><span class="ident">validator</span>,
 					<span class="ident">err</span><span class="op">=</span> <span class="question-mark">?</span><span class="ident">err</span>,
@@ -789,7 +789,7 @@
 				<span class="prelude-val">Err</span>(<span class="ident">TaskError::PeerError</span>)
 			},
 			<span class="prelude-val">Err</span>(<span class="ident">RequestError::Canceled</span>(<span class="ident">oneshot::Canceled</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="macro">tracing::warn!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+				<span class="macro">tracing::debug!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 							   <span class="ident">origin</span><span class="op">=</span> <span class="question-mark">?</span><span class="ident">validator</span>,
 							   <span class="string">&quot;Erasure chunk request got canceled&quot;</span>);
 				<span class="prelude-val">Err</span>(<span class="ident">TaskError::PeerError</span>)

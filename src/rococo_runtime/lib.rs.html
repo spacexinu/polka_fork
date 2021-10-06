@@ -1635,11 +1635,6 @@
 <span id="1635">1635</span>
 <span id="1636">1636</span>
 <span id="1637">1637</span>
-<span id="1638">1638</span>
-<span id="1639">1639</span>
-<span id="1640">1640</span>
-<span id="1641">1641</span>
-<span id="1642">1642</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1698,7 +1693,7 @@
 		<span class="ident">OpaqueKeys</span>, <span class="ident">SaturatedConversion</span>, <span class="ident">Verify</span>,
 	},
 	<span class="ident">transaction_validity</span>::{<span class="ident">TransactionPriority</span>, <span class="ident">TransactionSource</span>, <span class="ident">TransactionValidity</span>},
-	<span class="ident">ApplyExtrinsicResult</span>, <span class="ident">KeyTypeId</span>, <span class="ident">Perbill</span>,
+	<span class="ident">ApplyExtrinsicResult</span>, <span class="ident">KeyTypeId</span>,
 };
 <span class="kw">use</span> <span class="ident">sp_staking::SessionIndex</span>;
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">collections::btree_map::BTreeMap</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
@@ -2108,10 +2103,6 @@
 	<span class="kw">type</span> <span class="ident">FeeMultiplierUpdate</span> <span class="op">=</span> <span class="ident">SlowAdjustingFeeUpdate</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 }
 
-<span class="macro">parameter_types!</span> {
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DisabledValidatorsThreshold</span>: <span class="ident">Perbill</span> <span class="op">=</span> <span class="ident">Perbill::from_percent</span>(<span class="number">17</span>);
-}
-
 <span class="doccomment">/// Special `ValidatorIdOf` implementation that is just returning the input as result.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValidatorIdOf</span>;
 <span class="kw">impl</span> <span class="ident">sp_runtime::traits::Convert</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValidatorIdOf</span> {
@@ -2129,7 +2120,6 @@
 	<span class="kw">type</span> <span class="ident">SessionManager</span> <span class="op">=</span> <span class="ident">pallet_session::historical::NoteHistoricalRoot</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ValidatorManager</span><span class="op">&gt;</span>;
 	<span class="kw">type</span> <span class="ident">SessionHandler</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">SessionKeys</span> <span class="kw">as</span> <span class="ident">OpaqueKeys</span><span class="op">&gt;</span><span class="ident">::KeyTypeIdProviders</span>;
 	<span class="kw">type</span> <span class="ident">Keys</span> <span class="op">=</span> <span class="ident">SessionKeys</span>;
-	<span class="kw">type</span> <span class="ident">DisabledValidatorsThreshold</span> <span class="op">=</span> <span class="ident">DisabledValidatorsThreshold</span>;
 	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> ();
 }
 
