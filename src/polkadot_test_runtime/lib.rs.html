@@ -1454,7 +1454,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">parachains_configuration::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">parachains_configuration::weights::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">parachains_configuration::TestWeightInfo</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">parachains_shared::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
@@ -1485,7 +1485,7 @@
 <span class="kw">impl</span> <span class="ident">parachains_paras::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
 	<span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
 	<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
-	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">parachains_paras::weights::WeightInfo</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident">parachains_paras::TestWeightInfo</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">parachains_dmp::Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {}
