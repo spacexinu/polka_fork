@@ -1112,12 +1112,12 @@
 	<span class="op">&lt;</span><span class="ident">Ctx</span> <span class="kw">as</span> <span class="ident">Context</span><span class="op">&gt;</span><span class="ident">::Signature</span>,
 <span class="op">&gt;</span>;
 
-<span class="comment">// kinds of votes for validity</span>
+<span class="comment">// Kinds of votes for validity on a particular candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">enum</span> <span class="ident">ValidityVote</span><span class="op">&lt;</span><span class="ident">Signature</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
-	<span class="comment">// implicit validity vote by issuing</span>
+	<span class="comment">// Implicit validity vote.</span>
 	<span class="ident">Issued</span>(<span class="ident">Signature</span>),
-	<span class="comment">// direct validity vote</span>
+	<span class="comment">// Direct validity vote.</span>
 	<span class="ident">Valid</span>(<span class="ident">Signature</span>),
 }
 

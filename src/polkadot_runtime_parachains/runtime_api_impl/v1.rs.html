@@ -329,6 +329,12 @@
 <span id="329">329</span>
 <span id="330">330</span>
 <span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -350,14 +356,15 @@
 <span class="doccomment">//! functions.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">configuration</span>, <span class="ident">dmp</span>, <span class="ident">hrmp</span>, <span class="ident">inclusion</span>, <span class="ident">initializer</span>, <span class="ident">paras</span>, <span class="ident">scheduler</span>, <span class="ident">session_info</span>, <span class="ident">shared</span>,
+	<span class="ident">configuration</span>, <span class="ident">dmp</span>, <span class="ident">hrmp</span>, <span class="ident">inclusion</span>, <span class="ident">initializer</span>, <span class="ident">paras</span>, <span class="ident">paras_inherent</span>, <span class="ident">scheduler</span>,
+	<span class="ident">session_info</span>, <span class="ident">shared</span>,
 };
 <span class="kw">use</span> <span class="ident">primitives::v1</span>::{
 	<span class="ident">AuthorityDiscoveryId</span>, <span class="ident">CandidateEvent</span>, <span class="ident">CommittedCandidateReceipt</span>, <span class="ident">CoreIndex</span>, <span class="ident">CoreOccupied</span>,
 	<span class="ident">CoreState</span>, <span class="ident">GroupIndex</span>, <span class="ident">GroupRotationInfo</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>, <span class="ident">InboundDownwardMessage</span>,
 	<span class="ident">InboundHrmpMessage</span>, <span class="ident">OccupiedCore</span>, <span class="ident">OccupiedCoreAssumption</span>, <span class="ident">PersistedValidationData</span>,
-	<span class="ident">ScheduledCore</span>, <span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>, <span class="ident">ValidationCode</span>, <span class="ident">ValidationCodeHash</span>, <span class="ident">ValidatorId</span>,
-	<span class="ident">ValidatorIndex</span>,
+	<span class="ident">ScheduledCore</span>, <span class="ident">ScrapedOnChainVotes</span>, <span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>, <span class="ident">ValidationCode</span>,
+	<span class="ident">ValidationCodeHash</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
 };
 <span class="kw">use</span> <span class="ident">sp_runtime::traits::One</span>;
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">collections::btree_map::BTreeMap</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
@@ -660,6 +667,11 @@
 	<span class="ident">hash</span>: <span class="ident">ValidationCodeHash</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span> {
 	<span class="op">&lt;</span><span class="ident">paras::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::code_by_hash</span>(<span class="ident">hash</span>)
+}
+
+<span class="doccomment">/// Disputes imported via means of on-chain imports.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_chain_votes</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">paras_inherent::Config</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScrapedOnChainVotes</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="op">&lt;</span><span class="ident">paras_inherent::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::on_chain_votes</span>()
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="polkadot_runtime_parachains" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

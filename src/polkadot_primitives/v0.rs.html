@@ -932,6 +932,19 @@
 <span id="932">932</span>
 <span id="933">933</span>
 <span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1670,6 +1683,7 @@
 <span class="doccomment">/// An either implicit or explicit attestation to the validity of a parachain</span>
 <span class="doccomment">/// candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValidityAttestation</span> {
 	<span class="doccomment">/// Implicit validity attestation by issuing.</span>
 	<span class="doccomment">/// This corresponds to issuance of a `Candidate` statement.</span>
@@ -1682,6 +1696,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ValidityAttestation</span> {
+	<span class="doccomment">/// Produce the underlying signed payload of the attestation, given the hash of the candidate,</span>
+	<span class="doccomment">/// which should be known in context.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_compact_statement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CompactStatement</span> {
+		<span class="comment">// Explicit and implicit map directly from</span>
+		<span class="comment">// `ValidityVote::Valid` and `ValidityVote::Issued`, and hence there is a</span>
+		<span class="comment">// `1:1` relationshow which enables the conversion.</span>
+		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+			<span class="ident">ValidityAttestation::Implicit</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CompactStatement::Seconded</span>(<span class="ident">candidate_hash</span>),
+			<span class="ident">ValidityAttestation::Explicit</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CompactStatement::Valid</span>(<span class="ident">candidate_hash</span>),
+		}
+	}
+
 	<span class="doccomment">/// Get a reference to the signature.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ValidatorSignature</span> {
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {

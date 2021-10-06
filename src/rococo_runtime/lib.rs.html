@@ -1635,6 +1635,11 @@
 <span id="1635">1635</span>
 <span id="1636">1636</span>
 <span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1676,8 +1681,9 @@
 <span class="kw">use</span> <span class="ident">primitives::v1</span>::{
 	<span class="ident">AccountId</span>, <span class="ident">AccountIndex</span>, <span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CandidateEvent</span>, <span class="ident">CommittedCandidateReceipt</span>,
 	<span class="ident">CoreState</span>, <span class="ident">GroupRotationInfo</span>, <span class="ident">Hash</span>, <span class="ident">Id</span>, <span class="ident">InboundDownwardMessage</span>, <span class="ident">InboundHrmpMessage</span>, <span class="ident">Moment</span>,
-	<span class="ident">Nonce</span>, <span class="ident">OccupiedCoreAssumption</span>, <span class="ident">PersistedValidationData</span>, <span class="ident">SessionInfo</span> <span class="kw">as</span> <span class="ident">SessionInfoData</span>,
-	<span class="ident">Signature</span>, <span class="ident">ValidationCode</span>, <span class="ident">ValidationCodeHash</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
+	<span class="ident">Nonce</span>, <span class="ident">OccupiedCoreAssumption</span>, <span class="ident">PersistedValidationData</span>, <span class="ident">ScrapedOnChainVotes</span>,
+	<span class="ident">SessionInfo</span> <span class="kw">as</span> <span class="ident">SessionInfoData</span>, <span class="ident">Signature</span>, <span class="ident">ValidationCode</span>, <span class="ident">ValidationCodeHash</span>, <span class="ident">ValidatorId</span>,
+	<span class="ident">ValidatorIndex</span>,
 };
 <span class="kw">use</span> <span class="ident">runtime_common</span>::{
 	<span class="ident">auctions</span>, <span class="ident">crowdloan</span>, <span class="ident">impls::ToAuthor</span>, <span class="ident">paras_registrar</span>, <span class="ident">paras_sudo_wrapper</span>, <span class="ident">slots</span>, <span class="ident">xcm_sender</span>,
@@ -2922,6 +2928,10 @@
 
 		<span class="kw">fn</span> <span class="ident">validation_code_by_hash</span>(<span class="ident">hash</span>: <span class="ident">ValidationCodeHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span> {
 			<span class="ident">runtime_api_impl::validation_code_by_hash</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="ident">hash</span>)
+		}
+
+		<span class="kw">fn</span> <span class="ident">on_chain_votes</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScrapedOnChainVotes</span><span class="op">&lt;</span><span class="ident">Hash</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+			<span class="ident">runtime_api_impl::on_chain_votes</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>()
 		}
 	}
 

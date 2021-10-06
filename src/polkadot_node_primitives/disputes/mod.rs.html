@@ -210,6 +210,26 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -279,6 +299,26 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SignedDisputeStatement</span> {
+	<span class="doccomment">/// Create a new `SignedDisputeStatement` from information</span>
+	<span class="doccomment">/// that is available on-chain, and hence already can be trusted.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Attention: Not to be used other than with guaranteed fetches.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_unchecked_from_trusted_source</span>(
+		<span class="ident">dispute_statement</span>: <span class="ident">DisputeStatement</span>,
+		<span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
+		<span class="ident">session_index</span>: <span class="ident">SessionIndex</span>,
+		<span class="ident">validator_public</span>: <span class="ident">ValidatorId</span>,
+		<span class="ident">validator_signature</span>: <span class="ident">ValidatorSignature</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="ident">SignedDisputeStatement</span> {
+			<span class="ident">dispute_statement</span>,
+			<span class="ident">candidate_hash</span>,
+			<span class="ident">validator_public</span>,
+			<span class="ident">validator_signature</span>,
+			<span class="ident">session_index</span>,
+		}
+	}
+
 	<span class="doccomment">/// Create a new `SignedDisputeStatement`, which is only possible by checking the signature.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_checked</span>(
 		<span class="ident">dispute_statement</span>: <span class="ident">DisputeStatement</span>,

@@ -404,6 +404,11 @@
 <span id="404">404</span>
 <span id="405">405</span>
 <span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -550,6 +555,8 @@
 				.<span class="ident">cache_inbound_hrmp_channel_contents</span>((<span class="ident">relay_parent</span>, <span class="ident">para_id</span>), <span class="ident">contents</span>),
 			<span class="ident">CurrentBabeEpoch</span>(<span class="ident">relay_parent</span>, <span class="ident">epoch</span>) <span class="op">=</span><span class="op">&gt;</span>
 				<span class="self">self</span>.<span class="ident">requests_cache</span>.<span class="ident">cache_current_babe_epoch</span>(<span class="ident">relay_parent</span>, <span class="ident">epoch</span>),
+			<span class="ident">FetchOnChainVotes</span>(<span class="ident">relay_parent</span>, <span class="ident">scraped</span>) <span class="op">=</span><span class="op">&gt;</span>
+				<span class="self">self</span>.<span class="ident">requests_cache</span>.<span class="ident">cache_on_chain_votes</span>(<span class="ident">relay_parent</span>, <span class="ident">scraped</span>),
 		}
 	}
 
@@ -616,6 +623,8 @@
 					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> <span class="ident">Request::InboundHrmpChannelsContents</span>(<span class="ident">id</span>, <span class="ident">sender</span>)),
 			<span class="ident">Request::CurrentBabeEpoch</span>(<span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
 				<span class="macro">query!</span>(<span class="ident">current_babe_epoch</span>(), <span class="ident">sender</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> <span class="ident">Request::CurrentBabeEpoch</span>(<span class="ident">sender</span>)),
+			<span class="ident">Request::FetchOnChainVotes</span>(<span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
+				<span class="macro">query!</span>(<span class="ident">on_chain_votes</span>(), <span class="ident">sender</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> <span class="ident">Request::FetchOnChainVotes</span>(<span class="ident">sender</span>)),
 		}
 	}
 
@@ -749,6 +758,7 @@
 		<span class="ident">Request::InboundHrmpChannelsContents</span>(<span class="ident">id</span>, <span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
 			<span class="macro">query!</span>(<span class="ident">InboundHrmpChannelsContents</span>, <span class="ident">inbound_hrmp_channels_contents</span>(<span class="ident">id</span>), <span class="ident">sender</span>),
 		<span class="ident">Request::CurrentBabeEpoch</span>(<span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">query!</span>(<span class="ident">CurrentBabeEpoch</span>, <span class="ident">current_epoch</span>(), <span class="ident">sender</span>),
+		<span class="ident">Request::FetchOnChainVotes</span>(<span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">query!</span>(<span class="ident">FetchOnChainVotes</span>, <span class="ident">on_chain_votes</span>(), <span class="ident">sender</span>),
 	}
 }
 

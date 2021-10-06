@@ -1417,6 +1417,29 @@
 <span id="1417">1417</span>
 <span id="1418">1418</span>
 <span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
+<span id="1431">1431</span>
+<span id="1432">1432</span>
+<span id="1433">1433</span>
+<span id="1434">1434</span>
+<span id="1435">1435</span>
+<span id="1436">1436</span>
+<span id="1437">1437</span>
+<span id="1438">1438</span>
+<span id="1439">1439</span>
+<span id="1440">1440</span>
+<span id="1441">1441</span>
+<span id="1442">1442</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2365,6 +2388,22 @@
 	<span class="kw">pub</span> <span class="ident">needed_approvals</span>: <span class="ident">u32</span>,
 }
 
+<span class="doccomment">/// Scraped runtime backing votes and resolved disputes.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Default</span>, <span class="ident">MallocSizeOf</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScrapedOnChainVotes</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Encode</span> <span class="op">+</span> <span class="ident">Decode</span> <span class="op">=</span> <span class="ident">Hash</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// The session in which the block was included.</span>
+	<span class="kw">pub</span> <span class="ident">session</span>: <span class="ident">SessionIndex</span>,
+	<span class="doccomment">/// Set of backing validators for each candidate, represented by its candidate</span>
+	<span class="doccomment">/// receipt.</span>
+	<span class="kw">pub</span> <span class="ident">backing_validators_per_candidate</span>:
+		<span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">CandidateReceipt</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ValidatorIndex</span>, <span class="ident">ValidityAttestation</span>)<span class="op">&gt;</span>)<span class="op">&gt;</span>,
+	<span class="doccomment">/// On-chain-recorded set of disputes.</span>
+	<span class="doccomment">/// Note that the above `backing_validators` are</span>
+	<span class="doccomment">/// unrelated to the backers of the disputes candidates.</span>
+	<span class="kw">pub</span> <span class="ident">disputes</span>: <span class="ident">MultiDisputeStatementSet</span>,
+}
+
 <span class="doccomment">/// A vote of approval on a candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">RuntimeDebug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApprovalVote</span>(<span class="kw">pub</span> <span class="ident">CandidateHash</span>);
@@ -2380,7 +2419,7 @@
 
 <span class="macro">sp_api::decl_runtime_apis!</span> {
 	<span class="doccomment">/// The API for querying the state of parachains on-chain.</span>
-	<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParachainHost</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Decode</span> <span class="op">=</span> <span class="ident">Hash</span>, <span class="ident">N</span>: <span class="ident">Encode</span> <span class="op">+</span> <span class="ident">Decode</span> <span class="op">=</span> <span class="ident">BlockNumber</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParachainHost</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Encode</span> <span class="op">+</span> <span class="ident">Decode</span> <span class="op">=</span> <span class="ident">Hash</span>, <span class="ident">N</span>: <span class="ident">Encode</span> <span class="op">+</span> <span class="ident">Decode</span> <span class="op">=</span> <span class="ident">BlockNumber</span><span class="op">&gt;</span> {
 		<span class="doccomment">/// Get the current validators.</span>
 		<span class="kw">fn</span> <span class="ident">validators</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ValidatorId</span><span class="op">&gt;</span>;
 
@@ -2437,6 +2476,9 @@
 
 		<span class="doccomment">/// Get the validation code from its hash.</span>
 		<span class="kw">fn</span> <span class="ident">validation_code_by_hash</span>(<span class="ident">hash</span>: <span class="ident">ValidationCodeHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span>;
+
+		<span class="doccomment">/// Scrape dispute relevant from on-chain, backing votes and resolved disputes.</span>
+		<span class="kw">fn</span> <span class="ident">on_chain_votes</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScrapedOnChainVotes</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 	}
 }
 
@@ -2602,6 +2644,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Statements are either in favor of the candidate&#39;s validity or against it.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DisputeStatement</span> {
 	<span class="doccomment">/// A valid statement, of the given kind.</span>
 	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>)]</span>
@@ -2671,6 +2714,7 @@
 
 <span class="doccomment">/// Different kinds of statements of validity on  a candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValidDisputeStatementKind</span> {
 	<span class="doccomment">/// An explicit statement issued as part of a dispute.</span>
 	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>)]</span>
@@ -2688,6 +2732,7 @@
 
 <span class="doccomment">/// Different kinds of statements of invalidity on a candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InvalidDisputeStatementKind</span> {
 	<span class="doccomment">/// An explicit statement issued as part of a dispute.</span>
 	<span class="attribute">#[<span class="ident">codec</span>(<span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>)]</span>
@@ -2716,6 +2761,7 @@
 
 <span class="doccomment">/// A set of statements about a specific candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DisputeStatementSet</span> {
 	<span class="doccomment">/// The candidate referenced by this set.</span>
 	<span class="kw">pub</span> <span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
