@@ -2549,8 +2549,8 @@
 	<span class="kw">pub</span> <span class="ident">SignedRewardBase</span>: <span class="ident">Balance</span> <span class="op">=</span>  <span class="ident">UNITS</span> <span class="op">/</span> <span class="number">10</span>;
 	<span class="kw">pub</span> <span class="ident">SolutionImprovementThreshold</span>: <span class="ident">Perbill</span> <span class="op">=</span> <span class="ident">Perbill::from_rational</span>(<span class="number">5u32</span>, <span class="number">10_000</span>);
 
-	<span class="comment">// miner configs</span>
-	<span class="kw">pub</span> <span class="ident">OffchainRepeat</span>: <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="number">5</span>;
+	<span class="comment">// 1 hour session, 15 minutes unsigned phase, 8 offchain executions.</span>
+	<span class="kw">pub</span> <span class="ident">OffchainRepeat</span>: <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">UnsignedPhase::get</span>() <span class="op">/</span> <span class="number">8</span>;
 
 	<span class="doccomment">/// Whilst `UseNominatorsAndUpdateBagsList` or `UseNominatorsMap` is in use, this can still be a</span>
 	<span class="doccomment">/// very large value. Once the `BagsList` is in full motion, staking might open its door to many</span>
