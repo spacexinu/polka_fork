@@ -2152,6 +2152,26 @@
 <span id="2152">2152</span>
 <span id="2153">2153</span>
 <span id="2154">2154</span>
+<span id="2155">2155</span>
+<span id="2156">2156</span>
+<span id="2157">2157</span>
+<span id="2158">2158</span>
+<span id="2159">2159</span>
+<span id="2160">2160</span>
+<span id="2161">2161</span>
+<span id="2162">2162</span>
+<span id="2163">2163</span>
+<span id="2164">2164</span>
+<span id="2165">2165</span>
+<span id="2166">2166</span>
+<span id="2167">2167</span>
+<span id="2168">2168</span>
+<span id="2169">2169</span>
+<span id="2170">2170</span>
+<span id="2171">2171</span>
+<span id="2172">2172</span>
+<span id="2173">2173</span>
+<span id="2174">2174</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3696,6 +3716,26 @@
 		<span class="comment">// Only set the config if it&#39;s needed to be set explicitly.</span>
 		<span class="kw">if</span> <span class="ident">Configuration::config</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">Default::default</span>() {
 			<span class="ident">Configuration::force_set_active_config</span>(<span class="ident">active_config</span>);
+		}
+
+		{
+			<span class="comment">// At the moment, the `parachains_configuration` crate has already had one runtime</span>
+			<span class="comment">// storage migration (performed as part of [#3575]). As the result a call to</span>
+			<span class="comment">// `StorageVersion::get::&lt;Configuration&gt;` will return `Some(1)`</span>
+			<span class="comment">//</span>
+			<span class="comment">// However, Polkadot is just about to have its first version of parachains runtime</span>
+			<span class="comment">// pallets and thus there is no existing storage which needs to be migrated. Above</span>
+			<span class="comment">// we just have set the active configuration of the actual version, i.e. the same as the</span>
+			<span class="comment">// version 1 on Kusama.</span>
+			<span class="comment">//</span>
+			<span class="comment">// The caveat here is when we deploy a module for the first time, it&#39;s runtime version</span>
+			<span class="comment">// will be empty and thus it will be considered as version 0. Since we want to avoid</span>
+			<span class="comment">// the situation where the same storage structure has version 0 on Polkadot and</span>
+			<span class="comment">// version 1 on Kusama we need to set the storage version explicitly.</span>
+			<span class="comment">//</span>
+			<span class="comment">// [#3575]: https://github.com/paritytech/polkadot/pull/3575</span>
+			<span class="kw">use</span> <span class="ident">frame_support::traits::StorageVersion</span>;
+			<span class="ident">StorageVersion::new</span>(<span class="number">1</span>).<span class="ident">put</span>::<span class="op">&lt;</span><span class="ident">Configuration</span><span class="op">&gt;</span>();
 		}
 
 		<span class="ident">RocksDbWeight::get</span>().<span class="ident">reads</span>(<span class="number">1</span>) <span class="op">+</span> <span class="ident">RocksDbWeight::get</span>().<span class="ident">writes</span>(<span class="number">1</span>)
