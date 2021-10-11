@@ -2172,6 +2172,12 @@
 <span id="2172">2172</span>
 <span id="2173">2173</span>
 <span id="2174">2174</span>
+<span id="2175">2175</span>
+<span id="2176">2176</span>
+<span id="2177">2177</span>
+<span id="2178">2178</span>
+<span id="2179">2179</span>
+<span id="2180">2180</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -4088,6 +4094,9 @@
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::claims</span>, <span class="ident">Claims</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_common::paras_registrar</span>, <span class="ident">Registrar</span>);
+			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::configuration</span>, <span class="ident">Configuration</span>);
+			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::initializer</span>, <span class="ident">Initializer</span>);
+			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">runtime_parachains::paras</span>, <span class="ident">Paras</span>);
 			<span class="comment">// Substrate</span>
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
 			<span class="macro">list_benchmark!</span>(<span class="ident">list</span>, <span class="ident">extra</span>, <span class="ident">pallet_bounties</span>, <span class="ident">Bounties</span>);
@@ -4160,6 +4169,9 @@
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::claims</span>, <span class="ident">Claims</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::slots</span>, <span class="ident">Slots</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_common::paras_registrar</span>, <span class="ident">Registrar</span>);
+			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::configuration</span>, <span class="ident">Configuration</span>);
+			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::initializer</span>, <span class="ident">Initializer</span>);
+			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">runtime_parachains::paras</span>, <span class="ident">Paras</span>);
 			<span class="comment">// Substrate</span>
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_balances</span>, <span class="ident">Balances</span>);
 			<span class="macro">add_benchmark!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_bounties</span>, <span class="ident">Bounties</span>);
