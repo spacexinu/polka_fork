@@ -3512,7 +3512,7 @@
 <span class="doccomment">/// individual routers.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">XcmRouter</span> <span class="op">=</span> (
 	<span class="comment">// Only one router so far - use DMP to communicate with child parachains.</span>
-	<span class="ident">xcm_sender::ChildParachainRouter</span><span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">xcm::AlwaysRelease</span><span class="op">&gt;</span>,
+	<span class="ident">xcm_sender::ChildParachainRouter</span><span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">XcmPallet</span><span class="op">&gt;</span>,
 );
 
 <span class="macro">parameter_types!</span> {
