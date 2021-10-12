@@ -305,6 +305,10 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -349,7 +353,10 @@
 	<span class="comment">// wasm pages.</span>
 	<span class="comment">//</span>
 	<span class="comment">// Thus let&#39;s assume that 32 pages or 2 MiB are used for these needs.</span>
-	<span class="ident">max_memory_pages</span>: <span class="prelude-val">Some</span>(<span class="number">2048</span> <span class="op">+</span> <span class="number">32</span>),
+	<span class="comment">//</span>
+	<span class="comment">// Note that the memory limit is specified in bytes, so we multiply this value</span>
+	<span class="comment">// by wasm page size -- 64 KiB.</span>
+	<span class="ident">max_memory_size</span>: <span class="prelude-val">Some</span>((<span class="number">2048</span> <span class="op">+</span> <span class="number">32</span>) <span class="op">*</span> <span class="number">65536</span>),
 	<span class="ident">heap_pages</span>: <span class="number">2048</span>,
 
 	<span class="ident">allow_missing_func_imports</span>: <span class="bool-val">true</span>,
@@ -373,6 +380,7 @@
 			<span class="ident">native_stack_max</span>: <span class="number">256</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>,
 		}),
 		<span class="ident">canonicalize_nans</span>: <span class="bool-val">true</span>,
+		<span class="ident">parallel_compilation</span>: <span class="bool-val">true</span>,
 	},
 };
 
