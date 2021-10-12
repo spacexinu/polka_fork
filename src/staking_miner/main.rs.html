@@ -1165,7 +1165,7 @@
 	<span class="kw">match</span> <span class="ident">chain</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
 		<span class="string">&quot;polkadot&quot;</span> <span class="op">|</span> <span class="string">&quot;development&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="ident">sp_core::crypto::set_default_ss58_version</span>(
-				<span class="ident">sp_core::crypto::Ss58AddressFormat::PolkadotAccount</span>,
+				<span class="ident">sp_core::crypto::Ss58AddressFormatRegistry::PolkadotAccount</span>.<span class="ident">into</span>(),
 			);
 			<span class="ident">sub_tokens::dynamic::set_name</span>(<span class="string">&quot;DOT&quot;</span>);
 			<span class="ident">sub_tokens::dynamic::set_decimal_points</span>(<span class="number">10_000_000_000</span>);
@@ -1177,7 +1177,7 @@
 		},
 		<span class="string">&quot;kusama&quot;</span> <span class="op">|</span> <span class="string">&quot;kusama-dev&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="ident">sp_core::crypto::set_default_ss58_version</span>(
-				<span class="ident">sp_core::crypto::Ss58AddressFormat::KusamaAccount</span>,
+				<span class="ident">sp_core::crypto::Ss58AddressFormatRegistry::KusamaAccount</span>.<span class="ident">into</span>(),
 			);
 			<span class="ident">sub_tokens::dynamic::set_name</span>(<span class="string">&quot;KSM&quot;</span>);
 			<span class="ident">sub_tokens::dynamic::set_decimal_points</span>(<span class="number">1_000_000_000_000</span>);
@@ -1189,7 +1189,7 @@
 		},
 		<span class="string">&quot;westend&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="ident">sp_core::crypto::set_default_ss58_version</span>(
-				<span class="ident">sp_core::crypto::Ss58AddressFormat::PolkadotAccount</span>,
+				<span class="ident">sp_core::crypto::Ss58AddressFormatRegistry::PolkadotAccount</span>.<span class="ident">into</span>(),
 			);
 			<span class="ident">sub_tokens::dynamic::set_name</span>(<span class="string">&quot;WND&quot;</span>);
 			<span class="ident">sub_tokens::dynamic::set_decimal_points</span>(<span class="number">1_000_000_000_000</span>);
