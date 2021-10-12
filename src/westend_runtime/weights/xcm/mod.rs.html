@@ -191,6 +191,8 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust">
 <span class="kw">mod</span> <span class="ident">pallet_xcm_benchmarks_fungible</span>;
 <span class="kw">mod</span> <span class="ident">pallet_xcm_benchmarks_generic</span>;
@@ -225,7 +227,9 @@
 	<span class="kw">fn</span> <span class="ident">weigh_multi_assets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">balances_weight</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
 }
 
-<span class="comment">// TODO wild case</span>
+<span class="comment">// Westend only knows about one asset, the balances pallet.</span>
+<span class="kw">const</span> <span class="ident">MAX_ASSETS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span>;
+
 <span class="kw">impl</span> <span class="ident">WeighMultiAssets</span> <span class="kw">for</span> <span class="ident">MultiAssetFilter</span> {
 	<span class="kw">fn</span> <span class="ident">weigh_multi_assets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">balances_weight</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
@@ -238,7 +242,7 @@
 					<span class="ident">AssetTypes::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Weight::MAX</span>,
 				})
 				.<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">saturating_add</span>(<span class="ident">x</span>)),
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Weight::MAX</span>,
+			<span class="self">Self</span><span class="ident">::Wild</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">MAX_ASSETS</span> <span class="kw">as</span> <span class="ident">Weight</span>).<span class="ident">saturating_mul</span>(<span class="ident">balances_weight</span>),
 		}
 	}
 }
