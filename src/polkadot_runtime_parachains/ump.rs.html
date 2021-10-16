@@ -1246,20 +1246,20 @@
 		<span class="doccomment">/// Upward message executed with the given outcome.</span>
 		<span class="doccomment">/// \[ id, outcome \]</span>
 		<span class="ident">ExecutedUpward</span>(<span class="ident">MessageId</span>, <span class="ident">Outcome</span>),
-		<span class="doccomment">/// The weight limit for handling downward messages was reached.</span>
+		<span class="doccomment">/// The weight limit for handling upward messages was reached.</span>
 		<span class="doccomment">/// \[ id, remaining, required \]</span>
 		<span class="ident">WeightExhausted</span>(<span class="ident">MessageId</span>, <span class="ident">Weight</span>, <span class="ident">Weight</span>),
-		<span class="doccomment">/// Some downward messages have been received and will be processed.</span>
+		<span class="doccomment">/// Some upward messages have been received and will be processed.</span>
 		<span class="doccomment">/// \[ para, count, size \]</span>
 		<span class="ident">UpwardMessagesReceived</span>(<span class="ident">ParaId</span>, <span class="ident">u32</span>, <span class="ident">u32</span>),
-		<span class="doccomment">/// The weight budget was exceeded for an individual downward message.</span>
+		<span class="doccomment">/// The weight budget was exceeded for an individual upward message.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// This message can be later dispatched manually using `service_overweight` dispatchable</span>
 		<span class="doccomment">/// using the assigned `overweight_index`.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// \[ para, id, overweight_index, required \]</span>
 		<span class="ident">OverweightEnqueued</span>(<span class="ident">ParaId</span>, <span class="ident">MessageId</span>, <span class="ident">OverweightIndex</span>, <span class="ident">Weight</span>),
-		<span class="doccomment">/// Downward message from the overweight queue was executed with the given actual weight</span>
+		<span class="doccomment">/// Upward message from the overweight queue was executed with the given actual weight</span>
 		<span class="doccomment">/// used.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// \[ overweight_index, used \]</span>
