@@ -2178,6 +2178,9 @@
 <span id="2178">2178</span>
 <span id="2179">2179</span>
 <span id="2180">2180</span>
+<span id="2181">2181</span>
+<span id="2182">2182</span>
+<span id="2183">2183</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2348,9 +2351,12 @@
 			<span class="ident">Call::Dmp</span>(<span class="kw">_</span>) <span class="op">|</span>
 			<span class="ident">Call::Ump</span>(<span class="kw">_</span>) <span class="op">|</span>
 			<span class="ident">Call::Hrmp</span>(<span class="kw">_</span>) <span class="op">|</span>
-			<span class="ident">Call::Slots</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-			<span class="comment">// Disable paras registration, crowdloans, and auctions for now.</span>
-			<span class="ident">Call::Registrar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Call::Auctions</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Call::Crowdloan</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+			<span class="ident">Call::Slots</span>(<span class="kw">_</span>) <span class="op">|</span>
+			<span class="ident">Call::Registrar</span>(<span class="kw">_</span>) <span class="op">|</span>
+			<span class="ident">Call::Auctions</span>(<span class="kw">_</span>) <span class="op">|</span>
+			<span class="ident">Call::Crowdloan</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+			<span class="comment">// All pallets are allowed, but exhaustive match is defensive</span>
+			<span class="comment">// in the case of adding new pallets.</span>
 		}
 	}
 }
