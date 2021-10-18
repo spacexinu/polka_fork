@@ -4091,7 +4091,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This functions modifies the state when failing. It is expected to be called in inherent,</span>
 	<span class="doccomment">/// and to fail the extrinsic on error. As invalid inherents are not allowed, the dirty state</span>
-	<span class="doccomment">/// is not commited.</span>
+	<span class="doccomment">/// is not committed.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">provide_multi_dispute_data</span>(
 		<span class="ident">statement_sets</span>: <span class="ident">MultiDisputeStatementSet</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SessionIndex</span>, <span class="ident">CandidateHash</span>)<span class="op">&gt;</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span> {

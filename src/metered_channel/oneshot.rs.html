@@ -514,7 +514,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">thiserror::Error</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Oneshot was cancelled.&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Oneshot was canceled.&quot;</span>)]</span>
 	<span class="ident">Canceled</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">Canceled</span>, <span class="ident">Measurements</span>),
 	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Oneshot did not receive a response within {}&quot;</span>, <span class="ident">Duration::as_secs_f64</span>(.<span class="number">0</span>))]</span>
 	<span class="ident">HardTimeout</span>(<span class="ident">Duration</span>, <span class="ident">Measurements</span>),
@@ -543,7 +543,7 @@
 		<span class="ident">inner</span>.<span class="ident">send</span>((<span class="ident">Instant::now</span>(), <span class="ident">t</span>)).<span class="ident">map_err</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">t</span>)<span class="op">|</span> <span class="ident">t</span>)
 	}
 
-	<span class="doccomment">/// Poll if the thing is already cancelled.</span>
+	<span class="doccomment">/// Poll if the thing is already canceled.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_canceled</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_canceled</span>(<span class="ident">ctx</span>)
 	}

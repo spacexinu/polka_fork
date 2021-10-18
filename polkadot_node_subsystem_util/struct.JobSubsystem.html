@@ -2,7 +2,7 @@
 <p>Conceptually, this is very simple: it just loops forever.</p>
 <ul>
 <li>On incoming overseer messages, it starts or stops jobs as appropriate.</li>
-<li>On other incoming messages, if they can be converted into Job::ToJob and
+<li>On other incoming messages, if they can be converted into <code>Job::ToJob</code> and
 include a hash, then they’re forwarded to the appropriate individual job.</li>
 <li>On outgoing messages from the jobs, it forwards them to the overseer.</li>
 </ul>
