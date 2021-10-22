@@ -752,6 +752,7 @@
 <span id="752">752</span>
 <span id="753">753</span>
 <span id="754">754</span>
+<span id="755">755</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -808,7 +809,7 @@
 	<span class="ident">AuthorityDiscoveryId</span>, <span class="ident">CandidateEvent</span>, <span class="ident">CommittedCandidateReceipt</span>, <span class="ident">CoreState</span>, <span class="ident">EncodeAs</span>,
 	<span class="ident">GroupIndex</span>, <span class="ident">GroupRotationInfo</span>, <span class="ident">Hash</span>, <span class="ident">Id</span> <span class="kw">as</span> <span class="ident">ParaId</span>, <span class="ident">OccupiedCoreAssumption</span>,
 	<span class="ident">PersistedValidationData</span>, <span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>, <span class="ident">Signed</span>, <span class="ident">SigningContext</span>, <span class="ident">ValidationCode</span>,
-	<span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
+	<span class="ident">ValidationCodeHash</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
 };
 <span class="kw">use</span> <span class="ident">sp_application_crypto::AppKey</span>;
 <span class="kw">use</span> <span class="ident">sp_core</span>::{<span class="ident">traits::SpawnNamed</span>, <span class="ident">Public</span>};
@@ -961,6 +962,7 @@
 	<span class="kw">fn</span> <span class="ident">request_validator_groups</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">GroupRotationInfo</span>); <span class="ident">ValidatorGroups</span>;
 	<span class="kw">fn</span> <span class="ident">request_availability_cores</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CoreState</span><span class="op">&gt;</span>; <span class="ident">AvailabilityCores</span>;
 	<span class="kw">fn</span> <span class="ident">request_persisted_validation_data</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>, <span class="ident">assumption</span>: <span class="ident">OccupiedCoreAssumption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PersistedValidationData</span><span class="op">&gt;</span>; <span class="ident">PersistedValidationData</span>;
+	<span class="kw">fn</span> <span class="ident">request_assumed_validation_data</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>, <span class="ident">expected_persisted_validation_data_hash</span>: <span class="ident">Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PersistedValidationData</span>, <span class="ident">ValidationCodeHash</span>)<span class="op">&gt;</span>; <span class="ident">AssumedValidationData</span>;
 	<span class="kw">fn</span> <span class="ident">request_session_index_for_child</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionIndex</span>; <span class="ident">SessionIndexForChild</span>;
 	<span class="kw">fn</span> <span class="ident">request_validation_code</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>, <span class="ident">assumption</span>: <span class="ident">OccupiedCoreAssumption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span>; <span class="ident">ValidationCode</span>;
 	<span class="kw">fn</span> <span class="ident">request_candidate_pending_availability</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommittedCandidateReceipt</span><span class="op">&gt;</span>; <span class="ident">CandidatePendingAvailability</span>;

@@ -1440,6 +1440,14 @@
 <span id="1440">1440</span>
 <span id="1441">1441</span>
 <span id="1442">1442</span>
+<span id="1443">1443</span>
+<span id="1444">1444</span>
+<span id="1445">1445</span>
+<span id="1446">1446</span>
+<span id="1447">1447</span>
+<span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2439,6 +2447,14 @@
 		<span class="doccomment">/// and the para already occupies a core.</span>
 		<span class="kw">fn</span> <span class="ident">persisted_validation_data</span>(<span class="ident">para_id</span>: <span class="ident">Id</span>, <span class="ident">assumption</span>: <span class="ident">OccupiedCoreAssumption</span>)
 			<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PersistedValidationData</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+		<span class="doccomment">/// Returns the persisted validation data for the given `ParaId` along with the corresponding</span>
+		<span class="doccomment">/// validation code hash. Instead of accepting assumption about the para, matches the validation</span>
+		<span class="doccomment">/// data hash against an expected one and yields `None` if they&#39;re not equal.</span>
+		<span class="kw">fn</span> <span class="ident">assumed_validation_data</span>(
+			<span class="ident">para_id</span>: <span class="ident">Id</span>,
+			<span class="ident">expected_persisted_validation_data_hash</span>: <span class="ident">Hash</span>,
+		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PersistedValidationData</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">ValidationCodeHash</span>)<span class="op">&gt;</span>;
 
 		<span class="doccomment">/// Checks if the given validation outputs pass the acceptance criteria.</span>
 		<span class="kw">fn</span> <span class="ident">check_validation_outputs</span>(<span class="ident">para_id</span>: <span class="ident">Id</span>, <span class="ident">outputs</span>: <span class="ident">CandidateCommitments</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;

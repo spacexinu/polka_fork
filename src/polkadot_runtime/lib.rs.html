@@ -2046,6 +2046,16 @@
 <span id="2046">2046</span>
 <span id="2047">2047</span>
 <span id="2048">2048</span>
+<span id="2049">2049</span>
+<span id="2050">2050</span>
+<span id="2051">2051</span>
+<span id="2052">2052</span>
+<span id="2053">2053</span>
+<span id="2054">2054</span>
+<span id="2055">2055</span>
+<span id="2056">2056</span>
+<span id="2057">2057</span>
+<span id="2058">2058</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -3581,6 +3591,16 @@
 		<span class="kw">fn</span> <span class="ident">persisted_validation_data</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>, <span class="ident">assumption</span>: <span class="ident">OccupiedCoreAssumption</span>)
 			<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PersistedValidationData</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 			<span class="ident">parachains_runtime_api_impl::persisted_validation_data</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="ident">para_id</span>, <span class="ident">assumption</span>)
+		}
+
+		<span class="kw">fn</span> <span class="ident">assumed_validation_data</span>(
+			<span class="ident">para_id</span>: <span class="ident">ParaId</span>,
+			<span class="ident">expected_persisted_validation_data_hash</span>: <span class="ident">Hash</span>,
+		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PersistedValidationData</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span>, <span class="ident">ValidationCodeHash</span>)<span class="op">&gt;</span> {
+			<span class="ident">parachains_runtime_api_impl::assumed_validation_data</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(
+				<span class="ident">para_id</span>,
+				<span class="ident">expected_persisted_validation_data_hash</span>,
+			)
 		}
 
 		<span class="kw">fn</span> <span class="ident">check_validation_outputs</span>(

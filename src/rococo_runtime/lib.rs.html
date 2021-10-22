@@ -1640,6 +1640,16 @@
 <span id="1640">1640</span>
 <span id="1641">1641</span>
 <span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2879,6 +2889,16 @@
 		<span class="kw">fn</span> <span class="ident">persisted_validation_data</span>(<span class="ident">para_id</span>: <span class="ident">Id</span>, <span class="ident">assumption</span>: <span class="ident">OccupiedCoreAssumption</span>)
 			<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PersistedValidationData</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 			<span class="ident">runtime_api_impl::persisted_validation_data</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(<span class="ident">para_id</span>, <span class="ident">assumption</span>)
+		}
+
+		<span class="kw">fn</span> <span class="ident">assumed_validation_data</span>(
+			<span class="ident">para_id</span>: <span class="ident">ParaId</span>,
+			<span class="ident">expected_persisted_validation_data_hash</span>: <span class="ident">Hash</span>,
+		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PersistedValidationData</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span>, <span class="ident">ValidationCodeHash</span>)<span class="op">&gt;</span> {
+			<span class="ident">runtime_api_impl::assumed_validation_data</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>(
+				<span class="ident">para_id</span>,
+				<span class="ident">expected_persisted_validation_data_hash</span>,
+			)
 		}
 
 		<span class="kw">fn</span> <span class="ident">check_validation_outputs</span>(

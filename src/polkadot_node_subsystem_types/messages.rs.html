@@ -875,6 +875,13 @@
 <span id="875">875</span>
 <span id="876">876</span>
 <span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1488,6 +1495,13 @@
 		<span class="ident">ParaId</span>,
 		<span class="ident">OccupiedCoreAssumption</span>,
 		<span class="ident">RuntimeApiSender</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PersistedValidationData</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	),
+	<span class="doccomment">/// Get the persisted validation data for a particular para along with the current validation code</span>
+	<span class="doccomment">/// hash, matching the data hash against an expected one.</span>
+	<span class="ident">AssumedValidationData</span>(
+		<span class="ident">ParaId</span>,
+		<span class="ident">Hash</span>,
+		<span class="ident">RuntimeApiSender</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PersistedValidationData</span>, <span class="ident">ValidationCodeHash</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
 	),
 	<span class="doccomment">/// Sends back `true` if the validation outputs pass all acceptance criteria checks.</span>
 	<span class="ident">CheckValidationOutputs</span>(

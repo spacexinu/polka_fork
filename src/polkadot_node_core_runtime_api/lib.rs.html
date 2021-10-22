@@ -409,6 +409,36 @@
 <span id="409">409</span>
 <span id="410">410</span>
 <span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -531,6 +561,15 @@
 			<span class="ident">PersistedValidationData</span>(<span class="ident">relay_parent</span>, <span class="ident">para_id</span>, <span class="ident">assumption</span>, <span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
 				.<span class="ident">requests_cache</span>
 				.<span class="ident">cache_persisted_validation_data</span>((<span class="ident">relay_parent</span>, <span class="ident">para_id</span>, <span class="ident">assumption</span>), <span class="ident">data</span>),
+			<span class="ident">AssumedValidationData</span>(
+				<span class="ident">_relay_parent</span>,
+				<span class="ident">para_id</span>,
+				<span class="ident">expected_persisted_validation_data_hash</span>,
+				<span class="ident">data</span>,
+			) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">requests_cache</span>.<span class="ident">cache_assumed_validation_data</span>(
+				(<span class="ident">para_id</span>, <span class="ident">expected_persisted_validation_data_hash</span>),
+				<span class="ident">data</span>,
+			),
 			<span class="ident">CheckValidationOutputs</span>(<span class="ident">relay_parent</span>, <span class="ident">para_id</span>, <span class="ident">commitments</span>, <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
 				.<span class="ident">requests_cache</span>
 				.<span class="ident">cache_check_validation_outputs</span>((<span class="ident">relay_parent</span>, <span class="ident">para_id</span>, <span class="ident">commitments</span>), <span class="ident">b</span>),
@@ -598,6 +637,21 @@
 			<span class="ident">Request::PersistedValidationData</span>(<span class="ident">para</span>, <span class="ident">assumption</span>, <span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
 				<span class="macro">query!</span>(<span class="ident">persisted_validation_data</span>(<span class="ident">para</span>, <span class="ident">assumption</span>), <span class="ident">sender</span>)
 					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> <span class="ident">Request::PersistedValidationData</span>(<span class="ident">para</span>, <span class="ident">assumption</span>, <span class="ident">sender</span>)),
+			<span class="ident">Request::AssumedValidationData</span>(
+				<span class="ident">para</span>,
+				<span class="ident">expected_persisted_validation_data_hash</span>,
+				<span class="ident">sender</span>,
+			) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">query!</span>(
+				<span class="ident">assumed_validation_data</span>(<span class="ident">para</span>, <span class="ident">expected_persisted_validation_data_hash</span>),
+				<span class="ident">sender</span>
+			)
+			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> {
+				<span class="ident">Request::AssumedValidationData</span>(
+					<span class="ident">para</span>,
+					<span class="ident">expected_persisted_validation_data_hash</span>,
+					<span class="ident">sender</span>,
+				)
+			}),
 			<span class="ident">Request::CheckValidationOutputs</span>(<span class="ident">para</span>, <span class="ident">commitments</span>, <span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
 				<span class="macro">query!</span>(<span class="ident">check_validation_outputs</span>(<span class="ident">para</span>, <span class="ident">commitments</span>), <span class="ident">sender</span>)
 					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> <span class="ident">Request::CheckValidationOutputs</span>(<span class="ident">para</span>, <span class="ident">commitments</span>, <span class="ident">sender</span>)),
@@ -742,6 +796,12 @@
 			<span class="macro">query!</span>(<span class="ident">AvailabilityCores</span>, <span class="ident">availability_cores</span>(), <span class="ident">sender</span>),
 		<span class="ident">Request::PersistedValidationData</span>(<span class="ident">para</span>, <span class="ident">assumption</span>, <span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
 			<span class="macro">query!</span>(<span class="ident">PersistedValidationData</span>, <span class="ident">persisted_validation_data</span>(<span class="ident">para</span>, <span class="ident">assumption</span>), <span class="ident">sender</span>),
+		<span class="ident">Request::AssumedValidationData</span>(<span class="ident">para</span>, <span class="ident">expected_persisted_validation_data_hash</span>, <span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
+			<span class="macro">query!</span>(
+				<span class="ident">AssumedValidationData</span>,
+				<span class="ident">assumed_validation_data</span>(<span class="ident">para</span>, <span class="ident">expected_persisted_validation_data_hash</span>),
+				<span class="ident">sender</span>
+			),
 		<span class="ident">Request::CheckValidationOutputs</span>(<span class="ident">para</span>, <span class="ident">commitments</span>, <span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
 			<span class="macro">query!</span>(<span class="ident">CheckValidationOutputs</span>, <span class="ident">check_validation_outputs</span>(<span class="ident">para</span>, <span class="ident">commitments</span>), <span class="ident">sender</span>),
 		<span class="ident">Request::SessionIndexForChild</span>(<span class="ident">sender</span>) <span class="op">=</span><span class="op">&gt;</span>
