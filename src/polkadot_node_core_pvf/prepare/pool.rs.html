@@ -379,6 +379,21 @@
 <span id="379">379</span>
 <span id="380">380</span>
 <span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -398,6 +413,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::worker</span>::{<span class="self">self</span>, <span class="ident">Outcome</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">error::PrepareError</span>,
 	<span class="ident">metrics::Metrics</span>,
 	<span class="ident">worker_common</span>::{<span class="ident">IdleWorker</span>, <span class="ident">WorkerHandle</span>},
 	<span class="ident">LOG_TARGET</span>,
@@ -460,9 +476,16 @@
 	<span class="doccomment">/// The given worker was just spawned and is ready to be used.</span>
 	<span class="ident">Spawned</span>(<span class="ident">Worker</span>),
 
-	<span class="doccomment">/// The given worker either succeeded or failed the given job. Under any circumstances the</span>
-	<span class="doccomment">/// artifact file has been written. The `bool` says whether the worker ripped.</span>
-	<span class="ident">Concluded</span>(<span class="ident">Worker</span>, <span class="ident">bool</span>),
+	<span class="doccomment">/// The given worker either succeeded or failed the given job.</span>
+	<span class="ident">Concluded</span> {
+		<span class="doccomment">/// A key for retrieving the worker data from the pool.</span>
+		<span class="ident">worker</span>: <span class="ident">Worker</span>,
+		<span class="doccomment">/// Indicates whether the worker process was killed.</span>
+		<span class="ident">rip</span>: <span class="ident">bool</span>,
+		<span class="doccomment">/// [`Ok`] indicates that compiled artifact is successfully stored on disk.</span>
+		<span class="doccomment">/// Otherwise, an [error](PrepareError) is supplied.</span>
+		<span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>,
+	},
 
 	<span class="doccomment">/// The given worker ceased to exist.</span>
 	<span class="ident">Rip</span>(<span class="ident">Worker</span>),
@@ -677,7 +700,7 @@
 		},
 		<span class="ident">PoolEvent::StartWork</span>(<span class="ident">worker</span>, <span class="ident">outcome</span>) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="kw">match</span> <span class="ident">outcome</span> {
-				<span class="ident">Outcome::Concluded</span>(<span class="ident">idle</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="ident">Outcome::Concluded</span> { <span class="ident">worker</span>: <span class="ident">idle</span>, <span class="ident">result</span> } <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">spawned</span>.<span class="ident">get_mut</span>(<span class="ident">worker</span>) {
 						<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
 							<span class="comment">// Perhaps the worker was killed meanwhile and the result is no longer</span>
@@ -692,7 +715,7 @@
 					<span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">idle</span>.<span class="ident">replace</span>(<span class="ident">idle</span>);
 					<span class="macro">assert_matches!</span>(<span class="ident">old</span>, <span class="prelude-val">None</span>, <span class="string">&quot;attempt to overwrite an idle worker&quot;</span>);
 
-					<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Concluded</span>(<span class="ident">worker</span>, <span class="bool-val">false</span>))<span class="question-mark">?</span>;
+					<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Concluded</span> { <span class="ident">worker</span>, <span class="ident">rip</span>: <span class="bool-val">false</span>, <span class="ident">result</span> })<span class="question-mark">?</span>;
 
 					<span class="prelude-val">Ok</span>(())
 				},
@@ -703,9 +726,16 @@
 
 					<span class="prelude-val">Ok</span>(())
 				},
-				<span class="ident">Outcome::DidntMakeIt</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="ident">Outcome::DidNotMakeIt</span> <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="kw">if</span> <span class="ident">attempt_retire</span>(<span class="ident">metrics</span>, <span class="ident">spawned</span>, <span class="ident">worker</span>) {
-						<span class="ident">reply</span>(<span class="ident">from_pool</span>, <span class="ident">FromPool::Concluded</span>(<span class="ident">worker</span>, <span class="bool-val">true</span>))<span class="question-mark">?</span>;
+						<span class="ident">reply</span>(
+							<span class="ident">from_pool</span>,
+							<span class="ident">FromPool::Concluded</span> {
+								<span class="ident">worker</span>,
+								<span class="ident">rip</span>: <span class="bool-val">true</span>,
+								<span class="ident">result</span>: <span class="prelude-val">Err</span>(<span class="ident">PrepareError::DidNotMakeIt</span>),
+							},
+						)<span class="question-mark">?</span>;
 					}
 
 					<span class="prelude-val">Ok</span>(())

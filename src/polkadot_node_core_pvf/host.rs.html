@@ -1014,6 +1014,25 @@
 <span id="1014">1014</span>
 <span id="1015">1015</span>
 <span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1361,8 +1380,7 @@
 				.<span class="kw">await</span>);
 			},
 			<span class="ident">from_prepare_queue</span> <span class="op">=</span> <span class="ident">from_prepare_queue_rx</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">prepare::FromQueue::Prepared</span>(<span class="ident">artifact_id</span>)
-					<span class="op">=</span> <span class="macro">break_if_fatal!</span>(<span class="ident">from_prepare_queue</span>.<span class="ident">ok_or</span>(<span class="ident">Fatal</span>));
+				<span class="kw">let</span> <span class="ident">from_queue</span> <span class="op">=</span> <span class="macro">break_if_fatal!</span>(<span class="ident">from_prepare_queue</span>.<span class="ident">ok_or</span>(<span class="ident">Fatal</span>));
 
 				<span class="comment">// Note that preparation always succeeds.</span>
 				<span class="comment">//</span>
@@ -1378,7 +1396,7 @@
 					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">artifacts</span>,
 					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">to_execute_queue_tx</span>,
 					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">awaiting_prepare</span>,
-					<span class="ident">artifact_id</span>,
+					<span class="ident">from_queue</span>,
 				).<span class="kw">await</span>);
 			},
 		}
@@ -1456,6 +1474,9 @@
 
 				<span class="ident">awaiting_prepare</span>.<span class="ident">add</span>(<span class="ident">artifact_id</span>, <span class="ident">execution_timeout</span>, <span class="ident">params</span>, <span class="ident">result_tx</span>);
 			},
+			<span class="ident">ArtifactState::FailedToProcess</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">result_tx</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">ValidationError::from</span>(<span class="ident">error</span>.<span class="ident">clone</span>())));
+			},
 		}
 	} <span class="kw">else</span> {
 		<span class="comment">// Artifact is unknown: register it and enqueue a job with the corresponding priority and</span>
@@ -1487,6 +1508,7 @@
 					<span class="comment">// Already preparing. We don&#39;t need to send a priority amend either because</span>
 					<span class="comment">// it can&#39;t get any lower than the background.</span>
 				},
+				<span class="ident">ArtifactState::FailedToProcess</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
 			}
 		} <span class="kw">else</span> {
 			<span class="comment">// The artifact is unknown: register it and put a background job into the prepare queue.</span>
@@ -1508,8 +1530,10 @@
 	<span class="ident">artifacts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Artifacts</span>,
 	<span class="ident">execute_queue</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">execute::ToQueue</span><span class="op">&gt;</span>,
 	<span class="ident">awaiting_prepare</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AwaitingPrepare</span>,
-	<span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>,
+	<span class="ident">from_queue</span>: <span class="ident">prepare::FromQueue</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
+	<span class="kw">let</span> <span class="ident">prepare::FromQueue</span> { <span class="ident">artifact_id</span>, <span class="ident">result</span> } <span class="op">=</span> <span class="ident">from_queue</span>;
+
 	<span class="comment">// Make some sanity checks and extract the current state.</span>
 	<span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">artifacts</span>.<span class="ident">artifact_state_mut</span>(<span class="kw-2">&amp;</span><span class="ident">artifact_id</span>) {
 		<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
@@ -1530,6 +1554,12 @@
 			<span class="macro">never!</span>(<span class="string">&quot;the artifact is already prepared: {:?}&quot;</span>, <span class="ident">artifact_id</span>);
 			<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
 		},
+		<span class="prelude-val">Some</span>(<span class="ident">ArtifactState::FailedToProcess</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="comment">// The reasoning is similar to the above, the artifact cannot be</span>
+			<span class="comment">// processed at this point.</span>
+			<span class="macro">never!</span>(<span class="string">&quot;the artifact is already processed unsuccessfully: {:?}&quot;</span>, <span class="ident">artifact_id</span>);
+			<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
+		},
 		<span class="prelude-val">Some</span>(<span class="ident">state</span> @ <span class="ident">ArtifactState::Preparing</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span>,
 	};
 
@@ -1540,6 +1570,12 @@
 		<span class="kw">if</span> <span class="ident">result_tx</span>.<span class="ident">is_canceled</span>() {
 			<span class="comment">// Preparation could&#39;ve taken quite a bit of time and the requester may be not interested</span>
 			<span class="comment">// in execution anymore, in which case we just skip the request.</span>
+			<span class="kw">continue</span>
+		}
+
+		<span class="comment">// Don&#39;t send failed artifacts to the execution&#39;s queue.</span>
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">error</span>) <span class="op">=</span> <span class="ident">result</span> {
+			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">result_tx</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">ValidationError::from</span>(<span class="ident">error</span>.<span class="ident">clone</span>())));
 			<span class="kw">continue</span>
 		}
 
@@ -1555,8 +1591,10 @@
 		.<span class="kw">await</span><span class="question-mark">?</span>;
 	}
 
-	<span class="comment">// Now consider the artifact prepared.</span>
-	<span class="kw-2">*</span><span class="ident">state</span> <span class="op">=</span> <span class="ident">ArtifactState::Prepared</span> { <span class="ident">last_time_needed</span>: <span class="ident">SystemTime::now</span>() };
+	<span class="kw-2">*</span><span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result</span> {
+		<span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ArtifactState::Prepared</span> { <span class="ident">last_time_needed</span>: <span class="ident">SystemTime::now</span>() },
+		<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ArtifactState::FailedToProcess</span>(<span class="ident">error</span>.<span class="ident">clone</span>()),
+	};
 
 	<span class="prelude-val">Ok</span>(())
 }
@@ -1954,7 +1992,7 @@
 		);
 
 		<span class="ident">test</span>.<span class="ident">from_prepare_queue_tx</span>
-			.<span class="ident">send</span>(<span class="ident">prepare::FromQueue::Prepared</span>(<span class="ident">artifact_id</span>(<span class="number">1</span>)))
+			.<span class="ident">send</span>(<span class="ident">prepare::FromQueue</span> { <span class="ident">artifact_id</span>: <span class="ident">artifact_id</span>(<span class="number">1</span>), <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) })
 			.<span class="kw">await</span>
 			.<span class="ident">unwrap</span>();
 		<span class="kw">let</span> <span class="ident">result_tx_pvf_1_1</span> <span class="op">=</span> <span class="macro">assert_matches!</span>(
@@ -1967,7 +2005,7 @@
 		);
 
 		<span class="ident">test</span>.<span class="ident">from_prepare_queue_tx</span>
-			.<span class="ident">send</span>(<span class="ident">prepare::FromQueue::Prepared</span>(<span class="ident">artifact_id</span>(<span class="number">2</span>)))
+			.<span class="ident">send</span>(<span class="ident">prepare::FromQueue</span> { <span class="ident">artifact_id</span>: <span class="ident">artifact_id</span>(<span class="number">2</span>), <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) })
 			.<span class="kw">await</span>
 			.<span class="ident">unwrap</span>();
 		<span class="kw">let</span> <span class="ident">result_tx_pvf_2</span> <span class="op">=</span> <span class="macro">assert_matches!</span>(
@@ -2022,7 +2060,7 @@
 		);
 
 		<span class="ident">test</span>.<span class="ident">from_prepare_queue_tx</span>
-			.<span class="ident">send</span>(<span class="ident">prepare::FromQueue::Prepared</span>(<span class="ident">artifact_id</span>(<span class="number">1</span>)))
+			.<span class="ident">send</span>(<span class="ident">prepare::FromQueue</span> { <span class="ident">artifact_id</span>: <span class="ident">artifact_id</span>(<span class="number">1</span>), <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) })
 			.<span class="kw">await</span>
 			.<span class="ident">unwrap</span>();
 

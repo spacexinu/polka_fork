@@ -316,6 +316,17 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -334,7 +345,8 @@
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">artifacts::Artifact</span>,
+	<span class="ident">artifacts::CompiledArtifact</span>,
+	<span class="ident">error::PrepareError</span>,
 	<span class="ident">worker_common</span>::{
 		<span class="ident">bytes_to_path</span>, <span class="ident">framed_recv</span>, <span class="ident">framed_send</span>, <span class="ident">path_to_bytes</span>, <span class="ident">spawn_with_program_path</span>,
 		<span class="ident">tmpfile_in</span>, <span class="ident">worker_event_loop</span>, <span class="ident">IdleWorker</span>, <span class="ident">SpawnErr</span>, <span class="ident">WorkerHandle</span>,
@@ -348,6 +360,8 @@
 };
 <span class="kw">use</span> <span class="ident">futures::FutureExt</span> <span class="kw">as</span> <span class="kw">_</span>;
 <span class="kw">use</span> <span class="ident">futures_timer::Delay</span>;
+<span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
+<span class="kw">use</span> <span class="ident">sp_core::hexdisplay::HexDisplay</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">const</span> <span class="ident">NICENESS_BACKGROUND</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">10</span>;
@@ -367,7 +381,7 @@
 
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Outcome</span> {
 	<span class="doccomment">/// The worker has finished the work assigned to it.</span>
-	<span class="ident">Concluded</span>(<span class="ident">IdleWorker</span>),
+	<span class="ident">Concluded</span> { <span class="ident">worker</span>: <span class="ident">IdleWorker</span>, <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span> },
 	<span class="doccomment">/// The host tried to reach the worker but failed. This is most likely because the worked was</span>
 	<span class="doccomment">/// killed by the system.</span>
 	<span class="ident">Unreachable</span>,
@@ -378,7 +392,7 @@
 	<span class="doccomment">/// the artifact).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This doesn&#39;t return an idle worker instance, thus this worker is no longer usable.</span>
-	<span class="ident">DidntMakeIt</span>,
+	<span class="ident">DidNotMakeIt</span>,
 }
 
 <span class="doccomment">/// Given the idle token of a worker and parameters of work, communicates with the worker and</span>
@@ -418,13 +432,11 @@
 		<span class="comment">// Wait for the result from the worker, keeping in mind that there may be a timeout, the</span>
 		<span class="comment">// worker may get killed, or something along these lines.</span>
 		<span class="comment">//</span>
-		<span class="comment">// In that case we should handle these gracefully by writing the artifact file by ourselves.</span>
-		<span class="comment">// We may potentially overwrite the artifact in rare cases where the worker didn&#39;t make</span>
-		<span class="comment">// it to report back the result.</span>
+		<span class="comment">// In that case we should propagate the error to the pool.</span>
 
 		<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 		<span class="kw">enum</span> <span class="ident">Selected</span> {
-			<span class="ident">Done</span>,
+			<span class="ident">Done</span>(<span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>),
 			<span class="ident">IoErr</span>,
 			<span class="ident">Deadline</span>,
 		}
@@ -432,41 +444,48 @@
 		<span class="kw">let</span> <span class="ident">selected</span> <span class="op">=</span> <span class="macro">futures::select!</span> {
 			<span class="ident">res</span> <span class="op">=</span> <span class="ident">framed_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">match</span> <span class="ident">res</span> {
-					<span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">1u8</span>] <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="macro">tracing::debug!</span>(
-							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-							<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-							<span class="string">&quot;promoting WIP artifact {} to {}&quot;</span>,
-							<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
-							<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
-						);
-
-						<span class="ident">async_std::fs::rename</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_file</span>, <span class="kw-2">&amp;</span><span class="ident">artifact_path</span>)
-							.<span class="kw">await</span>
-							.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Selected::Done</span>)
-							.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-								<span class="macro">tracing::warn!</span>(
+					<span class="prelude-val">Ok</span>(<span class="ident">response_bytes</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="comment">// By convention we expect encoded `Result&lt;(), PrepareError&gt;`.</span>
+						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span>
+							<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">response_bytes</span>.<span class="ident">clone</span>().<span class="ident">as_slice</span>())
+						{
+							<span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
+								<span class="macro">tracing::debug!</span>(
 									<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 									<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-									<span class="string">&quot;failed to rename the artifact from {} to {}: {:?}&quot;</span>,
+									<span class="string">&quot;promoting WIP artifact {} to {}&quot;</span>,
 									<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
 									<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
-									<span class="ident">err</span>,
 								);
-								<span class="ident">Selected::IoErr</span>
-							})
-					}
-					<span class="prelude-val">Ok</span>(<span class="ident">response_bytes</span>) <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="kw">use</span> <span class="ident">sp_core::hexdisplay::HexDisplay</span>;
-						<span class="kw">let</span> <span class="ident">bound_bytes</span> <span class="op">=</span>
-							<span class="kw-2">&amp;</span><span class="ident">response_bytes</span>[..<span class="ident">response_bytes</span>.<span class="ident">len</span>().<span class="ident">min</span>(<span class="number">4</span>)];
-						<span class="macro">tracing::warn!</span>(
-							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-							<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-							<span class="string">&quot;received unexpected response from the prepare worker: {}&quot;</span>,
-							<span class="ident">HexDisplay::from</span>(<span class="kw-2">&amp;</span><span class="ident">bound_bytes</span>),
-						);
-						<span class="ident">Selected::IoErr</span>
+
+								<span class="ident">async_std::fs::rename</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_file</span>, <span class="kw-2">&amp;</span><span class="ident">artifact_path</span>)
+									.<span class="kw">await</span>
+									.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Selected::Done</span>(<span class="ident">result</span>))
+									.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+										<span class="macro">tracing::warn!</span>(
+											<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+											<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
+											<span class="string">&quot;failed to rename the artifact from {} to {}: {:?}&quot;</span>,
+											<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
+											<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
+											<span class="ident">err</span>,
+										);
+										<span class="ident">Selected::IoErr</span>
+									})
+							} <span class="kw">else</span> {
+								<span class="ident">Selected::Done</span>(<span class="ident">result</span>)
+							}
+						} <span class="kw">else</span> {
+							<span class="comment">// We received invalid bytes from the worker.</span>
+							<span class="kw">let</span> <span class="ident">bound_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">response_bytes</span>[..<span class="ident">response_bytes</span>.<span class="ident">len</span>().<span class="ident">min</span>(<span class="number">4</span>)];
+							<span class="macro">tracing::warn!</span>(
+								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+								<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
+								<span class="string">&quot;received unexpected response from the prepare worker: {}&quot;</span>,
+								<span class="ident">HexDisplay::from</span>(<span class="kw-2">&amp;</span><span class="ident">bound_bytes</span>),
+							);
+							<span class="ident">Selected::IoErr</span>
+						}
 					},
 					<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
 						<span class="macro">tracing::warn!</span>(
@@ -483,24 +502,11 @@
 		};
 
 		<span class="kw">match</span> <span class="ident">selected</span> {
-			<span class="ident">Selected::Done</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Selected::Done</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="ident">renice</span>(<span class="ident">pid</span>, <span class="ident">NICENESS_FOREGROUND</span>);
-				<span class="ident">Outcome::Concluded</span>(<span class="ident">IdleWorker</span> { <span class="ident">stream</span>, <span class="ident">pid</span> })
+				<span class="ident">Outcome::Concluded</span> { <span class="ident">worker</span>: <span class="ident">IdleWorker</span> { <span class="ident">stream</span>, <span class="ident">pid</span> }, <span class="ident">result</span> }
 			},
-			<span class="ident">Selected::IoErr</span> <span class="op">|</span> <span class="ident">Selected::Deadline</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Artifact::DidntMakeIt</span>.<span class="ident">serialize</span>();
-				<span class="comment">// best effort: there is nothing we can do here if the write fails.</span>
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">async_std::fs::write</span>(<span class="kw-2">&amp;</span><span class="ident">artifact_path</span>, <span class="kw-2">&amp;</span><span class="ident">bytes</span>).<span class="kw">await</span> {
-					<span class="macro">tracing::warn!</span>(
-						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-						<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-						<span class="string">&quot;preparation didn&#39;t make it, because of `{:?}`: {:?}&quot;</span>,
-						<span class="ident">selected</span>,
-						<span class="ident">err</span>,
-					);
-				}
-				<span class="ident">Outcome::DidntMakeIt</span>
-			},
+			<span class="ident">Selected::IoErr</span> <span class="op">|</span> <span class="ident">Selected::Deadline</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::DidNotMakeIt</span>,
 		}
 	})
 	.<span class="kw">await</span>
@@ -524,7 +530,7 @@
 				<span class="string">&quot;failed to create a temp file for the artifact: {:?}&quot;</span>,
 				<span class="ident">err</span>,
 			);
-			<span class="kw">return</span> <span class="ident">Outcome::DidntMakeIt</span>
+			<span class="kw">return</span> <span class="ident">Outcome::DidNotMakeIt</span>
 		},
 	};
 
@@ -607,32 +613,48 @@
 				<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">std::process::id</span>(),
 				<span class="string">&quot;worker: preparing artifact&quot;</span>,
 			);
-			<span class="kw">let</span> <span class="ident">artifact_bytes</span> <span class="op">=</span> <span class="ident">prepare_artifact</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>).<span class="ident">serialize</span>();
 
-			<span class="comment">// Write the serialized artifact into into a temp file.</span>
-			<span class="macro">tracing::debug!</span>(
-				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">std::process::id</span>(),
-				<span class="string">&quot;worker: writing artifact to {}&quot;</span>,
-				<span class="ident">dest</span>.<span class="ident">display</span>(),
-			);
-			<span class="ident">async_std::fs::write</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>, <span class="kw-2">&amp;</span><span class="ident">artifact_bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">prepare_artifact</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>) {
+				<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="comment">// Serialized error will be written into the socket.</span>
+					<span class="prelude-val">Err</span>(<span class="ident">err</span>)
+				},
+				<span class="prelude-val">Ok</span>(<span class="ident">compiled_artifact</span>) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="comment">// Write the serialized artifact into a temp file.</span>
+					<span class="comment">// PVF host only keeps artifacts statuses in its memory,</span>
+					<span class="comment">// successfully compiled code gets stored on the disk (and</span>
+					<span class="comment">// consequently deserialized by execute-workers). The prepare</span>
+					<span class="comment">// worker is only required to send an empty `Ok` to the pool</span>
+					<span class="comment">// to indicate the success.</span>
 
-			<span class="comment">// Return back a byte that signals finishing the work.</span>
-			<span class="ident">framed_send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span>[<span class="number">1u8</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
+					<span class="kw">let</span> <span class="ident">artifact_bytes</span> <span class="op">=</span> <span class="ident">compiled_artifact</span>.<span class="ident">encode</span>();
+
+					<span class="macro">tracing::debug!</span>(
+						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+						<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">std::process::id</span>(),
+						<span class="string">&quot;worker: writing artifact to {}&quot;</span>,
+						<span class="ident">dest</span>.<span class="ident">display</span>(),
+					);
+					<span class="ident">async_std::fs::write</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>, <span class="kw-2">&amp;</span><span class="ident">artifact_bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+					<span class="prelude-val">Ok</span>(())
+				},
+			};
+
+			<span class="ident">framed_send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>, <span class="ident">result</span>.<span class="ident">encode</span>().<span class="ident">as_slice</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 		}
 	});
 }
 
-<span class="kw">fn</span> <span class="ident">prepare_artifact</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Artifact</span> {
+<span class="kw">fn</span> <span class="ident">prepare_artifact</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CompiledArtifact</span>, <span class="ident">PrepareError</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">blob</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw">crate</span><span class="ident">::executor_intf::prevalidate</span>(<span class="ident">code</span>) {
-		<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Artifact::PrevalidationErr</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>)),
+		<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PrepareError::Prevalidation</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>))),
 		<span class="prelude-val">Ok</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>,
 	};
 
 	<span class="kw">match</span> <span class="kw">crate</span><span class="ident">::executor_intf::prepare</span>(<span class="ident">blob</span>) {
-		<span class="prelude-val">Ok</span>(<span class="ident">compiled_artifact</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Artifact::Compiled</span> { <span class="ident">compiled_artifact</span> },
-		<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Artifact::PreparationErr</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>)),
+		<span class="prelude-val">Ok</span>(<span class="ident">compiled_artifact</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CompiledArtifact::new</span>(<span class="ident">compiled_artifact</span>)),
+		<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">PrepareError::Preparation</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>))),
 	}
 }
 </pre></div>

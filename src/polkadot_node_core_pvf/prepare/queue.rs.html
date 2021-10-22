@@ -801,6 +801,12 @@
 <span id="801">801</span>
 <span id="802">802</span>
 <span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -821,7 +827,9 @@
 <span class="doccomment">//! A queue that handles requests for PVF preparation.</span>
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::pool</span>::{<span class="self">self</span>, <span class="ident">Worker</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">artifacts::ArtifactId</span>, <span class="ident">metrics::Metrics</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">LOG_TARGET</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">artifacts::ArtifactId</span>, <span class="ident">error::PrepareError</span>, <span class="ident">metrics::Metrics</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">LOG_TARGET</span>,
+};
 <span class="kw">use</span> <span class="ident">always_assert</span>::{<span class="ident">always</span>, <span class="ident">never</span>};
 <span class="kw">use</span> <span class="ident">async_std::path::PathBuf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel::mpsc</span>, <span class="ident">stream::StreamExt</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Future</span>, <span class="ident">SinkExt</span>};
@@ -833,7 +841,7 @@
 	<span class="doccomment">/// This schedules preparation of the given PVF.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Note that it is incorrect to enqueue the same PVF again without first receiving the</span>
-	<span class="doccomment">/// [`FromQueue::Prepared`] response. In case there is a need to bump the priority, use</span>
+	<span class="doccomment">/// [`FromQueue`] response. In case there is a need to bump the priority, use</span>
 	<span class="doccomment">/// [`ToQueue::Amend`].</span>
 	<span class="ident">Enqueue</span> { <span class="ident">priority</span>: <span class="ident">Priority</span>, <span class="ident">pvf</span>: <span class="ident">Pvf</span> },
 	<span class="doccomment">/// Amends the priority for the given [`ArtifactId`] if it is running. If it&#39;s not, then it&#39;s noop.</span>
@@ -841,9 +849,13 @@
 }
 
 <span class="doccomment">/// A response from queue.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FromQueue</span> {
-	<span class="ident">Prepared</span>(<span class="ident">ArtifactId</span>),
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromQueue</span> {
+	<span class="doccomment">/// Identifier of an artifact.</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>,
+	<span class="doccomment">/// Outcome of the PVF processing. [`Ok`] indicates that compiled artifact</span>
+	<span class="doccomment">/// is successfully stored on disk. Otherwise, an [error](PrepareError) is supplied.</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
@@ -1103,7 +1115,8 @@
 	<span class="kw">use</span> <span class="ident">pool::FromPool</span>::<span class="kw-2">*</span>;
 	<span class="kw">match</span> <span class="ident">from_pool</span> {
 		<span class="ident">Spawned</span>(<span class="ident">worker</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">handle_worker_spawned</span>(<span class="ident">queue</span>, <span class="ident">worker</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-		<span class="ident">Concluded</span>(<span class="ident">worker</span>, <span class="ident">rip</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">handle_worker_concluded</span>(<span class="ident">queue</span>, <span class="ident">worker</span>, <span class="ident">rip</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+		<span class="ident">Concluded</span> { <span class="ident">worker</span>, <span class="ident">rip</span>, <span class="ident">result</span> } <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">handle_worker_concluded</span>(<span class="ident">queue</span>, <span class="ident">worker</span>, <span class="ident">rip</span>, <span class="ident">result</span>).<span class="kw">await</span><span class="question-mark">?</span>,
 		<span class="ident">Rip</span>(<span class="ident">worker</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">handle_worker_rip</span>(<span class="ident">queue</span>, <span class="ident">worker</span>).<span class="kw">await</span><span class="question-mark">?</span>,
 	}
 	<span class="prelude-val">Ok</span>(())
@@ -1124,6 +1137,7 @@
 	<span class="ident">queue</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Queue</span>,
 	<span class="ident">worker</span>: <span class="ident">Worker</span>,
 	<span class="ident">rip</span>: <span class="ident">bool</span>,
+	<span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
 	<span class="ident">queue</span>.<span class="ident">metrics</span>.<span class="ident">prepare_concluded</span>();
 
@@ -1181,7 +1195,7 @@
 		<span class="string">&quot;prepare worker concluded&quot;</span>,
 	);
 
-	<span class="ident">reply</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">queue</span>.<span class="ident">from_queue_tx</span>, <span class="ident">FromQueue::Prepared</span>(<span class="ident">artifact_id</span>))<span class="question-mark">?</span>;
+	<span class="ident">reply</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">queue</span>.<span class="ident">from_queue_tx</span>, <span class="ident">FromQueue</span> { <span class="ident">artifact_id</span>, <span class="ident">result</span> })<span class="question-mark">?</span>;
 
 	<span class="comment">// Figure out what to do with the worker.</span>
 	<span class="kw">if</span> <span class="ident">rip</span> {
@@ -1445,12 +1459,9 @@
 
 		<span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">test</span>.<span class="ident">workers</span>.<span class="ident">insert</span>(());
 		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Spawned</span>(<span class="ident">w</span>));
-		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span>(<span class="ident">w</span>, <span class="bool-val">false</span>));
+		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span> { <span class="ident">worker</span>: <span class="ident">w</span>, <span class="ident">rip</span>: <span class="bool-val">false</span>, <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) });
 
-		<span class="macro">assert_eq!</span>(
-			<span class="ident">test</span>.<span class="ident">poll_and_recv_from_queue</span>().<span class="kw">await</span>,
-			<span class="ident">FromQueue::Prepared</span>(<span class="ident">pvf</span>(<span class="number">1</span>).<span class="ident">as_artifact_id</span>())
-		);
+		<span class="macro">assert_eq!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_from_queue</span>().<span class="kw">await</span>.<span class="ident">artifact_id</span>, <span class="ident">pvf</span>(<span class="number">1</span>).<span class="ident">as_artifact_id</span>());
 	}
 
 	<span class="attribute">#[<span class="ident">async_std::test</span>]</span>
@@ -1475,7 +1486,7 @@
 		<span class="macro">assert_matches!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::StartWork</span> { .. });
 		<span class="macro">assert_matches!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::StartWork</span> { .. });
 
-		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span>(<span class="ident">w1</span>, <span class="bool-val">false</span>));
+		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span> { <span class="ident">worker</span>: <span class="ident">w1</span>, <span class="ident">rip</span>: <span class="bool-val">false</span>, <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) });
 
 		<span class="macro">assert_matches!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::StartWork</span> { .. });
 
@@ -1508,7 +1519,7 @@
 		<span class="comment">// That&#39;s a bit silly in this context, but in production there will be an entire pool up</span>
 		<span class="comment">// to the `soft_capacity` of workers and it doesn&#39;t matter which one to cull. Either way,</span>
 		<span class="comment">// we just check that edge case of an edge case works.</span>
-		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span>(<span class="ident">w1</span>, <span class="bool-val">false</span>));
+		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span> { <span class="ident">worker</span>: <span class="ident">w1</span>, <span class="ident">rip</span>: <span class="bool-val">false</span>, <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) });
 		<span class="macro">assert_eq!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::Kill</span>(<span class="ident">w1</span>));
 	}
 
@@ -1553,15 +1564,12 @@
 		<span class="macro">assert_matches!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::StartWork</span> { .. });
 
 		<span class="comment">// Conclude worker 1 and rip it.</span>
-		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span>(<span class="ident">w1</span>, <span class="bool-val">true</span>));
+		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span> { <span class="ident">worker</span>: <span class="ident">w1</span>, <span class="ident">rip</span>: <span class="bool-val">true</span>, <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) });
 
 		<span class="comment">// Since there is still work, the queue requested one extra worker to spawn to handle the</span>
 		<span class="comment">// remaining enqueued work items.</span>
 		<span class="macro">assert_eq!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::Spawn</span>);
-		<span class="macro">assert_eq!</span>(
-			<span class="ident">test</span>.<span class="ident">poll_and_recv_from_queue</span>().<span class="kw">await</span>,
-			<span class="ident">FromQueue::Prepared</span>(<span class="ident">pvf</span>(<span class="number">1</span>).<span class="ident">as_artifact_id</span>())
-		);
+		<span class="macro">assert_eq!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_from_queue</span>().<span class="kw">await</span>.<span class="ident">artifact_id</span>, <span class="ident">pvf</span>(<span class="number">1</span>).<span class="ident">as_artifact_id</span>());
 	}
 
 	<span class="attribute">#[<span class="ident">async_std::test</span>]</span>
@@ -1577,7 +1585,11 @@
 
 		<span class="macro">assert_matches!</span>(<span class="ident">test</span>.<span class="ident">poll_and_recv_to_pool</span>().<span class="kw">await</span>, <span class="ident">pool::ToPool::StartWork</span> { .. });
 
-		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span>(<span class="ident">w1</span>, <span class="bool-val">true</span>));
+		<span class="ident">test</span>.<span class="ident">send_from_pool</span>(<span class="ident">pool::FromPool::Concluded</span> {
+			<span class="ident">worker</span>: <span class="ident">w1</span>,
+			<span class="ident">rip</span>: <span class="bool-val">true</span>,
+			<span class="ident">result</span>: <span class="prelude-val">Err</span>(<span class="ident">PrepareError::DidNotMakeIt</span>),
+		});
 		<span class="ident">test</span>.<span class="ident">poll_ensure_to_pool_is_empty</span>().<span class="kw">await</span>;
 	}
 

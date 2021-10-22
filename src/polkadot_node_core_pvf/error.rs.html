@@ -54,6 +54,31 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -70,6 +95,20 @@
 
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
+
+<span class="doccomment">/// An error that occurred during the prepare part of the PVF pipeline.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PrepareError</span> {
+	<span class="doccomment">/// During the prevalidation stage of preparation an issue was found with the PVF.</span>
+	<span class="ident">Prevalidation</span>(<span class="ident">String</span>),
+	<span class="doccomment">/// Compilation failed for the given PVF.</span>
+	<span class="ident">Preparation</span>(<span class="ident">String</span>),
+	<span class="doccomment">/// This state indicates that the process assigned to prepare the artifact wasn&#39;t responsible</span>
+	<span class="doccomment">/// or were killed. This state is reported by the validation host (not by the worker).</span>
+	<span class="ident">DidNotMakeIt</span>,
+}
 
 <span class="doccomment">/// A error raised during validation of the candidate.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -110,6 +149,17 @@
 	<span class="ident">AmbigiousWorkerDeath</span>,
 	<span class="doccomment">/// PVF execution (compilation is not included) took more time than was allotted.</span>
 	<span class="ident">HardTimeout</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PrepareError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValidationError</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">PrepareError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="kw">let</span> <span class="ident">error_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">error</span> {
+			<span class="ident">PrepareError::Prevalidation</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>,
+			<span class="ident">PrepareError::Preparation</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>,
+			<span class="ident">PrepareError::DidNotMakeIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;preparation timeout&quot;</span>.<span class="ident">to_owned</span>(),
+		};
+		<span class="ident">ValidationError::InvalidCandidate</span>(<span class="ident">InvalidCandidate::WorkerReportedError</span>(<span class="ident">error_str</span>))
+	}
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_node_core_pvf" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
