@@ -1888,6 +1888,12 @@
 <span id="1888">1888</span>
 <span id="1889">1889</span>
 <span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2449,6 +2455,7 @@
 		<span class="ident">registrar</span>: <span class="ident">westend_runtime::RegistrarConfig</span> {
 			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
 		},
+		<span class="ident">xcm_pallet</span>: <span class="ident">westend_runtime::XcmPalletConfig</span> { <span class="ident">safe_xcm_version</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>) },
 	}
 }
 
@@ -2646,6 +2653,7 @@
 		},
 		<span class="ident">gilt</span>: <span class="ident">Default::default</span>(),
 		<span class="ident">paras</span>: <span class="ident">Default::default</span>(),
+		<span class="ident">xcm_pallet</span>: <span class="ident">kusama::XcmPalletConfig</span> { <span class="ident">safe_xcm_version</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>) },
 	}
 }
 
@@ -2945,6 +2953,7 @@
 		<span class="ident">registrar</span>: <span class="ident">rococo_runtime::RegistrarConfig</span> {
 			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
 		},
+		<span class="ident">xcm_pallet</span>: <span class="ident">rococo_runtime::XcmPalletConfig</span> { <span class="ident">safe_xcm_version</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>) },
 		<span class="comment">// bridge_rococo_grandpa: rococo_runtime::BridgeRococoGrandpaConfig {</span>
 		<span class="comment">// 	owner: Some(endowed_accounts[0].clone()),</span>
 		<span class="comment">// 	..Default::default()</span>
@@ -3302,6 +3311,7 @@
 		},
 		<span class="ident">gilt</span>: <span class="ident">Default::default</span>(),
 		<span class="ident">paras</span>: <span class="ident">Default::default</span>(),
+		<span class="ident">xcm_pallet</span>: <span class="ident">kusama::XcmPalletConfig</span> { <span class="ident">safe_xcm_version</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>) },
 	}
 }
 
@@ -3383,6 +3393,7 @@
 		<span class="ident">registrar</span>: <span class="ident">westend_runtime::RegistrarConfig</span> {
 			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
 		},
+		<span class="ident">xcm_pallet</span>: <span class="ident">westend_runtime::XcmPalletConfig</span> { <span class="ident">safe_xcm_version</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>) },
 	}
 }
 
@@ -3459,6 +3470,7 @@
 		<span class="ident">registrar</span>: <span class="ident">rococo_runtime::RegistrarConfig</span> {
 			<span class="ident">next_free_para_id</span>: <span class="ident">polkadot_primitives::v1::LOWEST_PUBLIC_ID</span>,
 		},
+		<span class="ident">xcm_pallet</span>: <span class="ident">rococo_runtime::XcmPalletConfig</span> { <span class="ident">safe_xcm_version</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>) },
 		<span class="comment">// bridge_rococo_grandpa: rococo_runtime::BridgeRococoGrandpaConfig {</span>
 		<span class="comment">// 	owner: Some(root_key.clone()),</span>
 		<span class="comment">// 	..Default::default()</span>
