@@ -146,6 +146,15 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -203,6 +212,15 @@
 		<span class="comment">// set the ss58 prefix so addresses printed below are human friendly.</span>
 		<span class="ident">sp_core::crypto::set_default_ss58_version</span>(<span class="ident">Runtime::SS58Prefix::get</span>().<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
 
+		<span class="comment">// clear anything that may have existed before.</span>
+		<span class="kw">if</span> <span class="op">&lt;</span><span class="ident">Runtime</span> <span class="kw">as</span> <span class="ident">pallet_staking::Config</span><span class="op">&gt;</span><span class="ident">::SortedListProvider::count</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+			<span class="macro">log::warn!</span>(
+				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+				<span class="string">&quot;some data already seem to exist in the bags-list pallet..&quot;</span>
+			);
+		}
+		<span class="op">&lt;</span><span class="ident">Runtime</span> <span class="kw">as</span> <span class="ident">pallet_staking::Config</span><span class="op">&gt;</span><span class="ident">::SortedListProvider::clear</span>(<span class="prelude-val">None</span>);
+
 		<span class="comment">// get the nominator &amp; validator count prior to migrating; these should be invariant.</span>
 		<span class="kw">let</span> <span class="ident">pre_migrate_nominator_count</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Nominators</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::iter</span>().<span class="ident">count</span>() <span class="kw">as</span> <span class="ident">u32</span>;
 		<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;Nominator count: {}&quot;</span>, <span class="ident">pre_migrate_nominator_count</span>);
@@ -248,7 +266,7 @@
 				(<span class="kw-2">*</span><span class="ident">vote_weight_thresh</span>).<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;should not fail&quot;</span>).<span class="ident">unwrap</span>();
 			<span class="kw">if</span> <span class="ident">vote_weight_as_balance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">min_nominator_bond</span> {
 				<span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">bag</span>.<span class="ident">std_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="ident">node</span>.<span class="ident">std_id</span>().<span class="ident">clone</span>()) {
-					<span class="macro">log::trace!</span>(
+					<span class="macro">log::error!</span>(
 						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 						<span class="string">&quot;{} Account found below min bond: {:?}.&quot;</span>,
 						<span class="ident">pretty_thresh</span>,
