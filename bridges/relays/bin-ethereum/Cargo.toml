@@ -40,9 +40,9 @@ rialto-runtime = { path = "../../bin/rialto/runtime" }
 
 # Substrate Dependencies
 
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.12" }
-pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.12" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.12" }
-sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.12" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.12" }
-substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.12" }
+frame-system = { git = "https://github.com/paritytech/substrate", branch = "ao-polkadot-v0.9.12-revert-9964" }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "ao-polkadot-v0.9.12-revert-9964" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "ao-polkadot-v0.9.12-revert-9964" }
+sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "ao-polkadot-v0.9.12-revert-9964" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "ao-polkadot-v0.9.12-revert-9964" }
+substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate", branch = "ao-polkadot-v0.9.12-revert-9964" }
