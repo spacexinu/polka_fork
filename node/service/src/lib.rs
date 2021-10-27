@@ -723,17 +723,9 @@ where
 
 	let chain_spec = config.chain_spec.cloned_box();
 
-	// we should remove this check before we deploy parachains on polkadot
-	// TODO: https://github.com/paritytech/polkadot/issues/3326
-	let is_relay_chain = chain_spec.is_kusama() ||
-		chain_spec.is_westend() ||
-		chain_spec.is_rococo() ||
-		chain_spec.is_wococo();
-
 	let local_keystore = basics.keystore_container.local_keystore();
-	let requires_overseer_for_chain_sel = local_keystore.is_some() &&
-		is_relay_chain &&
-		(role.is_authority() || is_collator.is_collator());
+	let requires_overseer_for_chain_sel =
+		local_keystore.is_some() && (role.is_authority() || is_collator.is_collator());
 
 	let select_chain = SelectRelayChain::new(
 		basics.backend.clone(),
@@ -788,9 +780,16 @@ where
 	let (dispute_req_receiver, cfg) = IncomingRequest::get_config_receiver();
 	config.network.request_response_protocols.push(cfg);
 
+	let grandpa_hard_forks = if config.chain_spec.is_kusama() {
+		grandpa_support::kusama_hard_forks()
+	} else {
+		Vec::new()
+	};
+
 	let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
 		backend.clone(),
 		import_setup.1.shared_authority_set().clone(),
+		grandpa_hard_forks,
 	));
 
 	let (network, system_rpc_tx, network_starter) =

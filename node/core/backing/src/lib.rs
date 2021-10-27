@@ -37,6 +37,7 @@ use futures::{
 
 use polkadot_node_primitives::{
 	AvailableData, PoV, SignedDisputeStatement, SignedFullStatement, Statement, ValidationResult,
+	BACKING_EXECUTION_TIMEOUT,
 };
 use polkadot_node_subsystem_util::{
 	self as util,
@@ -415,7 +416,12 @@ async fn request_candidate_validation(
 	let (tx, rx) = oneshot::channel();
 
 	sender
-		.send_message(CandidateValidationMessage::ValidateFromChainState(candidate, pov, tx))
+		.send_message(CandidateValidationMessage::ValidateFromChainState(
+			candidate,
+			pov,
+			BACKING_EXECUTION_TIMEOUT,
+			tx,
+		))
 		.await;
 
 	match rx.await {
