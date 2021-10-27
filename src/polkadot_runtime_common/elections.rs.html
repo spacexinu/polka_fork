@@ -221,7 +221,7 @@
 <span class="doccomment">/// pallet-election-provider-multi-phase.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MINER_MAX_ITERATIONS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
 
-<span class="doccomment">/// A source of random balance for the NPoS Solver, which is meant to be run by the offchain worker</span>
+<span class="doccomment">/// A source of random balance for the NPoS Solver, which is meant to be run by the off-chain worker</span>
 <span class="doccomment">/// election miner.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OffchainRandomBalancing</span>;
 <span class="kw">impl</span> <span class="ident">frame_support::pallet_prelude::Get</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">sp_npos_elections::ExtendedBalance</span>)<span class="op">&gt;</span><span class="op">&gt;</span>

@@ -1650,6 +1650,10 @@
 <span id="1650">1650</span>
 <span id="1651">1651</span>
 <span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -1737,10 +1741,10 @@
 <span class="kw">use</span> <span class="ident">frame_support::traits::InstanceFilter</span>;
 <span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">xcm_builder</span>::{
-	<span class="ident">AccountId32Aliases</span>, <span class="ident">BackingToPlurality</span>, <span class="ident">ChildParachainAsNative</span>, <span class="ident">ChildParachainConvertsVia</span>,
-	<span class="ident">ChildSystemParachainAsSuperuser</span>, <span class="ident">CurrencyAdapter</span> <span class="kw">as</span> <span class="ident">XcmCurrencyAdapter</span>, <span class="ident">FixedWeightBounds</span>,
-	<span class="ident">IsConcrete</span>, <span class="ident">LocationInverter</span>, <span class="ident">SignedAccountId32AsNative</span>, <span class="ident">SignedToAccountId32</span>,
-	<span class="ident">SovereignSignedViaLocation</span>, <span class="ident">UsingComponents</span>,
+	<span class="ident">AccountId32Aliases</span>, <span class="ident">AllowKnownQueryResponses</span>, <span class="ident">AllowSubscriptionsFrom</span>, <span class="ident">BackingToPlurality</span>,
+	<span class="ident">ChildParachainAsNative</span>, <span class="ident">ChildParachainConvertsVia</span>, <span class="ident">ChildSystemParachainAsSuperuser</span>,
+	<span class="ident">CurrencyAdapter</span> <span class="kw">as</span> <span class="ident">XcmCurrencyAdapter</span>, <span class="ident">FixedWeightBounds</span>, <span class="ident">IsConcrete</span>, <span class="ident">LocationInverter</span>,
+	<span class="ident">SignedAccountId32AsNative</span>, <span class="ident">SignedToAccountId32</span>, <span class="ident">SovereignSignedViaLocation</span>, <span class="ident">UsingComponents</span>,
 };
 <span class="kw">use</span> <span class="ident">xcm_executor::XcmExecutor</span>;
 
@@ -2325,6 +2329,10 @@
 	<span class="ident">TakeWeightCredit</span>,
 	<span class="ident">AllowTopLevelPaidExecutionFrom</span><span class="op">&lt;</span><span class="ident">Everything</span><span class="op">&gt;</span>,
 	<span class="ident">AllowUnpaidExecutionFrom</span><span class="op">&lt;</span><span class="ident">IsInVec</span><span class="op">&lt;</span><span class="ident">AllowUnpaidFrom</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// &lt;- Trusted parachains get free execution</span>
+	<span class="comment">// Expected responses are OK.</span>
+	<span class="ident">AllowKnownQueryResponses</span><span class="op">&lt;</span><span class="ident">XcmPallet</span><span class="op">&gt;</span>,
+	<span class="comment">// Subscriptions for version tracking are OK.</span>
+	<span class="ident">AllowSubscriptionsFrom</span><span class="op">&lt;</span><span class="ident">Everything</span><span class="op">&gt;</span>,
 );
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">XcmConfig</span>;

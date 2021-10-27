@@ -256,7 +256,7 @@
 <span class="doccomment">//! futures will still get polled, but will not count towards length. So length will only count</span>
 <span class="doccomment">//! futures, which are still considered live.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Usecase: If futures take longer than we would like them too, we may be able to request the data</span>
+<span class="doccomment">//! Use case: If futures take longer than we would like them too, we may be able to request the data</span>
 <span class="doccomment">//! from somewhere else as well. We don&#39;t really want to cancel the old future, because maybe it</span>
 <span class="doccomment">//! was almost done, thus we would have wasted time with our impatience. By simply making them</span>
 <span class="doccomment">//! not count towards length, we can make sure to have enough &quot;live&quot; requests ongoing, while at the</span>

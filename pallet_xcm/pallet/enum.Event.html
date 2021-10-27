@@ -48,7 +48,7 @@ not match that expected. The query remains registered for a later, valid, respon
 be received and acted upon.</p>
 <p>[ origin location, id, expected location ]</p>
 </div><div id="variant.InvalidResponderVersion" class="variant small-section-header"><a href="#variant.InvalidResponderVersion" class="anchor field"></a><code>InvalidResponderVersion(<a class="struct" href="../../xcm/v1/multilocation/struct.MultiLocation.html" title="struct xcm::v1::multilocation::MultiLocation">MultiLocation</a>,&nbsp;<a class="type" href="../../xcm/v2/type.QueryId.html" title="type xcm::v2::QueryId">QueryId</a>)</code></div><div class="docblock"><p>Expected query response has been received but the expected origin location placed in
-storate by this runtime previously cannot be decoded. The query remains registered.</p>
+storage by this runtime previously cannot be decoded. The query remains registered.</p>
 <p>This is unexpected (since a location placed in storage in a previously executing
 runtime should be readable prior to query timeout) and dangerous since the possibly
 valid response will be dropped. Manual governance intervention is probably going to be

@@ -2018,6 +2018,17 @@
 <span id="2018">2018</span>
 <span id="2019">2019</span>
 <span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
+<span id="2027">2027</span>
+<span id="2028">2028</span>
+<span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
@@ -2069,7 +2080,7 @@
 <span class="kw">use</span> <span class="ident">authority_discovery_primitives::AuthorityId</span> <span class="kw">as</span> <span class="ident">AuthorityDiscoveryId</span>;
 <span class="kw">use</span> <span class="ident">beefy_primitives::crypto::AuthorityId</span> <span class="kw">as</span> <span class="ident">BeefyId</span>;
 <span class="kw">use</span> <span class="ident">frame_support</span>::{
-	<span class="ident">construct_runtime</span>, <span class="ident">parameter_types</span>,
+	<span class="ident">construct_runtime</span>, <span class="ident">match_type</span>, <span class="ident">parameter_types</span>,
 	<span class="ident">traits</span>::{<span class="ident">Contains</span>, <span class="ident">Everything</span>, <span class="ident">InstanceFilter</span>, <span class="ident">KeyOwnerProofSystem</span>, <span class="ident">LockIdentifier</span>, <span class="ident">Nothing</span>},
 	<span class="ident">weights::Weight</span>,
 	<span class="ident">PalletId</span>, <span class="ident">RuntimeDebug</span>,
@@ -2098,11 +2109,12 @@
 <span class="kw">use</span> <span class="ident">static_assertions::const_assert</span>;
 <span class="kw">use</span> <span class="ident">xcm::latest::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">xcm_builder</span>::{
-	<span class="ident">AccountId32Aliases</span>, <span class="ident">AllowTopLevelPaidExecutionFrom</span>, <span class="ident">AllowUnpaidExecutionFrom</span>,
-	<span class="ident">BackingToPlurality</span>, <span class="ident">ChildParachainAsNative</span>, <span class="ident">ChildParachainConvertsVia</span>,
-	<span class="ident">ChildSystemParachainAsSuperuser</span>, <span class="ident">CurrencyAdapter</span> <span class="kw">as</span> <span class="ident">XcmCurrencyAdapter</span>, <span class="ident">FixedWeightBounds</span>,
-	<span class="ident">IsChildSystemParachain</span>, <span class="ident">IsConcrete</span>, <span class="ident">LocationInverter</span>, <span class="ident">SignedAccountId32AsNative</span>,
-	<span class="ident">SignedToAccountId32</span>, <span class="ident">SovereignSignedViaLocation</span>, <span class="ident">TakeWeightCredit</span>, <span class="ident">UsingComponents</span>,
+	<span class="ident">AccountId32Aliases</span>, <span class="ident">AllowKnownQueryResponses</span>, <span class="ident">AllowSubscriptionsFrom</span>,
+	<span class="ident">AllowTopLevelPaidExecutionFrom</span>, <span class="ident">AllowUnpaidExecutionFrom</span>, <span class="ident">BackingToPlurality</span>,
+	<span class="ident">ChildParachainAsNative</span>, <span class="ident">ChildParachainConvertsVia</span>, <span class="ident">ChildSystemParachainAsSuperuser</span>,
+	<span class="ident">CurrencyAdapter</span> <span class="kw">as</span> <span class="ident">XcmCurrencyAdapter</span>, <span class="ident">FixedWeightBounds</span>, <span class="ident">IsChildSystemParachain</span>, <span class="ident">IsConcrete</span>,
+	<span class="ident">LocationInverter</span>, <span class="ident">SignedAccountId32AsNative</span>, <span class="ident">SignedToAccountId32</span>, <span class="ident">SovereignSignedViaLocation</span>,
+	<span class="ident">TakeWeightCredit</span>, <span class="ident">UsingComponents</span>,
 };
 <span class="kw">use</span> <span class="ident">xcm_executor::XcmExecutor</span>;
 
@@ -3350,6 +3362,12 @@
 }
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TrustedTeleporters</span> <span class="op">=</span> (<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">KusamaForStatemine</span><span class="op">&gt;</span>,);
 
+<span class="macro">match_type!</span> {
+	<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OnlyParachains</span>: <span class="kw">impl</span> <span class="ident">Contains</span><span class="op">&lt;</span><span class="ident">MultiLocation</span><span class="op">&gt;</span> <span class="op">=</span> {
+		<span class="ident">MultiLocation</span> { <span class="ident">parents</span>: <span class="number">0</span>, <span class="ident">interior</span>: <span class="ident">X1</span>(<span class="ident">Parachain</span>(<span class="kw">_</span>)) }
+	};
+}
+
 <span class="doccomment">/// The barriers one of which must be passed for an XCM message to be executed.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Barrier</span> <span class="op">=</span> (
 	<span class="comment">// Weight that is paid for may be consumed.</span>
@@ -3358,6 +3376,10 @@
 	<span class="ident">AllowTopLevelPaidExecutionFrom</span><span class="op">&lt;</span><span class="ident">Everything</span><span class="op">&gt;</span>,
 	<span class="comment">// Messages coming from system parachains need not pay for execution.</span>
 	<span class="ident">AllowUnpaidExecutionFrom</span><span class="op">&lt;</span><span class="ident">IsChildSystemParachain</span><span class="op">&lt;</span><span class="ident">ParaId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="comment">// Expected responses are OK.</span>
+	<span class="ident">AllowKnownQueryResponses</span><span class="op">&lt;</span><span class="ident">XcmPallet</span><span class="op">&gt;</span>,
+	<span class="comment">// Subscriptions for version tracking are OK.</span>
+	<span class="ident">AllowSubscriptionsFrom</span><span class="op">&lt;</span><span class="ident">OnlyParachains</span><span class="op">&gt;</span>,
 );
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">XcmConfig</span>;
