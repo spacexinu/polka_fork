@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime&#x2F;common&#x2F;src&#x2F;crowdloan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>crowdloan.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_runtime_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime&#x2F;common&#x2F;src&#x2F;crowdloan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>crowdloan.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_runtime_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2113,8 +2113,7 @@
 <span id="2113">2113</span>
 <span id="2114">2114</span>
 <span id="2115">2115</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
 <span class="comment">// Polkadot is free software: you can redistribute it and/or modify</span>
@@ -2318,13 +2317,13 @@
 
 		<span class="doccomment">/// The parachain registrar type. We just use this to ensure that only the manager of a para is able to</span>
 		<span class="doccomment">/// start a crowdloan for its slot.</span>
-		<span class="kw">type</span> <span class="ident">Registrar</span>: <span class="ident">Registrar</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Registrar</span>: <span class="ident">Registrar</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::AccountId</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The type representing the auctioning system.</span>
 		<span class="kw">type</span> <span class="ident">Auctioneer</span>: <span class="ident">Auctioneer</span><span class="op">&lt;</span>
-			<span class="self">Self</span><span class="ident">::BlockNumber</span>,
-			<span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span>,
-			<span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::BlockNumber</span>,
+			<span class="ident"><span class="self">Self</span>::BlockNumber</span>,
+			<span class="ident">AccountId</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::AccountId</span>,
+			<span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::BlockNumber</span>,
 		<span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The maximum length for the memo attached to a crowdloan contribution.</span>
@@ -2448,19 +2447,19 @@
 				<span class="kw">let</span> <span class="ident">new_raise</span> <span class="op">=</span> <span class="ident">NewRaise</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::take</span>();
 				<span class="kw">let</span> <span class="ident">new_raise_len</span> <span class="op">=</span> <span class="ident">new_raise</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>;
 				<span class="kw">for</span> (<span class="ident">fund</span>, <span class="ident">para_id</span>) <span class="kw">in</span>
-					<span class="ident">new_raise</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">i</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> (<span class="ident">f</span>, <span class="ident">i</span>)))
+					<span class="ident">new_raise</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">i</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> (<span class="ident">f</span>, <span class="ident">i</span>)))
 				{
 					<span class="comment">// Care needs to be taken by the crowdloan creator that this function will succeed given</span>
 					<span class="comment">// the crowdloaning configuration. We do some checks ahead of time in crowdloan `create`.</span>
 					<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">T::Auctioneer::place_bid</span>(
-						<span class="self">Self</span><span class="ident">::fund_account_id</span>(<span class="ident">para_id</span>),
+						<span class="ident"><span class="self">Self</span>::fund_account_id</span>(<span class="ident">para_id</span>),
 						<span class="ident">para_id</span>,
 						<span class="ident">fund</span>.<span class="ident">first_period</span>,
 						<span class="ident">fund</span>.<span class="ident">last_period</span>,
 						<span class="ident">fund</span>.<span class="ident">raised</span>,
 					);
 
-					<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::HandleBidResult</span>(<span class="ident">para_id</span>, <span class="ident">result</span>));
+					<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::HandleBidResult</span>(<span class="ident">para_id</span>, <span class="ident">result</span>));
 				}
 				<span class="ident">T::WeightInfo::on_initialize</span>(<span class="ident">new_raise_len</span>)
 			} <span class="kw">else</span> {
@@ -2519,7 +2518,7 @@
 			<span class="macro">ensure!</span>(<span class="ident">depositor</span> <span class="op">=</span><span class="op">=</span> <span class="ident">manager</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidOrigin</span>);
 			<span class="macro">ensure!</span>(<span class="ident">T::Registrar::is_registered</span>(<span class="ident">index</span>), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>);
 
-			<span class="kw">let</span> <span class="ident">trie_index</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::next_trie_index</span>();
+			<span class="kw">let</span> <span class="ident">trie_index</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::next_trie_index</span>();
 			<span class="kw">let</span> <span class="ident">new_trie_index</span> <span class="op">=</span> <span class="ident">trie_index</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Overflow</span>)<span class="question-mark">?</span>;
 
 			<span class="kw">let</span> <span class="ident">deposit</span> <span class="op">=</span> <span class="ident">T::SubmissionDeposit::get</span>();
@@ -2546,7 +2545,7 @@
 			<span class="comment">// Add a lock to the para so that the configuration cannot be changed.</span>
 			<span class="ident">T::Registrar::apply_lock</span>(<span class="ident">index</span>);
 
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Created</span>(<span class="ident">index</span>));
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Created</span>(<span class="ident">index</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2562,7 +2561,7 @@
 			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 
 			<span class="macro">ensure!</span>(<span class="ident">value</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::MinContribution::get</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ContributionTooSmall</span>);
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 			<span class="ident">fund</span>.<span class="ident">raised</span> <span class="op">=</span> <span class="ident">fund</span>.<span class="ident">raised</span>.<span class="ident">checked_add</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Overflow</span>)<span class="question-mark">?</span>;
 			<span class="macro">ensure!</span>(<span class="ident">fund</span>.<span class="ident">raised</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">fund</span>.<span class="ident">cap</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::CapExceeded</span>);
 
@@ -2577,7 +2576,7 @@
 			<span class="macro">ensure!</span>(<span class="ident">current_lease_period</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">fund</span>.<span class="ident">first_period</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ContributionPeriodOver</span>);
 
 			<span class="comment">// Make sure crowdloan has not already won.</span>
-			<span class="kw">let</span> <span class="ident">fund_account</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::fund_account_id</span>(<span class="ident">index</span>);
+			<span class="kw">let</span> <span class="ident">fund_account</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::fund_account_id</span>(<span class="ident">index</span>);
 			<span class="macro">ensure!</span>(
 				<span class="op">!</span><span class="ident">T::Auctioneer::has_won_an_auction</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">fund_account</span>),
 				<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::BidOrLeaseActive</span>
@@ -2587,7 +2586,7 @@
 			<span class="comment">// contributions into the auction when it would not impact the outcome.</span>
 			<span class="macro">ensure!</span>(<span class="op">!</span><span class="ident">T::Auctioneer::auction_status</span>(<span class="ident">now</span>).<span class="ident">is_vrf</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::VrfDelayInProgress</span>);
 
-			<span class="kw">let</span> (<span class="ident">old_balance</span>, <span class="ident">memo</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::contribution_get</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
+			<span class="kw">let</span> (<span class="ident">old_balance</span>, <span class="ident">memo</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::contribution_get</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
 
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">verifier</span>) <span class="op">=</span> <span class="ident">fund</span>.<span class="ident">verifier</span> {
 				<span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">signature</span>.<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidSignature</span>)<span class="question-mark">?</span>;
@@ -2601,7 +2600,7 @@
 			<span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::transfer</span>(<span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="ident">value</span>, <span class="ident">AllowDeath</span>)<span class="question-mark">?</span>;
 
 			<span class="kw">let</span> <span class="ident">balance</span> <span class="op">=</span> <span class="ident">old_balance</span>.<span class="ident">saturating_add</span>(<span class="ident">value</span>);
-			<span class="self">Self</span><span class="ident">::contribution_put</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="kw-2">&amp;</span><span class="ident">balance</span>, <span class="kw-2">&amp;</span><span class="ident">memo</span>);
+			<span class="ident"><span class="self">Self</span>::contribution_put</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="kw-2">&amp;</span><span class="ident">balance</span>, <span class="kw-2">&amp;</span><span class="ident">memo</span>);
 
 			<span class="kw">if</span> <span class="ident">T::Auctioneer::auction_status</span>(<span class="ident">now</span>).<span class="ident">is_ending</span>().<span class="ident">is_some</span>() {
 				<span class="kw">match</span> <span class="ident">fund</span>.<span class="ident">last_contribution</span> {
@@ -2615,7 +2614,7 @@
 					},
 				}
 			} <span class="kw">else</span> {
-				<span class="kw">let</span> <span class="ident">endings_count</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::endings_count</span>();
+				<span class="kw">let</span> <span class="ident">endings_count</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::endings_count</span>();
 				<span class="kw">match</span> <span class="ident">fund</span>.<span class="ident">last_contribution</span> {
 					<span class="ident">LastContribution::PreEnding</span>(<span class="ident">a</span>) <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">endings_count</span> <span class="op">=</span><span class="op">&gt;</span> {
 						<span class="comment">// Not in ending period and no auctions have ended ending since our</span>
@@ -2633,7 +2632,7 @@
 
 			<span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>);
 
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Contributed</span>(<span class="ident">who</span>, <span class="ident">index</span>, <span class="ident">value</span>));
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Contributed</span>(<span class="ident">who</span>, <span class="ident">index</span>, <span class="ident">value</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2662,22 +2661,22 @@
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
-			<span class="kw">let</span> <span class="ident">fund_account</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::fund_account_id</span>(<span class="ident">index</span>);
-			<span class="self">Self</span><span class="ident">::ensure_crowdloan_ended</span>(<span class="ident">now</span>, <span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">fund_account</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::fund_account_id</span>(<span class="ident">index</span>);
+			<span class="ident"><span class="self">Self</span>::ensure_crowdloan_ended</span>(<span class="ident">now</span>, <span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>)<span class="question-mark">?</span>;
 
-			<span class="kw">let</span> (<span class="ident">balance</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::contribution_get</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
+			<span class="kw">let</span> (<span class="ident">balance</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::contribution_get</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
 			<span class="macro">ensure!</span>(<span class="ident">balance</span> <span class="op">&gt;</span> <span class="ident">Zero::zero</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NoContributions</span>);
 
 			<span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::transfer</span>(<span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="ident">balance</span>, <span class="ident">AllowDeath</span>)<span class="question-mark">?</span>;
 
-			<span class="self">Self</span><span class="ident">::contribution_kill</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
+			<span class="ident"><span class="self">Self</span>::contribution_kill</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
 			<span class="ident">fund</span>.<span class="ident">raised</span> <span class="op">=</span> <span class="ident">fund</span>.<span class="ident">raised</span>.<span class="ident">saturating_sub</span>(<span class="ident">balance</span>);
 
 			<span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>);
 
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Withdrew</span>(<span class="ident">who</span>, <span class="ident">index</span>, <span class="ident">balance</span>));
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Withdrew</span>(<span class="ident">who</span>, <span class="ident">index</span>, <span class="ident">balance</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2693,14 +2692,14 @@
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResultWithPostInfo</span> {
 			<span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
-			<span class="kw">let</span> <span class="ident">fund_account</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::fund_account_id</span>(<span class="ident">index</span>);
-			<span class="self">Self</span><span class="ident">::ensure_crowdloan_ended</span>(<span class="ident">now</span>, <span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">fund_account</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::fund_account_id</span>(<span class="ident">index</span>);
+			<span class="ident"><span class="self">Self</span>::ensure_crowdloan_ended</span>(<span class="ident">now</span>, <span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>)<span class="question-mark">?</span>;
 
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">refund_count</span> <span class="op">=</span> <span class="number">0u32</span>;
 			<span class="comment">// Try killing the crowdloan child trie</span>
-			<span class="kw">let</span> <span class="ident">contributions</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::contribution_iterator</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>);
+			<span class="kw">let</span> <span class="ident">contributions</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::contribution_iterator</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>);
 			<span class="comment">// Assume everyone will be refunded.</span>
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_refunded</span> <span class="op">=</span> <span class="bool-val">true</span>;
 			<span class="kw">for</span> (<span class="ident">who</span>, (<span class="ident">balance</span>, <span class="kw">_</span>)) <span class="kw">in</span> <span class="ident">contributions</span> {
@@ -2710,7 +2709,7 @@
 					<span class="kw">break</span>
 				}
 				<span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::transfer</span>(<span class="kw-2">&amp;</span><span class="ident">fund_account</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="ident">balance</span>, <span class="ident">AllowDeath</span>)<span class="question-mark">?</span>;
-				<span class="self">Self</span><span class="ident">::contribution_kill</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
+				<span class="ident"><span class="self">Self</span>::contribution_kill</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
 				<span class="ident">fund</span>.<span class="ident">raised</span> <span class="op">=</span> <span class="ident">fund</span>.<span class="ident">raised</span>.<span class="ident">saturating_sub</span>(<span class="ident">balance</span>);
 				<span class="ident">refund_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 			}
@@ -2719,11 +2718,11 @@
 			<span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">fund</span>);
 
 			<span class="kw">if</span> <span class="ident">all_refunded</span> {
-				<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AllRefunded</span>(<span class="ident">index</span>));
+				<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AllRefunded</span>(<span class="ident">index</span>));
 				<span class="comment">// Refund for unused refund count.</span>
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">T::WeightInfo::refund</span>(<span class="ident">refund_count</span>)).<span class="ident">into</span>())
 			} <span class="kw">else</span> {
-				<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::PartiallyRefunded</span>(<span class="ident">index</span>));
+				<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::PartiallyRefunded</span>(<span class="ident">index</span>));
 				<span class="comment">// No weight to refund since we did not finish the loop.</span>
 				<span class="prelude-val">Ok</span>(().<span class="ident">into</span>())
 			}
@@ -2734,7 +2733,7 @@
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dissolve</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="attribute">#[<span class="ident">pallet::compact</span>]</span> <span class="ident">index</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 
-			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
 
 			<span class="comment">// Only allow dissolution when the raised funds goes to zero,</span>
@@ -2746,11 +2745,11 @@
 			<span class="comment">// Assuming state is not corrupted, the child trie should already be cleaned up</span>
 			<span class="comment">// and all funds in the crowdloan account have been returned. If not, governance</span>
 			<span class="comment">// can take care of that.</span>
-			<span class="macro">debug_assert!</span>(<span class="self">Self</span><span class="ident">::contribution_iterator</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>).<span class="ident">count</span>().<span class="ident">is_zero</span>());
+			<span class="macro">debug_assert!</span>(<span class="ident"><span class="self">Self</span>::contribution_iterator</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>).<span class="ident">count</span>().<span class="ident">is_zero</span>());
 
 			<span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::unreserve</span>(<span class="kw-2">&amp;</span><span class="ident">fund</span>.<span class="ident">depositor</span>, <span class="ident">fund</span>.<span class="ident">deposit</span>);
 			<span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::remove</span>(<span class="ident">index</span>);
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Dissolved</span>(<span class="ident">index</span>));
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Dissolved</span>(<span class="ident">index</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2769,7 +2768,7 @@
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="ident">ensure_root</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 
-			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 
 			<span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(
 				<span class="ident">index</span>,
@@ -2787,7 +2786,7 @@
 				},
 			);
 
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Edited</span>(<span class="ident">index</span>));
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Edited</span>(<span class="ident">index</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2799,13 +2798,13 @@
 			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
 
 			<span class="macro">ensure!</span>(<span class="ident">memo</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">T::MaxMemoLength::get</span>().<span class="ident">into</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MemoTooLarge</span>);
-			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 
-			<span class="kw">let</span> (<span class="ident">balance</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::contribution_get</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
+			<span class="kw">let</span> (<span class="ident">balance</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::contribution_get</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>);
 			<span class="macro">ensure!</span>(<span class="ident">balance</span> <span class="op">&gt;</span> <span class="ident">Zero::zero</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NoContributions</span>);
 
-			<span class="self">Self</span><span class="ident">::contribution_put</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="kw-2">&amp;</span><span class="ident">balance</span>, <span class="kw-2">&amp;</span><span class="ident">memo</span>);
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MemoUpdated</span>(<span class="ident">who</span>, <span class="ident">index</span>, <span class="ident">memo</span>));
+			<span class="ident"><span class="self">Self</span>::contribution_put</span>(<span class="ident">fund</span>.<span class="ident">trie_index</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="kw-2">&amp;</span><span class="ident">balance</span>, <span class="kw-2">&amp;</span><span class="ident">memo</span>);
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MemoUpdated</span>(<span class="ident">who</span>, <span class="ident">index</span>, <span class="ident">memo</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2815,11 +2814,11 @@
 		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="ident">T::WeightInfo::poke</span>())]</span>
 		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poke</span>(<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
-			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
+			<span class="kw">let</span> <span class="ident">fund</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::funds</span>(<span class="ident">index</span>).<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParaId</span>)<span class="question-mark">?</span>;
 			<span class="macro">ensure!</span>(<span class="op">!</span><span class="ident">fund</span>.<span class="ident">raised</span>.<span class="ident">is_zero</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NoContributions</span>);
 			<span class="macro">ensure!</span>(<span class="op">!</span><span class="ident">NewRaise</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AlreadyInNewRaise</span>);
 			<span class="ident">NewRaise</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::append</span>(<span class="ident">index</span>);
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AddedToNewRaise</span>(<span class="ident">index</span>));
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AddedToNewRaise</span>(<span class="ident">index</span>));
 			<span class="prelude-val">Ok</span>(())
 		}
 	}
@@ -2847,28 +2846,28 @@
 		<span class="ident">balance</span>: <span class="kw-2">&amp;</span><span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		<span class="ident">memo</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
 	) {
-		<span class="ident">who</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">child::put</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::id_from_index</span>(<span class="ident">index</span>), <span class="ident">b</span>, <span class="kw-2">&amp;</span>(<span class="ident">balance</span>, <span class="ident">memo</span>)));
+		<span class="ident">who</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">child::put</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::id_from_index</span>(<span class="ident">index</span>), <span class="ident">b</span>, <span class="kw-2">&amp;</span>(<span class="ident">balance</span>, <span class="ident">memo</span>)));
 	}
 
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contribution_get</span>(<span class="ident">index</span>: <span class="ident">TrieIndex</span>, <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T::AccountId</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
 		<span class="ident">who</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> {
-			<span class="ident">child::get_or_default</span>::<span class="op">&lt;</span>(<span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::id_from_index</span>(<span class="ident">index</span>), <span class="ident">b</span>)
+			<span class="ident">child::get_or_default</span>::<span class="op">&lt;</span>(<span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::id_from_index</span>(<span class="ident">index</span>), <span class="ident">b</span>)
 		})
 	}
 
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contribution_kill</span>(<span class="ident">index</span>: <span class="ident">TrieIndex</span>, <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T::AccountId</span>) {
-		<span class="ident">who</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">child::kill</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::id_from_index</span>(<span class="ident">index</span>), <span class="ident">b</span>));
+		<span class="ident">who</span>.<span class="ident">using_encoded</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">child::kill</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::id_from_index</span>(<span class="ident">index</span>), <span class="ident">b</span>));
 	}
 
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crowdloan_kill</span>(<span class="ident">index</span>: <span class="ident">TrieIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">child::KillStorageResult</span> {
-		<span class="ident">child::kill_storage</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::id_from_index</span>(<span class="ident">index</span>), <span class="prelude-val">Some</span>(<span class="ident">T::RemoveKeysLimit::get</span>()))
+		<span class="ident">child::kill_storage</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::id_from_index</span>(<span class="ident">index</span>), <span class="prelude-val">Some</span>(<span class="ident">T::RemoveKeysLimit::get</span>()))
 	}
 
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contribution_iterator</span>(
 		<span class="ident">index</span>: <span class="ident">TrieIndex</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChildTriePrefixIterator</span><span class="op">&lt;</span>(<span class="ident">T::AccountId</span>, (<span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>))<span class="op">&gt;</span> {
 		<span class="ident">ChildTriePrefixIterator</span>::<span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="ident">::with_prefix_over_key</span>::<span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span>(
-			<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::id_from_index</span>(<span class="ident">index</span>),
+			<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::id_from_index</span>(<span class="ident">index</span>),
 			<span class="kw-2">&amp;</span>[],
 		)
 	}
@@ -2902,7 +2901,7 @@
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="kw">crate</span><span class="ident">::traits::OnSwap</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::traits::OnSwap</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">on_swap</span>(<span class="ident">one</span>: <span class="ident">ParaId</span>, <span class="ident">other</span>: <span class="ident">ParaId</span>) {
 		<span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::mutate</span>(<span class="ident">one</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Funds</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::mutate</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">y</span><span class="op">|</span> <span class="ident">sp_std::mem::swap</span>(<span class="ident">x</span>, <span class="ident">y</span>)))
 	}
@@ -2984,7 +2983,7 @@
 		<span class="kw">type</span> <span class="ident">Hash</span> <span class="op">=</span> <span class="ident">H256</span>;
 		<span class="kw">type</span> <span class="ident">Hashing</span> <span class="op">=</span> <span class="ident">BlakeTwo256</span>;
 		<span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">u64</span>;
-		<span class="kw">type</span> <span class="ident">Lookup</span> <span class="op">=</span> <span class="ident">IdentityLookup</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Lookup</span> <span class="op">=</span> <span class="ident">IdentityLookup</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AccountId</span><span class="op">&gt;</span>;
 		<span class="kw">type</span> <span class="ident">Header</span> <span class="op">=</span> <span class="ident">Header</span>;
 		<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
 		<span class="kw">type</span> <span class="ident">BlockHashCount</span> <span class="op">=</span> <span class="ident">BlockHashCount</span>;
@@ -3074,7 +3073,7 @@
 		<span class="kw">fn</span> <span class="ident">new_auction</span>(<span class="ident">duration</span>: <span class="ident">u64</span>, <span class="ident">lease_period_index</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">System::block_number</span>();
 			<span class="kw">let</span> (<span class="ident">current_lease_period</span>, <span class="kw">_</span>) <span class="op">=</span>
-				<span class="self">Self</span><span class="ident">::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="string">&quot;no lease period yet&quot;</span>)<span class="question-mark">?</span>;
+				<span class="ident"><span class="self">Self</span>::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="string">&quot;no lease period yet&quot;</span>)<span class="question-mark">?</span>;
 			<span class="macro">assert!</span>(<span class="ident">lease_period_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">current_lease_period</span>);
 
 			<span class="kw">let</span> <span class="ident">ending</span> <span class="op">=</span> <span class="ident">System::block_number</span>().<span class="ident">saturating_add</span>(<span class="ident">duration</span>);
@@ -3129,7 +3128,7 @@
 		}
 
 		<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
-			<span class="kw">let</span> (<span class="ident">lease_period_length</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::lease_period_length</span>();
+			<span class="kw">let</span> (<span class="ident">lease_period_length</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::lease_period_length</span>();
 			<span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">checked_sub</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
 
 			<span class="kw">let</span> <span class="ident">lease_period</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">/</span> <span class="ident">lease_period_length</span>;
@@ -3163,7 +3162,7 @@
 		<span class="kw">type</span> <span class="ident">Registrar</span> <span class="op">=</span> <span class="ident">TestRegistrar</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>;
 		<span class="kw">type</span> <span class="ident">Auctioneer</span> <span class="op">=</span> <span class="ident">TestAuctioneer</span>;
 		<span class="kw">type</span> <span class="ident">MaxMemoLength</span> <span class="op">=</span> <span class="ident">MaxMemoLength</span>;
-		<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::crowdloan::TestWeightInfo</span>;
+		<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::crowdloan::TestWeightInfo</span>;
 	}
 
 	<span class="kw">use</span> <span class="ident">pallet_balances::Error</span> <span class="kw">as</span> <span class="ident">BalancesError</span>;
@@ -3723,14 +3722,14 @@
 			<span class="comment">// Move to the end of the crowdloan</span>
 			<span class="ident">run_to_block</span>(<span class="number">10</span>);
 			<span class="macro">assert_ok!</span>(<span class="ident">Crowdloan::refund</span>(<span class="ident">Origin::signed</span>(<span class="number">1337</span>), <span class="ident">para</span>));
-			<span class="macro">assert_eq!</span>(<span class="ident">last_event</span>(), <span class="kw">super</span><span class="ident">::Event</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::PartiallyRefunded</span>(<span class="ident">para</span>).<span class="ident">into</span>());
+			<span class="macro">assert_eq!</span>(<span class="ident">last_event</span>(), <span class="ident"><span class="kw">super</span>::Event</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::PartiallyRefunded</span>(<span class="ident">para</span>).<span class="ident">into</span>());
 
 			<span class="comment">// Funds still left over</span>
 			<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Balances::free_balance</span>(<span class="ident">account_id</span>).<span class="ident">is_zero</span>());
 
 			<span class="comment">// Call again</span>
 			<span class="macro">assert_ok!</span>(<span class="ident">Crowdloan::refund</span>(<span class="ident">Origin::signed</span>(<span class="number">1337</span>), <span class="ident">para</span>));
-			<span class="macro">assert_eq!</span>(<span class="ident">last_event</span>(), <span class="kw">super</span><span class="ident">::Event</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::AllRefunded</span>(<span class="ident">para</span>).<span class="ident">into</span>());
+			<span class="macro">assert_eq!</span>(<span class="ident">last_event</span>(), <span class="ident"><span class="kw">super</span>::Event</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::AllRefunded</span>(<span class="ident">para</span>).<span class="ident">into</span>());
 
 			<span class="comment">// Funds are returned</span>
 			<span class="macro">assert_eq!</span>(<span class="ident">Balances::free_balance</span>(<span class="ident">account_id</span>), <span class="number">0</span>);
@@ -4224,12 +4223,12 @@
 
 		<span class="macro">impl_benchmark_test_suite!</span>(
 			<span class="ident">Crowdloan</span>,
-			<span class="kw">crate</span><span class="ident">::integration_tests::new_test_ext_with_offset</span>(<span class="number">10</span>),
-			<span class="kw">crate</span><span class="ident">::integration_tests::Test</span>,
+			<span class="ident"><span class="kw">crate</span>::integration_tests::new_test_ext_with_offset</span>(<span class="number">10</span>),
+			<span class="ident"><span class="kw">crate</span>::integration_tests::Test</span>,
 		);
 	}
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_runtime_common" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

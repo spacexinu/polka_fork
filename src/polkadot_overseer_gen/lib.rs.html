@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `node&#x2F;overseer&#x2F;overseer-gen&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_overseer_gen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `node&#x2F;overseer&#x2F;overseer-gen&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_overseer_gen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -501,8 +501,7 @@
 <span id="501">501</span>
 <span id="502">502</span>
 <span id="503">503</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
 <span class="comment">// Polkadot is free software: you can redistribute it and/or modify</span>
@@ -632,8 +631,8 @@
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ToOverseer</span> {
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::SpawnJob</span> { <span class="ident">name</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;SpawnJob{{ {}, ..}}&quot;</span>, <span class="ident">name</span>),
-			<span class="self">Self</span><span class="ident">::SpawnBlockingJob</span> { <span class="ident">name</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;SpawnBlockingJob{{ {}, ..}}&quot;</span>, <span class="ident">name</span>),
+			<span class="ident"><span class="self">Self</span>::SpawnJob</span> { <span class="ident">name</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;SpawnJob{{ {}, ..}}&quot;</span>, <span class="ident">name</span>),
+			<span class="ident"><span class="self">Self</span>::SpawnBlockingJob</span> { <span class="ident">name</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;SpawnBlockingJob{{ {}, ..}}&quot;</span>, <span class="ident">name</span>),
 		}
 	}
 }
@@ -644,7 +643,7 @@
 	<span class="kw">type</span> <span class="ident">Output</span>;
 
 	<span class="doccomment">/// Consumes a `T` per subsystem, and maps it to `Self::Output`.</span>
-	<span class="kw">fn</span> <span class="ident">map_subsystem</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sub</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>;
+	<span class="kw">fn</span> <span class="ident">map_subsystem</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sub</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">MapSubsystem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span>
@@ -680,9 +679,9 @@
 }
 
 <span class="doccomment">/// Incoming messages from both the bounded and unbounded channel.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SubsystemIncomingMessages</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span><span class="ident">::stream::Select</span><span class="op">&lt;</span>
-	<span class="self">self</span><span class="ident">::metered::MeteredReceiver</span><span class="op">&lt;</span><span class="ident">MessagePacket</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="self">self</span><span class="ident">::metered::UnboundedMeteredReceiver</span><span class="op">&lt;</span><span class="ident">MessagePacket</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SubsystemIncomingMessages</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="self">self</span>::stream::Select</span><span class="op">&lt;</span>
+	<span class="ident"><span class="self">self</span>::metered::MeteredReceiver</span><span class="op">&lt;</span><span class="ident">MessagePacket</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident"><span class="self">self</span>::metered::UnboundedMeteredReceiver</span><span class="op">&lt;</span><span class="ident">MessagePacket</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 <span class="op">&gt;</span>;
 
 <span class="doccomment">/// Watermark to track the received signals.</span>
@@ -720,7 +719,7 @@
 <span class="doccomment">/// In essence it&#39;s just a new type wrapping a `BoxFuture`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpawnedSubsystem</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">E</span>: <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="self">self</span><span class="ident">::OverseerError</span><span class="op">&gt;</span>,
+	<span class="ident">E</span>: <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="self">self</span>::OverseerError</span><span class="op">&gt;</span>,
 {
 	<span class="doccomment">/// Name of the subsystem being spawned.</span>
 	<span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
@@ -768,7 +767,7 @@
 }
 
 <span class="doccomment">/// Alias for a result with error type `OverseerError`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OverseerResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">self</span><span class="ident">::OverseerError</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OverseerResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">self</span>::OverseerError</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Collection of meters related to a subsystem.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -809,9 +808,9 @@
 <span class="doccomment">/// `M` here is the inner message type, and _not_ the generated `enum AllMessages`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SubsystemInstance</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Signal</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Send sink for `Signal`s to be sent to a subsystem.</span>
-	<span class="kw">pub</span> <span class="ident">tx_signal</span>: <span class="kw">crate</span><span class="ident">::metered::MeteredSender</span><span class="op">&lt;</span><span class="ident">Signal</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">tx_signal</span>: <span class="ident"><span class="kw">crate</span>::metered::MeteredSender</span><span class="op">&lt;</span><span class="ident">Signal</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Send sink for `Message`s to be sent to a subsystem.</span>
-	<span class="kw">pub</span> <span class="ident">tx_bounded</span>: <span class="kw">crate</span><span class="ident">::metered::MeteredSender</span><span class="op">&lt;</span><span class="ident">MessagePacket</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">tx_bounded</span>: <span class="ident"><span class="kw">crate</span>::metered::MeteredSender</span><span class="op">&lt;</span><span class="ident">MessagePacket</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// All meters of the particular subsystem instance.</span>
 	<span class="kw">pub</span> <span class="ident">meters</span>: <span class="ident">SubsystemMeters</span>,
 	<span class="doccomment">/// The number of signals already received.</span>
@@ -841,7 +840,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Signal</span>, <span class="ident">Message</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Signal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FromOverseer</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Signal</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">signal</span>: <span class="ident">Signal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span><span class="ident">::Signal</span>(<span class="ident">signal</span>)
+		<span class="ident"><span class="self">Self</span>::Signal</span>(<span class="ident">signal</span>)
 	}
 }
 
@@ -861,9 +860,9 @@
 	<span class="kw">type</span> <span class="ident">Signal</span>: <span class="ident">std::fmt::Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 	<span class="doccomment">/// The overarching all messages `enum`.</span>
 	<span class="doccomment">/// In some cases can be identical to `Self::Message`.</span>
-	<span class="kw">type</span> <span class="ident">AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Message</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+	<span class="kw">type</span> <span class="ident">AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Message</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 	<span class="doccomment">/// The sender type as provided by `sender()` and underlying.</span>
-	<span class="kw">type</span> <span class="ident">Sender</span>: <span class="ident">SubsystemSender</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AllMessages</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+	<span class="kw">type</span> <span class="ident">Sender</span>: <span class="ident">SubsystemSender</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AllMessages</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 	<span class="doccomment">/// The error type.</span>
 	<span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">::std::error::Error</span> <span class="op">+</span> <span class="ident">::std::convert::From</span><span class="op">&lt;</span><span class="ident">OverseerError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 
@@ -871,32 +870,32 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This has to be used with caution, if you loop over this without</span>
 	<span class="doccomment">/// using `pending!()` macro you will end up with a busy loop!</span>
-	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FromOverseer</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Message</span>, <span class="self">Self</span><span class="ident">::Signal</span><span class="op">&gt;</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span>;
+	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FromOverseer</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Message</span>, <span class="ident"><span class="self">Self</span>::Signal</span><span class="op">&gt;</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Receive a message.</span>
-	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FromOverseer</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Message</span>, <span class="self">Self</span><span class="ident">::Signal</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FromOverseer</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Message</span>, <span class="ident"><span class="self">Self</span>::Signal</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Spawn a child task on the executor.</span>
 	<span class="kw">fn</span> <span class="ident">spawn</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-		<span class="ident">s</span>: <span class="ident">::std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="kw">crate</span><span class="ident">::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+		<span class="ident">s</span>: <span class="ident">::std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Spawn a blocking child task on the executor&#39;s dedicated thread pool.</span>
 	<span class="kw">fn</span> <span class="ident">spawn_blocking</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-		<span class="ident">s</span>: <span class="ident">::std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="kw">crate</span><span class="ident">::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+		<span class="ident">s</span>: <span class="ident">::std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Send a direct message to some other `Subsystem`, routed based on message type.</span>
 	<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_message</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">X</span>)
 	<span class="kw">where</span>
-		<span class="self">Self</span><span class="ident">::AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>,
+		<span class="ident"><span class="self">Self</span>::AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>,
 		<span class="ident">X</span>: <span class="ident">Send</span>,
 	{
-		<span class="self">self</span>.<span class="ident">sender</span>().<span class="ident">send_message</span>(<span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AllMessages</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">msg</span>)).<span class="kw">await</span>
+		<span class="self">self</span>.<span class="ident">sender</span>().<span class="ident">send_message</span>(<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AllMessages</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">msg</span>)).<span class="kw">await</span>
 	}
 
 	<span class="doccomment">/// Send multiple direct messages to other `Subsystem`s, routed based on message type.</span>
@@ -904,25 +903,25 @@
 	<span class="kw">where</span>
 		<span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">X</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
 		<span class="ident">T::IntoIter</span>: <span class="ident">Send</span>,
-		<span class="self">Self</span><span class="ident">::AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>,
+		<span class="ident"><span class="self">Self</span>::AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>,
 		<span class="ident">X</span>: <span class="ident">Send</span>,
 	{
 		<span class="self">self</span>.<span class="ident">sender</span>()
-			.<span class="ident">send_messages</span>(<span class="ident">msgs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AllMessages</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">x</span>)))
+			.<span class="ident">send_messages</span>(<span class="ident">msgs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AllMessages</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">x</span>)))
 			.<span class="kw">await</span>
 	}
 
 	<span class="doccomment">/// Send a message using the unbounded connection.</span>
 	<span class="kw">fn</span> <span class="ident">send_unbounded_message</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">X</span>)
 	<span class="kw">where</span>
-		<span class="self">Self</span><span class="ident">::AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>,
+		<span class="ident"><span class="self">Self</span>::AllMessages</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">X</span><span class="op">&gt;</span>,
 		<span class="ident">X</span>: <span class="ident">Send</span>,
 	{
-		<span class="self">self</span>.<span class="ident">sender</span>().<span class="ident">send_unbounded_message</span>(<span class="self">Self</span><span class="ident">::AllMessages::from</span>(<span class="ident">msg</span>))
+		<span class="self">self</span>.<span class="ident">sender</span>().<span class="ident">send_unbounded_message</span>(<span class="ident"><span class="self">Self</span>::AllMessages::from</span>(<span class="ident">msg</span>))
 	}
 
 	<span class="doccomment">/// Obtain the sender.</span>
-	<span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Sender</span>;
+	<span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Sender</span>;
 }
 
 <span class="doccomment">/// A trait that describes the [`Subsystem`]s that can run on the [`Overseer`].</span>
@@ -936,7 +935,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">Ctx</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">Ctx</span>: <span class="ident">SubsystemContext</span>,
-	<span class="ident">E</span>: <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="self">self</span><span class="ident">::OverseerError</span><span class="op">&gt;</span>,
+	<span class="ident">E</span>: <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="self">self</span>::OverseerError</span><span class="op">&gt;</span>,
 {
 	<span class="doccomment">/// Start this `Subsystem` and return `SpawnedSubsystem`.</span>
 	<span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Ctx</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpawnedSubsystem</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>;
@@ -991,7 +990,7 @@
 {
 	<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>;
 
-	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
 
 		<span class="kw">if</span> <span class="ident">this</span>.<span class="ident">delay</span>.<span class="ident">poll</span>(<span class="ident">ctx</span>).<span class="ident">is_ready</span>() {
@@ -1005,7 +1004,7 @@
 		<span class="ident">Poll::Pending</span>
 	}
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_overseer_gen" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

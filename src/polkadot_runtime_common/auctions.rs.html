@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime&#x2F;common&#x2F;src&#x2F;auctions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>auctions.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_runtime_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime&#x2F;common&#x2F;src&#x2F;auctions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>auctions.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_runtime_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1891,8 +1891,7 @@
 <span id="1891">1891</span>
 <span id="1892">1892</span>
 <span id="1893">1893</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright 2019-2020 Parity Technologies (UK) Ltd.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2019-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
 <span class="comment">// Polkadot is free software: you can redistribute it and/or modify</span>
@@ -1989,29 +1988,29 @@
 
 		<span class="doccomment">/// The type representing the leasing system.</span>
 		<span class="kw">type</span> <span class="ident">Leaser</span>: <span class="ident">Leaser</span><span class="op">&lt;</span>
-			<span class="self">Self</span><span class="ident">::BlockNumber</span>,
-			<span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span>,
-			<span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::BlockNumber</span>,
+			<span class="ident"><span class="self">Self</span>::BlockNumber</span>,
+			<span class="ident">AccountId</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::AccountId</span>,
+			<span class="ident">LeasePeriod</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::BlockNumber</span>,
 		<span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The parachain registrar type.</span>
-		<span class="kw">type</span> <span class="ident">Registrar</span>: <span class="ident">Registrar</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Registrar</span>: <span class="ident">Registrar</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::AccountId</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The number of blocks over which an auction may be retroactively ended.</span>
 		<span class="attribute">#[<span class="ident">pallet::constant</span>]</span>
-		<span class="kw">type</span> <span class="ident">EndingPeriod</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">EndingPeriod</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::BlockNumber</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The length of each sample to take during the ending period.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// `EndingPeriod` / `SampleLength` = Total # of Samples</span>
 		<span class="attribute">#[<span class="ident">pallet::constant</span>]</span>
-		<span class="kw">type</span> <span class="ident">SampleLength</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">SampleLength</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::BlockNumber</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// Something that provides randomness in the runtime.</span>
-		<span class="kw">type</span> <span class="ident">Randomness</span>: <span class="ident">Randomness</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Hash</span>, <span class="self">Self</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Randomness</span>: <span class="ident">Randomness</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Hash</span>, <span class="ident"><span class="self">Self</span>::BlockNumber</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// The origin which may initiate auctions.</span>
-		<span class="kw">type</span> <span class="ident">InitiateOrigin</span>: <span class="ident">EnsureOrigin</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Origin</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">InitiateOrigin</span>: <span class="ident">EnsureOrigin</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Origin</span><span class="op">&gt;</span>;
 
 		<span class="doccomment">/// Weight Information for the Extrinsics in the Pallet</span>
 		<span class="kw">type</span> <span class="ident">WeightInfo</span>: <span class="ident">WeightInfo</span>;
@@ -2112,23 +2111,23 @@
 			<span class="comment">// If the current auction was in its ending period last block, then ensure that the (sub-)range</span>
 			<span class="comment">// winner information is duplicated from the previous block in case no bids happened in the</span>
 			<span class="comment">// last block.</span>
-			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">AuctionStatus::EndingPeriod</span>(<span class="ident">offset</span>, <span class="ident">_sub_sample</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::auction_status</span>(<span class="ident">n</span>) {
+			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">AuctionStatus::EndingPeriod</span>(<span class="ident">offset</span>, <span class="ident">_sub_sample</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::auction_status</span>(<span class="ident">n</span>) {
 				<span class="ident">weight</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="number">1</span>));
 				<span class="kw">if</span> <span class="op">!</span><span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">offset</span>) {
 					<span class="ident">weight</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">saturating_add</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="number">1</span>));
 					<span class="kw">let</span> <span class="ident">winning_data</span> <span class="op">=</span> <span class="ident">offset</span>
 						.<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">One::one</span>())
 						.<span class="ident">and_then</span>(<span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>)
-						.<span class="ident">unwrap_or</span>([<span class="self">Self</span><span class="ident">::EMPTY</span>; <span class="ident">SlotRange::SLOT_RANGE_COUNT</span>]);
+						.<span class="ident">unwrap_or</span>([<span class="ident"><span class="self">Self</span>::EMPTY</span>; <span class="ident">SlotRange::SLOT_RANGE_COUNT</span>]);
 					<span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="ident">offset</span>, <span class="ident">winning_data</span>);
 				}
 			}
 
 			<span class="comment">// Check to see if an auction just ended.</span>
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">winning_ranges</span>, <span class="ident">auction_lease_period_index</span>)) <span class="op">=</span> <span class="self">Self</span><span class="ident">::check_auction_end</span>(<span class="ident">n</span>) {
+			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">winning_ranges</span>, <span class="ident">auction_lease_period_index</span>)) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::check_auction_end</span>(<span class="ident">n</span>) {
 				<span class="comment">// Auction is ended now. We have the winning ranges and the lease period index which</span>
 				<span class="comment">// acts as the offset. Handle it.</span>
-				<span class="self">Self</span><span class="ident">::manage_auction_end</span>(<span class="ident">auction_lease_period_index</span>, <span class="ident">winning_ranges</span>);
+				<span class="ident"><span class="self">Self</span>::manage_auction_end</span>(<span class="ident">auction_lease_period_index</span>, <span class="ident">winning_ranges</span>);
 				<span class="ident">weight</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">saturating_add</span>(<span class="ident">T::WeightInfo::on_initialize</span>());
 			}
 
@@ -2150,7 +2149,7 @@
 			<span class="attribute">#[<span class="ident">pallet::compact</span>]</span> <span class="ident">lease_period_index</span>: <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="ident">T::InitiateOrigin::ensure_origin</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
-			<span class="self">Self</span><span class="ident">::do_new_auction</span>(<span class="ident">duration</span>, <span class="ident">lease_period_index</span>)
+			<span class="ident"><span class="self">Self</span>::do_new_auction</span>(<span class="ident">duration</span>, <span class="ident">lease_period_index</span>)
 		}
 
 		<span class="doccomment">/// Make a new bid from an account (including a parachain account) for deploying a new</span>
@@ -2179,7 +2178,7 @@
 			<span class="attribute">#[<span class="ident">pallet::compact</span>]</span> <span class="ident">amount</span>: <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
 			<span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
-			<span class="self">Self</span><span class="ident">::handle_bid</span>(<span class="ident">who</span>, <span class="ident">para</span>, <span class="ident">auction_index</span>, <span class="ident">first_slot</span>, <span class="ident">last_slot</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+			<span class="ident"><span class="self">Self</span>::handle_bid</span>(<span class="ident">who</span>, <span class="ident">para</span>, <span class="ident">auction_index</span>, <span class="ident">first_slot</span>, <span class="ident">last_slot</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(())
 		}
 
@@ -2209,7 +2208,7 @@
 		<span class="ident">duration</span>: <span class="ident">T::BlockNumber</span>,
 		<span class="ident">lease_period_index</span>: <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-		<span class="self">Self</span><span class="ident">::do_new_auction</span>(<span class="ident">duration</span>, <span class="ident">lease_period_index</span>)
+		<span class="ident"><span class="self">Self</span>::do_new_auction</span>(<span class="ident">duration</span>, <span class="ident">lease_period_index</span>)
 	}
 
 	<span class="comment">// Returns the status of the auction given the current block number.</span>
@@ -2243,10 +2242,10 @@
 		<span class="ident">last_slot</span>: <span class="ident">LeasePeriodOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		<span class="ident">amount</span>: <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-		<span class="self">Self</span><span class="ident">::handle_bid</span>(<span class="ident">bidder</span>, <span class="ident">para</span>, <span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(), <span class="ident">first_slot</span>, <span class="ident">last_slot</span>, <span class="ident">amount</span>)
+		<span class="ident"><span class="self">Self</span>::handle_bid</span>(<span class="ident">bidder</span>, <span class="ident">para</span>, <span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(), <span class="ident">first_slot</span>, <span class="ident">last_slot</span>, <span class="ident">amount</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span><span class="ident">::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
 		<span class="ident">T::Leaser::lease_period_index</span>(<span class="ident">b</span>)
 	}
 
@@ -2291,7 +2290,7 @@
 		<span class="kw">let</span> <span class="ident">ending</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>().<span class="ident">saturating_add</span>(<span class="ident">duration</span>);
 		<span class="ident">AuctionInfo</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::put</span>((<span class="ident">lease_period_index</span>, <span class="ident">ending</span>));
 
-		<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AuctionStarted</span>(<span class="ident">n</span>, <span class="ident">lease_period_index</span>, <span class="ident">ending</span>));
+		<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AuctionStarted</span>(<span class="ident">n</span>, <span class="ident">lease_period_index</span>, <span class="ident">ending</span>));
 		<span class="prelude-val">Ok</span>(())
 	}
 
@@ -2320,7 +2319,7 @@
 
 		<span class="comment">// Get the auction status and the current sample block. For the starting period, the sample</span>
 		<span class="comment">// block is zero.</span>
-		<span class="kw">let</span> <span class="ident">auction_status</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::auction_status</span>(<span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>());
+		<span class="kw">let</span> <span class="ident">auction_status</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::auction_status</span>(<span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::block_number</span>());
 		<span class="comment">// The offset into the ending samples of the auction.</span>
 		<span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">auction_status</span> {
 			<span class="ident">AuctionStatus::NotStarted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AuctionEnded</span>.<span class="ident">into</span>()),
@@ -2343,7 +2342,7 @@
 		<span class="comment">// The current winning ranges.</span>
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_winning</span> <span class="op">=</span> <span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(<span class="ident">offset</span>)
 			.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">offset</span>.<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">One::one</span>()).<span class="ident">and_then</span>(<span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>))
-			.<span class="ident">unwrap_or</span>([<span class="self">Self</span><span class="ident">::EMPTY</span>; <span class="ident">SlotRange::SLOT_RANGE_COUNT</span>]);
+			.<span class="ident">unwrap_or</span>([<span class="ident"><span class="self">Self</span>::EMPTY</span>; <span class="ident">SlotRange::SLOT_RANGE_COUNT</span>]);
 
 		<span class="comment">// If this bid beat the previous winner of our range.</span>
 		<span class="kw">if</span> <span class="ident">current_winning</span>[<span class="ident">range_index</span>].<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">last</span><span class="op">|</span> <span class="ident">amount</span> <span class="op">&gt;</span> <span class="ident">last</span>.<span class="number">2</span>) {
@@ -2366,7 +2365,7 @@
 				<span class="comment">// ...and record the amount reserved.</span>
 				<span class="ident">ReservedAmounts</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="kw-2">&amp;</span><span class="ident">bidder_para</span>, <span class="ident">reserve_required</span>);
 
-				<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Reserved</span>(
+				<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Reserved</span>(
 					<span class="ident">bidder</span>.<span class="ident">clone</span>(),
 					<span class="ident">additional</span>,
 					<span class="ident">reserve_required</span>,
@@ -2389,14 +2388,14 @@
 						<span class="comment">// It really should be reserved; there&#39;s not much we can do here on fail.</span>
 						<span class="kw">let</span> <span class="ident">err_amt</span> <span class="op">=</span> <span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::unreserve</span>(<span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="ident">amount</span>);
 						<span class="macro">debug_assert!</span>(<span class="ident">err_amt</span>.<span class="ident">is_zero</span>());
-						<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Unreserved</span>(<span class="ident">who</span>, <span class="ident">amount</span>));
+						<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Unreserved</span>(<span class="ident">who</span>, <span class="ident">amount</span>));
 					}
 				}
 			}
 
 			<span class="comment">// Update the range winner.</span>
 			<span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="ident">offset</span>, <span class="kw-2">&amp;</span><span class="ident">current_winning</span>);
-			<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::BidAccepted</span>(
+			<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::BidAccepted</span>(
 				<span class="ident">bidder</span>, <span class="ident">para</span>, <span class="ident">amount</span>, <span class="ident">first_slot</span>, <span class="ident">last_slot</span>,
 			));
 		}
@@ -2429,9 +2428,9 @@
 						<span class="ident">T::SampleLength::get</span>().<span class="ident">max</span>(<span class="ident">One::one</span>());
 
 					<span class="kw">let</span> <span class="ident">auction_counter</span> <span class="op">=</span> <span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>();
-					<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::WinningOffset</span>(<span class="ident">auction_counter</span>, <span class="ident">offset</span>));
+					<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::WinningOffset</span>(<span class="ident">auction_counter</span>, <span class="ident">offset</span>));
 					<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>(<span class="ident">offset</span>)
-						.<span class="ident">unwrap_or</span>([<span class="self">Self</span><span class="ident">::EMPTY</span>; <span class="ident">SlotRange::SLOT_RANGE_COUNT</span>]);
+						.<span class="ident">unwrap_or</span>([<span class="ident"><span class="self">Self</span>::EMPTY</span>; <span class="ident">SlotRange::SLOT_RANGE_COUNT</span>]);
 					<span class="comment">// This `remove_all` statement should remove at most `EndingPeriod` / `SampleLength` items,</span>
 					<span class="comment">// which should be bounded and sensibly configured in the runtime.</span>
 					<span class="ident">Winning</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::remove_all</span>(<span class="prelude-val">None</span>);
@@ -2459,7 +2458,7 @@
 
 		<span class="comment">// Next, calculate the winning combination of slots and thus the final winners of the</span>
 		<span class="comment">// auction.</span>
-		<span class="kw">let</span> <span class="ident">winners</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::calculate_winners</span>(<span class="ident">winning_ranges</span>);
+		<span class="kw">let</span> <span class="ident">winners</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::calculate_winners</span>(<span class="ident">winning_ranges</span>);
 
 		<span class="comment">// Go through those winners and re-reserve their bid, updating our table of deposits</span>
 		<span class="comment">// accordingly.</span>
@@ -2479,14 +2478,14 @@
 					<span class="comment">// The leaser attempted to get a second lease on the same para ID, possibly griefing us. Let&#39;s</span>
 					<span class="comment">// keep the amount reserved and let governance sort it out.</span>
 					<span class="kw">if</span> <span class="ident">CurrencyOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::reserve</span>(<span class="kw-2">&amp;</span><span class="ident">leaser</span>, <span class="ident">amount</span>).<span class="ident">is_ok</span>() {
-						<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ReserveConfiscated</span>(<span class="ident">para</span>, <span class="ident">leaser</span>, <span class="ident">amount</span>));
+						<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ReserveConfiscated</span>(<span class="ident">para</span>, <span class="ident">leaser</span>, <span class="ident">amount</span>));
 					}
 				},
 				<span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {}, <span class="comment">// Nothing to report.</span>
 			}
 		}
 
-		<span class="self">Self</span><span class="ident">::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AuctionClosed</span>(<span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>()));
+		<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::AuctionClosed</span>(<span class="ident">AuctionCounter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>()));
 	}
 
 	<span class="doccomment">/// Calculate the final winners from the winning slots.</span>
@@ -2592,7 +2591,7 @@
 		<span class="kw">type</span> <span class="ident">Hash</span> <span class="op">=</span> <span class="ident">H256</span>;
 		<span class="kw">type</span> <span class="ident">Hashing</span> <span class="op">=</span> <span class="ident">BlakeTwo256</span>;
 		<span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">u64</span>;
-		<span class="kw">type</span> <span class="ident">Lookup</span> <span class="op">=</span> <span class="ident">IdentityLookup</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span>;
+		<span class="kw">type</span> <span class="ident">Lookup</span> <span class="op">=</span> <span class="ident">IdentityLookup</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AccountId</span><span class="op">&gt;</span>;
 		<span class="kw">type</span> <span class="ident">Header</span> <span class="op">=</span> <span class="ident">Header</span>;
 		<span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
 		<span class="kw">type</span> <span class="ident">BlockHashCount</span> <span class="op">=</span> <span class="ident">BlockHashCount</span>;
@@ -2646,16 +2645,16 @@
 
 		<span class="kw">fn</span> <span class="ident">lease_out</span>(
 			<span class="ident">para</span>: <span class="ident">ParaId</span>,
-			<span class="ident">leaser</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::AccountId</span>,
-			<span class="ident">amount</span>: <span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span>,
-			<span class="ident">period_begin</span>: <span class="self">Self</span><span class="ident">::LeasePeriod</span>,
-			<span class="ident">period_count</span>: <span class="self">Self</span><span class="ident">::LeasePeriod</span>,
+			<span class="ident">leaser</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::AccountId</span>,
+			<span class="ident">amount</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span>,
+			<span class="ident">period_begin</span>: <span class="ident"><span class="self">Self</span>::LeasePeriod</span>,
+			<span class="ident">period_count</span>: <span class="ident"><span class="self">Self</span>::LeasePeriod</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">LeaseError</span><span class="op">&gt;</span> {
 			<span class="ident">LEASES</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> {
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">leases</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">borrow_mut</span>();
 				<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">System::block_number</span>();
 				<span class="kw">let</span> (<span class="ident">current_lease_period</span>, <span class="kw">_</span>) <span class="op">=</span>
-					<span class="self">Self</span><span class="ident">::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="ident">LeaseError::NoLeasePeriod</span>)<span class="question-mark">?</span>;
+					<span class="ident"><span class="self">Self</span>::lease_period_index</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="ident">LeaseError::NoLeasePeriod</span>)<span class="question-mark">?</span>;
 				<span class="kw">if</span> <span class="ident">period_begin</span> <span class="op">&lt;</span> <span class="ident">current_lease_period</span> {
 					<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">LeaseError::AlreadyEnded</span>)
 				}
@@ -2671,8 +2670,8 @@
 
 		<span class="kw">fn</span> <span class="ident">deposit_held</span>(
 			<span class="ident">para</span>: <span class="ident">ParaId</span>,
-			<span class="ident">leaser</span>: <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::AccountId</span>,
-		) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span> {
+			<span class="ident">leaser</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::AccountId</span>,
+		) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Currency</span> <span class="kw">as</span> <span class="ident">Currency</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Balance</span> {
 			<span class="ident">leases</span>()
 				.<span class="ident">iter</span>()
 				.<span class="ident">filter_map</span>(<span class="op">|</span>((<span class="ident">id</span>, <span class="ident">_period</span>), <span class="ident">data</span>)<span class="op">|</span> {
@@ -2690,8 +2689,8 @@
 			(<span class="number">10</span>, <span class="number">0</span>)
 		}
 
-		<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span><span class="ident">::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
-			<span class="kw">let</span> (<span class="ident">lease_period_length</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="self">Self</span><span class="ident">::lease_period_length</span>();
+		<span class="kw">fn</span> <span class="ident">lease_period_index</span>(<span class="ident">b</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::LeasePeriod</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+			<span class="kw">let</span> (<span class="ident">lease_period_length</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::lease_period_length</span>();
 			<span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">checked_sub</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
 
 			<span class="kw">let</span> <span class="ident">lease_period</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">/</span> <span class="ident">lease_period_length</span>;
@@ -2702,8 +2701,8 @@
 
 		<span class="kw">fn</span> <span class="ident">already_leased</span>(
 			<span class="ident">para_id</span>: <span class="ident">ParaId</span>,
-			<span class="ident">first_period</span>: <span class="self">Self</span><span class="ident">::LeasePeriod</span>,
-			<span class="ident">last_period</span>: <span class="self">Self</span><span class="ident">::LeasePeriod</span>,
+			<span class="ident">first_period</span>: <span class="ident"><span class="self">Self</span>::LeasePeriod</span>,
+			<span class="ident">last_period</span>: <span class="ident"><span class="self">Self</span>::LeasePeriod</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 			<span class="ident">leases</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span>((<span class="ident">para</span>, <span class="ident">period</span>), <span class="ident">_data</span>)<span class="op">|</span> {
 				<span class="ident">para</span> <span class="op">=</span><span class="op">=</span> <span class="ident">para_id</span> <span class="op">&amp;&amp;</span> <span class="ident">first_period</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">period</span> <span class="op">&amp;&amp;</span> <span class="ident">period</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">last_period</span>
@@ -2749,7 +2748,7 @@
 		<span class="kw">type</span> <span class="ident">SampleLength</span> <span class="op">=</span> <span class="ident">SampleLength</span>;
 		<span class="kw">type</span> <span class="ident">Randomness</span> <span class="op">=</span> <span class="ident">TestPastRandomness</span>;
 		<span class="kw">type</span> <span class="ident">InitiateOrigin</span> <span class="op">=</span> <span class="ident">RootOrSix</span>;
-		<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::auctions::TestWeightInfo</span>;
+		<span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::auctions::TestWeightInfo</span>;
 	}
 
 	<span class="comment">// This function basically just builds a genesis storage key/value store according to</span>
@@ -3780,12 +3779,12 @@
 
 		<span class="macro">impl_benchmark_test_suite!</span>(
 			<span class="ident">Auctions</span>,
-			<span class="kw">crate</span><span class="ident">::integration_tests::new_test_ext</span>(),
-			<span class="kw">crate</span><span class="ident">::integration_tests::Test</span>,
+			<span class="ident"><span class="kw">crate</span>::integration_tests::new_test_ext</span>(),
+			<span class="ident"><span class="kw">crate</span>::integration_tests::Test</span>,
 		);
 	}
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_runtime_common" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

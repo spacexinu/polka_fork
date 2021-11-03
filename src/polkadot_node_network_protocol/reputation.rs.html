@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `node&#x2F;network&#x2F;protocol&#x2F;src&#x2F;reputation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reputation.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_node_network_protocol/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `node&#x2F;network&#x2F;protocol&#x2F;src&#x2F;reputation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reputation.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_node_network_protocol/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -71,8 +71,7 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-</pre><pre class="rust">
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sc_network::ReputationChange</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sc_network::ReputationChange</span>;
 
 <span class="doccomment">/// Unified annoyance cost and good behavior benefits.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
@@ -102,40 +101,40 @@
 	<span class="doccomment">/// something malicious should be `1&lt;&lt;20` (give or take).</span>
 	<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">cost_or_benefit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::CostMinor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">100_000</span>,
-			<span class="self">Self</span><span class="ident">::CostMajor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">300_000</span>,
-			<span class="self">Self</span><span class="ident">::CostMinorRepeated</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">200_000</span>,
-			<span class="self">Self</span><span class="ident">::CostMajorRepeated</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">600_000</span>,
-			<span class="self">Self</span><span class="ident">::Malicious</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i32::MIN</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMajorFirst</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">300_000</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMajor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">200_000</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMinorFirst</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">15_000</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMinor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">10_000</span>,
+			<span class="ident"><span class="self">Self</span>::CostMinor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">100_000</span>,
+			<span class="ident"><span class="self">Self</span>::CostMajor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">300_000</span>,
+			<span class="ident"><span class="self">Self</span>::CostMinorRepeated</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">200_000</span>,
+			<span class="ident"><span class="self">Self</span>::CostMajorRepeated</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">600_000</span>,
+			<span class="ident"><span class="self">Self</span>::Malicious</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i32::MIN</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMajorFirst</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">300_000</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMajor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">200_000</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMinorFirst</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">15_000</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMinor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">10_000</span>,
 		}
 	}
 
 	<span class="doccomment">/// Extract the static description.</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::CostMinor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::CostMajor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::CostMinorRepeated</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::CostMajorRepeated</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::Malicious</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMajorFirst</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMajor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMinorFirst</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
-			<span class="self">Self</span><span class="ident">::BenefitMinor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::CostMinor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::CostMajor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::CostMinorRepeated</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::CostMajorRepeated</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::Malicious</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMajorFirst</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMajor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMinorFirst</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMinor</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">description</span>,
 		}
 	}
 
 	<span class="doccomment">/// Whether the reputation change is for good behavior.</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_benefit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::BenefitMajorFirst</span>(<span class="kw">_</span>) <span class="op">|</span>
-			<span class="self">Self</span><span class="ident">::BenefitMajor</span>(<span class="kw">_</span>) <span class="op">|</span>
-			<span class="self">Self</span><span class="ident">::BenefitMinorFirst</span>(<span class="kw">_</span>) <span class="op">|</span>
-			<span class="self">Self</span><span class="ident">::BenefitMinor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+			<span class="ident"><span class="self">Self</span>::BenefitMajorFirst</span>(<span class="kw">_</span>) <span class="op">|</span>
+			<span class="ident"><span class="self">Self</span>::BenefitMajor</span>(<span class="kw">_</span>) <span class="op">|</span>
+			<span class="ident"><span class="self">Self</span>::BenefitMinorFirst</span>(<span class="kw">_</span>) <span class="op">|</span>
+			<span class="ident"><span class="self">Self</span>::BenefitMinor</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 		}
 	}
@@ -145,7 +144,7 @@
 		<span class="ident">ReputationChange::new</span>(<span class="self">self</span>.<span class="ident">cost_or_benefit</span>(), <span class="self">self</span>.<span class="ident">description</span>())
 	}
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_node_network_protocol" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

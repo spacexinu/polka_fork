@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `bridges&#x2F;bin&#x2F;runtime-common&#x2F;src&#x2F;messages.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>messages.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bridge_runtime_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `bridges&#x2F;bin&#x2F;runtime-common&#x2F;src&#x2F;messages.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>messages.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bridge_runtime_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1516,8 +1516,7 @@
 <span id="1516">1516</span>
 <span id="1517">1517</span>
 <span id="1518">1518</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2019-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Parity Bridges Common.</span>
 
 <span class="comment">// Parity Bridges Common is free software: you can redistribute it and/or modify</span>
@@ -1647,7 +1646,7 @@
 	<span class="doccomment">/// (like weight of signature and signed extensions verification), because they&#39;re</span>
 	<span class="doccomment">/// already accounted by the `weight_of_delivery_transaction`. So this function should</span>
 	<span class="doccomment">/// return pure call dispatch weights range.</span>
-	<span class="kw">fn</span> <span class="ident">message_weight_limits</span>(<span class="ident">message_payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Weight</span><span class="op">&gt;</span>;
+	<span class="kw">fn</span> <span class="ident">message_weight_limits</span>(<span class="ident">message_payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Weight</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// Estimate size and weight of single message delivery transaction at the Bridged chain.</span>
 	<span class="kw">fn</span> <span class="ident">estimate_delivery_transaction</span>(
@@ -1779,7 +1778,7 @@
 			<span class="ident">lane</span>: <span class="kw-2">&amp;</span><span class="ident">LaneId</span>,
 			<span class="ident">lane_outbound_data</span>: <span class="kw-2">&amp;</span><span class="ident">OutboundLaneData</span>,
 			<span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="ident">FromThisChainMessagePayload</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+		) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
 			<span class="comment">// reject message if lane is blocked</span>
 			<span class="kw">if</span> <span class="op">!</span><span class="ident">ThisChain</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::is_outbound_lane_enabled</span>(<span class="ident">lane</span>) {
 				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">OUTBOUND_LANE_DISABLED</span>);
@@ -1812,7 +1811,7 @@
 
 	<span class="doccomment">/// Return maximal message size of This -&gt; Bridged chain message.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maximal_message_size</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">MessageBridge</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-		<span class="kw">super</span><span class="ident">::target::maximal_incoming_message_size</span>(<span class="ident">BridgedChain</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::maximal_extrinsic_size</span>())
+		<span class="ident"><span class="kw">super</span>::target::maximal_incoming_message_size</span>(<span class="ident">BridgedChain</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::maximal_extrinsic_size</span>())
 	}
 
 	<span class="doccomment">/// Do basic Bridged-chain specific verification of This -&gt; Bridged chain message.</span>
@@ -2029,14 +2028,14 @@
 		<span class="kw">type</span> <span class="ident">DispatchPayload</span> <span class="op">=</span> <span class="ident">FromBridgedChainMessagePayload</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>;
 
 		<span class="kw">fn</span> <span class="ident">dispatch_weight</span>(
-			<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">DispatchMessage</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::DispatchPayload</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">BridgedChain</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+			<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">DispatchMessage</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::DispatchPayload</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">BridgedChain</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">frame_support::weights::Weight</span> {
 			<span class="ident">message</span>.<span class="ident">data</span>.<span class="ident">payload</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">payload</span><span class="op">|</span> <span class="ident">payload</span>.<span class="ident">weight</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>)
 		}
 
 		<span class="kw">fn</span> <span class="ident">dispatch</span>(
 			<span class="ident">relayer_account</span>: <span class="kw-2">&amp;</span><span class="ident">AccountIdOf</span><span class="op">&lt;</span><span class="ident">ThisChain</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-			<span class="ident">message</span>: <span class="ident">DispatchMessage</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::DispatchPayload</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">BridgedChain</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+			<span class="ident">message</span>: <span class="ident">DispatchMessage</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::DispatchPayload</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">BridgedChain</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageDispatchResult</span> {
 			<span class="kw">let</span> <span class="ident">message_id</span> <span class="op">=</span> (<span class="ident">message</span>.<span class="ident">key</span>.<span class="ident">lane_id</span>, <span class="ident">message</span>.<span class="ident">key</span>.<span class="ident">nonce</span>);
 			<span class="ident">pallet_bridge_dispatch::Pallet</span>::<span class="op">&lt;</span><span class="ident">ThisRuntime</span>, <span class="ident">ThisDispatchInstance</span><span class="op">&gt;</span><span class="ident">::dispatch</span>(
@@ -2414,7 +2413,7 @@
 			<span class="macro">unreachable!</span>()
 		}
 
-		<span class="kw">fn</span> <span class="ident">message_weight_limits</span>(<span class="ident">_message_payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Weight</span><span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">message_weight_limits</span>(<span class="ident">_message_payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Weight</span><span class="op">&gt;</span> {
 			<span class="macro">unreachable!</span>()
 		}
 
@@ -2467,7 +2466,7 @@
 			<span class="ident">BRIDGED_CHAIN_MAX_EXTRINSIC_SIZE</span>
 		}
 
-		<span class="kw">fn</span> <span class="ident">message_weight_limits</span>(<span class="ident">message_payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Weight</span><span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">message_weight_limits</span>(<span class="ident">message_payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Weight</span><span class="op">&gt;</span> {
 			<span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">BRIDGED_CHAIN_MAX_EXTRINSIC_WEIGHT</span>, <span class="ident">message_payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">Weight</span>);
 			<span class="ident">begin</span>..<span class="op">=</span><span class="ident">BRIDGED_CHAIN_MAX_EXTRINSIC_WEIGHT</span>
 		}
@@ -3035,7 +3034,7 @@
 		);
 	}
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bridge_runtime_common" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

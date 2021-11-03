@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime&#x2F;parachains&#x2F;src&#x2F;scheduler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scheduler.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_runtime_parachains/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime&#x2F;parachains&#x2F;src&#x2F;scheduler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scheduler.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../polkadot_runtime_parachains/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2203,8 +2203,7 @@
 <span id="2203">2203</span>
 <span id="2204">2204</span>
 <span id="2205">2205</span>
-</pre><pre class="rust">
-<span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
 <span class="comment">// Polkadot is free software: you can redistribute it and/or modify</span>
@@ -2619,7 +2618,7 @@
 		<span class="ident">just_freed_cores</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">CoreIndex</span>, <span class="ident">FreedReason</span>)<span class="op">&gt;</span>,
 		<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>,
 	) {
-		<span class="self">Self</span><span class="ident">::free_cores</span>(<span class="ident">just_freed_cores</span>);
+		<span class="ident"><span class="self">Self</span>::free_cores</span>(<span class="ident">just_freed_cores</span>);
 
 		<span class="kw">let</span> <span class="ident">cores</span> <span class="op">=</span> <span class="ident">AvailabilityCores</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>();
 		<span class="kw">let</span> <span class="ident">parachains</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">paras::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::parachains</span>();
@@ -2679,7 +2678,7 @@
 						<span class="ident">kind</span>: <span class="ident">AssignmentKind::Parachain</span>,
 						<span class="ident">para_id</span>: <span class="ident">parachains</span>[<span class="ident">core_index</span>],
 						<span class="ident">core</span>: <span class="ident">core</span>.<span class="ident">clone</span>(),
-						<span class="ident">group_idx</span>: <span class="self">Self</span><span class="ident">::group_assigned_to_core</span>(<span class="ident">core</span>, <span class="ident">now</span>).<span class="ident">expect</span>(
+						<span class="ident">group_idx</span>: <span class="ident"><span class="self">Self</span>::group_assigned_to_core</span>(<span class="ident">core</span>, <span class="ident">now</span>).<span class="ident">expect</span>(
 							<span class="string">&quot;core is not out of bounds and we are guaranteed \
 									to be after the most recent session start; qed&quot;</span>,
 						),
@@ -2692,7 +2691,7 @@
 						<span class="ident">kind</span>: <span class="ident">AssignmentKind::Parathread</span>(<span class="ident">entry</span>.<span class="ident">claim</span>.<span class="number">1</span>, <span class="ident">entry</span>.<span class="ident">retries</span>),
 						<span class="ident">para_id</span>: <span class="ident">entry</span>.<span class="ident">claim</span>.<span class="number">0</span>,
 						<span class="ident">core</span>: <span class="ident">core</span>.<span class="ident">clone</span>(),
-						<span class="ident">group_idx</span>: <span class="self">Self</span><span class="ident">::group_assigned_to_core</span>(<span class="ident">core</span>, <span class="ident">now</span>).<span class="ident">expect</span>(
+						<span class="ident">group_idx</span>: <span class="ident"><span class="self">Self</span>::group_assigned_to_core</span>(<span class="ident">core</span>, <span class="ident">now</span>).<span class="ident">expect</span>(
 							<span class="string">&quot;core is not out of bounds and we are guaranteed \
 									to be after the most recent session start; qed&quot;</span>,
 						),
@@ -2869,7 +2868,7 @@
 
 	<span class="doccomment">/// Returns a helper for determining group rotation.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">group_rotation_info</span>(<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GroupRotationInfo</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">session_start_block</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::session_start_block</span>();
+		<span class="kw">let</span> <span class="ident">session_start_block</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::session_start_block</span>();
 		<span class="kw">let</span> <span class="ident">group_rotation_frequency</span> <span class="op">=</span>
 			<span class="op">&lt;</span><span class="ident">configuration::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::config</span>().<span class="ident">group_rotation_frequency</span>;
 
@@ -3055,7 +3054,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">add_parathread_claim_works</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3139,7 +3138,7 @@
 			<span class="ident">config</span>
 		};
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> { <span class="ident">config</span>, ..<span class="ident">Default::default</span>() },
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> { <span class="ident">config</span>, ..<span class="ident">Default::default</span>() },
 			..<span class="ident">Default::default</span>()
 		};
 
@@ -3163,7 +3162,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">session_change_prunes_cores_beyond_retries_and_those_from_non_live_parathreads</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3271,7 +3270,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">session_change_shuffles_validators</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3329,7 +3328,7 @@
 		};
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">config</span>.<span class="ident">clone</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3377,7 +3376,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">schedule_schedules</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3502,7 +3501,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">schedule_schedules_including_just_freed</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3678,7 +3677,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">schedule_clears_availability_cores</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3787,7 +3786,7 @@
 		<span class="kw">let</span> <span class="ident">parathread_cores</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">parathread_cores</span>;
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">config</span>.<span class="ident">clone</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3865,7 +3864,7 @@
 		<span class="kw">let</span> <span class="ident">max_retries</span> <span class="op">=</span> <span class="ident">default_config</span>().<span class="ident">parathread_retries</span>;
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -3913,7 +3912,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">availability_predicate_works</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4021,7 +4020,7 @@
 		<span class="ident">config</span>.<span class="ident">parathread_cores</span> <span class="op">=</span> <span class="number">1</span>;
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">config</span>.<span class="ident">clone</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4093,7 +4092,7 @@
 		<span class="ident">config</span>.<span class="ident">parathread_cores</span> <span class="op">=</span> <span class="number">1</span>;
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">config</span>.<span class="ident">clone</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4171,7 +4170,7 @@
 		<span class="ident">config</span>.<span class="ident">parathread_cores</span> <span class="op">=</span> <span class="number">0</span>;
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">config</span>.<span class="ident">clone</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4225,7 +4224,7 @@
 		<span class="ident">config</span>.<span class="ident">parathread_cores</span> <span class="op">=</span> <span class="number">0</span>;
 
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">config</span>.<span class="ident">clone</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4276,7 +4275,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">session_change_requires_reschedule_dropping_removed_paras</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4353,7 +4352,7 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">parathread_claims_are_pruned_after_deregistration</span>() {
 		<span class="kw">let</span> <span class="ident">genesis_config</span> <span class="op">=</span> <span class="ident">MockGenesisConfig</span> {
-			<span class="ident">configuration</span>: <span class="kw">crate</span><span class="ident">::configuration::GenesisConfig</span> {
+			<span class="ident">configuration</span>: <span class="ident"><span class="kw">crate</span>::configuration::GenesisConfig</span> {
 				<span class="ident">config</span>: <span class="ident">default_config</span>(),
 				..<span class="ident">Default::default</span>()
 			},
@@ -4409,7 +4408,7 @@
 		});
 	}
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="polkadot_runtime_parachains" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>
