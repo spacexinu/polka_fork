@@ -415,7 +415,6 @@
 <span id="415">415</span>
 <span id="416">416</span>
 <span id="417">417</span>
-<span id="418">418</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -496,7 +495,7 @@
 	<span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 
 	(
-		<span class="ident">MeteredSender</span> { <span class="ident">name</span>, <span class="ident">inner</span>: <span class="ident">tx</span> },
+		<span class="ident">MeteredSender</span> { <span class="ident">inner</span>: <span class="ident">tx</span> },
 		<span class="ident">MeteredReceiver</span> {
 			<span class="ident">name</span>,
 			<span class="ident">inner</span>: <span class="ident">rx</span>,
@@ -531,14 +530,13 @@
 <span class="doccomment">/// Oneshot sender, created by [`channel`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MeteredSender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 	<span class="ident">inner</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span>(<span class="ident">Instant</span>, <span class="ident">T</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">MeteredSender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Send a value.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">name</span>: <span class="kw">_</span> } <span class="op">=</span> <span class="self">self</span>;
+		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">inner</span> } <span class="op">=</span> <span class="self">self</span>;
 		<span class="ident">inner</span>.<span class="ident">send</span>((<span class="ident">Instant::now</span>(), <span class="ident">t</span>)).<span class="ident">map_err</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">t</span>)<span class="op">|</span> <span class="ident">t</span>)
 	}
 

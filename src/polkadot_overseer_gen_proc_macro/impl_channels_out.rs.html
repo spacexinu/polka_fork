@@ -125,6 +125,7 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -183,7 +184,8 @@
 			)<span class="op">*</span>
 		}
 
-		<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span> <span class="comment">// when no defined messages in enum</span>
+		<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
+		<span class="comment">// when no defined messages in enum</span>
 		<span class="kw">impl</span> <span class="ident">ChannelsOut</span> {
 			<span class="doccomment">/// Send a message via a bounded channel.</span>
 			<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_and_log_error</span>(
