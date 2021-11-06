@@ -184,6 +184,7 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -211,13 +212,14 @@
 	<span class="ident">WsClient</span>,
 };
 <span class="kw">use</span> <span class="ident">sc_transaction_pool_api::TransactionStatus</span>;
+<span class="kw">use</span> <span class="ident">sp_core::storage::StorageKey</span>;
 
 <span class="doccomment">/// Ensure that now is the signed phase.</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_signed_phase</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span>, <span class="ident">B</span>: <span class="ident">BlockT</span><span class="op">&gt;</span>(
 	<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">WsClient</span>,
 	<span class="ident">at</span>: <span class="ident">B::Hash</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">sp_core::storage::StorageKey</span>(<span class="ident">EPM::CurrentPhase</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::hashed_key</span>().<span class="ident">to_vec</span>());
+	<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">StorageKey</span>(<span class="ident">EPM::CurrentPhase</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::hashed_key</span>().<span class="ident">to_vec</span>());
 	<span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> <span class="ident">get_storage</span>::<span class="op">&lt;</span><span class="ident">EPM::Phase</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">client</span>, <span class="macro">params!</span> {<span class="ident">key</span>, <span class="ident">at</span>})
 		.<span class="kw">await</span>
 		.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>
@@ -342,7 +344,7 @@
 						<span class="ident">TransactionStatus::Ready</span> <span class="op">|</span> <span class="ident">TransactionStatus::Broadcast</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">TransactionStatus::Future</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
 						<span class="ident">TransactionStatus::InBlock</span>(<span class="ident">hash</span>) <span class="op">=</span><span class="op">&gt;</span> {
 							<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;included at {:?}&quot;</span>, <span class="ident">hash</span>);
-							<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">frame_support::storage::storage_prefix</span>(<span class="string">b&quot;System&quot;</span>, <span class="string">b&quot;Events&quot;</span>);
+							<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">StorageKey</span>(<span class="ident">frame_support::storage::storage_prefix</span>(<span class="string">b&quot;System&quot;</span>,<span class="string">b&quot;Events&quot;</span>).<span class="ident">to_vec</span>());
 							<span class="kw">let</span> <span class="ident">events</span> <span class="op">=</span> <span class="ident">get_storage</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">frame_system::EventRecord</span><span class="op">&lt;</span><span class="ident">Event</span>, <span class="op">&lt;</span><span class="ident">Block</span> <span class="kw">as</span> <span class="ident">BlockT</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 							<span class="op">&gt;</span>(<span class="ident">client</span>, <span class="macro">params!</span>{ <span class="ident">key</span>, <span class="ident">hash</span> }).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">unwrap_or_default</span>();
 							<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;events at inclusion {:?}&quot;</span>, <span class="ident">events</span>);
