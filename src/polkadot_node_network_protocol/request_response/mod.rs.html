@@ -398,7 +398,7 @@
 			<span class="ident">Protocol::ChunkFetching</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RequestResponseConfig</span> {
 				<span class="ident">name</span>: <span class="ident">p_name</span>,
 				<span class="ident">max_request_size</span>: <span class="number">1_000</span>,
-				<span class="ident">max_response_size</span>: <span class="ident">POV_RESPONSE_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">/</span> <span class="number">10</span>,
+				<span class="ident">max_response_size</span>: <span class="ident">POV_RESPONSE_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">3</span>,
 				<span class="comment">// We are connected to all validators:</span>
 				<span class="ident">request_timeout</span>: <span class="ident">CHUNK_REQUEST_TIMEOUT</span>,
 				<span class="ident">inbound_queue</span>: <span class="prelude-val">Some</span>(<span class="ident">tx</span>),
