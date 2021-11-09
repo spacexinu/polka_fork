@@ -6373,22 +6373,7 @@ dependencies = [
  "sp-core",
  "sp-keyring",
  "sp-keystore",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "polkadot-node-core-dispute-participation"
-version = "0.9.12"
-dependencies = [
- "assert_matches",
- "futures 0.3.17",
- "parity-scale-codec",
- "polkadot-node-primitives",
- "polkadot-node-subsystem",
- "polkadot-node-subsystem-test-helpers",
- "polkadot-primitives",
- "sp-core",
+ "sp-tracing",
  "thiserror",
  "tracing",
 ]
@@ -6600,6 +6585,7 @@ dependencies = [
  "env_logger 0.9.0",
  "futures 0.3.17",
  "itertools",
+ "lazy_static",
  "log",
  "lru 0.7.0",
  "metered-channel",
@@ -6608,6 +6594,7 @@ dependencies = [
  "polkadot-node-jaeger",
  "polkadot-node-metrics",
  "polkadot-node-network-protocol",
+ "polkadot-node-primitives",
  "polkadot-node-subsystem",
  "polkadot-node-subsystem-test-helpers",
  "polkadot-overseer",
@@ -6963,7 +6950,6 @@ dependencies = [
  "polkadot-node-core-chain-api",
  "polkadot-node-core-chain-selection",
  "polkadot-node-core-dispute-coordinator",
- "polkadot-node-core-dispute-participation",
  "polkadot-node-core-parachains-inherent",
  "polkadot-node-core-provisioner",
  "polkadot-node-core-runtime-api",
