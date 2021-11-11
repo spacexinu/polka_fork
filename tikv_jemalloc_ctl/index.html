@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`jemalloc` control and introspection."><meta name="keywords" content="rust, rustlang, rust-lang, tikv_jemalloc_ctl"><title>tikv_jemalloc_ctl - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../tikv_jemalloc_ctl/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate tikv_jemalloc_ctl</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.4.2</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all tikv_jemalloc_ctl's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="tikv_jemalloc_ctl" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">tikv_jemalloc_ctl</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/tikv_jemalloc_ctl/lib.rs.html#1-222" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>jemalloc</code> control and introspection.</p>
+<p><code>jemalloc</code> offers a powerful introspection and control interface through the <code>mallctl</code> function.
+It can be used to tune the allocator, take heap dumps, and retrieve statistics. This crate
+provides a typed API over that interface.</p>
+<p>While <code>mallctl</code> takes a string to specify an operation (e.g. <code>stats.allocated</code> or
+<code>stats.arenas.15.muzzy_decay_ms</code>), the overhead of repeatedly parsing those strings is not
+ideal. Fortunately, <code>jemalloc</code> offers the ability to translate the string ahead of time into a
+“Management Information Base” (MIB) to speed up future lookups.</p>
+<p>This crate provides a type for each <code>mallctl</code> operation. Calling
+<code>$op::{read(), write(x), update(x)}</code> on the type calls <code>mallctl</code> with the
+string-based API. If the operation will be repeatedly performed, a MIB for
+the operation can be obtained using <code>$op.mib()</code>.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<p>Repeatedly printing allocation statistics:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::thread</span>;
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use</span> <span class="ident">tikv_jemalloc_ctl</span>::{<span class="ident">stats</span>, <span class="ident">epoch</span>};
+
+<span class="attribute">#[<span class="ident">global_allocator</span>]</span>
+<span class="kw">static</span> <span class="ident">ALLOC</span>: <span class="ident">tikv_jemallocator::Jemalloc</span> <span class="op">=</span> <span class="ident">tikv_jemallocator::Jemalloc</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="kw">loop</span> {
+        <span class="comment">// many statistics are cached and only updated when the epoch is advanced.</span>
+        <span class="ident">epoch::advance</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">allocated</span> <span class="op">=</span> <span class="ident">stats::allocated::read</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">resident</span> <span class="op">=</span> <span class="ident">stats::resident::read</span>().<span class="ident">unwrap</span>();
+        <span class="macro">println!</span>(<span class="string">&quot;{} bytes allocated/{} bytes resident&quot;</span>, <span class="ident">allocated</span>, <span class="ident">resident</span>);
+        <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>));
+    }
+}</code></pre></div>
+<p>Doing the same with the MIB-based API:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::thread</span>;
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use</span> <span class="ident">tikv_jemalloc_ctl</span>::{<span class="ident">stats</span>, <span class="ident">epoch</span>};
+
+<span class="attribute">#[<span class="ident">global_allocator</span>]</span>
+<span class="kw">static</span> <span class="ident">ALLOC</span>: <span class="ident">tikv_jemallocator::Jemalloc</span> <span class="op">=</span> <span class="ident">tikv_jemallocator::Jemalloc</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">epoch::mib</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">allocated</span> <span class="op">=</span> <span class="ident">stats::allocated::mib</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">resident</span> <span class="op">=</span> <span class="ident">stats::resident::mib</span>().<span class="ident">unwrap</span>();
+    <span class="kw">loop</span> {
+        <span class="comment">// many statistics are cached and only updated when the epoch is advanced.</span>
+        <span class="ident">e</span>.<span class="ident">advance</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">allocated</span> <span class="op">=</span> <span class="ident">allocated</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">resident</span> <span class="op">=</span> <span class="ident">resident</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
+        <span class="macro">println!</span>(<span class="string">&quot;{} bytes allocated/{} bytes resident&quot;</span>, <span class="ident">allocated</span>, <span class="ident">resident</span>);
+        <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>));
+    }
+}</code></pre></div>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="mod" href="arenas/index.html" title="tikv_jemalloc_ctl::arenas mod">arenas</a></div><div class="item-right docblock-short"><p>Arena operations.</p>
+</div><div class="item-left module-item"><a class="mod" href="config/index.html" title="tikv_jemalloc_ctl::config mod">config</a></div><div class="item-right docblock-short"><p><code>jemalloc</code>’s build-time configuration.</p>
+</div><div class="item-left module-item"><a class="mod" href="opt/index.html" title="tikv_jemalloc_ctl::opt mod">opt</a></div><div class="item-right docblock-short"><p><code>jemalloc</code>’s run-time configuration.</p>
+</div><div class="item-left module-item"><a class="mod" href="raw/index.html" title="tikv_jemalloc_ctl::raw mod">raw</a></div><div class="item-right docblock-short"><p>Raw <code>unsafe</code> access to the <code>malloctl</code> API.</p>
+</div><div class="item-left module-item"><a class="mod" href="stats/index.html" title="tikv_jemalloc_ctl::stats mod">stats</a></div><div class="item-right docblock-short"><p>Global allocator statistics.</p>
+</div><div class="item-left module-item"><a class="mod" href="thread/index.html" title="tikv_jemalloc_ctl::thread mod">thread</a></div><div class="item-right docblock-short"><p>Thread specific operations.</p>
+</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="tikv_jemalloc_ctl::Error struct">Error</a></div><div class="item-right docblock-short"><p>Errors of the <code>tikv_jemalloc_sys::mallct</code>-family of functions.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Mib.html" title="tikv_jemalloc_ctl::Mib struct">Mib</a></div><div class="item-right docblock-short"><p>Management Information Base of a non-string value.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.MibStr.html" title="tikv_jemalloc_ctl::MibStr struct">MibStr</a></div><div class="item-right docblock-short"><p>Management Information Base of a string value.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.Name.html" title="tikv_jemalloc_ctl::Name struct">Name</a></div><div class="item-right docblock-short"><p>A <code>Name</code> in the <em>MALLCTL NAMESPACE</em>.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.background_thread.html" title="tikv_jemalloc_ctl::background_thread struct">background_thread</a></div><div class="item-right docblock-short"><p>State of internal background worker threads.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.background_thread_mib.html" title="tikv_jemalloc_ctl::background_thread_mib struct">background_thread_mib</a></div><div class="item-right docblock-short"><p>See <a href="struct.background_thread.html" title="background_thread"><code>background_thread</code></a>.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.epoch.html" title="tikv_jemalloc_ctl::epoch struct">epoch</a></div><div class="item-right docblock-short"><p><code>jemalloc</code> epoch.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.epoch_mib.html" title="tikv_jemalloc_ctl::epoch_mib struct">epoch_mib</a></div><div class="item-right docblock-short"><p>See <a href="struct.epoch.html" title="epoch"><code>epoch</code></a>.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.max_background_threads.html" title="tikv_jemalloc_ctl::max_background_threads struct">max_background_threads</a></div><div class="item-right docblock-short"><p>Maximum number of background threads that will be created.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.max_background_threads_mib.html" title="tikv_jemalloc_ctl::max_background_threads_mib struct">max_background_threads_mib</a></div><div class="item-right docblock-short"><p>See <a href="struct.max_background_threads.html" title="max_background_threads"><code>max_background_threads</code></a>.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.version.html" title="tikv_jemalloc_ctl::version struct">version</a></div><div class="item-right docblock-short"><p><code>jemalloc</code> version string.</p>
+</div><div class="item-left module-item"><a class="struct" href="struct.version_mib.html" title="tikv_jemalloc_ctl::version_mib struct">version_mib</a></div><div class="item-right docblock-short"><p>See <a href="struct.version.html" title="version"><code>version</code></a>.</p>
+</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Access.html" title="tikv_jemalloc_ctl::Access trait">Access</a></div><div class="item-right docblock-short"><p>Safe read access to the <em>MALLCTL NAMESPACE</em>.</p>
+</div><div class="item-left module-item"><a class="trait" href="trait.AsName.html" title="tikv_jemalloc_ctl::AsName trait">AsName</a></div><div class="item-right docblock-short"><p>Converts a null-terminated byte-string into a <a href="struct.Name.html" title="Name"><code>Name</code></a>.</p>
+</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="tikv_jemalloc_ctl::Result type">Result</a></div><div class="item-right docblock-short"><p>Result type</p>
+</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tikv_jemalloc_ctl" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>

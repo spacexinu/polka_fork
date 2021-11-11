@@ -1,0 +1,126 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="About Honggfuzz"><meta name="keywords" content="rust, rustlang, rust-lang, honggfuzz"><title>honggfuzz - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../honggfuzz/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate honggfuzz</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.5.54</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all honggfuzz's items</p></a><div class="block items"><ul><li><a href="#macros">Macros</a></li><li><a href="#functions">Functions</a></li></ul></div><div id="sidebar-vars" data-name="honggfuzz" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">honggfuzz</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/honggfuzz/lib.rs.html#1-371" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="about-honggfuzz" class="section-header"><a href="#about-honggfuzz">About Honggfuzz</a></h2>
+<p>Honggfuzz is a security oriented fuzzer with powerful analysis options. Supports evolutionary, feedback-driven fuzzing based on code coverage (software- and hardware-based).</p>
+<ul>
+<li>project homepage <a href="http://honggfuzz.com/">honggfuzz.com</a></li>
+<li>project repository <a href="https://github.com/google/honggfuzz">github.com/google/honggfuzz</a></li>
+<li>this upstream project is maintained by Google, but …</li>
+<li>this is NOT an official Google product</li>
+</ul>
+<h2 id="compatibility" class="section-header"><a href="#compatibility">Compatibility</a></h2>
+<ul>
+<li><strong>Rust</strong>: stable, beta, nightly</li>
+<li><strong>OS</strong>: GNU/Linux, macOS, FreeBSD, NetBSD, Android, WSL (Windows Subsystem for Linux)</li>
+<li><strong>Arch</strong>: x86_64, x86, arm64-v8a, armeabi-v7a, armeabi</li>
+<li><strong>Sanitizer</strong>: none, address, thread, leak </li>
+</ul>
+<h2 id="dependencies" class="section-header"><a href="#dependencies">Dependencies</a></h2><h3 id="linux" class="section-header"><a href="#linux">Linux</a></h3>
+<ul>
+<li>C compiler: <code>cc</code></li>
+<li>GNU Make: <code>make</code></li>
+<li>GNU Binutils development files for the BFD library: <code>libbfd.h</code></li>
+<li>libunwind development files: <code>libunwind.h</code></li>
+<li>liblzma development files</li>
+</ul>
+<p>For example on Debian and its derivatives:</p>
+<div class="example-wrap"><pre class="language-sh"><code>sudo apt install build-essential binutils-dev libunwind-dev</code></pre></div><h2 id="how-to-use-this-crate" class="section-header"><a href="#how-to-use-this-crate">How to use this crate</a></h2>
+<p>Install honggfuzz commands to build with instrumentation and fuzz</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo install honggfuzz</code></pre></div>
+<p>Add to your dependencies</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+honggfuzz = &quot;0.5&quot;</code></pre></div>
+<p>Create a target to fuzz</p>
+
+<div class='information'><div class='tooltip should_panic'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered should_panic"><code><span class="kw">use</span> <span class="ident">honggfuzz::fuzz</span>;
+ 
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="comment">// Here you can parse `std::env::args and </span>
+    <span class="comment">// setup / initialize your project</span>
+ 
+    <span class="comment">// You have full control over the loop but</span>
+    <span class="comment">// you&#39;re supposed to call `fuzz` ad vitam aeternam</span>
+    <span class="kw">loop</span> {
+        <span class="comment">// The fuzz macro gives an arbitrary object (see `arbitrary crate`)</span>
+        <span class="comment">// to a closure-like block of code.</span>
+        <span class="comment">// For performance reasons, it is recommended that you use the native type</span>
+        <span class="comment">// `&amp;[u8]` when possible.</span>
+        <span class="comment">// Here, this slice will contain a &quot;random&quot; quantity of &quot;random&quot; data.</span>
+        <span class="macro">fuzz!</span>(<span class="op">|</span><span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">3</span> {<span class="kw">return</span>}
+            <span class="kw">if</span> <span class="ident">data</span>[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;h&#39;</span> {<span class="kw">return</span>}
+            <span class="kw">if</span> <span class="ident">data</span>[<span class="number">1</span>] <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;e&#39;</span> {<span class="kw">return</span>}
+            <span class="kw">if</span> <span class="ident">data</span>[<span class="number">2</span>] <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;y&#39;</span> {<span class="kw">return</span>}
+            <span class="macro">panic!</span>(<span class="string">&quot;BOOM&quot;</span>)
+        });
+    }
+}
+ </code></pre></div>
+<p>Fuzz for fun and profit !</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo hfuzz run example</code></pre></div>
+<p>Once you got a crash, replay it easily in a debug environment</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo hfuzz run-debug example fuzzing_workspace/*.fuzz</code></pre></div>
+<p>You can also build and run your project without compile-time software instrumentation (LLVM’s SanCov passes)</p>
+<p>This allows you for example to try hardware-only feedback driven fuzzing:</p>
+<div class="example-wrap"><pre class="language-sh"><code>HFUZZ_RUN_ARGS=&quot;--linux_perf_ipt_block --linux_perf_instr --linux_perf_branch&quot; cargo hfuzz run-no-instr example</code></pre></div>
+<p>Clean</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo hfuzz clean </code></pre></div>
+<p>Version</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo hfuzz version</code></pre></div><h3 id="environment-variables" class="section-header"><a href="#environment-variables">Environment variables</a></h3><h4 id="rustflags" class="section-header"><a href="#rustflags"><code>RUSTFLAGS</code></a></h4>
+<p>You can use <code>RUSTFLAGS</code> to send additional arguments to <code>rustc</code>.</p>
+<p>For instance, you can enable the use of LLVM’s <a href="https://github.com/japaric/rust-san">sanitizers</a>.
+This is a recommended option if you want to test your <code>unsafe</code> rust code but it will have an impact on performance.</p>
+<div class="example-wrap"><pre class="language-sh"><code>RUSTFLAGS=&quot;-Z sanitizer=address&quot; cargo hfuzz run example</code></pre></div><h4 id="hfuzz_build_args" class="section-header"><a href="#hfuzz_build_args"><code>HFUZZ_BUILD_ARGS</code></a></h4>
+<p>You can use <code>HFUZZ_BUILD_ARGS</code> to send additional arguments to <code>cargo build</code>.</p>
+<h4 id="hfuzz_run_args" class="section-header"><a href="#hfuzz_run_args"><code>HFUZZ_RUN_ARGS</code></a></h4>
+<p>You can use <code>HFUZZ_RUN_ARGS</code> to send additional arguments to <code>honggfuzz</code>.
+See <a href="https://github.com/google/honggfuzz/blob/master/docs/USAGE.md">USAGE</a> for the list of those.</p>
+<p>For example:</p>
+<div class="example-wrap"><pre class="language-sh"><code>HFUZZ_RUN_ARGS=&quot;-t 1 -n 12 -v -N 1000000 --exit_upon_crash&quot; cargo hfuzz run example</code></pre></div><h4 id="hfuzz_debugger" class="section-header"><a href="#hfuzz_debugger"><code>HFUZZ_DEBUGGER</code></a></h4>
+<p>By default we use <code>rust-lldb</code> but you can change it to <code>rust-gdb</code>, <code>gdb</code>, <code>/usr/bin/lldb-7</code> …</p>
+<h4 id="cargo_target_dir" class="section-header"><a href="#cargo_target_dir"><code>CARGO_TARGET_DIR</code></a></h4>
+<p>Target compilation directory, defaults to <code>hfuzz_target</code> to not clash with <code>cargo build</code>’s default <code>target</code> directory.</p>
+<h4 id="hfuzz_workspace" class="section-header"><a href="#hfuzz_workspace"><code>HFUZZ_WORKSPACE</code></a></h4>
+<p>Honggfuzz working directory, defaults to <code>hfuzz_workspace</code>.</p>
+<h4 id="hfuzz_input" class="section-header"><a href="#hfuzz_input"><code>HFUZZ_INPUT</code></a></h4>
+<p>Honggfuzz input files (also called “corpus”), defaults to <code>$HFUZZ_WORKSPACE/{TARGET}/input</code>.</p>
+<h2 id="conditionnal-compilation" class="section-header"><a href="#conditionnal-compilation">Conditionnal compilation</a></h2>
+<p>Sometimes, it is necessary to make some specific adaptation to your code to yield a better fuzzing efficiency.</p>
+<p>For instance:</p>
+<ul>
+<li>Make you software behavior as much as possible deterministic on the fuzzing input
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Pseudorandom_number_generator">PRNG</a>s must be seeded with a constant or the fuzzer input</li>
+<li>Behavior shouldn’t change based on the computer’s clock.</li>
+<li>Avoid potential undeterministic behavior from racing threads.</li>
+<li>…</li>
+</ul>
+</li>
+<li>Never ever call <code>std::process::exit()</code>.</li>
+<li>Disable logging and other unnecessary functionnalities.</li>
+<li>Try to avoid modifying global state when possible.</li>
+</ul>
+<p>When building with <code>cargo hfuzz</code>, the argument <code>--cfg fuzzing</code> is passed to <code>rustc</code> to allow you to condition the compilation of thoses adaptations thanks to the <code>cfg</code> macro like so:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">fuzzing</span>)]</span>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand_chacha::ChaCha8Rng::from_seed</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>]);
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">fuzzing</span>))]</span>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();</code></pre></div>
+<p>Also, when building in debug mode, the <code>fuzzing_debug</code> argument is added in addition to <code>fuzzing</code>.</p>
+<p>For more information about conditional compilation, please see the <a href="https://doc.rust-lang.org/reference/attributes.html#conditional-compilation">reference</a>.</p>
+<h2 id="relevant-documentation-about-honggfuzz" class="section-header"><a href="#relevant-documentation-about-honggfuzz">Relevant documentation about honggfuzz</a></h2>
+<ul>
+<li><a href="https://github.com/google/honggfuzz/blob/master/docs/USAGE.md">USAGE</a></li>
+<li><a href="https://github.com/google/honggfuzz/blob/master/docs/FeedbackDrivenFuzzing.md">FeedbackDrivenFuzzing</a></li>
+<li><a href="https://github.com/google/honggfuzz/blob/master/docs/PersistentFuzzing.md">PersistentFuzzing</a></li>
+</ul>
+<h2 id="about-rust-fuzzing" class="section-header"><a href="#about-rust-fuzzing">About Rust fuzzing</a></h2>
+<p>There is other projects providing Rust fuzzing support at <a href="https://github.com/rust-fuzz">github.com/rust-fuzz</a>. </p>
+<p>You’ll find support for <a href="https://github.com/rust-fuzz/afl.rs">AFL</a> and LLVM’s <a href="https://github.com/rust-fuzz/cargo-fuzz">LibFuzzer</a> and there is also a <a href="https://github.com/rust-fuzz/trophy-case">trophy case</a> ;-) .</p>
+<p>This crate was inspired by those projects!</p>
+</div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
+<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../arbitrary/index.html" title="mod arbitrary">arbitrary</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.fuzz.html" title="honggfuzz::fuzz macro">fuzz</a></div><div class="item-right docblock-short"><p>Fuzz a closure-like block of code by passing it an object of arbitrary type.</p>
+</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.fuzz.html" title="honggfuzz::fuzz fn">fuzz</a></div><div class="item-right docblock-short"><p>Fuzz a closure by passing it a <code>&amp;[u8]</code></p>
+</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="honggfuzz" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>

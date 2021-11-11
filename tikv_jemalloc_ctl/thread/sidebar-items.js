@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ThreadLocal","A thread-local pointer."],["allocatedp","Access to the total number of bytes allocated by the current thread."],["allocatedp_mib","See [`allocatedp`]."],["deallocatedp","Access to the total number of bytes deallocated by the current thread."],["deallocatedp_mib","See [`deallocatedp`]."]]});

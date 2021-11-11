@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["narenas","Current limit on the number of arenas."],["narenas_mib","See [`narenas`]."]]});
