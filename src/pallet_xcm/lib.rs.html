@@ -1544,6 +1544,18 @@
 <span id="1544">1544</span>
 <span id="1545">1545</span>
 <span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2738,6 +2750,11 @@
 		<span class="doccomment">/// Note that a particular destination to whom we would like to send a message is unknown</span>
 		<span class="doccomment">/// and queue it for version discovery.</span>
 		<span class="kw">fn</span> <span class="ident">note_unknown_version</span>(<span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="ident">MultiLocation</span>) {
+			<span class="macro">log::trace!</span>(
+				<span class="ident">target</span>: <span class="string">&quot;xcm::pallet_xcm::note_unknown_version&quot;</span>,
+				<span class="string">&quot;XCM version is unknown for destination: {:?}&quot;</span>,
+				<span class="ident">dest</span>,
+			);
 			<span class="kw">let</span> <span class="ident">versioned_dest</span> <span class="op">=</span> <span class="ident">VersionedMultiLocation::from</span>(<span class="ident">dest</span>.<span class="ident">clone</span>());
 			<span class="ident">VersionDiscoveryQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::mutate</span>(<span class="op">|</span><span class="ident">q</span><span class="op">|</span> {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">q</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">versioned_dest</span>) {
@@ -2760,7 +2777,14 @@
 					<span class="ident"><span class="self">Self</span>::note_unknown_version</span>(<span class="ident">dest</span>);
 					<span class="ident">SafeXcmVersion</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::get</span>()
 				})
-				.<span class="ident">ok_or</span>(())
+				.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+					<span class="macro">log::trace!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;xcm::pallet_xcm::wrap_version&quot;</span>,
+						<span class="string">&quot;Could not determine a version to wrap XCM for destination: {:?}&quot;</span>,
+						<span class="ident">dest</span>,
+					);
+					()
+				})
 				.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">xcm</span>.<span class="ident">into</span>().<span class="ident">into_version</span>(<span class="ident">v</span>.<span class="ident">min</span>(<span class="ident">XCM_VERSION</span>)))
 		}
 	}

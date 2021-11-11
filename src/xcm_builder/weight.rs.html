@@ -284,6 +284,22 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -318,6 +334,7 @@
 	<span class="kw">for</span> <span class="ident">FixedWeightBounds</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span>
 {
 	<span class="kw">fn</span> <span class="ident">weight</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>, <span class="string">&quot;FixedWeightBounds message: {:?}&quot;</span>, <span class="ident">message</span>);
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instructions_left</span> <span class="op">=</span> <span class="ident">M::get</span>();
 		<span class="ident"><span class="self">Self</span>::weight_with_limit</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">instructions_left</span>)
 	}
@@ -359,6 +376,7 @@
 	<span class="ident">Instruction</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>: <span class="ident">xcm::GetWeight</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>,
 {
 	<span class="kw">fn</span> <span class="ident">weight</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xcm</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Weight</span>, ()<span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>, <span class="string">&quot;WeightInfoBounds message: {:?}&quot;</span>, <span class="ident">message</span>);
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instructions_left</span> <span class="op">=</span> <span class="ident">M::get</span>();
 		<span class="ident"><span class="self">Self</span>::weight_with_limit</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">instructions_left</span>)
 	}
@@ -430,6 +448,11 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(
+			<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>,
+			<span class="string">&quot;FixedRateOfConcreteFungible::buy_weight weight: {:?}, payment: {:?}&quot;</span>,
+			<span class="ident">weight</span>, <span class="ident">payment</span>,
+		);
 		<span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">units_per_second</span>) <span class="op">=</span> <span class="ident">T::get</span>();
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">units_per_second</span> <span class="op">*</span> (<span class="ident">weight</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">/</span> (<span class="ident">WEIGHT_PER_SECOND</span> <span class="kw">as</span> <span class="ident">u128</span>);
 		<span class="kw">let</span> <span class="ident">unused</span> <span class="op">=</span>
@@ -440,6 +463,7 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">refund_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MultiAsset</span><span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>, <span class="string">&quot;FixedRateOfConcreteFungible::refund_weight weight: {:?}&quot;</span>, <span class="ident">weight</span>);
 		<span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">units_per_second</span>) <span class="op">=</span> <span class="ident">T::get</span>();
 		<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="number">0</span>);
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">units_per_second</span> <span class="op">*</span> (<span class="ident">weight</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">/</span> (<span class="ident">WEIGHT_PER_SECOND</span> <span class="kw">as</span> <span class="ident">u128</span>);
@@ -476,6 +500,11 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(
+			<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>,
+			<span class="string">&quot;FixedRateOfFungible::buy_weight weight: {:?}, payment: {:?}&quot;</span>,
+			<span class="ident">weight</span>, <span class="ident">payment</span>,
+		);
 		<span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">units_per_second</span>) <span class="op">=</span> <span class="ident">T::get</span>();
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">units_per_second</span> <span class="op">*</span> (<span class="ident">weight</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">/</span> (<span class="ident">WEIGHT_PER_SECOND</span> <span class="kw">as</span> <span class="ident">u128</span>);
 		<span class="kw">if</span> <span class="ident">amount</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
@@ -489,6 +518,7 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">refund_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MultiAsset</span><span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>, <span class="string">&quot;FixedRateOfFungible::refund_weight weight: {:?}&quot;</span>, <span class="ident">weight</span>);
 		<span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">units_per_second</span>) <span class="op">=</span> <span class="ident">T::get</span>();
 		<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="number">0</span>);
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">units_per_second</span> <span class="op">*</span> (<span class="ident">weight</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">/</span> (<span class="ident">WEIGHT_PER_SECOND</span> <span class="kw">as</span> <span class="ident">u128</span>);
@@ -536,6 +566,7 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">buy_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>, <span class="ident">payment</span>: <span class="ident">Assets</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assets</span>, <span class="ident">XcmError</span><span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>, <span class="string">&quot;UsingComponents::buy_weight weight: {:?}, payment: {:?}&quot;</span>, <span class="ident">weight</span>, <span class="ident">payment</span>);
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">WeightToFee::calc</span>(<span class="kw-2">&amp;</span><span class="ident">weight</span>);
 		<span class="kw">let</span> <span class="ident">u128_amount</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">amount</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::Overflow</span>)<span class="question-mark">?</span>;
 		<span class="kw">let</span> <span class="ident">required</span> <span class="op">=</span> (<span class="ident">Concrete</span>(<span class="ident">AssetId::get</span>()), <span class="ident">u128_amount</span>).<span class="ident">into</span>();
@@ -546,6 +577,7 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">refund_weight</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MultiAsset</span><span class="op">&gt;</span> {
+		<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::weight&quot;</span>, <span class="string">&quot;UsingComponents::refund_weight weight: {:?}&quot;</span>, <span class="ident">weight</span>);
 		<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">weight</span>.<span class="ident">min</span>(<span class="self">self</span>.<span class="number">0</span>);
 		<span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">WeightToFee::calc</span>(<span class="kw-2">&amp;</span><span class="ident">weight</span>);
 		<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span><span class="op">=</span> <span class="ident">weight</span>;
