@@ -1057,22 +1057,6 @@
 <span id="1057">1057</span>
 <span id="1058">1058</span>
 <span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -1454,11 +1438,11 @@
 		},
 	};
 
-	<span class="comment">// Determine the group on that core and the next group on that core.</span>
-	<span class="kw">let</span> (<span class="ident">current_validators</span>, <span class="ident">next_validators</span>) <span class="op">=</span>
+	<span class="comment">// Determine the group on that core.</span>
+	<span class="kw">let</span> <span class="ident">current_validators</span> <span class="op">=</span>
 		<span class="ident">determine_our_validators</span>(<span class="ident">ctx</span>, <span class="ident">runtime</span>, <span class="ident">our_core</span>, <span class="ident">num_cores</span>, <span class="ident">relay_parent</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-	<span class="kw">if</span> <span class="ident">current_validators</span>.<span class="ident">validators</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">next_validators</span>.<span class="ident">validators</span>.<span class="ident">is_empty</span>() {
+	<span class="kw">if</span> <span class="ident">current_validators</span>.<span class="ident">validators</span>.<span class="ident">is_empty</span>() {
 		<span class="macro">tracing::warn!</span>(
 			<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 			<span class="ident">core</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">our_core</span>,
@@ -1476,23 +1460,14 @@
 		<span class="ident">pov_hash</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">pov</span>.<span class="ident">hash</span>(),
 		<span class="ident">core</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">our_core</span>,
 		<span class="question-mark">?</span><span class="ident">current_validators</span>,
-		<span class="question-mark">?</span><span class="ident">next_validators</span>,
 		<span class="string">&quot;Accepted collation, connecting to validators.&quot;</span>
 	);
 
 	<span class="kw">let</span> <span class="ident">validator_group</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
 		<span class="ident">current_validators</span>.<span class="ident">validators</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Clone::clone</span>).<span class="ident">collect</span>();
 
-	<span class="comment">// Issue a discovery request for the validators of the current group and the next group:</span>
-	<span class="ident">connect_to_validators</span>(
-		<span class="ident">ctx</span>,
-		<span class="ident">current_validators</span>
-			.<span class="ident">validators</span>
-			.<span class="ident">into_iter</span>()
-			.<span class="ident">chain</span>(<span class="ident">next_validators</span>.<span class="ident">validators</span>.<span class="ident">into_iter</span>())
-			.<span class="ident">collect</span>(),
-	)
-	.<span class="kw">await</span>;
+	<span class="comment">// Issue a discovery request for the validators of the current group:</span>
+	<span class="ident">connect_to_validators</span>(<span class="ident">ctx</span>, <span class="ident">current_validators</span>.<span class="ident">validators</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()).<span class="kw">await</span>;
 
 	<span class="ident">state</span>.<span class="ident">our_validators_groups</span>.<span class="ident">insert</span>(<span class="ident">relay_parent</span>, <span class="ident">validator_group</span>.<span class="ident">into</span>());
 
@@ -1546,16 +1521,16 @@
 	<span class="ident">validators</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// Figure out current and next group of validators assigned to the para being collated on.</span>
+<span class="doccomment">/// Figure out current group of validators assigned to the para being collated on.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Returns [`ValidatorId`]&#39;s of current and next group as determined based on the `relay_parent`.</span>
+<span class="doccomment">/// Returns [`ValidatorId`]&#39;s of current group as determined based on the `relay_parent`.</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">determine_our_validators</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(
 	<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
 	<span class="ident">runtime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RuntimeInfo</span>,
 	<span class="ident">core_index</span>: <span class="ident">CoreIndex</span>,
 	<span class="ident">cores</span>: <span class="ident">usize</span>,
 	<span class="ident">relay_parent</span>: <span class="ident">Hash</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">GroupValidators</span>, <span class="ident">GroupValidators</span>)<span class="op">&gt;</span>
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GroupValidators</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">Context</span>: <span class="ident">SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CollatorProtocolMessage</span><span class="op">&gt;</span>,
 	<span class="ident">Context</span>: <span class="ident">overseer::SubsystemContext</span><span class="op">&lt;</span><span class="ident">Message</span> <span class="op">=</span> <span class="ident">CollatorProtocolMessage</span><span class="op">&gt;</span>,
@@ -1575,22 +1550,15 @@
 		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>())
 		.<span class="ident">unwrap_or_default</span>();
 
-	<span class="kw">let</span> <span class="ident">next_group_idx</span> <span class="op">=</span> (<span class="ident">current_group_index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="ident">groups</span>.<span class="ident">len</span>();
-	<span class="kw">let</span> <span class="ident">next_validators</span> <span class="op">=</span> <span class="ident">groups</span>.<span class="ident">get</span>(<span class="ident">next_group_idx</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>()).<span class="ident">unwrap_or_default</span>();
-
 	<span class="kw">let</span> <span class="ident">validators</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">discovery_keys</span>;
 
 	<span class="kw">let</span> <span class="ident">current_validators</span> <span class="op">=</span>
 		<span class="ident">current_validators</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">validators</span>[<span class="ident">i</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">clone</span>()).<span class="ident">collect</span>();
-	<span class="kw">let</span> <span class="ident">next_validators</span> <span class="op">=</span>
-		<span class="ident">next_validators</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">validators</span>[<span class="ident">i</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">clone</span>()).<span class="ident">collect</span>();
 
 	<span class="kw">let</span> <span class="ident">current_validators</span> <span class="op">=</span>
 		<span class="ident">GroupValidators</span> { <span class="ident">group</span>: <span class="ident">current_group_index</span>, <span class="ident">validators</span>: <span class="ident">current_validators</span> };
-	<span class="kw">let</span> <span class="ident">next_validators</span> <span class="op">=</span>
-		<span class="ident">GroupValidators</span> { <span class="ident">group</span>: <span class="ident">GroupIndex</span>(<span class="ident">next_group_idx</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="ident">validators</span>: <span class="ident">next_validators</span> };
 
-	<span class="prelude-val">Ok</span>((<span class="ident">current_validators</span>, <span class="ident">next_validators</span>))
+	<span class="prelude-val">Ok</span>(<span class="ident">current_validators</span>)
 }
 
 <span class="doccomment">/// Issue a `Declare` collation message to the given `peer`.</span>
