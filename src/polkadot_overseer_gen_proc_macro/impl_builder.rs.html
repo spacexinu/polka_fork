@@ -569,6 +569,15 @@
 <span id="569">569</span>
 <span id="570">570</span>
 <span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -908,7 +917,7 @@
 					<span class="comment">// TODO generate a builder pattern that ensures this</span>
 					<span class="comment">// TODO https://github.com/paritytech/polkadot/issues/3427</span>
 					<span class="kw">let</span> #<span class="ident">subsystem_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>. #<span class="ident">subsystem_name</span> {
-						 <span class="ident">FieldInitMethod::Fn</span>(<span class="ident">func</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">func</span>(<span class="ident">handle</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>,
+						<span class="ident">FieldInitMethod::Fn</span>(<span class="ident">func</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">func</span>(<span class="ident">handle</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>,
 						<span class="ident">FieldInitMethod::Value</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
 						<span class="ident">FieldInitMethod::Uninitialized</span> <span class="op">=</span><span class="op">&gt;</span>
 							<span class="macro">panic!</span>(<span class="string">&quot;All subsystems must exist with the builder pattern.&quot;</span>),
@@ -920,11 +929,18 @@
 						#<span class="ident">channel_name_rx</span>, #<span class="ident">channel_name_unbounded_rx</span>
 					);
 					<span class="kw">let</span> (<span class="ident">signal_tx</span>, <span class="ident">signal_rx</span>) <span class="op">=</span> #<span class="ident">support_crate</span> <span class="ident">::metered::channel</span>(<span class="ident">SIGNAL_CHANNEL_CAPACITY</span>);
+
+					<span class="comment">// Generate subsystem name based on overseer field name.</span>
+					<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subsystem_string</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="macro">stringify!</span>(#<span class="ident">subsystem_name</span>));
+					<span class="comment">// Convert owned `snake case` string to a `kebab case` static str.</span>
+					<span class="kw">let</span> <span class="ident">subsystem_static_str</span> <span class="op">=</span> <span class="ident">Box::leak</span>(<span class="ident">subsystem_string</span>.<span class="ident">replace</span>(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;-&quot;</span>).<span class="ident">into_boxed_str</span>());
+
 					<span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> #<span class="ident">subsyste_ctx_name</span>::<span class="op">&lt;</span> #<span class="ident">consumes</span> <span class="op">&gt;</span><span class="ident">::new</span>(
 						<span class="ident">signal_rx</span>,
 						<span class="ident">message_rx</span>,
 						<span class="ident">channels_out</span>.<span class="ident">clone</span>(),
 						<span class="ident">to_overseer_tx</span>.<span class="ident">clone</span>(),
+						<span class="ident">subsystem_static_str</span>
 					);
 
 					<span class="kw">let</span> #<span class="ident">subsystem_name</span>: <span class="ident">OverseenSubsystem</span><span class="op">&lt;</span> #<span class="ident">consumes</span> <span class="op">&gt;</span> <span class="op">=</span>
@@ -935,6 +951,7 @@
 							<span class="ident">unbounded_meter</span>,
 							<span class="ident">ctx</span>,
 							#<span class="ident">subsystem_name</span>,
+							<span class="ident">subsystem_static_str</span>,
 							<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">running_subsystems</span>,
 						)<span class="question-mark">?</span>;
 				)<span class="op">*</span>
@@ -1060,22 +1077,22 @@
 		<span class="doccomment">/// Task kind to launch.</span>
 		<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TaskKind</span> {
 			<span class="doccomment">/// Spawn a task, it depends on the implementer if this is blocking or not.</span>
-			<span class="kw">fn</span> <span class="ident">launch_task</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SpawnNamed</span><span class="op">&gt;</span>(<span class="ident">spawner</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>);
+			<span class="kw">fn</span> <span class="ident">launch_task</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SpawnNamed</span><span class="op">&gt;</span>(<span class="ident">spawner</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">task_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">subsystem_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>);
 		}
 
 		<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 		<span class="kw">struct</span> <span class="ident">Regular</span>;
 		<span class="kw">impl</span> <span class="ident">TaskKind</span> <span class="kw">for</span> <span class="ident">Regular</span> {
-			<span class="kw">fn</span> <span class="ident">launch_task</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SpawnNamed</span><span class="op">&gt;</span>(<span class="ident">spawner</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-				<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">name</span>, <span class="ident">future</span>)
+			<span class="kw">fn</span> <span class="ident">launch_task</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SpawnNamed</span><span class="op">&gt;</span>(<span class="ident">spawner</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">task_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">subsystem_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
+				<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">task_name</span>, <span class="prelude-val">Some</span>(<span class="ident">subsystem_name</span>), <span class="ident">future</span>)
 			}
 		}
 
 		<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 		<span class="kw">struct</span> <span class="ident">Blocking</span>;
 		<span class="kw">impl</span> <span class="ident">TaskKind</span> <span class="kw">for</span> <span class="ident">Blocking</span> {
-			<span class="kw">fn</span> <span class="ident">launch_task</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SpawnNamed</span><span class="op">&gt;</span>(<span class="ident">spawner</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-				<span class="ident">spawner</span>.<span class="ident">spawn_blocking</span>(<span class="ident">name</span>, <span class="ident">future</span>)
+			<span class="kw">fn</span> <span class="ident">launch_task</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SpawnNamed</span><span class="op">&gt;</span>(<span class="ident">spawner</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">task_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">subsystem_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
+				<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">task_name</span>, <span class="prelude-val">Some</span>(<span class="ident">subsystem_name</span>), <span class="ident">future</span>)
 			}
 		}
 
@@ -1088,6 +1105,7 @@
 			<span class="ident">unbounded_meter</span>: #<span class="ident">support_crate</span> <span class="ident">::metered::Meter</span>,
 			<span class="ident">ctx</span>: <span class="ident">Ctx</span>,
 			<span class="ident">s</span>: <span class="ident">SubSys</span>,
+			<span class="ident">subsystem_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 			<span class="ident">futures</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> #<span class="ident">support_crate</span> <span class="ident">::FuturesUnordered</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">::std::result::Result</span><span class="op">&lt;</span>(), #<span class="ident">error_ty</span><span class="op">&gt;</span> <span class="op">&gt;</span><span class="op">&gt;</span>,
 		) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">OverseenSubsystem</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, #<span class="ident">error_ty</span> <span class="op">&gt;</span>
 		<span class="kw">where</span>
@@ -1111,7 +1129,7 @@
 				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>(());
 			});
 
-			<span class="op">&lt;</span><span class="ident">TK</span> <span class="kw">as</span> <span class="ident">TaskKind</span><span class="op">&gt;</span><span class="ident">::launch_task</span>(<span class="ident">spawner</span>, <span class="ident">name</span>, <span class="ident">fut</span>);
+			<span class="op">&lt;</span><span class="ident">TK</span> <span class="kw">as</span> <span class="ident">TaskKind</span><span class="op">&gt;</span><span class="ident">::launch_task</span>(<span class="ident">spawner</span>, <span class="ident">name</span>, <span class="ident">subsystem_name</span>, <span class="ident">fut</span>);
 
 			<span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">Box::pin</span>(
 				<span class="ident">rx</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {

@@ -780,6 +780,19 @@
 <span id="780">780</span>
 <span id="781">781</span>
 <span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -1344,7 +1357,10 @@
 
 		<span class="ident">futures::future::ready</span>(())
 	});
-	<span class="ident">overseer</span>.<span class="ident">spawner</span>().<span class="ident">spawn</span>(<span class="string">&quot;metrics_metronome&quot;</span>, <span class="ident">Box::pin</span>(<span class="ident">metronome</span>));
+	<span class="ident">overseer</span>
+		.<span class="ident">spawner</span>()
+		.<span class="ident">spawn</span>(<span class="string">&quot;metrics-metronome&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;overseer&quot;</span>), <span class="ident">Box::pin</span>(<span class="ident">metronome</span>));
+
 	<span class="prelude-val">Ok</span>(())
 }
 
@@ -1398,11 +1414,11 @@
 				},
 				<span class="ident">msg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_overseer_rx</span>.<span class="ident">select_next_some</span>() <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="kw">match</span> <span class="ident">msg</span> {
-						<span class="ident">ToOverseer::SpawnJob</span> { <span class="ident">name</span>, <span class="ident">s</span> } <span class="op">=</span><span class="op">&gt;</span> {
-							<span class="self">self</span>.<span class="ident">spawn_job</span>(<span class="ident">name</span>, <span class="ident">s</span>);
+						<span class="ident">ToOverseer::SpawnJob</span> { <span class="ident">name</span>, <span class="ident">subsystem</span>, <span class="ident">s</span> } <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="self">self</span>.<span class="ident">spawn_job</span>(<span class="ident">name</span>, <span class="ident">subsystem</span>, <span class="ident">s</span>);
 						}
-						<span class="ident">ToOverseer::SpawnBlockingJob</span> { <span class="ident">name</span>, <span class="ident">s</span> } <span class="op">=</span><span class="op">&gt;</span> {
-							<span class="self">self</span>.<span class="ident">spawn_blocking_job</span>(<span class="ident">name</span>, <span class="ident">s</span>);
+						<span class="ident">ToOverseer::SpawnBlockingJob</span> { <span class="ident">name</span>, <span class="ident">subsystem</span>, <span class="ident">s</span> } <span class="op">=</span><span class="op">&gt;</span> {
+							<span class="self">self</span>.<span class="ident">spawn_blocking_job</span>(<span class="ident">name</span>, <span class="ident">subsystem</span>, <span class="ident">s</span>);
 						}
 					}
 				},
@@ -1554,12 +1570,22 @@
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">spawn_job</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">j</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">name</span>, <span class="ident">j</span>);
+	<span class="kw">fn</span> <span class="ident">spawn_job</span>(
+		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+		<span class="ident">task_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+		<span class="ident">subsystem_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+		<span class="ident">j</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>,
+	) {
+		<span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">task_name</span>, <span class="ident">subsystem_name</span>, <span class="ident">j</span>);
 	}
 
-	<span class="kw">fn</span> <span class="ident">spawn_blocking_job</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">j</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">spawn_blocking</span>(<span class="ident">name</span>, <span class="ident">j</span>);
+	<span class="kw">fn</span> <span class="ident">spawn_blocking_job</span>(
+		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+		<span class="ident">task_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+		<span class="ident">subsystem_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+		<span class="ident">j</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>,
+	) {
+		<span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">spawn_blocking</span>(<span class="ident">task_name</span>, <span class="ident">subsystem_name</span>, <span class="ident">j</span>);
 	}
 }
 </code></pre></div>

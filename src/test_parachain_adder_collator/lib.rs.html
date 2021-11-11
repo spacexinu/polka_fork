@@ -328,6 +328,7 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
+<span id="331">331</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -516,6 +517,7 @@
 			<span class="kw">let</span> <span class="ident">seconded_collations</span> <span class="op">=</span> <span class="ident">seconded_collations</span>.<span class="ident">clone</span>();
 			<span class="ident">spawner</span>.<span class="ident">spawn</span>(
 				<span class="string">&quot;adder-collator-seconded&quot;</span>,
+				<span class="prelude-val">None</span>,
 				<span class="kw">async</span> <span class="kw">move</span> {
 					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">recv</span>.<span class="kw">await</span> {
 						<span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(

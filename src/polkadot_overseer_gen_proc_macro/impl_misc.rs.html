@@ -248,6 +248,15 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -362,6 +371,7 @@
 				<span class="op">&gt;</span>,
 			<span class="ident">signals_received</span>: <span class="ident">SignalsReceived</span>,
 			<span class="ident">pending_incoming</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">M</span>)<span class="op">&gt;</span>,
+			<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>
 		}
 
 		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> #<span class="ident">subsystem_ctx_name</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
@@ -371,6 +381,7 @@
 				<span class="ident">messages</span>: <span class="ident">SubsystemIncomingMessages</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
 				<span class="ident">to_subsystems</span>: <span class="ident">ChannelsOut</span>,
 				<span class="ident">to_overseer</span>: #<span class="ident">support_crate</span> <span class="ident">::metered::UnboundedMeteredSender</span><span class="op">&lt;</span>#<span class="ident">support_crate</span>:: <span class="ident">ToOverseer</span><span class="op">&gt;</span>,
+				<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>
 			) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 				<span class="kw">let</span> <span class="ident">signals_received</span> <span class="op">=</span> <span class="ident">SignalsReceived::default</span>();
 				#<span class="ident">subsystem_ctx_name</span> {
@@ -383,7 +394,12 @@
 					<span class="ident">to_overseer</span>,
 					<span class="ident">signals_received</span>,
 					<span class="ident">pending_incoming</span>: <span class="prelude-val">None</span>,
+					<span class="ident">name</span>
 				}
+			}
+
+			<span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+				<span class="self">self</span>.<span class="ident">name</span>
 			}
 		}
 
@@ -479,6 +495,7 @@
 			{
 				<span class="self">self</span>.<span class="ident">to_overseer</span>.<span class="ident">unbounded_send</span>(#<span class="ident">support_crate</span> <span class="ident">::ToOverseer::SpawnJob</span> {
 					<span class="ident">name</span>,
+					<span class="ident">subsystem</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">name</span>()),
 					<span class="ident">s</span>,
 				}).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> #<span class="ident">support_crate</span> <span class="ident">::OverseerError::TaskSpawn</span>(<span class="ident">name</span>))<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(())
@@ -489,6 +506,7 @@
 			{
 				<span class="self">self</span>.<span class="ident">to_overseer</span>.<span class="ident">unbounded_send</span>(#<span class="ident">support_crate</span> <span class="ident">::ToOverseer::SpawnBlockingJob</span> {
 					<span class="ident">name</span>,
+					<span class="ident">subsystem</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">name</span>()),
 					<span class="ident">s</span>,
 				}).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> #<span class="ident">support_crate</span> <span class="ident">::OverseerError::TaskSpawn</span>(<span class="ident">name</span>))<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(())

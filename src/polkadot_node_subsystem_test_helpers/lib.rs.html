@@ -635,7 +635,7 @@
 		<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 		<span class="ident">s</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubsystemResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">spawn</span>.<span class="ident">spawn</span>(<span class="ident">name</span>, <span class="ident">s</span>);
+		<span class="self">self</span>.<span class="ident">spawn</span>.<span class="ident">spawn</span>(<span class="ident">name</span>, <span class="prelude-val">None</span>, <span class="ident">s</span>);
 		<span class="prelude-val">Ok</span>(())
 	}
 
@@ -644,7 +644,7 @@
 		<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 		<span class="ident">s</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubsystemResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">spawn</span>.<span class="ident">spawn_blocking</span>(<span class="ident">name</span>, <span class="ident">s</span>);
+		<span class="self">self</span>.<span class="ident">spawn</span>.<span class="ident">spawn_blocking</span>(<span class="ident">name</span>, <span class="prelude-val">None</span>, <span class="ident">s</span>);
 		<span class="prelude-val">Ok</span>(())
 	}
 
@@ -819,7 +819,7 @@
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle::new</span>(<span class="ident">handle</span>);
 
-		<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="string">&quot;overseer&quot;</span>, <span class="ident">overseer</span>.<span class="ident">run</span>().<span class="ident">then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> { () }).<span class="ident">boxed</span>());
+		<span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="string">&quot;overseer&quot;</span>, <span class="prelude-val">None</span>, <span class="ident">overseer</span>.<span class="ident">run</span>().<span class="ident">then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> { () }).<span class="ident">boxed</span>());
 
 		<span class="ident">block_on</span>(<span class="ident">handle</span>.<span class="ident">send_msg_anon</span>(<span class="ident">CollatorProtocolMessage::CollateOn</span>(<span class="ident">Default::default</span>())));
 		<span class="macro">assert!</span>(<span class="macro">matches!</span>(

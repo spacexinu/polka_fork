@@ -1269,6 +1269,20 @@
 <span id="1269">1269</span>
 <span id="1270">1270</span>
 <span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -1651,7 +1665,11 @@
 
 	<span class="kw">let</span> <span class="ident">telemetry</span> <span class="op">=</span> <span class="ident">telemetry</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">worker</span>, <span class="ident">telemetry</span>)<span class="op">|</span> {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">worker</span>) <span class="op">=</span> <span class="ident">worker</span> {
-			<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn</span>(<span class="string">&quot;telemetry&quot;</span>, <span class="ident">worker</span>.<span class="ident">run</span>());
+			<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn</span>(
+				<span class="string">&quot;telemetry&quot;</span>,
+				<span class="prelude-val">Some</span>(<span class="string">&quot;telemetry&quot;</span>),
+				<span class="ident">Box::pin</span>(<span class="ident">worker</span>.<span class="ident">run</span>()),
+			);
 		}
 		<span class="ident">telemetry</span>
 	});
@@ -2076,6 +2094,7 @@
 		<span class="comment">// Start the offchain workers to have</span>
 		<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn</span>(
 			<span class="string">&quot;offchain-notifications&quot;</span>,
+			<span class="prelude-val">None</span>,
 			<span class="ident">sc_offchain::notification_future</span>(
 				<span class="ident">config</span>.<span class="ident">role</span>.<span class="ident">is_authority</span>(),
 				<span class="ident">client</span>.<span class="ident">clone</span>(),
@@ -2175,7 +2194,11 @@
 			<span class="ident">prometheus_registry</span>.<span class="ident">clone</span>(),
 		);
 
-		<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn</span>(<span class="string">&quot;authority-discovery-worker&quot;</span>, <span class="ident">worker</span>.<span class="ident">run</span>());
+		<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn</span>(
+			<span class="string">&quot;authority-discovery-worker&quot;</span>,
+			<span class="prelude-val">Some</span>(<span class="string">&quot;authority-discovery&quot;</span>),
+			<span class="ident">Box::pin</span>(<span class="ident">worker</span>.<span class="ident">run</span>()),
+		);
 		<span class="prelude-val">Some</span>(<span class="ident">service</span>)
 	} <span class="kw">else</span> {
 		<span class="prelude-val">None</span>
@@ -2221,6 +2244,7 @@
 			<span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">clone</span>();
 			<span class="ident">task_manager</span>.<span class="ident">spawn_essential_handle</span>().<span class="ident">spawn_blocking</span>(
 				<span class="string">&quot;overseer&quot;</span>,
+				<span class="prelude-val">None</span>,
 				<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
 					<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">pin_mut</span>, <span class="ident">select</span>, <span class="ident">FutureExt</span>};
 
@@ -2309,7 +2333,7 @@
 		};
 
 		<span class="kw">let</span> <span class="ident">babe</span> <span class="op">=</span> <span class="ident">babe::start_babe</span>(<span class="ident">babe_config</span>)<span class="question-mark">?</span>;
-		<span class="ident">task_manager</span>.<span class="ident">spawn_essential_handle</span>().<span class="ident">spawn_blocking</span>(<span class="string">&quot;babe&quot;</span>, <span class="ident">babe</span>);
+		<span class="ident">task_manager</span>.<span class="ident">spawn_essential_handle</span>().<span class="ident">spawn_blocking</span>(<span class="string">&quot;babe&quot;</span>, <span class="prelude-val">None</span>, <span class="ident">babe</span>);
 	}
 
 	<span class="comment">// if the node isn&#39;t actively participating in consensus then it doesn&#39;t</span>
@@ -2334,9 +2358,11 @@
 		<span class="comment">// Wococo&#39;s purpose is to be a testbed for BEEFY, so if it fails we&#39;ll</span>
 		<span class="comment">// bring the node down with it to make sure it is noticed.</span>
 		<span class="kw">if</span> <span class="ident">chain_spec</span>.<span class="ident">is_wococo</span>() {
-			<span class="ident">task_manager</span>.<span class="ident">spawn_essential_handle</span>().<span class="ident">spawn_blocking</span>(<span class="string">&quot;beefy-gadget&quot;</span>, <span class="ident">gadget</span>);
+			<span class="ident">task_manager</span>
+				.<span class="ident">spawn_essential_handle</span>()
+				.<span class="ident">spawn_blocking</span>(<span class="string">&quot;beefy-gadget&quot;</span>, <span class="prelude-val">None</span>, <span class="ident">gadget</span>);
 		} <span class="kw">else</span> {
-			<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn_blocking</span>(<span class="string">&quot;beefy-gadget&quot;</span>, <span class="ident">gadget</span>);
+			<span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>().<span class="ident">spawn_blocking</span>(<span class="string">&quot;beefy-gadget&quot;</span>, <span class="prelude-val">None</span>, <span class="ident">gadget</span>);
 		}
 	}
 
@@ -2390,9 +2416,11 @@
 			<span class="ident">telemetry</span>: <span class="ident">telemetry</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">handle</span>()),
 		};
 
-		<span class="ident">task_manager</span>
-			.<span class="ident">spawn_essential_handle</span>()
-			.<span class="ident">spawn_blocking</span>(<span class="string">&quot;grandpa-voter&quot;</span>, <span class="ident">grandpa::run_grandpa_voter</span>(<span class="ident">grandpa_config</span>)<span class="question-mark">?</span>);
+		<span class="ident">task_manager</span>.<span class="ident">spawn_essential_handle</span>().<span class="ident">spawn_blocking</span>(
+			<span class="string">&quot;grandpa-voter&quot;</span>,
+			<span class="prelude-val">None</span>,
+			<span class="ident">grandpa::run_grandpa_voter</span>(<span class="ident">grandpa_config</span>)<span class="question-mark">?</span>,
+		);
 	}
 
 	<span class="ident">network_starter</span>.<span class="ident">start_network</span>();
