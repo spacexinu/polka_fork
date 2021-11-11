@@ -160,6 +160,7 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -179,10 +180,11 @@
 <span class="doccomment">//! The dry-run command.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">params</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">rpc_helpers</span>::<span class="kw-2">*</span>, <span class="ident">signer::Signer</span>, <span class="ident">DryRunConfig</span>, <span class="ident">Error</span>, <span class="ident">SharedConfig</span>, <span class="ident">WsClient</span>,
+	<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">rpc_helpers</span>::<span class="kw-2">*</span>, <span class="ident">signer::Signer</span>, <span class="ident">DryRunConfig</span>, <span class="ident">Error</span>, <span class="ident">SharedConfig</span>, <span class="ident">WsClient</span>,
 };
 <span class="kw">use</span> <span class="ident">codec::Encode</span>;
 <span class="kw">use</span> <span class="ident">frame_support::traits::Currency</span>;
+<span class="kw">use</span> <span class="ident">jsonrpsee::rpc_params</span>;
 
 <span class="doccomment">/// Forcefully create the snapshot. This can be used to compute the election at anytime.</span>
 <span class="kw">fn</span> <span class="ident">force_create_snapshot</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EPM::Config</span><span class="op">&gt;</span>(<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -236,7 +238,7 @@
 	<span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">rpc</span>::<span class="op">&lt;</span><span class="ident">pallet_transaction_payment::RuntimeDispatchInfo</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span><span class="op">&gt;</span>(
 		<span class="ident">client</span>,
 		<span class="string">&quot;payment_queryInfo&quot;</span>,
-		<span class="macro">params!</span> { <span class="ident">extrinsic</span> },
+		<span class="macro">rpc_params!</span> { <span class="ident">extrinsic</span> },
 	)
 	.<span class="kw">await</span>;
 	<span class="macro">log::info!</span>(
@@ -311,7 +313,7 @@
 		});
 		<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;dispatch result is {:?}&quot;</span>, <span class="ident">dispatch_result</span>);
 
-		<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">rpc_decode</span>::<span class="op">&lt;</span><span class="ident">sp_runtime::ApplyExtrinsicResult</span><span class="op">&gt;</span>(<span class="ident">client</span>, <span class="string">&quot;system_dryRun&quot;</span>, <span class="macro">params!</span>{ <span class="ident">bytes</span> })
+		<span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">rpc_decode</span>::<span class="op">&lt;</span><span class="ident">sp_runtime::ApplyExtrinsicResult</span><span class="op">&gt;</span>(<span class="ident">client</span>, <span class="string">&quot;system_dryRun&quot;</span>, <span class="macro">rpc_params!</span>{ <span class="ident">bytes</span> })
 			.<span class="kw">await</span>
 			.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
 		<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="string">&quot;dry-run outcome is {:?}&quot;</span>, <span class="ident">outcome</span>);
