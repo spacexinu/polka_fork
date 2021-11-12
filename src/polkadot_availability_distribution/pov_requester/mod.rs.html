@@ -203,9 +203,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -272,10 +269,7 @@
 
 	<span class="ident">ctx</span>.<span class="ident">send_message</span>(<span class="ident">NetworkBridgeMessage::SendRequests</span>(
 		<span class="macro">vec!</span>[<span class="ident">full_req</span>],
-		<span class="comment">// We are supposed to be connected to validators of our group via `PeerSet`,</span>
-		<span class="comment">// but at session boundaries that is kind of racy, in case a connection takes</span>
-		<span class="comment">// longer to get established, so we try to connect in any case.</span>
-		<span class="ident">IfDisconnected::TryConnect</span>,
+		<span class="ident">IfDisconnected::ImmediateError</span>,
 	))
 	.<span class="kw">await</span>;
 

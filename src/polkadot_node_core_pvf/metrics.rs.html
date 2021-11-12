@@ -422,7 +422,7 @@
 	<span class="doccomment">/// When the worker was killed or died.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_retired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">metrics</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metrics</span>.<span class="number">0</span> {
-			<span class="ident">metrics</span>.<span class="ident">worker_spawned</span>.<span class="ident">with_label_values</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span>.<span class="ident">flavor</span>.<span class="ident">as_label</span>()]).<span class="ident">inc</span>();
+			<span class="ident">metrics</span>.<span class="ident">worker_retired</span>.<span class="ident">with_label_values</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span>.<span class="ident">flavor</span>.<span class="ident">as_label</span>()]).<span class="ident">inc</span>();
 		}
 	}
 }

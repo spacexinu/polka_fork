@@ -762,7 +762,7 @@
 
 		<span class="self">self</span>.<span class="ident">sender</span>
 			.<span class="ident">send</span>(<span class="ident">FromFetchTask::Message</span>(<span class="ident">AllMessages::NetworkBridge</span>(
-				<span class="ident">NetworkBridgeMessage::SendRequests</span>(<span class="macro">vec!</span>[<span class="ident">requests</span>], <span class="ident">IfDisconnected::TryConnect</span>),
+				<span class="ident">NetworkBridgeMessage::SendRequests</span>(<span class="macro">vec!</span>[<span class="ident">requests</span>], <span class="ident">IfDisconnected::ImmediateError</span>),
 			)))
 			.<span class="kw">await</span>
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TaskError::ShuttingDown</span>)<span class="question-mark">?</span>;
