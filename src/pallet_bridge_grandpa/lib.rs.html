@@ -1687,7 +1687,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mock</span>::{<span class="ident">run_test</span>, <span class="ident">test_header</span>, <span class="ident">Origin</span>, <span class="ident">TestHash</span>, <span class="ident">TestHeader</span>, <span class="ident">TestNumber</span>, <span class="ident">TestRuntime</span>};
+	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mock</span>::{<span class="ident">run_test</span>, <span class="ident">test_header</span>, <span class="ident">Origin</span>, <span class="ident">TestHeader</span>, <span class="ident">TestNumber</span>, <span class="ident">TestRuntime</span>};
 	<span class="kw">use</span> <span class="ident">bp_test_utils</span>::{
 		<span class="ident">authority_list</span>, <span class="ident">make_default_justification</span>, <span class="ident">make_justification_for_header</span>, <span class="ident">JustificationGeneratorParams</span>, <span class="ident">ALICE</span>,
 		<span class="ident">BOB</span>,
@@ -1731,18 +1731,18 @@
 		<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">Pallet</span>::<span class="op">&lt;</span><span class="ident">TestRuntime</span><span class="op">&gt;</span><span class="ident">::on_initialize</span>(<span class="ident">current_number</span>);
 	}
 
-	<span class="kw">fn</span> <span class="ident">change_log</span>(<span class="ident">delay</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span><span class="op">&lt;</span><span class="ident">TestHash</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">change_log</span>(<span class="ident">delay</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span> {
 		<span class="kw">let</span> <span class="ident">consensus_log</span> <span class="op">=</span> <span class="ident">ConsensusLog</span>::<span class="op">&lt;</span><span class="ident">TestNumber</span><span class="op">&gt;</span><span class="ident">::ScheduledChange</span>(<span class="ident">sp_finality_grandpa::ScheduledChange</span> {
 			<span class="ident">next_authorities</span>: <span class="macro">vec!</span>[(<span class="ident">ALICE</span>.<span class="ident">into</span>(), <span class="number">1</span>), (<span class="ident">BOB</span>.<span class="ident">into</span>(), <span class="number">1</span>)],
 			<span class="ident">delay</span>,
 		});
 
-		<span class="ident">Digest</span>::<span class="op">&lt;</span><span class="ident">TestHash</span><span class="op">&gt;</span> {
+		<span class="ident">Digest</span> {
 			<span class="ident">logs</span>: <span class="macro">vec!</span>[<span class="ident">DigestItem::Consensus</span>(<span class="ident">GRANDPA_ENGINE_ID</span>, <span class="ident">consensus_log</span>.<span class="ident">encode</span>())],
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">forced_change_log</span>(<span class="ident">delay</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span><span class="op">&lt;</span><span class="ident">TestHash</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">forced_change_log</span>(<span class="ident">delay</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span> {
 		<span class="kw">let</span> <span class="ident">consensus_log</span> <span class="op">=</span> <span class="ident">ConsensusLog</span>::<span class="op">&lt;</span><span class="ident">TestNumber</span><span class="op">&gt;</span><span class="ident">::ForcedChange</span>(
 			<span class="ident">delay</span>,
 			<span class="ident">sp_finality_grandpa::ScheduledChange</span> {
@@ -1751,7 +1751,7 @@
 			},
 		);
 
-		<span class="ident">Digest</span>::<span class="op">&lt;</span><span class="ident">TestHash</span><span class="op">&gt;</span> {
+		<span class="ident">Digest</span> {
 			<span class="ident">logs</span>: <span class="macro">vec!</span>[<span class="ident">DigestItem::Consensus</span>(<span class="ident">GRANDPA_ENGINE_ID</span>, <span class="ident">consensus_log</span>.<span class="ident">encode</span>())],
 		}
 	}

@@ -1865,30 +1865,6 @@
 <span id="1865">1865</span>
 <span id="1866">1866</span>
 <span id="1867">1867</span>
-<span id="1868">1868</span>
-<span id="1869">1869</span>
-<span id="1870">1870</span>
-<span id="1871">1871</span>
-<span id="1872">1872</span>
-<span id="1873">1873</span>
-<span id="1874">1874</span>
-<span id="1875">1875</span>
-<span id="1876">1876</span>
-<span id="1877">1877</span>
-<span id="1878">1878</span>
-<span id="1879">1879</span>
-<span id="1880">1880</span>
-<span id="1881">1881</span>
-<span id="1882">1882</span>
-<span id="1883">1883</span>
-<span id="1884">1884</span>
-<span id="1885">1885</span>
-<span id="1886">1886</span>
-<span id="1887">1887</span>
-<span id="1888">1888</span>
-<span id="1889">1889</span>
-<span id="1890">1890</span>
-<span id="1891">1891</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2194,10 +2170,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">DOT</span>;
 
 	<span class="ident">polkadot::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">polkadot::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">polkadot::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">balances</span>: <span class="ident">polkadot::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>
 				.<span class="ident">iter</span>()
@@ -2385,10 +2358,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">WND</span>;
 
 	<span class="ident">westend::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">westend::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">westend::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">balances</span>: <span class="ident">westend::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>
 				.<span class="ident">iter</span>()
@@ -2576,10 +2546,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">KSM</span>;
 
 	<span class="ident">kusama::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">kusama::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">kusama::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">balances</span>: <span class="ident">kusama::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>
 				.<span class="ident">iter</span>()
@@ -2891,10 +2858,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">ROC</span>;
 
 	<span class="ident">rococo_runtime::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">rococo_runtime::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">rococo_runtime::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">balances</span>: <span class="ident">rococo_runtime::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>
 				.<span class="ident">iter</span>()
@@ -3151,10 +3115,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">DOT</span>;
 
 	<span class="ident">polkadot::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">polkadot::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">polkadot::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">indices</span>: <span class="ident">polkadot::IndicesConfig</span> { <span class="ident">indices</span>: <span class="macro">vec!</span>[] },
 		<span class="ident">balances</span>: <span class="ident">polkadot::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> (<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">ENDOWMENT</span>)).<span class="ident">collect</span>(),
@@ -3238,10 +3199,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">KSM</span>;
 
 	<span class="ident">kusama::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">kusama::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">kusama::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">indices</span>: <span class="ident">kusama::IndicesConfig</span> { <span class="ident">indices</span>: <span class="macro">vec!</span>[] },
 		<span class="ident">balances</span>: <span class="ident">kusama::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> (<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">ENDOWMENT</span>)).<span class="ident">collect</span>(),
@@ -3327,10 +3285,7 @@
 	<span class="kw">const</span> <span class="ident">STASH</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">DOT</span>;
 
 	<span class="ident">westend::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">westend::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">westend::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">indices</span>: <span class="ident">westend::IndicesConfig</span> { <span class="ident">indices</span>: <span class="macro">vec!</span>[] },
 		<span class="ident">balances</span>: <span class="ident">westend::BalancesConfig</span> {
 			<span class="ident">balances</span>: <span class="ident">endowed_accounts</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> (<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">ENDOWMENT</span>)).<span class="ident">collect</span>(),
@@ -3409,10 +3364,7 @@
 	<span class="kw">const</span> <span class="ident">ENDOWMENT</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">1_000_000</span> <span class="op">*</span> <span class="ident">DOT</span>;
 
 	<span class="ident">rococo_runtime::GenesisConfig</span> {
-		<span class="ident">system</span>: <span class="ident">rococo_runtime::SystemConfig</span> {
-			<span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>(),
-			<span class="ident">changes_trie_config</span>: <span class="ident">Default::default</span>(),
-		},
+		<span class="ident">system</span>: <span class="ident">rococo_runtime::SystemConfig</span> { <span class="ident">code</span>: <span class="ident">wasm_binary</span>.<span class="ident">to_vec</span>() },
 		<span class="ident">beefy</span>: <span class="ident">Default::default</span>(),
 		<span class="ident">indices</span>: <span class="ident">rococo_runtime::IndicesConfig</span> { <span class="ident">indices</span>: <span class="macro">vec!</span>[] },
 		<span class="ident">balances</span>: <span class="ident">rococo_runtime::BalancesConfig</span> {

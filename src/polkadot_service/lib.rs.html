@@ -1279,10 +1279,6 @@
 <span id="1279">1279</span>
 <span id="1280">1280</span>
 <span id="1281">1281</span>
-<span id="1282">1282</span>
-<span id="1283">1283</span>
-<span id="1284">1284</span>
-<span id="1285">1285</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -1392,8 +1388,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
 	<span class="ident">generic</span>,
 	<span class="ident">traits</span>::{
-		<span class="self">self</span> <span class="kw">as</span> <span class="ident">runtime_traits</span>, <span class="ident">BlakeTwo256</span>, <span class="ident">Block</span> <span class="kw">as</span> <span class="ident">BlockT</span>, <span class="ident">DigestFor</span>, <span class="ident">HashFor</span>,
-		<span class="ident">Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span>, <span class="ident">NumberFor</span>,
+		<span class="self">self</span> <span class="kw">as</span> <span class="ident">runtime_traits</span>, <span class="ident">BlakeTwo256</span>, <span class="ident">Block</span> <span class="kw">as</span> <span class="ident">BlockT</span>, <span class="ident">HashFor</span>, <span class="ident">Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span>, <span class="ident">NumberFor</span>,
 	},
 };
 
@@ -2080,7 +2075,6 @@
 			<span class="ident">transaction_pool</span>: <span class="ident">transaction_pool</span>.<span class="ident">clone</span>(),
 			<span class="ident">spawn_handle</span>: <span class="ident">task_manager</span>.<span class="ident">spawn_handle</span>(),
 			<span class="ident">import_queue</span>,
-			<span class="ident">on_demand</span>: <span class="prelude-val">None</span>,
 			<span class="ident">block_announce_validator_builder</span>: <span class="prelude-val">None</span>,
 			<span class="ident">warp_sync</span>: <span class="prelude-val">Some</span>(<span class="ident">warp_sync</span>),
 		})<span class="question-mark">?</span>;
@@ -2150,8 +2144,6 @@
 		<span class="ident">rpc_extensions_builder</span>: <span class="ident">Box::new</span>(<span class="ident">rpc_extensions_builder</span>),
 		<span class="ident">transaction_pool</span>: <span class="ident">transaction_pool</span>.<span class="ident">clone</span>(),
 		<span class="ident">task_manager</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task_manager</span>,
-		<span class="ident">on_demand</span>: <span class="prelude-val">None</span>,
-		<span class="ident">remote_blockchain</span>: <span class="prelude-val">None</span>,
 		<span class="ident">system_rpc_tx</span>,
 		<span class="ident">telemetry</span>: <span class="ident">telemetry</span>.<span class="ident">as_mut</span>(),
 	})<span class="question-mark">?</span>;
