@@ -326,7 +326,6 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
-<span id="329">329</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -345,7 +344,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">artifacts::CompiledArtifact</span>,
-	<span class="ident">error::PrepareError</span>,
+	<span class="ident">error</span>::{<span class="ident">PrepareError</span>, <span class="ident">PrepareResult</span>},
 	<span class="ident">worker_common</span>::{
 		<span class="ident">bytes_to_path</span>, <span class="ident">framed_recv</span>, <span class="ident">framed_send</span>, <span class="ident">path_to_bytes</span>, <span class="ident">spawn_with_program_path</span>,
 		<span class="ident">tmpfile_in</span>, <span class="ident">worker_event_loop</span>, <span class="ident">IdleWorker</span>, <span class="ident">SpawnErr</span>, <span class="ident">WorkerHandle</span>,
@@ -357,8 +356,6 @@
 	<span class="ident">os::unix::net::UnixStream</span>,
 	<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
 };
-<span class="kw">use</span> <span class="ident">futures::FutureExt</span> <span class="kw">as</span> <span class="kw">_</span>;
-<span class="kw">use</span> <span class="ident">futures_timer::Delay</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">use</span> <span class="ident">sp_core::hexdisplay::HexDisplay</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
@@ -380,15 +377,15 @@
 
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Outcome</span> {
 	<span class="doccomment">/// The worker has finished the work assigned to it.</span>
-	<span class="ident">Concluded</span> { <span class="ident">worker</span>: <span class="ident">IdleWorker</span>, <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span> },
+	<span class="ident">Concluded</span> { <span class="ident">worker</span>: <span class="ident">IdleWorker</span>, <span class="ident">result</span>: <span class="ident">PrepareResult</span> },
 	<span class="doccomment">/// The host tried to reach the worker but failed. This is most likely because the worked was</span>
 	<span class="doccomment">/// killed by the system.</span>
 	<span class="ident">Unreachable</span>,
-	<span class="doccomment">/// The execution was interrupted abruptly and the worker is not available anymore. For example,</span>
-	<span class="doccomment">/// this could&#39;ve happen because the worker hadn&#39;t finished the work until the given deadline.</span>
+	<span class="doccomment">/// The worker failed to finish the job until the given deadline.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that in this case the artifact file is written (unless there was an error writing the</span>
-	<span class="doccomment">/// the artifact).</span>
+	<span class="doccomment">/// The worker is no longer usable and should be killed.</span>
+	<span class="ident">TimedOut</span>,
+	<span class="doccomment">/// The execution was interrupted abruptly and the worker is not available anymore.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This doesn&#39;t return an idle worker instance, thus this worker is no longer usable.</span>
 	<span class="ident">DidNotMakeIt</span>,
@@ -435,77 +432,78 @@
 
 		<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 		<span class="kw">enum</span> <span class="ident">Selected</span> {
-			<span class="ident">Done</span>(<span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>),
+			<span class="ident">Done</span>(<span class="ident">PrepareResult</span>),
 			<span class="ident">IoErr</span>,
 			<span class="ident">Deadline</span>,
 		}
 
-		<span class="kw">let</span> <span class="ident">selected</span> <span class="op">=</span> <span class="macro">futures::select!</span> {
-			<span class="ident">res</span> <span class="op">=</span> <span class="ident">framed_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">match</span> <span class="ident">res</span> {
-					<span class="prelude-val">Ok</span>(<span class="ident">response_bytes</span>) <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="comment">// By convention we expect encoded `Result&lt;(), PrepareError&gt;`.</span>
-						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span>
-							<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">response_bytes</span>.<span class="ident">clone</span>().<span class="ident">as_slice</span>())
-						{
-							<span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
-								<span class="macro">tracing::debug!</span>(
-									<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-									<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-									<span class="string">&quot;promoting WIP artifact {} to {}&quot;</span>,
-									<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
-									<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
-								);
-
-								<span class="ident">async_std::fs::rename</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_file</span>, <span class="kw-2">&amp;</span><span class="ident">artifact_path</span>)
-									.<span class="kw">await</span>
-									.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Selected::Done</span>(<span class="ident">result</span>))
-									.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-										<span class="macro">tracing::warn!</span>(
-											<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-											<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-											<span class="string">&quot;failed to rename the artifact from {} to {}: {:?}&quot;</span>,
-											<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
-											<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
-											<span class="ident">err</span>,
-										);
-										<span class="ident">Selected::IoErr</span>
-									})
-							} <span class="kw">else</span> {
-								<span class="ident">Selected::Done</span>(<span class="ident">result</span>)
-							}
-						} <span class="kw">else</span> {
-							<span class="comment">// We received invalid bytes from the worker.</span>
-							<span class="kw">let</span> <span class="ident">bound_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">response_bytes</span>[..<span class="ident">response_bytes</span>.<span class="ident">len</span>().<span class="ident">min</span>(<span class="number">4</span>)];
-							<span class="macro">tracing::warn!</span>(
+		<span class="kw">let</span> <span class="ident">selected</span> <span class="op">=</span>
+			<span class="kw">match</span> <span class="ident">async_std::future::timeout</span>(<span class="ident">COMPILATION_TIMEOUT</span>, <span class="ident">framed_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>)).<span class="kw">await</span> {
+				<span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">response_bytes</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="comment">// Received bytes from worker within the time limit.</span>
+					<span class="comment">// By convention we expect encoded `PrepareResult`.</span>
+					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">PrepareResult::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">response_bytes</span>.<span class="ident">as_slice</span>()) {
+						<span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
+							<span class="macro">tracing::debug!</span>(
 								<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 								<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-								<span class="string">&quot;received unexpected response from the prepare worker: {}&quot;</span>,
-								<span class="ident">HexDisplay::from</span>(<span class="kw-2">&amp;</span><span class="ident">bound_bytes</span>),
+								<span class="string">&quot;promoting WIP artifact {} to {}&quot;</span>,
+								<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
+								<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
 							);
-							<span class="ident">Selected::IoErr</span>
+
+							<span class="ident">async_std::fs::rename</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_file</span>, <span class="kw-2">&amp;</span><span class="ident">artifact_path</span>)
+								.<span class="kw">await</span>
+								.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Selected::Done</span>(<span class="ident">result</span>))
+								.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+									<span class="macro">tracing::warn!</span>(
+										<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+										<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
+										<span class="string">&quot;failed to rename the artifact from {} to {}: {:?}&quot;</span>,
+										<span class="ident">tmp_file</span>.<span class="ident">display</span>(),
+										<span class="ident">artifact_path</span>.<span class="ident">display</span>(),
+										<span class="ident">err</span>,
+									);
+									<span class="ident">Selected::IoErr</span>
+								})
+						} <span class="kw">else</span> {
+							<span class="ident">Selected::Done</span>(<span class="ident">result</span>)
 						}
-					},
-					<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+					} <span class="kw">else</span> {
+						<span class="comment">// We received invalid bytes from the worker.</span>
+						<span class="kw">let</span> <span class="ident">bound_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">response_bytes</span>[..<span class="ident">response_bytes</span>.<span class="ident">len</span>().<span class="ident">min</span>(<span class="number">4</span>)];
 						<span class="macro">tracing::warn!</span>(
 							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 							<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
-							<span class="string">&quot;failed to recv a prepare response: {:?}&quot;</span>,
-							<span class="ident">err</span>,
+							<span class="string">&quot;received unexpected response from the prepare worker: {}&quot;</span>,
+							<span class="ident">HexDisplay::from</span>(<span class="kw-2">&amp;</span><span class="ident">bound_bytes</span>),
 						);
 						<span class="ident">Selected::IoErr</span>
 					}
-				}
-			},
-			<span class="kw">_</span> <span class="op">=</span> <span class="ident">Delay::new</span>(<span class="ident">COMPILATION_TIMEOUT</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Selected::Deadline</span>,
-		};
+				},
+				<span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="comment">// Communication error within the time limit.</span>
+					<span class="macro">tracing::warn!</span>(
+						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+						<span class="ident">worker_pid</span> <span class="op">=</span> <span class="op">%</span><span class="ident">pid</span>,
+						<span class="string">&quot;failed to recv a prepare response: {:?}&quot;</span>,
+						<span class="ident">err</span>,
+					);
+					<span class="ident">Selected::IoErr</span>
+				},
+				<span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="comment">// Timed out.</span>
+					<span class="ident">Selected::Deadline</span>
+				},
+			};
 
 		<span class="kw">match</span> <span class="ident">selected</span> {
 			<span class="ident">Selected::Done</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="ident">renice</span>(<span class="ident">pid</span>, <span class="ident">NICENESS_FOREGROUND</span>);
 				<span class="ident">Outcome::Concluded</span> { <span class="ident">worker</span>: <span class="ident">IdleWorker</span> { <span class="ident">stream</span>, <span class="ident">pid</span> }, <span class="ident">result</span> }
 			},
-			<span class="ident">Selected::IoErr</span> <span class="op">|</span> <span class="ident">Selected::Deadline</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::DidNotMakeIt</span>,
+			<span class="ident">Selected::Deadline</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::TimedOut</span>,
+			<span class="ident">Selected::IoErr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::DidNotMakeIt</span>,
 		}
 	})
 	.<span class="kw">await</span>

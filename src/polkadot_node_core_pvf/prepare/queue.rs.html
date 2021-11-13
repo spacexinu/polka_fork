@@ -826,9 +826,7 @@
 <span class="doccomment">//! A queue that handles requests for PVF preparation.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pool</span>::{<span class="self">self</span>, <span class="ident">Worker</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">artifacts::ArtifactId</span>, <span class="ident">error::PrepareError</span>, <span class="ident">metrics::Metrics</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">LOG_TARGET</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">artifacts::ArtifactId</span>, <span class="ident">metrics::Metrics</span>, <span class="ident">PrepareResult</span>, <span class="ident">Priority</span>, <span class="ident">Pvf</span>, <span class="ident">LOG_TARGET</span>};
 <span class="kw">use</span> <span class="ident">always_assert</span>::{<span class="ident">always</span>, <span class="ident">never</span>};
 <span class="kw">use</span> <span class="ident">async_std::path::PathBuf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">channel::mpsc</span>, <span class="ident">stream::StreamExt</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Future</span>, <span class="ident">SinkExt</span>};
@@ -853,8 +851,9 @@
 	<span class="doccomment">/// Identifier of an artifact.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>,
 	<span class="doccomment">/// Outcome of the PVF processing. [`Ok`] indicates that compiled artifact</span>
-	<span class="doccomment">/// is successfully stored on disk. Otherwise, an [error](PrepareError) is supplied.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// is successfully stored on disk. Otherwise, an [error](crate::error::PrepareError)</span>
+	<span class="doccomment">/// is supplied.</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">result</span>: <span class="ident">PrepareResult</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
@@ -1136,7 +1135,7 @@
 	<span class="ident">queue</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Queue</span>,
 	<span class="ident">worker</span>: <span class="ident">Worker</span>,
 	<span class="ident">rip</span>: <span class="ident">bool</span>,
-	<span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PrepareError</span><span class="op">&gt;</span>,
+	<span class="ident">result</span>: <span class="ident">PrepareResult</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Fatal</span><span class="op">&gt;</span> {
 	<span class="ident">queue</span>.<span class="ident">metrics</span>.<span class="ident">prepare_concluded</span>();
 
@@ -1338,6 +1337,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::PrepareError</span>;
 	<span class="kw">use</span> <span class="ident">assert_matches::assert_matches</span>;
 	<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">FutureExt</span>};
 	<span class="kw">use</span> <span class="ident">slotmap::SlotMap</span>;

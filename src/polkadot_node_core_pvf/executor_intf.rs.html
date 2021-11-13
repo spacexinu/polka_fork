@@ -315,6 +315,12 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -385,7 +391,13 @@
 			<span class="ident">native_stack_max</span>: <span class="number">256</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>,
 		}),
 		<span class="ident">canonicalize_nans</span>: <span class="bool-val">true</span>,
-		<span class="ident">parallel_compilation</span>: <span class="bool-val">true</span>,
+		<span class="comment">// Rationale for turning the multi-threaded compilation off is to make the preparation time</span>
+		<span class="comment">// easily reproducible and as deterministic as possible.</span>
+		<span class="comment">//</span>
+		<span class="comment">// Currently the prepare queue doesn&#39;t distinguish between precheck and prepare requests.</span>
+		<span class="comment">// On the one hand, it simplifies the code, on the other, however, slows down compile times</span>
+		<span class="comment">// for execute requests. This behavior may change in future.</span>
+		<span class="ident">parallel_compilation</span>: <span class="bool-val">false</span>,
 	},
 };
 

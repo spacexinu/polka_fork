@@ -255,6 +255,13 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -271,7 +278,7 @@
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::PrepareError</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::PrepareError</span>, <span class="ident">host::PrepareResultSender</span>};
 <span class="kw">use</span> <span class="ident">always_assert::always</span>;
 <span class="kw">use</span> <span class="ident">async_std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
@@ -363,7 +370,7 @@
 		<span class="ident">last_time_needed</span>: <span class="ident">SystemTime</span>,
 	},
 	<span class="doccomment">/// A task to prepare this artifact is scheduled.</span>
-	<span class="ident">Preparing</span>,
+	<span class="ident">Preparing</span> { <span class="ident">waiting_for_response</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrepareResultSender</span><span class="op">&gt;</span> },
 	<span class="doccomment">/// The code couldn&#39;t be compiled due to an error. Such artifacts</span>
 	<span class="doccomment">/// never reach the executor and stay in the host&#39;s memory.</span>
 	<span class="ident">FailedToProcess</span>(<span class="ident">PrepareError</span>),
@@ -402,9 +409,16 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This function must be used only for brand-new artifacts and should never be used for</span>
 	<span class="doccomment">/// replacing existing ones.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_preparing</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>) {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_preparing</span>(
+		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+		<span class="ident">artifact_id</span>: <span class="ident">ArtifactId</span>,
+		<span class="ident">waiting_for_response</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrepareResultSender</span><span class="op">&gt;</span>,
+	) {
 		<span class="comment">// See the precondition.</span>
-		<span class="macro">always!</span>(<span class="self">self</span>.<span class="ident">artifacts</span>.<span class="ident">insert</span>(<span class="ident">artifact_id</span>, <span class="ident">ArtifactState::Preparing</span>).<span class="ident">is_none</span>());
+		<span class="macro">always!</span>(<span class="self">self</span>
+			.<span class="ident">artifacts</span>
+			.<span class="ident">insert</span>(<span class="ident">artifact_id</span>, <span class="ident">ArtifactState::Preparing</span> { <span class="ident">waiting_for_response</span> })
+			.<span class="ident">is_none</span>());
 	}
 
 	<span class="doccomment">/// Insert an artifact with the given ID as &quot;prepared&quot;.</span>
