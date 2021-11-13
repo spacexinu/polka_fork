@@ -1163,11 +1163,11 @@
 			<span class="ident">cache_path</span>,
 			<span class="ident">prepare_worker_program_path</span>: <span class="ident">program_path</span>.<span class="ident">clone</span>(),
 			<span class="ident">prepare_worker_spawn_timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">3</span>),
-			<span class="ident">prepare_workers_soft_max_num</span>: <span class="number">8</span>,
-			<span class="ident">prepare_workers_hard_max_num</span>: <span class="number">5</span>,
+			<span class="ident">prepare_workers_soft_max_num</span>: <span class="number">1</span>,
+			<span class="ident">prepare_workers_hard_max_num</span>: <span class="number">1</span>,
 			<span class="ident">execute_worker_program_path</span>: <span class="ident">program_path</span>,
 			<span class="ident">execute_worker_spawn_timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">3</span>),
-			<span class="ident">execute_workers_max_num</span>: <span class="number">5</span>,
+			<span class="ident">execute_workers_max_num</span>: <span class="number">2</span>,
 		}
 	}
 }
