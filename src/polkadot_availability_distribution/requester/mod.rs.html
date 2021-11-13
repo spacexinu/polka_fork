@@ -371,7 +371,7 @@
 				<span class="comment">// Just book keeping - we are already requesting that chunk:</span>
 				{
 					<span class="ident">e</span>.<span class="ident">get_mut</span>().<span class="ident">add_leaf</span>(<span class="ident">leaf</span>);
-				}
+				},
 				<span class="ident">Entry::Vacant</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
 					<span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>();
 					<span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">clone</span>();
