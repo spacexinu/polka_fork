@@ -847,23 +847,7 @@ where
 			&mut approvals_cache,
 			&mut subsystem.mode,
 			actions,
-			if count >= offset {
-				tracing::debug!(
-					target: DEBUG_LOG_TARGET,
-					"ladi-debug-approval malicious {:?} == {:?}",
-					count,
-					offset
-				);
-				true
-			} else {
-				tracing::debug!(
-					target: DEBUG_LOG_TARGET,
-					"ladi-debug-approval benign {:?} != {:?}",
-					count,
-					offset
-				);
-				false
-			},
+			false,
 		)
 		.await?
 		{
