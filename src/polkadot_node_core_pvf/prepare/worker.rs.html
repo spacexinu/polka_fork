@@ -326,6 +326,8 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -363,7 +365,9 @@
 <span class="kw">const</span> <span class="ident">NICENESS_BACKGROUND</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">10</span>;
 <span class="kw">const</span> <span class="ident">NICENESS_FOREGROUND</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
 
-<span class="kw">const</span> <span class="ident">COMPILATION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
+<span class="doccomment">/// The time period after which the preparation worker is considered unresponsive and will be killed.</span>
+<span class="comment">// NOTE: If you change this make sure to fix the buckets of `pvf_preparation_time` metric.</span>
+<span class="kw">const</span> <span class="ident">COMPILATION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span>);
 
 <span class="doccomment">/// Spawns a new worker with the given program path that acts as the worker and the spawn timeout.</span>
 <span class="doccomment">///</span>
