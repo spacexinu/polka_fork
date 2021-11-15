@@ -498,6 +498,12 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -639,26 +645,7 @@
 			}
 		}
 
-		<span class="ident">vm</span>.<span class="ident">refund_surplus</span>();
-		<span class="ident">drop</span>(<span class="ident">vm</span>.<span class="ident">trader</span>);
-
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">weight_used</span> <span class="op">=</span> <span class="ident">xcm_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">vm</span>.<span class="ident">total_surplus</span>);
-
-		<span class="kw">if</span> <span class="op">!</span><span class="ident">vm</span>.<span class="ident">holding</span>.<span class="ident">is_empty</span>() {
-			<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm_in_credit&quot;</span>, <span class="string">&quot;Trapping assets in holding register: {:?} (original_origin: {:?})&quot;</span>, <span class="ident">vm</span>.<span class="ident">holding</span>, <span class="ident">vm</span>.<span class="ident">original_origin</span>);
-			<span class="kw">let</span> <span class="ident">trap_weight</span> <span class="op">=</span> <span class="ident">Config::AssetTrap::drop_assets</span>(<span class="kw-2">&amp;</span><span class="ident">vm</span>.<span class="ident">original_origin</span>, <span class="ident">vm</span>.<span class="ident">holding</span>);
-			<span class="ident">weight_used</span>.<span class="ident">saturating_accrue</span>(<span class="ident">trap_weight</span>);
-		};
-
-		<span class="kw">match</span> <span class="ident">vm</span>.<span class="ident">error</span> {
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::Complete</span>(<span class="ident">weight_used</span>),
-			<span class="comment">// TODO: #2841 #REALWEIGHT We should deduct the cost of any instructions following</span>
-			<span class="comment">// the error which didn&#39;t end up being executed.</span>
-			<span class="prelude-val">Some</span>((<span class="ident">_i</span>, <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="macro">log::debug!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm_in_credit&quot;</span>, <span class="string">&quot;Execution errored at {:?}: {:?} (original_origin: {:?})&quot;</span>, <span class="ident">_i</span>, <span class="ident">e</span>, <span class="ident">vm</span>.<span class="ident">original_origin</span>);
-				<span class="ident">Outcome::Incomplete</span>(<span class="ident">weight_used</span>, <span class="ident">e</span>)
-			},
-		}
+		<span class="ident">vm</span>.<span class="ident">post_execute</span>(<span class="ident">xcm_weight</span>)
 	}
 }
 
@@ -726,6 +713,31 @@
 			}
 		}
 		<span class="ident">result</span>
+	}
+
+	<span class="doccomment">/// Execute any final operations after having executed the XCM message.</span>
+	<span class="doccomment">/// This includes refunding surplus weight, trapping extra holding funds, and returning any errors during execution.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">post_execute</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">xcm_weight</span>: <span class="ident">Weight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Outcome</span> {
+		<span class="self">self</span>.<span class="ident">refund_surplus</span>();
+		<span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">trader</span>);
+
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">weight_used</span> <span class="op">=</span> <span class="ident">xcm_weight</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">total_surplus</span>);
+
+		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">holding</span>.<span class="ident">is_empty</span>() {
+			<span class="macro">log::trace!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm_in_credit&quot;</span>, <span class="string">&quot;Trapping assets in holding register: {:?} (original_origin: {:?})&quot;</span>, <span class="self">self</span>.<span class="ident">holding</span>, <span class="self">self</span>.<span class="ident">original_origin</span>);
+			<span class="kw">let</span> <span class="ident">trap_weight</span> <span class="op">=</span> <span class="ident">Config::AssetTrap::drop_assets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">original_origin</span>, <span class="self">self</span>.<span class="ident">holding</span>);
+			<span class="ident">weight_used</span>.<span class="ident">saturating_accrue</span>(<span class="ident">trap_weight</span>);
+		};
+
+		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">error</span> {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outcome::Complete</span>(<span class="ident">weight_used</span>),
+			<span class="comment">// TODO: #2841 #REALWEIGHT We should deduct the cost of any instructions following</span>
+			<span class="comment">// the error which didn&#39;t end up being executed.</span>
+			<span class="prelude-val">Some</span>((<span class="ident">_i</span>, <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="macro">log::debug!</span>(<span class="ident">target</span>: <span class="string">&quot;xcm::execute_xcm_in_credit&quot;</span>, <span class="string">&quot;Execution errored at {:?}: {:?} (original_origin: {:?})&quot;</span>, <span class="ident">_i</span>, <span class="ident">e</span>, <span class="self">self</span>.<span class="ident">original_origin</span>);
+				<span class="ident">Outcome::Incomplete</span>(<span class="ident">weight_used</span>, <span class="ident">e</span>)
+			},
+		}
 	}
 
 	<span class="doccomment">/// Remove the registered error handler and return it. Do not refund its weight.</span>
