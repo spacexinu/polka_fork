@@ -314,23 +314,17 @@ ErasStartSessionIndex</li>
 </ul>
 </li>
 </ul>
-<h1 id="-37" class="section-header"><a href="#-37"></weight></a></h1></div><div class="sub-variant" id="variant.set_history_depth.fields"><h3>Fields of <b>set_history_depth</b></h3><div><span id="variant.set_history_depth.field.new_history_depth" class="variant small-section-header"><a href="#variant.set_history_depth.field.new_history_depth" class="anchor field"></a><code>new_history_depth:&nbsp;<a class="type" href="../type.EraIndex.html" title="type pallet_staking::EraIndex">EraIndex</a></code></span><span id="variant.set_history_depth.field.era_items_deleted" class="variant small-section-header"><a href="#variant.set_history_depth.field.era_items_deleted" class="anchor field"></a><code>era_items_deleted:&nbsp;<a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.u32.html">u32</a></code></span></div></div><div id="variant.reap_stash" class="variant small-section-header"><a href="#variant.reap_stash" class="anchor field"></a><code>reap_stash</code></div><div class="docblock"><p>Remove all data structure concerning a staker/stash once its balance is at the minimum.
-This is essentially equivalent to <code>withdraw_unbonded</code> except it can be called by anyone
-and the target <code>stash</code> must have no funds left beyond the ED.</p>
-<p>This can be called from any origin.</p>
-<ul>
-<li><code>stash</code>: The stash account to reap. Its balance must be zero.</li>
-</ul>
-<h1 id="-38" class="section-header"><a href="#-38"><weight></a></h1>
-<p>Complexity: O(S) where S is the number of slashing spans on the account.
-DB Weight:</p>
-<ul>
-<li>Reads: Stash Account, Bonded, Slashing Spans, Locks</li>
-<li>Writes: Bonded, Slashing Spans (if S &gt; 0), Ledger, Payee, Validators, Nominators,
-Stash Account, Locks</li>
-<li>Writes Each: SpanSlash * S</li>
-</ul>
-<h1 id="-39" class="section-header"><a href="#-39"></weight></a></h1></div><div class="sub-variant" id="variant.reap_stash.fields"><h3>Fields of <b>reap_stash</b></h3><div><span id="variant.reap_stash.field.stash" class="variant small-section-header"><a href="#variant.reap_stash.field.stash" class="anchor field"></a><code>stash:&nbsp;T::<a class="type" href="../../frame_system/pallet/trait.Config.html#associatedtype.AccountId" title="type frame_system::pallet::Config::AccountId">AccountId</a></code></span><span id="variant.reap_stash.field.num_slashing_spans" class="variant small-section-header"><a href="#variant.reap_stash.field.num_slashing_spans" class="anchor field"></a><code>num_slashing_spans:&nbsp;<a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.u32.html">u32</a></code></span></div></div><div id="variant.kick" class="variant small-section-header"><a href="#variant.kick" class="anchor field"></a><code>kick</code></div><div class="docblock"><p>Remove the given nominations from the calling validator.</p>
+<h1 id="-37" class="section-header"><a href="#-37"></weight></a></h1></div><div class="sub-variant" id="variant.set_history_depth.fields"><h3>Fields of <b>set_history_depth</b></h3><div><span id="variant.set_history_depth.field.new_history_depth" class="variant small-section-header"><a href="#variant.set_history_depth.field.new_history_depth" class="anchor field"></a><code>new_history_depth:&nbsp;<a class="type" href="../type.EraIndex.html" title="type pallet_staking::EraIndex">EraIndex</a></code></span><span id="variant.set_history_depth.field.era_items_deleted" class="variant small-section-header"><a href="#variant.set_history_depth.field.era_items_deleted" class="anchor field"></a><code>era_items_deleted:&nbsp;<a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.u32.html">u32</a></code></span></div></div><div id="variant.reap_stash" class="variant small-section-header"><a href="#variant.reap_stash" class="anchor field"></a><code>reap_stash</code></div><div class="docblock"><p>Remove all data structures concerning a staker/stash once it is at a state where it can
+be considered <code>dust</code> in the staking system. The requirements are:</p>
+<ol>
+<li>the <code>total_balance</code> of the stash is below existential deposit.</li>
+<li>or, the <code>ledger.total</code> of the stash is below existential deposit.</li>
+</ol>
+<p>The former can happen in cases like a slash; the latter when a fully unbonded account
+is still receiving staking rewards in <code>RewardDestination::Staked</code>.</p>
+<p>It can be called by anyone, as long as <code>stash</code> meets the above requirements.</p>
+<p>Refunds the transaction fees upon successful execution.</p>
+</div><div class="sub-variant" id="variant.reap_stash.fields"><h3>Fields of <b>reap_stash</b></h3><div><span id="variant.reap_stash.field.stash" class="variant small-section-header"><a href="#variant.reap_stash.field.stash" class="anchor field"></a><code>stash:&nbsp;T::<a class="type" href="../../frame_system/pallet/trait.Config.html#associatedtype.AccountId" title="type frame_system::pallet::Config::AccountId">AccountId</a></code></span><span id="variant.reap_stash.field.num_slashing_spans" class="variant small-section-header"><a href="#variant.reap_stash.field.num_slashing_spans" class="anchor field"></a><code>num_slashing_spans:&nbsp;<a class="primitive" href="https://doc.rust-lang.org/1.56.1/std/primitive.u32.html">u32</a></code></span></div></div><div id="variant.kick" class="variant small-section-header"><a href="#variant.kick" class="anchor field"></a><code>kick</code></div><div class="docblock"><p>Remove the given nominations from the calling validator.</p>
 <p>Effects will be felt at the beginning of the next era.</p>
 <p>The dispatch origin for this call must be <em>Signed</em> by the controller, not the stash.</p>
 <ul>
