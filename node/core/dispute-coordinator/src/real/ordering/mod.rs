@@ -32,6 +32,9 @@ use super::{
 	LOG_TARGET,
 };
 
+#[cfg(test)]
+mod tests;
+
 /// Provider of `CandidateComparator` for candidates.
 pub struct OrderingProvider {
 	/// All candidates we have seen included, which not yet have been finalized.
@@ -42,9 +45,9 @@ pub struct OrderingProvider {
 	candidates_by_block_number: BTreeMap<BlockNumber, HashSet<CandidateHash>>,
 }
 
-/// Comparator for ordering of disputes for candidates.
+/// `Comparator` for ordering of disputes for candidates.
 ///
-/// This comparator makes it possible to order disputes based on age and to ensure some fairness
+/// This `comparator` makes it possible to order disputes based on age and to ensure some fairness
 /// between chains in case of equally old disputes.
 ///
 /// Objective ordering between nodes is important in case of lots disputes, so nodes will pull in
@@ -64,14 +67,13 @@ pub struct CandidateComparator {
 	///
 	/// Important, so we will be participating in oldest disputes first.
 	///
-	/// Note: In fact it would make a bit more sense to use the `BlockNumber` of the including
+	/// Note: In theory it would make more sense to use the `BlockNumber` of the including
 	/// block, as inclusion time is the actual relevant event when it comes to ordering. The
 	/// problem is, that a candidate can get included multiple times on forks, so the `BlockNumber`
-	/// of the including block is not unique. We could however easily work around that problem, by
-	/// just using the lowest `BlockNumber` of all available including blocks.
-	///
-	/// In practice it should not matter much, so in the interest of time I will not change the
-	/// implementation again now, but keep that in mind in case it becomes relevant at some point.
+	/// of the including block is not unique. We could theoretically work around that problem, by
+	/// just using the lowest `BlockNumber` of all available including blocks - the problem is,
+	/// that is not stable. If a new fork appears after the fact, we would start ordering the same
+	/// candidate differently, which would result in the same candidate getting queued twice.
 	relay_parent_block_number: BlockNumber,
 	/// By adding the `CandidateHash`, we can guarantee a unique ordering across candidates.
 	candidate_hash: CandidateHash,
@@ -101,6 +103,20 @@ impl Ord for CandidateComparator {
 	}
 }
 
+impl CandidateComparator {
+	/// Create a candidate comparator based on given (fake) values.
+	///
+	/// Useful for testing.
+	#[cfg(test)]
+	pub fn new_dummy(block_number: BlockNumber, candidate_hash: CandidateHash) -> Self {
+		Self { relay_parent_block_number: block_number, candidate_hash }
+	}
+	/// Check whether the given candidate hash belongs to this comparator.
+	pub fn matches_candidate(&self, candidate_hash: &CandidateHash) -> bool {
+		&self.candidate_hash == candidate_hash
+	}
+}
+
 impl OrderingProvider {
 	/// Create a properly initialized `OrderingProvider`.
 	pub async fn new<Sender: SubsystemSender>(
@@ -117,7 +133,7 @@ impl OrderingProvider {
 		Ok(s)
 	}
 
-	/// Retrieve a candidate comparator if available.
+	/// Retrieve a candidate `comparator` if available.
 	///
 	/// If not available, we can treat disputes concerning this candidate with low priority and
 	/// should use spam slots for such disputes.

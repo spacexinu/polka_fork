@@ -23,6 +23,8 @@ use futures::{
 	FutureExt, StreamExt,
 };
 
+use sc_keystore::LocalKeystore;
+
 use polkadot_node_primitives::{
 	CandidateVotes, DisputeMessage, DisputeMessageCheckError, SignedDisputeStatement,
 	DISPUTE_WINDOW,
@@ -42,7 +44,6 @@ use polkadot_primitives::v1::{
 	DisputeStatement, DisputeStatementSet, Hash, ScrapedOnChainVotes, SessionIndex, SessionInfo,
 	ValidDisputeStatementKind, ValidatorId, ValidatorIndex, ValidatorPair, ValidatorSignature,
 };
-use sc_keystore::LocalKeystore;
 
 use crate::{metrics::Metrics, DisputeCoordinatorSubsystem};
 
@@ -76,6 +77,7 @@ pub struct Initialized {
 }
 
 impl Initialized {
+	/// Make initialized subsystem, ready to `run`.
 	pub fn new(
 		subsystem: DisputeCoordinatorSubsystem,
 		rolling_session_window: RollingSessionWindow,
@@ -100,6 +102,9 @@ impl Initialized {
 		}
 	}
 
+	/// Run the initialized subsystem.
+	///
+	/// Optionally supply initial participations and a first leaf to process.
 	pub async fn run<B, Context>(
 		mut self,
 		mut ctx: Context,
@@ -743,22 +748,31 @@ impl Initialized {
 		let concluded_valid = votes.valid.len() >= supermajority_threshold;
 		let concluded_invalid = votes.invalid.len() >= supermajority_threshold;
 
-		// Participate in dispute if the imported vote was not local & we did not vote before either:
-		if !is_local && !voted_already && is_disputed {
+		// Participate in dispute if the imported vote was not local, we did not vote before either
+		// and we actually have keys to issue a local vote.
+		if !is_local && !voted_already && is_disputed && !controlled_indices.is_empty() {
 			tracing::trace!(
 				target: LOG_TARGET,
 				candidate_hash = ?candidate_receipt.hash(),
+				priority = ?comparator.is_some(),
 				"Queuing participation for candidate"
 			);
+			if comparator.is_some() {
+				self.metrics.on_queued_priority_participation();
+			} else {
+				self.metrics.on_queued_best_effort_participation();
+			}
 			// Participate whenever the imported vote was local & we did not had no cast
 			// previously:
-			self.participation
+			let r = self
+				.participation
 				.queue_participation(
 					ctx,
 					comparator,
 					ParticipationRequest::new(candidate_receipt, session, n_validators),
 				)
-				.await?;
+				.await;
+			log_error(r)?;
 		}
 
 		let prev_status = recent_disputes.get(&(session, candidate_hash)).map(|x| x.clone());
