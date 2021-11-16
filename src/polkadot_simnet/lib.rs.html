@@ -433,6 +433,19 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -584,7 +597,7 @@
 		<span class="ident">events</span>
 			.<span class="ident">iter</span>()
 			.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-				<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::PreimageNoted</span>(<span class="kw-2">ref</span> <span class="ident">proposal_hash</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::PreimageNoted</span> { <span class="kw-2">ref</span> <span class="ident">proposal_hash</span>, .. }) <span class="op">=</span><span class="op">&gt;</span>
 					<span class="prelude-val">Some</span>(<span class="ident">proposal_hash</span>.<span class="ident">clone</span>()),
 				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 			})
@@ -616,8 +629,12 @@
 		<span class="kw">let</span> (<span class="ident">index</span>, <span class="ident">hash</span>): (<span class="ident">u32</span>, <span class="ident">H256</span>) <span class="op">=</span> <span class="ident">events</span>
 			.<span class="ident">iter</span>()
 			.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Proposed</span>(<span class="kw">_</span>, <span class="ident">index</span>, <span class="kw-2">ref</span> <span class="ident">hash</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span>
-					<span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="ident">hash</span>.<span class="ident">clone</span>())),
+				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Proposed</span> {
+					<span class="ident">account</span>: <span class="kw">_</span>,
+					<span class="ident">proposal_index</span>,
+					<span class="kw-2">ref</span> <span class="ident">proposal_hash</span>,
+					<span class="ident">threshold</span>: <span class="kw">_</span>,
+				}) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">proposal_index</span>, <span class="ident">proposal_hash</span>.<span class="ident">clone</span>())),
 				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 			})
 			.<span class="ident">next</span>()
@@ -647,12 +664,16 @@
 			.<span class="ident">events</span>()
 			.<span class="ident">into_iter</span>()
 			.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Closed</span>(<span class="ident">_hash</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Closed</span> { <span class="ident">proposal_hash</span>, <span class="ident">yes</span>: <span class="kw">_</span>, <span class="ident">no</span>: <span class="kw">_</span> })
+					<span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">proposal_hash</span> <span class="op">=</span><span class="op">&gt;</span>
 					<span class="bool-val">true</span>,
-				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Approved</span>(<span class="ident">_hash</span>)) <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Executed</span>(<span class="ident">_hash</span>, <span class="prelude-val">Ok</span>(())))
-					<span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span>
+				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Approved</span> { <span class="ident">proposal_hash</span> })
+					<span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">proposal_hash</span> <span class="op">=</span><span class="op">&gt;</span>
 					<span class="bool-val">true</span>,
+				<span class="ident">Event::Council</span>(<span class="ident">CouncilCollectiveEvent::Executed</span> {
+					<span class="ident">proposal_hash</span>,
+					<span class="ident">result</span>: <span class="prelude-val">Ok</span>(()),
+				}) <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">proposal_hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 			})
 			.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
@@ -688,12 +709,12 @@
 		<span class="kw">let</span> (<span class="ident">index</span>, <span class="ident">hash</span>) <span class="op">=</span> <span class="ident">events</span>
 			.<span class="ident">iter</span>()
 			.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Proposed</span>(
-					<span class="kw">_</span>,
-					<span class="ident">index</span>,
-					<span class="kw-2">ref</span> <span class="ident">hash</span>,
-					<span class="kw">_</span>,
-				)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="ident">hash</span>.<span class="ident">clone</span>())),
+				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Proposed</span> {
+					<span class="ident">account</span>: <span class="kw">_</span>,
+					<span class="ident">proposal_index</span>,
+					<span class="kw-2">ref</span> <span class="ident">proposal_hash</span>,
+					<span class="ident">threshold</span>: <span class="kw">_</span>,
+				}) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">proposal_index</span>, <span class="ident">proposal_hash</span>.<span class="ident">clone</span>())),
 				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 			})
 			.<span class="ident">next</span>()
@@ -724,15 +745,17 @@
 			.<span class="ident">events</span>()
 			.<span class="ident">into_iter</span>()
 			.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Closed</span>(<span class="ident">_hash</span>, <span class="kw">_</span>, <span class="kw">_</span>))
-					<span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span>
-					<span class="bool-val">true</span>,
-				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Approved</span>(<span class="ident">_hash</span>))
-					<span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span>
-					<span class="bool-val">true</span>,
-				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Executed</span>(<span class="ident">_hash</span>, <span class="prelude-val">Ok</span>(())))
-					<span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span>
-					<span class="bool-val">true</span>,
+				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Closed</span> {
+					<span class="ident">proposal_hash</span>: <span class="ident">_hash</span>,
+					..
+				}) <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Approved</span> {
+					<span class="ident">proposal_hash</span>: <span class="ident">_hash</span>,
+				}) <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+				<span class="ident">Event::TechnicalCommittee</span>(<span class="ident">TechnicalCollectiveEvent::Executed</span> {
+					<span class="ident">proposal_hash</span>: <span class="ident">_hash</span>,
+					<span class="ident">result</span>: <span class="prelude-val">Ok</span>(()),
+				}) <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 			})
 			.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
@@ -751,7 +774,7 @@
 		.<span class="ident">events</span>()
 		.<span class="ident">into_iter</span>()
 		.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::Started</span>(<span class="ident">index</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>),
+			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::Started</span> { <span class="ident">ref_index</span>: <span class="ident">index</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>),
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 		})
 		.<span class="ident">next</span>()
@@ -779,11 +802,14 @@
 		.<span class="ident">events</span>()
 		.<span class="ident">into_iter</span>()
 		.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span> {
-			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::Passed</span>(<span class="ident">_index</span>)) <span class="kw">if</span> <span class="ident">_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ref_index</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::PreimageUsed</span>(<span class="ident">_hash</span>, <span class="kw">_</span>, <span class="kw">_</span>))
+			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::Passed</span> { <span class="ident">ref_index</span>: <span class="ident">_index</span> })
+				<span class="kw">if</span> <span class="ident">_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ref_index</span> <span class="op">=</span><span class="op">&gt;</span>
+				<span class="bool-val">true</span>,
+			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::PreimageUsed</span> { <span class="ident">proposal_hash</span>: <span class="ident">_hash</span>, .. })
 				<span class="kw">if</span> <span class="ident">_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">proposal_hash</span> <span class="op">=</span><span class="op">&gt;</span>
 				<span class="bool-val">true</span>,
-			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::Executed</span>(<span class="ident">_index</span>, <span class="prelude-val">Ok</span>(()))) <span class="kw">if</span> <span class="ident">_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ref_index</span> <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">Event::Democracy</span>(<span class="ident">democracy::Event::Executed</span> { <span class="ident">ref_index</span>: <span class="ident">_index</span>, <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()) })
+				<span class="kw">if</span> <span class="ident">_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ref_index</span> <span class="op">=</span><span class="op">&gt;</span>
 				<span class="bool-val">true</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 		})
