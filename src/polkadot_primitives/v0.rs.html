@@ -1054,8 +1054,8 @@
 }
 
 <span class="doccomment">/// Index of the validator is used as a lightweight replacement of the `ValidatorId` when appropriate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">MallocSizeOf</span>))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">TypeInfo</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Hash</span>, <span class="ident">MallocSizeOf</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValidatorIndex</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
 <span class="comment">// We should really get https://github.com/paritytech/polkadot/issues/2403 going ..</span>

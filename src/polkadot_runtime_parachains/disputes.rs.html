@@ -3380,6 +3380,32 @@
 <span id="3380">3380</span>
 <span id="3381">3381</span>
 <span id="3382">3382</span>
+<span id="3383">3383</span>
+<span id="3384">3384</span>
+<span id="3385">3385</span>
+<span id="3386">3386</span>
+<span id="3387">3387</span>
+<span id="3388">3388</span>
+<span id="3389">3389</span>
+<span id="3390">3390</span>
+<span id="3391">3391</span>
+<span id="3392">3392</span>
+<span id="3393">3393</span>
+<span id="3394">3394</span>
+<span id="3395">3395</span>
+<span id="3396">3396</span>
+<span id="3397">3397</span>
+<span id="3398">3398</span>
+<span id="3399">3399</span>
+<span id="3400">3400</span>
+<span id="3401">3401</span>
+<span id="3402">3402</span>
+<span id="3403">3403</span>
+<span id="3404">3404</span>
+<span id="3405">3405</span>
+<span id="3406">3406</span>
+<span id="3407">3407</span>
+<span id="3408">3408</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -3511,6 +3537,10 @@
 		<span class="ident">included_in</span>: <span class="ident">BlockNumber</span>,
 	);
 
+	<span class="doccomment">/// Retrieve the included state of a given candidate in a particular session. If it</span>
+	<span class="doccomment">/// returns `Some`, then we have a local dispute for the given `candidate_hash`.</span>
+	<span class="kw">fn</span> <span class="ident">included_state</span>(<span class="ident">session</span>: <span class="ident">SessionIndex</span>, <span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span>;
+
 	<span class="doccomment">/// Whether the given candidate concluded invalid in a dispute with supermajority.</span>
 	<span class="kw">fn</span> <span class="ident">concluded_invalid</span>(<span class="ident">session</span>: <span class="ident">SessionIndex</span>, <span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
@@ -3544,6 +3574,13 @@
 		<span class="ident">_candidate_hash</span>: <span class="ident">CandidateHash</span>,
 		<span class="ident">_included_in</span>: <span class="ident">BlockNumber</span>,
 	) {
+	}
+
+	<span class="kw">fn</span> <span class="ident">included_state</span>(
+		<span class="ident">_session</span>: <span class="ident">SessionIndex</span>,
+		<span class="ident">_candidate_hash</span>: <span class="ident">CandidateHash</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockNumber</span><span class="op">&gt;</span> {
+		<span class="prelude-val">None</span>
 	}
 
 	<span class="kw">fn</span> <span class="ident">concluded_invalid</span>(<span class="ident">_session</span>: <span class="ident">SessionIndex</span>, <span class="ident">_candidate_hash</span>: <span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -3580,6 +3617,13 @@
 		<span class="ident">included_in</span>: <span class="ident">T::BlockNumber</span>,
 	) {
 		<span class="ident">pallet::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::note_included</span>(<span class="ident">session</span>, <span class="ident">candidate_hash</span>, <span class="ident">included_in</span>)
+	}
+
+	<span class="kw">fn</span> <span class="ident">included_state</span>(
+		<span class="ident">session</span>: <span class="ident">SessionIndex</span>,
+		<span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span> {
+		<span class="ident">pallet::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::included_state</span>(<span class="ident">session</span>, <span class="ident">candidate_hash</span>)
 	}
 
 	<span class="kw">fn</span> <span class="ident">concluded_invalid</span>(<span class="ident">session</span>: <span class="ident">SessionIndex</span>, <span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -4120,6 +4164,7 @@
 		<span class="prelude-val">Ok</span>(<span class="ident">fresh</span>)
 	}
 
+	<span class="doccomment">/// Removes all duplicate disputes.</span>
 	<span class="kw">fn</span> <span class="ident">filter_multi_dispute_data</span>(<span class="ident">statement_sets</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MultiDisputeStatementSet</span>) {
 		<span class="ident">frame_support::storage::with_transaction</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">configuration::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::config</span>();
@@ -4496,6 +4541,13 @@
 				<span class="ident"><span class="self">Self</span>::revert_and_freeze</span>(<span class="ident">revert_to</span>);
 			}
 		}
+	}
+
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">included_state</span>(
+		<span class="ident">session</span>: <span class="ident">SessionIndex</span>,
+		<span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span> {
+		<span class="op">&lt;</span><span class="ident">Included</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::get</span>(<span class="ident">session</span>, <span class="ident">candidate_hash</span>)
 	}
 
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">concluded_invalid</span>(<span class="ident">session</span>: <span class="ident">SessionIndex</span>, <span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
