@@ -3085,7 +3085,7 @@
 		<span class="comment">// Sort the dispute statements according to the following prioritization:</span>
 		<span class="comment">//  1. Prioritize local disputes over remote disputes.</span>
 		<span class="comment">//  2. Prioritize older disputes over newer disputes.</span>
-		<span class="ident">disputes</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
+		<span class="ident">disputes</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="ident">a_local_block</span> <span class="op">=</span> <span class="ident">T::DisputesHandler::included_state</span>(<span class="ident">a</span>.<span class="ident">session</span>, <span class="ident">a</span>.<span class="ident">candidate_hash</span>);
 			<span class="kw">let</span> <span class="ident">b_local_block</span> <span class="op">=</span> <span class="ident">T::DisputesHandler::included_state</span>(<span class="ident">b</span>.<span class="ident">session</span>, <span class="ident">b</span>.<span class="ident">candidate_hash</span>);
 			<span class="kw">match</span> (<span class="ident">a_local_block</span>, <span class="ident">b_local_block</span>) {
