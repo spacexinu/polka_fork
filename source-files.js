@@ -629,7 +629,6 @@ sourcesIndex["strsim"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["structopt"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["structopt_derive"] = {"name":"","files":["attrs.rs","doc_comments.rs","lib.rs","parse.rs","spanned.rs","ty.rs"]};
 sourcesIndex["strum"] = {"name":"","files":["additional_attributes.rs","lib.rs"]};
-sourcesIndex["strum_macros"] = {"name":"","dirs":[{"name":"helpers","files":["case_style.rs","metadata.rs","mod.rs","type_props.rs","variant_props.rs"]},{"name":"macros","dirs":[{"name":"strings","files":["as_ref_str.rs","display.rs","from_string.rs","mod.rs","to_string.rs"]}],"files":["enum_count.rs","enum_discriminants.rs","enum_iter.rs","enum_messages.rs","enum_properties.rs","enum_variant_names.rs","mod.rs"]}],"files":["lib.rs"]};
 sourcesIndex["sub_tokens"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["substrate_bip39"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["substrate_frame_rpc_system"] = {"name":"","files":["lib.rs"]};
