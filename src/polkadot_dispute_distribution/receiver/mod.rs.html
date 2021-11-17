@@ -589,7 +589,7 @@
 		<span class="kw">let</span> <span class="ident">peer</span> <span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">peer</span>;
 
 		<span class="comment">// Only accept messages from validators:</span>
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">authority_discovery</span>.<span class="ident">get_authority_id_by_peer_id</span>(<span class="ident">peer</span>).<span class="kw">await</span>.<span class="ident">is_none</span>() {
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">authority_discovery</span>.<span class="ident">get_authority_ids_by_peer_id</span>(<span class="ident">peer</span>).<span class="kw">await</span>.<span class="ident">is_none</span>() {
 			<span class="ident">incoming</span>
 				.<span class="ident">send_outgoing_response</span>(<span class="ident">OutgoingResponse</span> {
 					<span class="ident">result</span>: <span class="prelude-val">Err</span>(()),

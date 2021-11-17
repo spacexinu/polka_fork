@@ -1057,6 +1057,8 @@
 <span id="1057">1057</span>
 <span id="1058">1058</span>
 <span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -1224,11 +1226,11 @@
 	<span class="doccomment">/// Returns `true` if we should advertise our collation to the given peer.</span>
 	<span class="kw">fn</span> <span class="ident">should_advertise_to</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">peer_ids</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
+		<span class="ident">peer_ids</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">PeerId</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="ident">peer_ids</span>.<span class="ident">get</span>(<span class="ident">peer</span>) {
-			<span class="prelude-val">Some</span>(<span class="ident">discovery_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">advertised_to</span>.<span class="ident">contains</span>(<span class="ident">discovery_id</span>),
+			<span class="prelude-val">Some</span>(<span class="ident">discovery_ids</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">discovery_ids</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">advertised_to</span>.<span class="ident">contains</span>(<span class="ident">d</span>)),
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 		}
 	}
@@ -1236,11 +1238,13 @@
 	<span class="doccomment">/// Should be called after we advertised our collation to the given `peer` to keep track of it.</span>
 	<span class="kw">fn</span> <span class="ident">advertised_to_peer</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">peer_ids</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
+		<span class="ident">peer_ids</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">PeerId</span>,
 	) {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">validator_id</span>) <span class="op">=</span> <span class="ident">peer_ids</span>.<span class="ident">get</span>(<span class="ident">peer</span>) {
-			<span class="self">self</span>.<span class="ident">advertised_to</span>.<span class="ident">insert</span>(<span class="ident">validator_id</span>.<span class="ident">clone</span>());
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">authority_ids</span>) <span class="op">=</span> <span class="ident">peer_ids</span>.<span class="ident">get</span>(<span class="ident">peer</span>) {
+			<span class="ident">authority_ids</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
+				<span class="self">self</span>.<span class="ident">advertised_to</span>.<span class="ident">insert</span>(<span class="ident">a</span>.<span class="ident">clone</span>());
+			});
 		}
 	}
 }
@@ -1333,9 +1337,9 @@
 	<span class="doccomment">/// Our validator groups per active leaf.</span>
 	<span class="ident">our_validators_groups</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Hash</span>, <span class="ident">ValidatorGroup</span><span class="op">&gt;</span>,
 
-	<span class="doccomment">/// The mapping from [`PeerId`] to [`ValidatorId`]. This is filled over time as we learn the [`PeerId`]&#39;s</span>
+	<span class="doccomment">/// The mapping from [`PeerId`] to [`HashSet&lt;AuthorityDiscoveryId&gt;`]. This is filled over time as we learn the [`PeerId`]&#39;s</span>
 	<span class="doccomment">/// by `PeerConnected` events.</span>
-	<span class="ident">peer_ids</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>,
+	<span class="ident">peer_ids</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
 	<span class="doccomment">/// Metrics.</span>
 	<span class="ident">metrics</span>: <span class="ident">Metrics</span>,
@@ -1966,14 +1970,14 @@
 			<span class="comment">// If it is possible that a disconnected validator would attempt a reconnect</span>
 			<span class="comment">// it should be handled here.</span>
 			<span class="macro">tracing::trace!</span>(<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>, <span class="question-mark">?</span><span class="ident">peer_id</span>, <span class="question-mark">?</span><span class="ident">observed_role</span>, <span class="string">&quot;Peer connected&quot;</span>);
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">authority</span>) <span class="op">=</span> <span class="ident">maybe_authority</span> {
+			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">authority_ids</span>) <span class="op">=</span> <span class="ident">maybe_authority</span> {
 				<span class="macro">tracing::trace!</span>(
 					<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-					<span class="question-mark">?</span><span class="ident">authority</span>,
+					<span class="question-mark">?</span><span class="ident">authority_ids</span>,
 					<span class="question-mark">?</span><span class="ident">peer_id</span>,
 					<span class="string">&quot;Connected to requested validator&quot;</span>
 				);
-				<span class="ident">state</span>.<span class="ident">peer_ids</span>.<span class="ident">insert</span>(<span class="ident">peer_id</span>, <span class="ident">authority</span>);
+				<span class="ident">state</span>.<span class="ident">peer_ids</span>.<span class="ident">insert</span>(<span class="ident">peer_id</span>, <span class="ident">authority_ids</span>);
 
 				<span class="ident">declare</span>(<span class="ident">ctx</span>, <span class="ident">state</span>, <span class="ident">peer_id</span>).<span class="kw">await</span>;
 			}

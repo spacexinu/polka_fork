@@ -1239,7 +1239,7 @@
 	<span class="doccomment">/// connected to.</span>
 	<span class="ident">ConnectToResolvedValidators</span> {
 		<span class="doccomment">/// Each entry corresponds to the addresses of an already resolved validator.</span>
-		<span class="ident">validator_addrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Multiaddr</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">validator_addrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Multiaddr</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="doccomment">/// The peer set we want the connection on.</span>
 		<span class="ident">peer_set</span>: <span class="ident">PeerSet</span>,
 	},

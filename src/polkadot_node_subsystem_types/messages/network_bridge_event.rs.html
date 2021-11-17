@@ -113,7 +113,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NetworkBridgeEvent</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// A peer has connected.</span>
-	<span class="ident">PeerConnected</span>(<span class="ident">PeerId</span>, <span class="ident">ObservedRole</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span>),
+	<span class="ident">PeerConnected</span>(<span class="ident">PeerId</span>, <span class="ident">ObservedRole</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryId</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 
 	<span class="doccomment">/// A peer has disconnected.</span>
 	<span class="ident">PeerDisconnected</span>(<span class="ident">PeerId</span>),
