@@ -2061,6 +2061,27 @@
 <span id="2061">2061</span>
 <span id="2062">2062</span>
 <span id="2063">2063</span>
+<span id="2064">2064</span>
+<span id="2065">2065</span>
+<span id="2066">2066</span>
+<span id="2067">2067</span>
+<span id="2068">2068</span>
+<span id="2069">2069</span>
+<span id="2070">2070</span>
+<span id="2071">2071</span>
+<span id="2072">2072</span>
+<span id="2073">2073</span>
+<span id="2074">2074</span>
+<span id="2075">2075</span>
+<span id="2076">2076</span>
+<span id="2077">2077</span>
+<span id="2078">2078</span>
+<span id="2079">2079</span>
+<span id="2080">2080</span>
+<span id="2081">2081</span>
+<span id="2082">2082</span>
+<span id="2083">2083</span>
+<span id="2084">2084</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2114,7 +2135,7 @@
 	<span class="ident">construct_runtime</span>, <span class="ident">match_type</span>, <span class="ident">parameter_types</span>,
 	<span class="ident">traits</span>::{
 		<span class="ident">Contains</span>, <span class="ident">Everything</span>, <span class="ident">InstanceFilter</span>, <span class="ident">KeyOwnerProofSystem</span>, <span class="ident">LockIdentifier</span>, <span class="ident">Nothing</span>,
-		<span class="ident">PrivilegeCmp</span>,
+		<span class="ident">OnRuntimeUpgrade</span>, <span class="ident">PrivilegeCmp</span>,
 	},
 	<span class="ident">weights::Weight</span>,
 	<span class="ident">PalletId</span>, <span class="ident">RuntimeDebug</span>,
@@ -3658,10 +3679,31 @@
 	<span class="ident">frame_system::ChainContext</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
 	<span class="ident">Runtime</span>,
 	<span class="ident">AllPallets</span>,
-	(),
+	(<span class="ident">SessionHistoricalPalletPrefixMigration</span>,),
 <span class="op">&gt;</span>;
 <span class="doccomment">/// The payload being signed in the transactions.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignedPayload</span> <span class="op">=</span> <span class="ident">generic::SignedPayload</span><span class="op">&lt;</span><span class="ident">Call</span>, <span class="ident">SignedExtra</span><span class="op">&gt;</span>;
+
+<span class="doccomment">/// Migrate session-historical from `Session` to the new pallet prefix `Historical`</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionHistoricalPalletPrefixMigration</span>;
+
+<span class="kw">impl</span> <span class="ident">OnRuntimeUpgrade</span> <span class="kw">for</span> <span class="ident">SessionHistoricalPalletPrefixMigration</span> {
+	<span class="kw">fn</span> <span class="ident">on_runtime_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">frame_support::weights::Weight</span> {
+		<span class="ident">pallet_session::migrations::v1::migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Historical</span><span class="op">&gt;</span>()
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">pre_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_session::migrations::v1::pre_migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Historical</span><span class="op">&gt;</span>();
+		<span class="prelude-val">Ok</span>(())
+	}
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;try-runtime&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">post_upgrade</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="ident">pallet_session::migrations::v1::post_migrate</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">Historical</span><span class="op">&gt;</span>();
+		<span class="prelude-val">Ok</span>(())
+	}
+}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;disable-runtime-api&quot;</span>))]</span>
 <span class="macro">sp_api::impl_runtime_apis!</span> {
