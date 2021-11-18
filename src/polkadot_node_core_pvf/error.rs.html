@@ -85,6 +85,9 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -113,6 +116,8 @@
 	<span class="ident">Prevalidation</span>(<span class="ident">String</span>),
 	<span class="doccomment">/// Compilation failed for the given PVF.</span>
 	<span class="ident">Preparation</span>(<span class="ident">String</span>),
+	<span class="doccomment">/// An unexpected panic has occured in the preparation worker.</span>
+	<span class="ident">Panic</span>(<span class="ident">String</span>),
 	<span class="doccomment">/// Failed to prepare the PVF due to the time limit.</span>
 	<span class="ident">TimedOut</span>,
 	<span class="doccomment">/// This state indicates that the process assigned to prepare the artifact wasn&#39;t responsible</span>
@@ -164,8 +169,9 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PrepareError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValidationError</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">PrepareError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">error_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">error</span> {
-			<span class="ident">PrepareError::Prevalidation</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>,
-			<span class="ident">PrepareError::Preparation</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>,
+			<span class="ident">PrepareError::Prevalidation</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;prevalidation: {}&quot;</span>, <span class="ident">err</span>),
+			<span class="ident">PrepareError::Preparation</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;preparation: {}&quot;</span>, <span class="ident">err</span>),
+			<span class="ident">PrepareError::Panic</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;panic: {}&quot;</span>, <span class="ident">err</span>),
 			<span class="ident">PrepareError::TimedOut</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;preparation timeout&quot;</span>.<span class="ident">to_owned</span>(),
 			<span class="ident">PrepareError::DidNotMakeIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;communication error&quot;</span>.<span class="ident">to_owned</span>(),
 		};
