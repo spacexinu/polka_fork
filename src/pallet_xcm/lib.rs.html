@@ -2048,8 +2048,8 @@
 		<span class="doccomment">///   an `AccountId32` value.</span>
 		<span class="doccomment">/// - `assets`: The assets to be withdrawn. The first item should be the currency used to to pay the fee on the</span>
 		<span class="doccomment">///   `dest` side. May not be empty.</span>
-		<span class="doccomment">/// - `dest_weight`: Equal to the total weight on `dest` of the XCM message</span>
-		<span class="doccomment">///   `Teleport { assets, effects: [ BuyExecution{..}, DepositAsset{..} ] }`.</span>
+		<span class="doccomment">/// - `fee_asset_item`: The index into `assets` of the item which should be used to pay</span>
+		<span class="doccomment">///   fees.</span>
 		<span class="attribute">#[<span class="ident">pallet::weight</span>({
 			<span class="kw">let</span> <span class="ident">maybe_assets</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MultiAssets</span>, ()<span class="op">&gt;</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">assets</span>.<span class="ident">clone</span>()).<span class="ident">try_into</span>();
 			<span class="kw">let</span> <span class="ident">maybe_dest</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MultiLocation</span>, ()<span class="op">&gt;</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">dest</span>.<span class="ident">clone</span>()).<span class="ident">try_into</span>();
@@ -2285,8 +2285,8 @@
 		<span class="doccomment">///   an `AccountId32` value.</span>
 		<span class="doccomment">/// - `assets`: The assets to be withdrawn. The first item should be the currency used to to pay the fee on the</span>
 		<span class="doccomment">///   `dest` side. May not be empty.</span>
-		<span class="doccomment">/// - `dest_weight`: Equal to the total weight on `dest` of the XCM message</span>
-		<span class="doccomment">///   `Teleport { assets, effects: [ BuyExecution{..}, DepositAsset{..} ] }`.</span>
+		<span class="doccomment">/// - `fee_asset_item`: The index into `assets` of the item which should be used to pay</span>
+		<span class="doccomment">///   fees.</span>
 		<span class="doccomment">/// - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.</span>
 		<span class="attribute">#[<span class="ident">pallet::weight</span>({
 			<span class="kw">let</span> <span class="ident">maybe_assets</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MultiAssets</span>, ()<span class="op">&gt;</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">assets</span>.<span class="ident">clone</span>()).<span class="ident">try_into</span>();
