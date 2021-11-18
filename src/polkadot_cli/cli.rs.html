@@ -224,9 +224,9 @@
 	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;grandpa-pause&quot;</span>, <span class="ident">number_of_values</span>(<span class="number">2</span>))]</span>
 	<span class="kw">pub</span> <span class="ident">grandpa_pause</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 
-	<span class="doccomment">/// Disable BEEFY gadget.</span>
+	<span class="doccomment">/// Enable the BEEFY gadget (only on Rococo or Wococo for now).</span>
 	<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-	<span class="kw">pub</span> <span class="ident">no_beefy</span>: <span class="ident">bool</span>,
+	<span class="kw">pub</span> <span class="ident">beefy</span>: <span class="ident">bool</span>,
 
 	<span class="doccomment">/// Add the destination address to the jaeger agent.</span>
 	<span class="doccomment">///</span>
