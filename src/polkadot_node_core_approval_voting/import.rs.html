@@ -1299,6 +1299,12 @@
 <span id="1299">1299</span>
 <span id="1300">1300</span>
 <span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -1377,7 +1383,7 @@
 }
 
 <span class="kw">struct</span> <span class="ident">ImportedBlockInfoEnv</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">session_window</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RollingSessionWindow</span>,
+	<span class="ident">session_window</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RollingSessionWindow</span><span class="op">&gt;</span>,
 	<span class="ident">assignment_criteria</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">AssignmentCriteria</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>),
 	<span class="ident">keystore</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">LocalKeystore</span>,
 }
@@ -1434,7 +1440,11 @@
 			<span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
 		};
 
-		<span class="kw">if</span> <span class="ident">env</span>.<span class="ident">session_window</span>.<span class="ident">earliest_session</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">session_index</span> <span class="op">&lt;</span> <span class="ident">e</span>) {
+		<span class="kw">if</span> <span class="ident">env</span>
+			.<span class="ident">session_window</span>
+			.<span class="ident">as_ref</span>()
+			.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">session_index</span> <span class="op">&lt;</span> <span class="ident">s</span>.<span class="ident">earliest_session</span>())
+		{
 			<span class="macro">tracing::debug!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 				<span class="string">&quot;Block {} is from ancient session {}. Skipping&quot;</span>,
@@ -1481,7 +1491,8 @@
 		}
 	};
 
-	<span class="kw">let</span> <span class="ident">session_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">env</span>.<span class="ident">session_window</span>.<span class="ident">session_info</span>(<span class="ident">session_index</span>) {
+	<span class="kw">let</span> <span class="ident">session_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">env</span>.<span class="ident">session_window</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">session_info</span>(<span class="ident">session_index</span>))
+	{
 		<span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
 		<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::debug!</span>(
@@ -1625,7 +1636,7 @@
 		}
 	};
 
-	<span class="kw">match</span> <span class="ident">state</span>.<span class="ident">session_window</span>.<span class="ident">cache_session_info_for_head</span>(<span class="ident">ctx</span>, <span class="ident">head</span>).<span class="kw">await</span> {
+	<span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cache_session_info_for_head</span>(<span class="ident">ctx</span>, <span class="ident">head</span>).<span class="kw">await</span> {
 		<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::debug!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
@@ -1636,7 +1647,7 @@
 
 			<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>())
 		},
-		<span class="prelude-val">Ok</span>(<span class="ident">a</span> @ <span class="ident">SessionWindowUpdate::Advanced</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">a</span> @ <span class="ident">SessionWindowUpdate::Advanced</span> { .. })) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="macro">tracing::info!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
 				<span class="ident">update</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">a</span>,
@@ -1732,8 +1743,9 @@
 
 		<span class="kw">let</span> <span class="ident">session_info</span> <span class="op">=</span> <span class="ident">state</span>
 			.<span class="ident">session_window</span>
-			.<span class="ident">session_info</span>(<span class="ident">session_index</span>)
-			.<span class="ident">expect</span>(<span class="string">&quot;imported_block_info requires session to be available; qed&quot;</span>);
+			.<span class="ident">as_ref</span>()
+			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">session_info</span>(<span class="ident">session_index</span>))
+			.<span class="ident">expect</span>(<span class="string">&quot;imported_block_info requires session info to be available; qed&quot;</span>);
 
 		<span class="kw">let</span> (<span class="ident">block_tick</span>, <span class="ident">no_show_duration</span>) <span class="op">=</span> {
 			<span class="kw">let</span> <span class="ident">block_tick</span> <span class="op">=</span> <span class="ident">slot_number_to_tick</span>(<span class="ident">state</span>.<span class="ident">slot_duration_millis</span>, <span class="ident">slot</span>);
@@ -1909,7 +1921,7 @@
 
 	<span class="kw">fn</span> <span class="ident">blank_state</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
 		<span class="ident">State</span> {
-			<span class="ident">session_window</span>: <span class="ident">RollingSessionWindow::new</span>(<span class="ident">APPROVAL_SESSIONS</span>),
+			<span class="ident">session_window</span>: <span class="prelude-val">None</span>,
 			<span class="ident">keystore</span>: <span class="ident">Arc::new</span>(<span class="ident">LocalKeystore::in_memory</span>()),
 			<span class="ident">slot_duration_millis</span>: <span class="number">6_000</span>,
 			<span class="ident">clock</span>: <span class="ident">Box::new</span>(<span class="ident">MockClock::default</span>()),
@@ -1919,11 +1931,11 @@
 
 	<span class="kw">fn</span> <span class="ident">single_session_state</span>(<span class="ident">index</span>: <span class="ident">SessionIndex</span>, <span class="ident">info</span>: <span class="ident">SessionInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
 		<span class="ident">State</span> {
-			<span class="ident">session_window</span>: <span class="ident">RollingSessionWindow::with_session_info</span>(
+			<span class="ident">session_window</span>: <span class="prelude-val">Some</span>(<span class="ident">RollingSessionWindow::with_session_info</span>(
 				<span class="ident">APPROVAL_SESSIONS</span>,
 				<span class="ident">index</span>,
 				<span class="macro">vec!</span>[<span class="ident">info</span>],
-			),
+			)),
 			..<span class="ident">blank_state</span>()
 		}
 	}
@@ -2041,7 +2053,7 @@
 			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
 				<span class="kw">let</span> <span class="ident">env</span> <span class="op">=</span> <span class="ident">ImportedBlockInfoEnv</span> {
-					<span class="ident">session_window</span>: <span class="kw-2">&amp;</span><span class="ident">session_window</span>,
+					<span class="ident">session_window</span>: <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">session_window</span>),
 					<span class="ident">assignment_criteria</span>: <span class="kw-2">&amp;</span><span class="ident">MockAssignmentCriteria</span>,
 					<span class="ident">keystore</span>: <span class="kw-2">&amp;</span><span class="ident">LocalKeystore::in_memory</span>(),
 				};
@@ -2150,7 +2162,7 @@
 			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
 				<span class="kw">let</span> <span class="ident">env</span> <span class="op">=</span> <span class="ident">ImportedBlockInfoEnv</span> {
-					<span class="ident">session_window</span>: <span class="kw-2">&amp;</span><span class="ident">session_window</span>,
+					<span class="ident">session_window</span>: <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">session_window</span>),
 					<span class="ident">assignment_criteria</span>: <span class="kw-2">&amp;</span><span class="ident">MockAssignmentCriteria</span>,
 					<span class="ident">keystore</span>: <span class="kw-2">&amp;</span><span class="ident">LocalKeystore::in_memory</span>(),
 				};
@@ -2243,7 +2255,7 @@
 			.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
 		<span class="kw">let</span> <span class="ident">test_fut</span> <span class="op">=</span> {
-			<span class="kw">let</span> <span class="ident">session_window</span> <span class="op">=</span> <span class="ident">RollingSessionWindow::new</span>(<span class="ident">APPROVAL_SESSIONS</span>);
+			<span class="kw">let</span> <span class="ident">session_window</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
 			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
@@ -2338,11 +2350,11 @@
 				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">r</span>, <span class="ident">c</span>, <span class="ident">g</span>)<span class="op">|</span> (<span class="ident">r</span>.<span class="ident">hash</span>(), <span class="ident">r</span>.<span class="ident">clone</span>(), <span class="kw-2">*</span><span class="ident">c</span>, <span class="kw-2">*</span><span class="ident">g</span>))
 				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-			<span class="kw">let</span> <span class="ident">session_window</span> <span class="op">=</span> <span class="ident">RollingSessionWindow::with_session_info</span>(
+			<span class="kw">let</span> <span class="ident">session_window</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">RollingSessionWindow::with_session_info</span>(
 				<span class="ident">APPROVAL_SESSIONS</span>,
 				<span class="ident">session</span>,
 				<span class="macro">vec!</span>[<span class="ident">session_info</span>],
-			);
+			));
 
 			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">clone</span>();
 			<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {

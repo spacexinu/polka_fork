@@ -1450,6 +1450,17 @@
 <span id="1450">1450</span>
 <span id="1451">1451</span>
 <span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2727,6 +2738,17 @@
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
 			<span class="ident">DisputeStatement::Valid</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 			<span class="ident">DisputeStatement::Invalid</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+		}
+	}
+
+	<span class="doccomment">/// Statement is backing statement.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_backing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+			<span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">ValidDisputeStatementKind::BackingSeconded</span>(<span class="kw">_</span>)) <span class="op">|</span>
+			<span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">ValidDisputeStatementKind::BackingValid</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+			<span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">ValidDisputeStatementKind::Explicit</span>) <span class="op">|</span>
+			<span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">ValidDisputeStatementKind::ApprovalChecking</span>) <span class="op">|</span>
+			<span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 		}
 	}
 }

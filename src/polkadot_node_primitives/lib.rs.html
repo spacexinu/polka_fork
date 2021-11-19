@@ -429,6 +429,53 @@
 <span id="429">429</span>
 <span id="430">430</span>
 <span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -496,12 +543,6 @@
 <span class="doccomment">/// The bomb limit for decompressing PoV blobs.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">POV_BOMB_LIMIT</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="ident">MAX_POV_SIZE</span> <span class="op">*</span> <span class="number">4u32</span>) <span class="kw">as</span> <span class="ident">usize</span>;
 
-<span class="doccomment">/// It would be nice to draw this from the chain state, but we have no tools for it right now.</span>
-<span class="doccomment">/// On Polkadot this is 1 day, and on Kusama it&#39;s 6 hours.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Number of sessions we want to consider in disputes.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DISPUTE_WINDOW</span>: <span class="ident">SessionIndex</span> <span class="op">=</span> <span class="number">6</span>;
-
 <span class="doccomment">/// The amount of time to spend on execution during backing.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BACKING_EXECUTION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">2</span>);
 
@@ -512,6 +553,59 @@
 <span class="doccomment">/// blocks that pass backing are considerd executable by approval checkers or</span>
 <span class="doccomment">/// dispute participants.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">APPROVAL_EXECUTION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">6</span>);
+
+<span class="doccomment">/// Type of a session window size.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// We are not using `NonZeroU32` here because `expect` and `unwrap` are not yet const, so global</span>
+<span class="doccomment">/// constants of `SessionWindowSize` would require `lazy_static` in that case.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See: https://github.com/rust-lang/rust/issues/67441</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionWindowSize</span>(<span class="ident">SessionIndex</span>);
+
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="doccomment">/// Create a new checked `SessionWindowSize`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// which cannot be 0.</span>
+<span class="macro">macro_rules!</span> <span class="ident">new_session_window_size</span> {
+	(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="macro">compile_error!</span>(<span class="string">&quot;Must be non zero&quot;</span>);
+	};
+	(<span class="number">0_u32</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="macro">compile_error!</span>(<span class="string">&quot;Must be non zero&quot;</span>);
+	};
+	(<span class="number">0</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="macro">compile_error!</span>(<span class="string">&quot;Must be non zero&quot;</span>);
+	};
+	(<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="macro">compile_error!</span>(<span class="string">&quot;Must be non zero&quot;</span>);
+	};
+	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">literal</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="ident">SessionWindowSize::unchecked_new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> <span class="kw">as</span> <span class="kw">_</span>)
+	};
+}
+
+<span class="doccomment">/// It would be nice to draw this from the chain state, but we have no tools for it right now.</span>
+<span class="doccomment">/// On Polkadot this is 1 day, and on Kusama it&#39;s 6 hours.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Number of sessions we want to consider in disputes.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DISPUTE_WINDOW</span>: <span class="ident">SessionWindowSize</span> <span class="op">=</span> <span class="macro">new_session_window_size!</span>(<span class="number">6</span>);
+
+<span class="kw">impl</span> <span class="ident">SessionWindowSize</span> {
+	<span class="doccomment">/// Get the value as `SessionIndex` for doing comparisons with those.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionIndex</span> {
+		<span class="self">self</span>.<span class="number">0</span>
+	}
+
+	<span class="doccomment">/// Helper function for `new_session_window_size`.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Don&#39;t use it. The only reason it is public, is because otherwise the</span>
+	<span class="doccomment">/// `new_session_window_size` macro would not work outside of this module.</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unchecked_new</span>(<span class="ident">size</span>: <span class="ident">SessionIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span>(<span class="ident">size</span>)
+	}
+}
 
 <span class="doccomment">/// The cumulative weight of a block in a fork-choice rule.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BlockWeight</span> <span class="op">=</span> <span class="ident">u32</span>;

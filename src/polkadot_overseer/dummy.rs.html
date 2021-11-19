@@ -190,10 +190,6 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -285,7 +281,6 @@
 		<span class="ident">DummySubsystem</span>,
 		<span class="ident">DummySubsystem</span>,
 		<span class="ident">DummySubsystem</span>,
-		<span class="ident">DummySubsystem</span>,
 	<span class="op">&gt;</span>,
 	<span class="ident">SubsystemError</span>,
 <span class="op">&gt;</span>
@@ -306,7 +301,6 @@
 	<span class="ident">OverseerBuilder</span><span class="op">&lt;</span>
 		<span class="ident">Spawner</span>,
 		<span class="ident">SupportsParachains</span>,
-		<span class="ident">Sub</span>,
 		<span class="ident">Sub</span>,
 		<span class="ident">Sub</span>,
 		<span class="ident">Sub</span>,
@@ -352,7 +346,6 @@
 		<span class="op">+</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">OverseerSubsystemContext</span><span class="op">&lt;</span><span class="ident">ApprovalVotingMessage</span><span class="op">&gt;</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span>
 		<span class="op">+</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">OverseerSubsystemContext</span><span class="op">&lt;</span><span class="ident">GossipSupportMessage</span><span class="op">&gt;</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span>
 		<span class="op">+</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">OverseerSubsystemContext</span><span class="op">&lt;</span><span class="ident">DisputeCoordinatorMessage</span><span class="op">&gt;</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span>
-		<span class="op">+</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">OverseerSubsystemContext</span><span class="op">&lt;</span><span class="ident">DisputeParticipationMessage</span><span class="op">&gt;</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span>
 		<span class="op">+</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">OverseerSubsystemContext</span><span class="op">&lt;</span><span class="ident">DisputeDistributionMessage</span><span class="op">&gt;</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span>
 		<span class="op">+</span> <span class="ident">Subsystem</span><span class="op">&lt;</span><span class="ident">OverseerSubsystemContext</span><span class="op">&lt;</span><span class="ident">ChainSelectionMessage</span><span class="op">&gt;</span>, <span class="ident">SubsystemError</span><span class="op">&gt;</span>,
 {
@@ -377,7 +370,6 @@
 		.<span class="ident">approval_voting</span>(<span class="ident">subsystem</span>.<span class="ident">clone</span>())
 		.<span class="ident">gossip_support</span>(<span class="ident">subsystem</span>.<span class="ident">clone</span>())
 		.<span class="ident">dispute_coordinator</span>(<span class="ident">subsystem</span>.<span class="ident">clone</span>())
-		.<span class="ident">dispute_participation</span>(<span class="ident">subsystem</span>.<span class="ident">clone</span>())
 		.<span class="ident">dispute_distribution</span>(<span class="ident">subsystem</span>.<span class="ident">clone</span>())
 		.<span class="ident">chain_selection</span>(<span class="ident">subsystem</span>)
 		.<span class="ident">activation_external_listeners</span>(<span class="ident">Default::default</span>())

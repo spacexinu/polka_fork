@@ -416,7 +416,6 @@ sourcesIndex["polkadot_node_core_candidate_validation"] = {"name":"","files":["l
 sourcesIndex["polkadot_node_core_chain_api"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["polkadot_node_core_chain_selection"] = {"name":"","dirs":[{"name":"db_backend","files":["mod.rs","v1.rs"]}],"files":["backend.rs","lib.rs","tree.rs"]};
 sourcesIndex["polkadot_node_core_dispute_coordinator"] = {"name":"","files":["dummy.rs","lib.rs","metrics.rs"]};
-sourcesIndex["polkadot_node_core_dispute_participation"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["polkadot_node_core_parachains_inherent"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["polkadot_node_core_provisioner"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["polkadot_node_core_pvf"] = {"name":"","dirs":[{"name":"execute","files":["mod.rs","queue.rs","worker.rs"]},{"name":"prepare","files":["mod.rs","pool.rs","queue.rs","worker.rs"]}],"files":["artifacts.rs","error.rs","executor_intf.rs","host.rs","lib.rs","metrics.rs","priority.rs","pvf.rs","testing.rs","worker_common.rs"]};

@@ -757,6 +757,7 @@
 <span id="757">757</span>
 <span id="758">758</span>
 <span id="759">759</span>
+<span id="760">760</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -968,6 +969,7 @@
 	<span class="kw">fn</span> <span class="ident">request_assumed_validation_data</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>, <span class="ident">expected_persisted_validation_data_hash</span>: <span class="ident">Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">PersistedValidationData</span>, <span class="ident">ValidationCodeHash</span>)<span class="op">&gt;</span>; <span class="ident">AssumedValidationData</span>;
 	<span class="kw">fn</span> <span class="ident">request_session_index_for_child</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionIndex</span>; <span class="ident">SessionIndexForChild</span>;
 	<span class="kw">fn</span> <span class="ident">request_validation_code</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>, <span class="ident">assumption</span>: <span class="ident">OccupiedCoreAssumption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span>; <span class="ident">ValidationCode</span>;
+	<span class="kw">fn</span> <span class="ident">request_validation_code_by_hash</span>(<span class="ident">validation_code_hash</span>: <span class="ident">ValidationCodeHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span>; <span class="ident">ValidationCodeByHash</span>;
 	<span class="kw">fn</span> <span class="ident">request_candidate_pending_availability</span>(<span class="ident">para_id</span>: <span class="ident">ParaId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommittedCandidateReceipt</span><span class="op">&gt;</span>; <span class="ident">CandidatePendingAvailability</span>;
 	<span class="kw">fn</span> <span class="ident">request_candidate_events</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CandidateEvent</span><span class="op">&gt;</span>; <span class="ident">CandidateEvents</span>;
 	<span class="kw">fn</span> <span class="ident">request_session_info</span>(<span class="ident">index</span>: <span class="ident">SessionIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionInfo</span><span class="op">&gt;</span>; <span class="ident">SessionInfo</span>;

@@ -116,11 +116,11 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NonFatal</span> {
 	<span class="doccomment">/// Some request to the runtime failed.</span>
 	<span class="doccomment">/// For example if we prune a block we&#39;re requesting info about.</span>
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Runtime API error&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Runtime API error {0}&quot;</span>)]</span>
 	<span class="ident">RuntimeRequest</span>(<span class="ident">RuntimeApiError</span>),
 
 	<span class="doccomment">/// We tried fetching a session info which was not available.</span>
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;There was no session with the given index&quot;</span>)]</span>
+	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;There was no session with the given index {0}&quot;</span>)]</span>
 	<span class="ident">NoSuchSession</span>(<span class="ident">SessionIndex</span>),
 }
 

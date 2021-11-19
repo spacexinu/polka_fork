@@ -300,6 +300,31 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -329,13 +354,14 @@
 
 <span class="kw">use</span> <span class="ident">polkadot_node_subsystem</span>::{<span class="ident">SubsystemContext</span>, <span class="ident">SubsystemSender</span>};
 <span class="kw">use</span> <span class="ident">polkadot_primitives::v1</span>::{
-	<span class="ident">CoreState</span>, <span class="ident">EncodeAs</span>, <span class="ident">GroupIndex</span>, <span class="ident">GroupRotationInfo</span>, <span class="ident">Hash</span>, <span class="ident">OccupiedCore</span>, <span class="ident">SessionIndex</span>,
-	<span class="ident">SessionInfo</span>, <span class="ident">Signed</span>, <span class="ident">SigningContext</span>, <span class="ident">UncheckedSigned</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
+	<span class="ident">CandidateEvent</span>, <span class="ident">CoreState</span>, <span class="ident">EncodeAs</span>, <span class="ident">GroupIndex</span>, <span class="ident">GroupRotationInfo</span>, <span class="ident">Hash</span>, <span class="ident">OccupiedCore</span>,
+	<span class="ident">SessionIndex</span>, <span class="ident">SessionInfo</span>, <span class="ident">Signed</span>, <span class="ident">SigningContext</span>, <span class="ident">UncheckedSigned</span>, <span class="ident">ValidationCode</span>,
+	<span class="ident">ValidationCodeHash</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
 };
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">request_availability_cores</span>, <span class="ident">request_session_index_for_child</span>, <span class="ident">request_session_info</span>,
-	<span class="ident">request_validator_groups</span>,
+	<span class="ident">request_availability_cores</span>, <span class="ident">request_candidate_events</span>, <span class="ident">request_session_index_for_child</span>,
+	<span class="ident">request_session_info</span>, <span class="ident">request_validation_code_by_hash</span>, <span class="ident">request_validator_groups</span>,
 };
 
 <span class="doccomment">/// Errors that can happen on runtime fetches.</span>
@@ -601,6 +627,30 @@
 	<span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">info</span>) <span class="op">=</span>
 		<span class="ident">recv_runtime</span>(<span class="ident">request_validator_groups</span>(<span class="ident">relay_parent</span>, <span class="ident">ctx</span>.<span class="ident">sender</span>()).<span class="kw">await</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 	<span class="prelude-val">Ok</span>(<span class="ident">info</span>)
+}
+
+<span class="doccomment">/// Get `CandidateEvent`s for the given `relay_parent`.</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_candidate_events</span><span class="op">&lt;</span><span class="ident">Sender</span><span class="op">&gt;</span>(
+	<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Sender</span>,
+	<span class="ident">relay_parent</span>: <span class="ident">Hash</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CandidateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">Sender</span>: <span class="ident">SubsystemSender</span>,
+{
+	<span class="ident">recv_runtime</span>(<span class="ident">request_candidate_events</span>(<span class="ident">relay_parent</span>, <span class="ident">sender</span>).<span class="kw">await</span>).<span class="kw">await</span>
+}
+
+<span class="doccomment">/// Fetch `ValidationCode` by hash from the runtime.</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_validation_code_by_hash</span><span class="op">&lt;</span><span class="ident">Sender</span><span class="op">&gt;</span>(
+	<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Sender</span>,
+	<span class="ident">relay_parent</span>: <span class="ident">Hash</span>,
+	<span class="ident">validation_code_hash</span>: <span class="ident">ValidationCodeHash</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationCode</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">Sender</span>: <span class="ident">SubsystemSender</span>,
+{
+	<span class="ident">recv_runtime</span>(<span class="ident">request_validation_code_by_hash</span>(<span class="ident">relay_parent</span>, <span class="ident">validation_code_hash</span>, <span class="ident">sender</span>).<span class="kw">await</span>)
+		.<span class="kw">await</span>
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="polkadot_node_subsystem_util" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

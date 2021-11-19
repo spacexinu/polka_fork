@@ -537,7 +537,7 @@
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">RuntimeInfo::new_with_config</span>(<span class="ident">runtime::Config</span> {
 			<span class="ident">keystore</span>: <span class="prelude-val">None</span>,
-			<span class="ident">session_cache_lru_size</span>: <span class="ident">DISPUTE_WINDOW</span> <span class="kw">as</span> <span class="ident">usize</span>,
+			<span class="ident">session_cache_lru_size</span>: <span class="ident">DISPUTE_WINDOW</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span>,
 		});
 		<span class="self">Self</span> {
 			<span class="ident">runtime</span>,

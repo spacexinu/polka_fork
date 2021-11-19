@@ -2126,6 +2126,22 @@
 <span id="2126">2126</span>
 <span id="2127">2127</span>
 <span id="2128">2128</span>
+<span id="2129">2129</span>
+<span id="2130">2130</span>
+<span id="2131">2131</span>
+<span id="2132">2132</span>
+<span id="2133">2133</span>
+<span id="2134">2134</span>
+<span id="2135">2135</span>
+<span id="2136">2136</span>
+<span id="2137">2137</span>
+<span id="2138">2138</span>
+<span id="2139">2139</span>
+<span id="2140">2140</span>
+<span id="2141">2141</span>
+<span id="2142">2142</span>
+<span id="2143">2143</span>
+<span id="2144">2144</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2464,6 +2480,14 @@
 				<span class="kw-2">mut</span> <span class="ident">disputes</span>,
 			} <span class="op">=</span> <span class="ident">data</span>;
 
+			<span class="macro">log::debug!</span>(
+				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+				<span class="string">&quot;[enter] bitfields.len(): {}, backed_candidates.len(): {}, disputes.len() {}&quot;</span>,
+				<span class="ident">signed_bitfields</span>.<span class="ident">len</span>(),
+				<span class="ident">backed_candidates</span>.<span class="ident">len</span>(),
+				<span class="ident">disputes</span>.<span class="ident">len</span>()
+			);
+
 			<span class="comment">// Check that the submitted parent header indeed corresponds to the previous block hash.</span>
 			<span class="kw">let</span> <span class="ident">parent_hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::parent_hash</span>();
 			<span class="macro">ensure!</span>(
@@ -2643,6 +2667,14 @@
 				<span class="kw">return</span> <span class="prelude-val">None</span>
 			},
 		};
+
+		<span class="macro">log::debug!</span>(
+			<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+			<span class="string">&quot;[create_inherent_inner] bitfields.len(): {}, backed_candidates.len(): {}, disputes.len() {}&quot;</span>,
+			<span class="ident">bitfields</span>.<span class="ident">len</span>(),
+			<span class="ident">backed_candidates</span>.<span class="ident">len</span>(),
+			<span class="ident">disputes</span>.<span class="ident">len</span>()
+		);
 
 		<span class="kw">let</span> <span class="ident">parent_hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::parent_hash</span>();
 

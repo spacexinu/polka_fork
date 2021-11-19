@@ -324,9 +324,6 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -388,7 +385,6 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_core_chain_api::ChainApiSubsystem</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_core_chain_selection::ChainSelectionSubsystem</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_core_dispute_coordinator::DisputeCoordinatorSubsystem</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_core_dispute_participation::DisputeParticipationSubsystem</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_core_provisioner::ProvisioningSubsystem</span> <span class="kw">as</span> <span class="ident">ProvisionerSubsystem</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_node_core_runtime_api::RuntimeApiSubsystem</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">polkadot_statement_distribution::StatementDistribution</span> <span class="kw">as</span> <span class="ident">StatementDistributionSubsystem</span>;
@@ -488,7 +484,6 @@
 		<span class="ident">ApprovalVotingSubsystem</span>,
 		<span class="ident">GossipSupportSubsystem</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryService</span><span class="op">&gt;</span>,
 		<span class="ident">DisputeCoordinatorSubsystem</span>,
-		<span class="ident">DisputeParticipationSubsystem</span>,
 		<span class="ident">DisputeDistributionSubsystem</span><span class="op">&lt;</span><span class="ident">AuthorityDiscoveryService</span><span class="op">&gt;</span>,
 		<span class="ident">ChainSelectionSubsystem</span>,
 	<span class="op">&gt;</span>,
@@ -588,7 +583,6 @@
 			<span class="ident">keystore</span>.<span class="ident">clone</span>(),
 			<span class="ident">Metrics::register</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>,
 		))
-		.<span class="ident">dispute_participation</span>(<span class="ident">DisputeParticipationSubsystem::new</span>())
 		.<span class="ident">dispute_distribution</span>(<span class="ident">DisputeDistributionSubsystem::new</span>(
 			<span class="ident">keystore</span>.<span class="ident">clone</span>(),
 			<span class="ident">dispute_req_receiver</span>,
