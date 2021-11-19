@@ -23,9 +23,6 @@ mod grandpa_support;
 mod parachains_db;
 mod relay_chain_selection;
 
-// TODO(niklasad1): this should be replaced.
-type RpcHandlers = ();
-
 #[cfg(feature = "full-node")]
 pub mod overseer;
 
@@ -567,7 +564,7 @@ pub struct NewFull<C> {
 	pub client: C,
 	pub overseer_handle: Option<Handle>,
 	pub network: Arc<sc_network::NetworkService<Block, <Block as BlockT>::Hash>>,
-	pub rpc_handlers: RpcHandlers,
+	pub rpc_handlers: service::RpcHandlers,
 	pub backend: Arc<FullBackend>,
 }
 

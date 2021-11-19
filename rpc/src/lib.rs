@@ -112,14 +112,14 @@ where
 	B::State: sc_client_api::StateBackend<sp_runtime::traits::HashFor<Block>>,
 {
 	use beefy_gadget_rpc::{BeefyApiServer, BeefyRpcHandler};
-	use frame_rpc_system::{SystemApiServer, SystemRpc, SystemRpcBackendFull};
+	use frame_rpc_system::{SystemApiServer, SystemRpc};
+	// use frame_rpc_system::{SystemApiServer, SystemRpc, SystemRpcBackendFull};
 	use pallet_mmr_rpc::{MmrApiServer, MmrRpc};
 	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPaymentRpc};
 	use sc_consensus_babe_rpc::{BabeApiServer, BabeRpc};
 	use sc_finality_grandpa_rpc::{GrandpaApiServer, GrandpaRpc};
 	use sc_sync_state_rpc::{SyncStateRpc, SyncStateRpcApiServer};
 
-	let mut io = RpcModule::new(());
 	let FullDeps { client, pool, select_chain, chain_spec, deny_unsafe, babe, grandpa, beefy } =
 		deps;
 	let BabeDeps { keystore, babe_config, shared_epoch_changes } = babe;
@@ -131,11 +131,13 @@ where
 		finality_provider,
 	} = grandpa;
 
-	let system_backend = SystemRpcBackendFull::new(client.clone(), pool, deny_unsafe);
-	io.merge(SystemRpc::new(Box::new(system_backend)).into_rpc())?;
-	io.merge(TransactionPaymentRpc::new(client.clone()).into_rpc())?;
-	io.merge(MmrRpc::new(client.clone()).into_rpc())?;
-	io.merge(
+	let mut module = RpcModule::new(());
+
+	// let system_backend = SystemRpcBackendFull::new(client.clone(), pool, deny_unsafe);
+	module.merge(SystemRpc::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
+	module.merge(MmrRpc::new(client.clone()).into_rpc())?;
+	module.merge(TransactionPaymentRpc::new(client.clone()).into_rpc())?;
+	module.merge(
 		BabeRpc::new(
 			client.clone(),
 			shared_epoch_changes.clone(),
@@ -146,7 +148,7 @@ where
 		)
 		.into_rpc(),
 	)?;
-	io.merge(
+	module.merge(
 		GrandpaRpc::new(
 			subscription_executor,
 			shared_authority_set.clone(),
@@ -156,7 +158,7 @@ where
 		)
 		.into_rpc(),
 	)?;
-	io.merge(
+	module.merge(
 		SyncStateRpc::new(
 			chain_spec,
 			client,
@@ -167,9 +169,9 @@ where
 		.into_rpc(),
 	)?;
 
-	io.merge(
+	module.merge(
 		BeefyRpcHandler::new(beefy.beefy_commitment_stream, beefy.subscription_executor).into_rpc(),
 	)?;
 
-	Ok(io)
+	Ok(module)
 }
