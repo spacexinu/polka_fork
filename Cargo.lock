@@ -2698,6 +2698,7 @@ dependencies = [
  "tokio",
  "tokio-rustls 0.22.0",
  "webpki 0.21.3",
+ "webpki-roots 0.21.0",
 ]
 
 [[package]]
@@ -2903,12 +2904,32 @@ name = "jsonrpsee"
 version = "0.4.1"
 source = "git+https://github.com/paritytech/jsonrpsee?rev=0e46b5cea9cd632dc438a005c77bbaa5c2af562f#0e46b5cea9cd632dc438a005c77bbaa5c2af562f"
 dependencies = [
+ "jsonrpsee-http-client",
  "jsonrpsee-http-server",
  "jsonrpsee-proc-macros",
  "jsonrpsee-types",
  "jsonrpsee-utils",
  "jsonrpsee-ws-client",
  "jsonrpsee-ws-server",
+]
+
+[[package]]
+name = "jsonrpsee-http-client"
+version = "0.4.1"
+source = "git+https://github.com/paritytech/jsonrpsee?rev=0e46b5cea9cd632dc438a005c77bbaa5c2af562f#0e46b5cea9cd632dc438a005c77bbaa5c2af562f"
+dependencies = [
+ "async-trait",
+ "fnv",
+ "hyper",
+ "hyper-rustls",
+ "jsonrpsee-types",
+ "jsonrpsee-utils",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "url",
 ]
 
 [[package]]
@@ -7006,6 +7027,7 @@ dependencies = [
  "futures 0.1.29",
  "futures 0.3.17",
  "hex",
+ "jsonrpsee",
  "pallet-balances",
  "pallet-staking",
  "pallet-transaction-payment",

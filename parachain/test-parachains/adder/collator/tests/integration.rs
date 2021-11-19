@@ -55,8 +55,7 @@ async fn collating_using_adder_collator() {
 	// register parachain
 	alice
 		.register_parachain(para_id, collator.validation_code().to_vec(), collator.genesis_head())
-		.await
-		.unwrap();
+		.await;
 
 	// run the collator node
 	let mut charlie = polkadot_test_service::run_collator_node(

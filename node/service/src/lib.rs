@@ -99,7 +99,7 @@ use sc_executor::NativeElseWasmExecutor;
 pub use sc_executor::NativeExecutionDispatch;
 pub use service::{
 	config::{DatabaseSource, PrometheusConfig},
-	ChainSpec, Configuration, Error as SubstrateServiceError, PruningMode, Role, RuntimeGenesis,
+	ChainSpec, Configuration, PruningMode, Role, RuntimeGenesis,
 	TFullBackend, TFullCallExecutor, TFullClient, TaskManager, TransactionPoolOptions,
 };
 pub use sp_api::{ApiRef, ConstructRuntimeApi, Core as CoreApi, ProvideRuntimeApi, StateBackend};
@@ -199,7 +199,7 @@ pub enum Error {
 	AddrFormatInvalid(#[from] std::net::AddrParseError),
 
 	#[error(transparent)]
-	Sub(#[from] SubstrateServiceError),
+	Sub(#[from] service::Error),
 
 	#[error(transparent)]
 	Blockchain(#[from] sp_blockchain::Error),
@@ -411,7 +411,7 @@ fn new_partial<RuntimeApi, ExecutorDispatch, ChainSelection>(
 			impl Fn(
 				polkadot_rpc::DenyUnsafe,
 				polkadot_rpc::SubscriptionTaskExecutor,
-			) -> Result<polkadot_rpc::RpcExtension, SubstrateServiceError>,
+			) -> Result<polkadot_rpc::RpcModule<()>, service::Error>,
 			(
 				babe::BabeBlockImport<
 					Block,
@@ -517,7 +517,7 @@ where
 
 		move |deny_unsafe,
 		      subscription_executor: polkadot_rpc::SubscriptionTaskExecutor|
-		      -> Result<polkadot_rpc::RpcExtension, service::Error> {
+		      -> Result<polkadot_rpc::RpcModule<()>, service::Error> {
 			let deps = polkadot_rpc::FullDeps {
 				client: client.clone(),
 				pool: transaction_pool.clone(),

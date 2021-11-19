@@ -49,10 +49,8 @@ use sp_keyring::Sr25519Keyring;
 use sp_runtime::{codec::Encode, generic, traits::IdentifyAccount, MultiSigner};
 use sp_state_machine::BasicExternalities;
 use std::{path::PathBuf, sync::Arc};
-use substrate_test_client::{
-	BlockchainEventsExt, RpcHandlersExt, RpcTransactionError, RpcTransactionOutput,
-};
-
+use substrate_test_client::BlockchainEventsExt;
+use jsonrpsee::types::v2::Response as RpcResponse;
 /// Declare an instance of the native executor named `PolkadotTestExecutorDispatch`. Include the wasm binary as the
 /// equivalent wasm code.
 pub struct PolkadotTestExecutorDispatch;
@@ -271,12 +269,23 @@ impl PolkadotTestNode {
 	/// Send an extrinsic to this node.
 	pub async fn send_extrinsic(
 		&self,
-		function: impl Into<polkadot_test_runtime::Call>,
+		call: impl Into<polkadot_test_runtime::Call>,
 		caller: Sr25519Keyring,
-	) -> Result<RpcTransactionOutput, RpcTransactionError> {
-		let extrinsic = construct_extrinsic(&*self.client, function, caller, 0);
+	) -> Option<String> {
+		let extrinsic = construct_extrinsic(&*self.client, call, caller, 0);
+		let payload = hex::encode(extrinsic.encode());
+		let rpc = self
+			.rpc_handlers
+			.handle()
+			.call_with("author_submitExtrinsic", [payload])
+			.await
+			.unwrap();
 
-		self.rpc_handlers.send_transaction(extrinsic.into()).await
+		let rpc_result = serde_json::from_str::<RpcResponse<String>>(&rpc);
+		match rpc_result {
+			Ok(result) => Some(result.result),
+			Err(_) => None,
+		}
 	}
 
 	/// Register a parachain at this relay chain.
@@ -285,7 +294,7 @@ impl PolkadotTestNode {
 		id: ParaId,
 		validation_code: impl Into<ValidationCode>,
 		genesis_head: impl Into<HeadData>,
-	) -> Result<(), RpcTransactionError> {
+		) -> Option<String> {
 		let call = ParasSudoWrapperCall::sudo_schedule_para_initialize {
 			id,
 			genesis: ParaGenesisArgs {
@@ -297,7 +306,6 @@ impl PolkadotTestNode {
 
 		self.send_extrinsic(SudoCall::sudo { call: Box::new(call.into()) }, Sr25519Keyring::Alice)
 			.await
-			.map(drop)
 	}
 
 	/// Wait for `count` blocks to be imported in the node and then exit. This function will not return if no blocks

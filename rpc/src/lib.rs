@@ -20,7 +20,7 @@
 
 use std::sync::Arc;
 
-use jsonrpsee::RpcModule;
+pub use jsonrpsee::RpcModule;
 use polkadot_primitives::v0::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
 use sc_client_api::AuxStore;
 use sc_consensus_babe::Epoch;
@@ -33,9 +33,6 @@ use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
 use sp_keystore::SyncCryptoStorePtr;
 use txpool_api::TransactionPool;
-
-/// A type representing all RPC extensions.
-pub type RpcExtension = RpcModule<()>;
 
 /// Extra dependencies for BABE.
 pub struct BabeDeps {
@@ -92,7 +89,7 @@ pub struct FullDeps<C, P, SC, B> {
 /// Instantiate all RPC extensions.
 pub fn create_full<C, P, SC, B>(
 	deps: FullDeps<C, P, SC, B>,
-) -> Result<RpcExtension, Box<dyn std::error::Error + Send + Sync>>
+) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 where
 	C: ProvideRuntimeApi<Block>
 		+ HeaderBackend<Block>
