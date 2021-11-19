@@ -22,7 +22,7 @@ pub mod chain_spec;
 
 pub use chain_spec::*;
 use futures::future::Future;
-use jsonrpsee::types::v2::{Response as RpcResponse, RpcError};
+use jsonrpsee::types::v2::Response as RpcResponse;
 use polkadot_node_primitives::{CollationGenerationConfig, CollatorFn};
 use polkadot_node_subsystem::messages::{CollationGenerationMessage, CollatorProtocolMessage};
 use polkadot_overseer::Handle;
@@ -276,8 +276,7 @@ impl PolkadotTestNode {
 		let payload = hex::encode(extrinsic.encode());
 		let rpc = self
 			.rpc_handlers
-			.handle()
-			.call_with("author_submitExtrinsic", [payload])
+			.rpc_query("author_submitExtrinsic", vec![payload])
 			.await
 			.expect("in-memory rpc calls work");
 
