@@ -22,7 +22,7 @@ pub mod chain_spec;
 
 pub use chain_spec::*;
 use futures::future::Future;
-use jsonrpsee::types::v2::Response as RpcResponse;
+use jsonrpsee::types::v2::{Response as RpcResponse, RpcError};
 use polkadot_node_primitives::{CollationGenerationConfig, CollatorFn};
 use polkadot_node_subsystem::messages::{CollationGenerationMessage, CollatorProtocolMessage};
 use polkadot_overseer::Handle;
@@ -271,7 +271,7 @@ impl PolkadotTestNode {
 		&self,
 		call: impl Into<polkadot_test_runtime::Call>,
 		caller: Sr25519Keyring,
-	) -> Option<String> {
+	) -> Result<String, serde_json::Error> {
 		let extrinsic = construct_extrinsic(&*self.client, call, caller, 0);
 		let payload = hex::encode(extrinsic.encode());
 		let rpc = self
@@ -279,13 +279,9 @@ impl PolkadotTestNode {
 			.handle()
 			.call_with("author_submitExtrinsic", [payload])
 			.await
-			.unwrap();
+			.expect("in-memory rpc calls work");
 
-		let rpc_result = serde_json::from_str::<RpcResponse<String>>(&rpc);
-		match rpc_result {
-			Ok(result) => Some(result.result),
-			Err(_) => None,
-		}
+		serde_json::from_str::<RpcResponse<String>>(&rpc).map(|result| result.result)
 	}
 
 	/// Register a parachain at this relay chain.
@@ -294,7 +290,7 @@ impl PolkadotTestNode {
 		id: ParaId,
 		validation_code: impl Into<ValidationCode>,
 		genesis_head: impl Into<HeadData>,
-	) -> Option<String> {
+	) -> Result<String, serde_json::Error> {
 		let call = ParasSudoWrapperCall::sudo_schedule_para_initialize {
 			id,
 			genesis: ParaGenesisArgs {
