@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;usr&#x2F;local&#x2F;cargo&#x2F;git&#x2F;checkouts&#x2F;substrate-7e08433d4c370a21&#x2F;0baa586&#x2F;frame&#x2F;staking&#x2F;src&#x2F;slashing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slashing.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../pallet_staking/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;usr&#x2F;local&#x2F;cargo&#x2F;git&#x2F;checkouts&#x2F;substrate-7e08433d4c370a21&#x2F;3cf5449&#x2F;frame&#x2F;staking&#x2F;src&#x2F;slashing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slashing.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../pallet_staking/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -912,6 +912,7 @@
 	<span class="ident">traits</span>::{<span class="ident">Saturating</span>, <span class="ident">Zero</span>},
 	<span class="ident">DispatchResult</span>, <span class="ident">RuntimeDebug</span>,
 };
+<span class="kw">use</span> <span class="ident">sp_staking::offence::DisableStrategy</span>;
 <span class="kw">use</span> <span class="ident">sp_std::vec::Vec</span>;
 
 <span class="doccomment">/// The proportion of the slashing reward to be paid out on the first slashing detection.</span>
@@ -1062,6 +1063,8 @@
 	<span class="doccomment">/// The maximum percentage of a slash that ever gets paid out.</span>
 	<span class="doccomment">/// This is f_inf in the paper.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">reward_proportion</span>: <span class="ident">Perbill</span>,
+	<span class="doccomment">/// When to disable offenders.</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">disable_strategy</span>: <span class="ident">DisableStrategy</span>,
 }
 
 <span class="doccomment">/// Computes a slash of a validator and nominators. It returns an unapplied</span>
@@ -1073,15 +1076,12 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compute_slash</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span>(
 	<span class="ident">params</span>: <span class="ident">SlashParams</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnappliedSlash</span><span class="op">&lt;</span><span class="ident">T::AccountId</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">SlashParams</span> { <span class="ident">stash</span>, <span class="ident">slash</span>, <span class="ident">exposure</span>, <span class="ident">slash_era</span>, <span class="ident">window_start</span>, <span class="ident">now</span>, <span class="ident">reward_proportion</span> } <span class="op">=</span>
-		<span class="ident">params</span>.<span class="ident">clone</span>();
-
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reward_payout</span> <span class="op">=</span> <span class="ident">Zero::zero</span>();
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val_slashed</span> <span class="op">=</span> <span class="ident">Zero::zero</span>();
 
 	<span class="comment">// is the slash amount here a maximum for the era?</span>
-	<span class="kw">let</span> <span class="ident">own_slash</span> <span class="op">=</span> <span class="ident">slash</span> <span class="op">*</span> <span class="ident">exposure</span>.<span class="ident">own</span>;
-	<span class="kw">if</span> <span class="ident">slash</span> <span class="op">*</span> <span class="ident">exposure</span>.<span class="ident">total</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Zero::zero</span>() {
+	<span class="kw">let</span> <span class="ident">own_slash</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">slash</span> <span class="op">*</span> <span class="ident">params</span>.<span class="ident">exposure</span>.<span class="ident">own</span>;
+	<span class="kw">if</span> <span class="ident">params</span>.<span class="ident">slash</span> <span class="op">*</span> <span class="ident">params</span>.<span class="ident">exposure</span>.<span class="ident">total</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Zero::zero</span>() {
 		<span class="comment">// kick out the validator even if they won&#39;t be slashed,</span>
 		<span class="comment">// as long as the misbehavior is from their most recent slashing span.</span>
 		<span class="ident">kick_out_if_recent</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>);
@@ -1089,13 +1089,17 @@
 	}
 
 	<span class="kw">let</span> (<span class="ident">prior_slash_p</span>, <span class="ident">_era_slash</span>) <span class="op">=</span>
-		<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::ValidatorSlashInEra::get</span>(<span class="kw-2">&amp;</span><span class="ident">slash_era</span>, <span class="ident">stash</span>)
+		<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::ValidatorSlashInEra::get</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">slash_era</span>, <span class="ident">params</span>.<span class="ident">stash</span>)
 			.<span class="ident">unwrap_or</span>((<span class="ident">Perbill::zero</span>(), <span class="ident">Zero::zero</span>()));
 
 	<span class="comment">// compare slash proportions rather than slash values to avoid issues due to rounding</span>
 	<span class="comment">// error.</span>
-	<span class="kw">if</span> <span class="ident">slash</span>.<span class="ident">deconstruct</span>() <span class="op">&gt;</span> <span class="ident">prior_slash_p</span>.<span class="ident">deconstruct</span>() {
-		<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::ValidatorSlashInEra::insert</span>(<span class="kw-2">&amp;</span><span class="ident">slash_era</span>, <span class="ident">stash</span>, <span class="kw-2">&amp;</span>(<span class="ident">slash</span>, <span class="ident">own_slash</span>));
+	<span class="kw">if</span> <span class="ident">params</span>.<span class="ident">slash</span>.<span class="ident">deconstruct</span>() <span class="op">&gt;</span> <span class="ident">prior_slash_p</span>.<span class="ident">deconstruct</span>() {
+		<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::ValidatorSlashInEra::insert</span>(
+			<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">slash_era</span>,
+			<span class="ident">params</span>.<span class="ident">stash</span>,
+			<span class="kw-2">&amp;</span>(<span class="ident">params</span>.<span class="ident">slash</span>, <span class="ident">own_slash</span>),
+		);
 	} <span class="kw">else</span> {
 		<span class="comment">// we slash based on the max in era - this new event is not the max,</span>
 		<span class="comment">// so neither the validator or any nominators will need an update.</span>
@@ -1110,14 +1114,14 @@
 	<span class="comment">// apply slash to validator.</span>
 	{
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span> <span class="op">=</span> <span class="ident">fetch_spans</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-			<span class="ident">stash</span>,
-			<span class="ident">window_start</span>,
+			<span class="ident">params</span>.<span class="ident">stash</span>,
+			<span class="ident">params</span>.<span class="ident">window_start</span>,
 			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reward_payout</span>,
 			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">val_slashed</span>,
-			<span class="ident">reward_proportion</span>,
+			<span class="ident">params</span>.<span class="ident">reward_proportion</span>,
 		);
 
-		<span class="kw">let</span> <span class="ident">target_span</span> <span class="op">=</span> <span class="ident">spans</span>.<span class="ident">compare_and_update_span_slash</span>(<span class="ident">slash_era</span>, <span class="ident">own_slash</span>);
+		<span class="kw">let</span> <span class="ident">target_span</span> <span class="op">=</span> <span class="ident">spans</span>.<span class="ident">compare_and_update_span_slash</span>(<span class="ident">params</span>.<span class="ident">slash_era</span>, <span class="ident">own_slash</span>);
 
 		<span class="kw">if</span> <span class="ident">target_span</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">spans</span>.<span class="ident">span_index</span>()) {
 			<span class="comment">// misbehavior occurred within the current slashing span - take appropriate</span>
@@ -1125,20 +1129,19 @@
 
 			<span class="comment">// chill the validator - it misbehaved in the current span and should</span>
 			<span class="comment">// not continue in the next election. also end the slashing span.</span>
-			<span class="ident">spans</span>.<span class="ident">end_span</span>(<span class="ident">now</span>);
-			<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::chill_stash</span>(<span class="ident">stash</span>);
+			<span class="ident">spans</span>.<span class="ident">end_span</span>(<span class="ident">params</span>.<span class="ident">now</span>);
+			<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::chill_stash</span>(<span class="ident">params</span>.<span class="ident">stash</span>);
 		}
 	}
 
-	<span class="comment">// add the validator to the offenders list and make sure it is disabled for</span>
-	<span class="comment">// the duration of the era</span>
-	<span class="ident">add_offending_validator</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>.<span class="ident">stash</span>, <span class="bool-val">true</span>);
+	<span class="kw">let</span> <span class="ident">disable_when_slashed</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">disable_strategy</span> <span class="op">!</span><span class="op">=</span> <span class="ident">DisableStrategy::Never</span>;
+	<span class="ident">add_offending_validator</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>.<span class="ident">stash</span>, <span class="ident">disable_when_slashed</span>);
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nominators_slashed</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-	<span class="ident">reward_payout</span> <span class="op">+</span><span class="op">=</span> <span class="ident">slash_nominators</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>, <span class="ident">prior_slash_p</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nominators_slashed</span>);
+	<span class="ident">reward_payout</span> <span class="op">+</span><span class="op">=</span> <span class="ident">slash_nominators</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>.<span class="ident">clone</span>(), <span class="ident">prior_slash_p</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nominators_slashed</span>);
 
 	<span class="prelude-val">Some</span>(<span class="ident">UnappliedSlash</span> {
-		<span class="ident">validator</span>: <span class="ident">stash</span>.<span class="ident">clone</span>(),
+		<span class="ident">validator</span>: <span class="ident">params</span>.<span class="ident">stash</span>.<span class="ident">clone</span>(),
 		<span class="ident">own</span>: <span class="ident">val_slashed</span>,
 		<span class="ident">others</span>: <span class="ident">nominators_slashed</span>,
 		<span class="ident">reporters</span>: <span class="ident">Vec::new</span>(),
@@ -1165,9 +1168,8 @@
 		<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::chill_stash</span>(<span class="ident">params</span>.<span class="ident">stash</span>);
 	}
 
-	<span class="comment">// add the validator to the offenders list but since there&#39;s no slash being</span>
-	<span class="comment">// applied there&#39;s no need to disable the validator</span>
-	<span class="ident">add_offending_validator</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>.<span class="ident">stash</span>, <span class="bool-val">false</span>);
+	<span class="kw">let</span> <span class="ident">disable_without_slash</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">disable_strategy</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DisableStrategy::Always</span>;
+	<span class="ident">add_offending_validator</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">params</span>.<span class="ident">stash</span>, <span class="ident">disable_without_slash</span>);
 }
 
 <span class="doccomment">/// Add the given validator to the offenders list and optionally disable it.</span>
@@ -1220,13 +1222,10 @@
 	<span class="ident">prior_slash_p</span>: <span class="ident">Perbill</span>,
 	<span class="ident">nominators_slashed</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T::AccountId</span>, <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">SlashParams</span> { <span class="ident">stash</span>: <span class="kw">_</span>, <span class="ident">slash</span>, <span class="ident">exposure</span>, <span class="ident">slash_era</span>, <span class="ident">window_start</span>, <span class="ident">now</span>, <span class="ident">reward_proportion</span> } <span class="op">=</span>
-		<span class="ident">params</span>;
-
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reward_payout</span> <span class="op">=</span> <span class="ident">Zero::zero</span>();
 
-	<span class="ident">nominators_slashed</span>.<span class="ident">reserve</span>(<span class="ident">exposure</span>.<span class="ident">others</span>.<span class="ident">len</span>());
-	<span class="kw">for</span> <span class="ident">nominator</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">exposure</span>.<span class="ident">others</span> {
+	<span class="ident">nominators_slashed</span>.<span class="ident">reserve</span>(<span class="ident">params</span>.<span class="ident">exposure</span>.<span class="ident">others</span>.<span class="ident">len</span>());
+	<span class="kw">for</span> <span class="ident">nominator</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">exposure</span>.<span class="ident">others</span> {
 		<span class="kw">let</span> <span class="ident">stash</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">nominator</span>.<span class="ident">who</span>;
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nom_slashed</span> <span class="op">=</span> <span class="ident">Zero::zero</span>();
 
@@ -1234,15 +1233,16 @@
 		<span class="comment">// had a new max slash for the era.</span>
 		<span class="kw">let</span> <span class="ident">era_slash</span> <span class="op">=</span> {
 			<span class="kw">let</span> <span class="ident">own_slash_prior</span> <span class="op">=</span> <span class="ident">prior_slash_p</span> <span class="op">*</span> <span class="ident">nominator</span>.<span class="ident">value</span>;
-			<span class="kw">let</span> <span class="ident">own_slash_by_validator</span> <span class="op">=</span> <span class="ident">slash</span> <span class="op">*</span> <span class="ident">nominator</span>.<span class="ident">value</span>;
+			<span class="kw">let</span> <span class="ident">own_slash_by_validator</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">slash</span> <span class="op">*</span> <span class="ident">nominator</span>.<span class="ident">value</span>;
 			<span class="kw">let</span> <span class="ident">own_slash_difference</span> <span class="op">=</span> <span class="ident">own_slash_by_validator</span>.<span class="ident">saturating_sub</span>(<span class="ident">own_slash_prior</span>);
 
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">era_slash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::NominatorSlashInEra::get</span>(<span class="kw-2">&amp;</span><span class="ident">slash_era</span>, <span class="ident">stash</span>)
-				.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Zero::zero</span>());
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">era_slash</span> <span class="op">=</span>
+				<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::NominatorSlashInEra::get</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">slash_era</span>, <span class="ident">stash</span>)
+					.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Zero::zero</span>());
 
 			<span class="ident">era_slash</span> <span class="op">+</span><span class="op">=</span> <span class="ident">own_slash_difference</span>;
 
-			<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::NominatorSlashInEra::insert</span>(<span class="kw-2">&amp;</span><span class="ident">slash_era</span>, <span class="ident">stash</span>, <span class="kw-2">&amp;</span><span class="ident">era_slash</span>);
+			<span class="op">&lt;</span><span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Store</span><span class="op">&gt;</span><span class="ident">::NominatorSlashInEra::insert</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">slash_era</span>, <span class="ident">stash</span>, <span class="kw-2">&amp;</span><span class="ident">era_slash</span>);
 
 			<span class="ident">era_slash</span>
 		};
@@ -1251,18 +1251,18 @@
 		{
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span> <span class="op">=</span> <span class="ident">fetch_spans</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
 				<span class="ident">stash</span>,
-				<span class="ident">window_start</span>,
+				<span class="ident">params</span>.<span class="ident">window_start</span>,
 				<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reward_payout</span>,
 				<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nom_slashed</span>,
-				<span class="ident">reward_proportion</span>,
+				<span class="ident">params</span>.<span class="ident">reward_proportion</span>,
 			);
 
-			<span class="kw">let</span> <span class="ident">target_span</span> <span class="op">=</span> <span class="ident">spans</span>.<span class="ident">compare_and_update_span_slash</span>(<span class="ident">slash_era</span>, <span class="ident">era_slash</span>);
+			<span class="kw">let</span> <span class="ident">target_span</span> <span class="op">=</span> <span class="ident">spans</span>.<span class="ident">compare_and_update_span_slash</span>(<span class="ident">params</span>.<span class="ident">slash_era</span>, <span class="ident">era_slash</span>);
 
 			<span class="kw">if</span> <span class="ident">target_span</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">spans</span>.<span class="ident">span_index</span>()) {
 				<span class="comment">// End the span, but don&#39;t chill the nominator. its nomination</span>
 				<span class="comment">// on this validator will be ignored in the future.</span>
-				<span class="ident">spans</span>.<span class="ident">end_span</span>(<span class="ident">now</span>);
+				<span class="ident">spans</span>.<span class="ident">end_span</span>(<span class="ident">params</span>.<span class="ident">now</span>);
 			}
 		}
 
