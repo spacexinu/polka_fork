@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BackGarbageCandidate","Generates an overseer that exposes bad behavior."],["BribedPassage",""],["BribedPassageInner",""]]});

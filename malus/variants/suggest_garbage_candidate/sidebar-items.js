@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ReplacePoVBytes","Replaces the seconded PoV data of outgoing messages by some garbage data."],["SuggestGarbageCandidate","Generates an overseer that exposes bad behavior."]]});

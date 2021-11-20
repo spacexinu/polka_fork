@@ -45,10 +45,10 @@
 <span class="comment">// along with Polkadot.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="doccomment">//! Binary used for Simnet nodes, supports all runtimes, although only polkadot is implemented currently.</span>
-<span class="doccomment">//! This binary accepts all the CLI args the polkadot binary does, Only difference is it uses</span>
+<span class="doccomment">//! This binary accepts all the CLI args the polkadot binary does, with the only difference that it uses</span>
 <span class="doccomment">//! manual-seal™ and babe for block authorship, it has a no-op verifier, so all blocks received over the network</span>
 <span class="doccomment">//! are imported and executed straight away. Block authorship/Finalization maybe done by calling the</span>
-<span class="doccomment">//!  `engine_createBlock` &amp; `engine_FinalizeBlock` rpc methods respectively.</span>
+<span class="doccomment">//! rpc methods `engine_createBlock` and `engine_FinalizeBlock` respectively.</span>
 
 <span class="kw">use</span> <span class="ident">std::error::Error</span>;
 

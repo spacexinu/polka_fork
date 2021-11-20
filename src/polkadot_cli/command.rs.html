@@ -701,8 +701,8 @@
 <span class="doccomment">/// accepts an alternative overseer generator, to adjust behavior</span>
 <span class="doccomment">/// for integration tests as needed.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;malus&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_node</span>(<span class="ident">cli</span>: <span class="ident">Cli</span>, <span class="ident">overseer_gen</span>: <span class="kw">impl</span> <span class="ident">service::OverseerGen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">run_node_inner</span>(<span class="ident">cli</span>, <span class="ident">overseer_gen</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_node</span>(<span class="ident">run</span>: <span class="ident">Cli</span>, <span class="ident">overseer_gen</span>: <span class="kw">impl</span> <span class="ident">service::OverseerGen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+	<span class="ident">run_node_inner</span>(<span class="ident">run</span>, <span class="ident">overseer_gen</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">run_node_inner</span>(<span class="ident">cli</span>: <span class="ident">Cli</span>, <span class="ident">overseer_gen</span>: <span class="kw">impl</span> <span class="ident">service::OverseerGen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {

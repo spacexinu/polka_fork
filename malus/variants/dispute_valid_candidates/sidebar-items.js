@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DisputeValidCandidates","Generates an overseer that disputes instead of approving valid candidates."],["ReplaceApprovalsWithDisputes","Replace outgoing approval messages with disputes."]]});
