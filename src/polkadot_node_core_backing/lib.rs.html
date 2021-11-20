@@ -1398,6 +1398,13 @@
 <span id="1398">1398</span>
 <span id="1399">1399</span>
 <span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2332,6 +2339,13 @@
 
 				<span class="comment">// Sanity check that candidate is from our assignment.</span>
 				<span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">candidate</span>.<span class="ident">descriptor</span>().<span class="ident">para_id</span>) <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">assignment</span> {
+					<span class="macro">tracing::debug!</span>(
+						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+						<span class="ident">our_assignment</span> <span class="op">=</span> <span class="question-mark">?</span><span class="self">self</span>.<span class="ident">assignment</span>,
+						<span class="ident">collation</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">candidate</span>.<span class="ident">descriptor</span>().<span class="ident">para_id</span>,
+						<span class="string">&quot;Subsystem asked to second for para outside of our assignment&quot;</span>,
+					);
+
 					<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
 				}
 
