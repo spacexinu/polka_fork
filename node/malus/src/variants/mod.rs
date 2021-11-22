@@ -1,4 +1,4 @@
-// Copyright 2020 Parity Technologies (UK) Ltd.
+// Copyright 2021 Parity Technologies (UK) Ltd.
 // This file is part of Polkadot.
 
 // Polkadot is free software: you can redistribute it and/or modify
@@ -14,18 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Polkadot.  If not, see <http://www.gnu.org/licenses/>.
 
-use polkadot_test_service::*;
-use sp_keyring::Sr25519Keyring::{Alice, Bob};
+//! Collection of behavior variants.
 
-#[substrate_test_utils::test]
-async fn call_function_actually_works() {
-	let alice =
-		run_validator_node(tokio::runtime::Handle::current(), Alice, || {}, Vec::new(), None);
+mod back_garbage_candidate;
+mod dispute_valid_candidates;
+mod suggest_garbage_candidate;
 
-	let transfer_call = polkadot_test_runtime::Call::Balances(pallet_balances::Call::transfer {
-		dest: Default::default(),
-		value: 1,
-	});
-	let result = alice.send_extrinsic(transfer_call, Bob).await.expect("return value expected");
-	assert!(result.starts_with("0x"), "result starts with 0x");
-}
+pub(crate) use self::{
+	back_garbage_candidate::BackGarbageCandidate, dispute_valid_candidates::DisputeValidCandidates,
+	suggest_garbage_candidate::SuggestGarbageCandidate,
+};

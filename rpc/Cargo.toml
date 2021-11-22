@@ -5,7 +5,7 @@ authors = ["Parity Technologies <admin@parity.io>"]
 edition = "2018"
 
 [dependencies]
-jsonrpsee = { git = "https://github.com/paritytech/jsonrpsee", rev = "0e46b5cea9cd632dc438a005c77bbaa5c2af562f", features = ["server"] }
+jsonrpsee = { git = "https://github.com/paritytech/jsonrpsee", rev = "9a3c1e981bcdbbb558b1457bbd78277a14dca2da", features = ["server"] }
 polkadot-primitives = { path = "../primitives" }
 sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
 sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
