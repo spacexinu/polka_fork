@@ -6173,8 +6173,6 @@ dependencies = [
  "polkadot-node-subsystem-test-helpers",
  "polkadot-node-subsystem-util",
  "polkadot-primitives",
- "sp-application-crypto",
- "sp-keystore 0.10.0-dev (git+https://github.com/paritytech/substrate?branch=dp-jsonrpsee-integration-2)",
  "thiserror",
  "tracing",
 ]
