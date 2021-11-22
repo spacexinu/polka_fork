@@ -110,7 +110,6 @@ where
 {
 	use beefy_gadget_rpc::{BeefyApiServer, BeefyRpcHandler};
 	use frame_rpc_system::{SystemApiServer, SystemRpc};
-	// use frame_rpc_system::{SystemApiServer, SystemRpc, SystemRpcBackendFull};
 	use pallet_mmr_rpc::{MmrApiServer, MmrRpc};
 	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPaymentRpc};
 	use sc_consensus_babe_rpc::{BabeApiServer, BabeRpc};
@@ -130,7 +129,6 @@ where
 
 	let mut module = RpcModule::new(());
 
-	// let system_backend = SystemRpcBackendFull::new(client.clone(), pool, deny_unsafe);
 	module.merge(SystemRpc::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
 	module.merge(MmrRpc::new(client.clone()).into_rpc())?;
 	module.merge(TransactionPaymentRpc::new(client.clone()).into_rpc())?;

@@ -12,6 +12,8 @@ tracing = "0.1.29"
 rand = "0.8.3"
 tempfile = "3.2.0"
 tokio = "1.14.0"
+jsonrpsee = { git = "https://github.com/paritytech/jsonrpsee", rev = "0e46b5cea9cd632dc438a005c77bbaa5c2af562f", features = ["client"] }
+serde_json = "1.0.71"
 
 # Polkadot dependencies
 polkadot-overseer = { path = "../../overseer" }
@@ -55,8 +57,6 @@ sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "dp-jso
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
 sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
 substrate-test-client = { git = "https://github.com/paritytech/substrate", branch = "dp-jsonrpsee-integration-2" }
-jsonrpsee = { git = "https://github.com/paritytech/jsonrpsee", rev = "0e46b5cea9cd632dc438a005c77bbaa5c2af562f", features = ["client"] }
-serde_json = "1.0.71"
 
 [dev-dependencies]
 pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false , branch = "dp-jsonrpsee-integration-2" }
