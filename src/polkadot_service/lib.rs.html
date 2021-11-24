@@ -1283,6 +1283,7 @@
 <span id="1283">1283</span>
 <span id="1284">1284</span>
 <span id="1285">1285</span>
+<span id="1286">1286</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2300,6 +2301,7 @@
 			<span class="ident">create_inherent_data_providers</span>: <span class="kw">move</span> <span class="op">|</span><span class="ident">parent</span>, ()<span class="op">|</span> {
 				<span class="kw">let</span> <span class="ident">client_clone</span> <span class="op">=</span> <span class="ident">client_clone</span>.<span class="ident">clone</span>();
 				<span class="kw">let</span> <span class="ident">overseer_handle</span> <span class="op">=</span> <span class="ident">overseer_handle</span>.<span class="ident">clone</span>();
+
 				<span class="kw">async</span> <span class="kw">move</span> {
 					<span class="kw">let</span> <span class="ident">parachain</span> <span class="op">=</span> <span class="ident">polkadot_node_core_parachains_inherent::ParachainsInherentDataProvider::create</span>(
 						<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">client_clone</span>,

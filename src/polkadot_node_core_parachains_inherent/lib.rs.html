@@ -251,9 +251,9 @@
 <span class="kw">impl</span> <span class="ident">sp_inherents::InherentDataProvider</span> <span class="kw">for</span> <span class="ident">ParachainsInherentDataProvider</span> {
 	<span class="kw">fn</span> <span class="ident">provide_inherent_data</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">inherent_data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sp_inherents::InherentData</span>,
+		<span class="ident">dst_inherent_data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sp_inherents::InherentData</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">sp_inherents::Error</span><span class="op">&gt;</span> {
-		<span class="ident">inherent_data</span>
+		<span class="ident">dst_inherent_data</span>
 			.<span class="ident">put_data</span>(<span class="ident">polkadot_primitives::v1::PARACHAINS_INHERENT_IDENTIFIER</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inherent_data</span>)
 	}
 
