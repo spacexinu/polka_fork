@@ -322,10 +322,6 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -590,9 +586,7 @@
 	}
 
 	<span class="doccomment">/// Sign this payload with the given context and pair.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # WARNING</span>
-	<span class="doccomment">/// Only meant for usage in tests and and benchmarks.</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">benchmark_sign</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Encode</span><span class="op">&gt;</span>(
 		<span class="ident">public</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::v0::ValidatorId</span>,
 		<span class="ident">payload</span>: <span class="ident">Payload</span>,
@@ -607,9 +601,7 @@
 	}
 
 	<span class="doccomment">/// Immutably access the signature.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # WARNING</span>
-	<span class="doccomment">/// Only meant for usage in tests and and benchmarks.</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">benchmark_signature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValidatorSignature</span> {
 		<span class="self">self</span>.<span class="ident">signature</span>.<span class="ident">clone</span>()
 	}
