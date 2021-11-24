@@ -850,7 +850,7 @@
 				<span class="kw">let</span> <span class="ident">dispatch_origin</span> <span class="op">=</span> <span class="ident">Config::OriginConverter::convert_origin</span>(<span class="ident">origin</span>, <span class="ident">origin_type</span>)
 					.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">XcmError::BadOrigin</span>)<span class="question-mark">?</span>;
 				<span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">message_call</span>.<span class="ident">get_dispatch_info</span>().<span class="ident">weight</span>;
-				<span class="macro">ensure!</span>(<span class="ident">weight</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">require_weight_at_most</span>, <span class="ident">XcmError::TooMuchWeightRequired</span>);
+				<span class="macro">ensure!</span>(<span class="ident">weight</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">require_weight_at_most</span>, <span class="ident">XcmError::MaxWeightInvalid</span>);
 				<span class="kw">let</span> <span class="ident">actual_weight</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">message_call</span>.<span class="ident">dispatch</span>(<span class="ident">dispatch_origin</span>) {
 					<span class="prelude-val">Ok</span>(<span class="ident">post_info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">post_info</span>.<span class="ident">actual_weight</span>,
 					<span class="prelude-val">Err</span>(<span class="ident">error_and_info</span>) <span class="op">=</span><span class="op">&gt;</span> {

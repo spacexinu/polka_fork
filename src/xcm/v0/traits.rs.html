@@ -319,12 +319,12 @@
 	<span class="doccomment">/// An asset wildcard was passed where it was not expected (e.g. as the asset to withdraw in a</span>
 	<span class="doccomment">/// `WithdrawAsset` XCM).</span>
 	<span class="ident">Wildcard</span>,
-	<span class="doccomment">/// The case where an XCM message has specified a optional weight limit and the weight required for</span>
-	<span class="doccomment">/// processing is too great.</span>
+	<span class="doccomment">/// The case where an XCM message has specified a weight limit on an interior call and this</span>
+	<span class="doccomment">/// limit is too low.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Used by:</span>
 	<span class="doccomment">/// - `Transact`</span>
-	<span class="ident">TooMuchWeightRequired</span>,
+	<span class="ident">MaxWeightInvalid</span>,
 	<span class="doccomment">/// The fees specified by the XCM message were not found in the holding account.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Used by:</span>
