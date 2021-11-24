@@ -25,35 +25,35 @@ rialto-runtime = { path = "../runtime" }
 # Substrate Dependencies
 
 
-frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "master" }
-frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate", branch = "master" }
-node-inspect = { git = "https://github.com/paritytech/substrate", branch = "master" }
-pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-basic-authorship = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-cli = { git = "https://github.com/paritytech/substrate", branch = "master", features = ["wasmtime"] }
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-executor = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-finality-grandpa-rpc = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-keystore = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-rpc = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-service = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-telemetry = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-timestamp = { git = "https://github.com/paritytech/substrate", branch = "master" }
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate", branch = "master" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+node-inspect = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-basic-authorship = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-cli = { git = "https://github.com/paritytech/substrate", features = ["wasmtime"] , branch = "kiz-temp" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-finality-grandpa-rpc = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-keystore = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-rpc = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-service = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-telemetry = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-timestamp = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
 
 [build-dependencies]
-substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "master" }
-frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate", branch = "master" }
+substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
 
 [features]
 default = []

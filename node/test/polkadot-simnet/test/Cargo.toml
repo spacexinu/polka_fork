@@ -6,16 +6,16 @@ edition = "2018"
 
 [dependencies]
 # substrate primitives
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
 
 # frame pallets
-system = { package = "frame-system", git = "https://github.com/paritytech/substrate", branch = "master" }
-balances = { package = "pallet-balances", git = "https://github.com/paritytech/substrate", branch = "master" }
+system = { package = "frame-system", git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
+balances = { package = "pallet-balances", git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
 
 # substrate client libs
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "kiz-temp" }
 
 # polkadot deps
 polkadot-simnet = { path = "../common" }
