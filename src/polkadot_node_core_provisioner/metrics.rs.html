@@ -158,9 +158,9 @@
 	<span class="ident">request_inherent_data</span>: <span class="ident">prometheus::Histogram</span>,
 	<span class="ident">provisionable_data</span>: <span class="ident">prometheus::Histogram</span>,
 
-	<span class="doccomment">/// The dispute_statement.* metrics trak how many disputes/votes the runtime will have to process. It will count</span>
+	<span class="doccomment">/// The `dispute_statement_*` metrics track how many disputes/votes the runtime will have to process. It will count</span>
 	<span class="doccomment">/// all recent statements meaning every dispute from last sessions: 10 min on Rococo, 60 min on Kusama and</span>
-	<span class="doccomment">/// 4 hours on Polkadot. The metrics are updated only when the node authors block, so values vary across nodes.</span>
+	<span class="doccomment">/// 4 hours on Polkadot. The metrics are updated only when the node authors a block, so values vary across nodes.</span>
 	<span class="ident">dispute_statement_sets_requested</span>: <span class="ident">prometheus::Counter</span><span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span>,
 	<span class="ident">dispute_statements_requested</span>: <span class="ident">prometheus::CounterVec</span><span class="op">&lt;</span><span class="ident">prometheus::U64</span><span class="op">&gt;</span>,
 }

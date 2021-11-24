@@ -2893,6 +2893,65 @@
 <span id="2893">2893</span>
 <span id="2894">2894</span>
 <span id="2895">2895</span>
+<span id="2896">2896</span>
+<span id="2897">2897</span>
+<span id="2898">2898</span>
+<span id="2899">2899</span>
+<span id="2900">2900</span>
+<span id="2901">2901</span>
+<span id="2902">2902</span>
+<span id="2903">2903</span>
+<span id="2904">2904</span>
+<span id="2905">2905</span>
+<span id="2906">2906</span>
+<span id="2907">2907</span>
+<span id="2908">2908</span>
+<span id="2909">2909</span>
+<span id="2910">2910</span>
+<span id="2911">2911</span>
+<span id="2912">2912</span>
+<span id="2913">2913</span>
+<span id="2914">2914</span>
+<span id="2915">2915</span>
+<span id="2916">2916</span>
+<span id="2917">2917</span>
+<span id="2918">2918</span>
+<span id="2919">2919</span>
+<span id="2920">2920</span>
+<span id="2921">2921</span>
+<span id="2922">2922</span>
+<span id="2923">2923</span>
+<span id="2924">2924</span>
+<span id="2925">2925</span>
+<span id="2926">2926</span>
+<span id="2927">2927</span>
+<span id="2928">2928</span>
+<span id="2929">2929</span>
+<span id="2930">2930</span>
+<span id="2931">2931</span>
+<span id="2932">2932</span>
+<span id="2933">2933</span>
+<span id="2934">2934</span>
+<span id="2935">2935</span>
+<span id="2936">2936</span>
+<span id="2937">2937</span>
+<span id="2938">2938</span>
+<span id="2939">2939</span>
+<span id="2940">2940</span>
+<span id="2941">2941</span>
+<span id="2942">2942</span>
+<span id="2943">2943</span>
+<span id="2944">2944</span>
+<span id="2945">2945</span>
+<span id="2946">2946</span>
+<span id="2947">2947</span>
+<span id="2948">2948</span>
+<span id="2949">2949</span>
+<span id="2950">2950</span>
+<span id="2951">2951</span>
+<span id="2952">2952</span>
+<span id="2953">2953</span>
+<span id="2954">2954</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2917,7 +2976,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">configuration</span>, <span class="ident">disputes</span>, <span class="ident">dmp</span>, <span class="ident">hrmp</span>, <span class="ident">paras</span>,
-	<span class="ident">paras_inherent</span>::{<span class="ident">sanitize_bitfields</span>, <span class="ident">DisputedBitfield</span>, <span class="ident">VERIFY_SIGS</span>},
+	<span class="ident">paras_inherent</span>::{<span class="ident">sanitize_bitfields</span>, <span class="ident">DisputedBitfield</span>},
 	<span class="ident">scheduler::CoreAssignment</span>,
 	<span class="ident">shared</span>, <span class="ident">ump</span>,
 };
@@ -2949,6 +3008,19 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AvailabilityBitfieldRecord</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="ident">bitfield</span>: <span class="ident">AvailabilityBitfield</span>, <span class="comment">// one bit per core.</span>
 	<span class="ident">submitted_at</span>: <span class="ident">N</span>,                <span class="comment">// for accounting, as meaning of bits may change over time.</span>
+}
+
+<span class="doccomment">/// Determines if all checks should be applied or if a subset was already completed</span>
+<span class="doccomment">/// in a code path that will be executed afterwards or was already executed before.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">FullCheck</span> {
+	<span class="doccomment">/// Yes, do a full check, skip nothing.</span>
+	<span class="ident">Yes</span>,
+	<span class="doccomment">/// Skip a subset of checks that are already completed before.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Attention: Should only be used when absolutely sure that the required</span>
+	<span class="doccomment">/// checks are completed before.</span>
+	<span class="ident">Skip</span>,
 }
 
 <span class="doccomment">/// A backed candidate pending availability.</span>
@@ -3298,13 +3370,14 @@
 		<span class="kw">let</span> <span class="ident">session_index</span> <span class="op">=</span> <span class="ident">shared::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::session_index</span>();
 		<span class="kw">let</span> <span class="ident">parent_hash</span> <span class="op">=</span> <span class="ident">frame_system::Pallet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::parent_hash</span>();
 
-		<span class="kw">let</span> <span class="ident">checked_bitfields</span> <span class="op">=</span> <span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+		<span class="kw">let</span> <span class="ident">checked_bitfields</span> <span class="op">=</span> <span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
 			<span class="ident">signed_bitfields</span>,
 			<span class="ident">disputed_bitfield</span>,
 			<span class="ident">expected_bits</span>,
 			<span class="ident">parent_hash</span>,
 			<span class="ident">session_index</span>,
 			<span class="kw-2">&amp;</span><span class="ident">validators</span>[..],
+			<span class="ident">FullCheck::Yes</span>,
 		);
 
 		<span class="kw">let</span> <span class="ident">freed_cores</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::update_pending_availability_and_get_freed_cores</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="bool-val">true</span><span class="op">&gt;</span>(
@@ -3322,12 +3395,16 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Both should be sorted ascending by core index, and the candidates should be a subset of</span>
 	<span class="doccomment">/// scheduled cores. If these conditions are not met, the execution of the function fails.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">process_candidates</span>(
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">process_candidates</span><span class="op">&lt;</span><span class="ident">GV</span><span class="op">&gt;</span>(
 		<span class="ident">parent_storage_root</span>: <span class="ident">T::Hash</span>,
 		<span class="ident">candidates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">scheduled</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CoreAssignment</span><span class="op">&gt;</span>,
-		<span class="ident">group_validators</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">GroupIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProcessedCandidates</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span> {
+		<span class="ident">group_validators</span>: <span class="ident">GV</span>,
+		<span class="ident">full_check</span>: <span class="ident">FullCheck</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProcessedCandidates</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
+		<span class="ident">GV</span>: <span class="ident">Fn</span>(<span class="ident">GroupIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ValidatorIndex</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	{
 		<span class="macro">ensure!</span>(<span class="ident">candidates</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">scheduled</span>.<span class="ident">len</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::UnscheduledCandidate</span>);
 
 		<span class="kw">if</span> <span class="ident">scheduled</span>.<span class="ident">is_empty</span>() {
@@ -3341,7 +3418,7 @@
 		<span class="comment">// before of the block where we include a candidate (i.e. this code path).</span>
 		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
 		<span class="kw">let</span> <span class="ident">relay_parent_number</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">-</span> <span class="ident">One::one</span>();
-		<span class="kw">let</span> <span class="ident">check_cx</span> <span class="op">=</span> <span class="ident">CandidateCheckContext</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">now</span>, <span class="ident">relay_parent_number</span>);
+		<span class="kw">let</span> <span class="ident">check_ctx</span> <span class="op">=</span> <span class="ident">CandidateCheckContext</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">now</span>, <span class="ident">relay_parent_number</span>);
 
 		<span class="comment">// Collect candidate receipts with backers.</span>
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">candidate_receipt_with_backing_validator_indices</span> <span class="op">=</span>
@@ -3376,53 +3453,19 @@
 			<span class="comment">//</span>
 			<span class="comment">// In the meantime, we do certain sanity checks on the candidates and on the scheduled</span>
 			<span class="comment">// list.</span>
-			<span class="lifetime">&#39;a</span>: <span class="kw">for</span> (<span class="ident">candidate_idx</span>, <span class="ident">backed_candidate</span>) <span class="kw">in</span> <span class="ident">candidates</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
+			<span class="lifetime">&#39;next_backed_candidate</span>: <span class="kw">for</span> (<span class="ident">candidate_idx</span>, <span class="ident">backed_candidate</span>) <span class="kw">in</span>
+				<span class="ident">candidates</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>()
+			{
+				<span class="kw">if</span> <span class="kw">let</span> <span class="ident">FullCheck::Yes</span> <span class="op">=</span> <span class="ident">full_check</span> {
+					<span class="ident">check_ctx</span>.<span class="ident">verify_backed_candidate</span>(
+						<span class="ident">parent_hash</span>,
+						<span class="ident">candidate_idx</span>,
+						<span class="ident">backed_candidate</span>,
+					)<span class="question-mark">?</span>;
+				}
+
 				<span class="kw">let</span> <span class="ident">para_id</span> <span class="op">=</span> <span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">para_id</span>;
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backers</span> <span class="op">=</span> <span class="macro">bitvec::bitvec!</span>[<span class="ident">BitOrderLsb0</span>, <span class="ident">u8</span>; <span class="number">0</span>; <span class="ident">validators</span>.<span class="ident">len</span>()];
-
-				<span class="comment">// we require that the candidate is in the context of the parent block.</span>
-				<span class="macro">ensure!</span>(
-					<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">relay_parent</span> <span class="op">=</span><span class="op">=</span> <span class="ident">parent_hash</span>,
-					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::CandidateNotInParentContext</span>,
-				);
-				<span class="macro">ensure!</span>(
-					<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">check_collator_signature</span>().<span class="ident">is_ok</span>(),
-					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NotCollatorSigned</span>,
-				);
-
-				<span class="kw">let</span> <span class="ident">validation_code_hash</span> <span class="op">=</span>
-					<span class="op">&lt;</span><span class="ident">paras::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::validation_code_hash_at</span>(<span class="ident">para_id</span>, <span class="ident">now</span>, <span class="prelude-val">None</span>)
-						<span class="comment">// A candidate for a parachain without current validation code is not scheduled.</span>
-						.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::UnscheduledCandidate</span>)<span class="question-mark">?</span>;
-				<span class="macro">ensure!</span>(
-					<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">validation_code_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">validation_code_hash</span>,
-					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidValidationCodeHash</span>,
-				);
-
-				<span class="macro">ensure!</span>(
-					<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">para_head</span> <span class="op">=</span><span class="op">=</span>
-						<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">head_data</span>.<span class="ident">hash</span>(),
-					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ParaHeadMismatch</span>,
-				);
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">check_cx</span>.<span class="ident">check_validation_outputs</span>(
-					<span class="ident">para_id</span>,
-					<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">head_data</span>,
-					<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">new_validation_code</span>,
-					<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">processed_downward_messages</span>,
-					<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">upward_messages</span>,
-					<span class="ident">T::BlockNumber::from</span>(<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">hrmp_watermark</span>),
-					<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">horizontal_messages</span>,
-				) {
-					<span class="macro">log::debug!</span>(
-						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-						<span class="string">&quot;Validation outputs checking during inclusion of a candidate {} for parachain `{}` failed: {:?}&quot;</span>,
-						<span class="ident">candidate_idx</span>,
-						<span class="ident">u32::from</span>(<span class="ident">para_id</span>),
-						<span class="ident">err</span>,
-					);
-					<span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">strip_into_dispatch_err</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())<span class="question-mark">?</span>;
-				};
 
 				<span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">assignment</span>) <span class="kw">in</span> <span class="ident">scheduled</span>[<span class="ident">skip</span>..].<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
 					<span class="ident">check_assignment_in_order</span>(<span class="ident">assignment</span>)<span class="question-mark">?</span>;
@@ -3526,7 +3569,7 @@
 							<span class="ident">backers</span>,
 							<span class="ident">assignment</span>.<span class="ident">group_idx</span>,
 						));
-						<span class="kw">continue</span> <span class="lifetime">&#39;a</span>
+						<span class="kw">continue</span> <span class="lifetime">&#39;next_backed_candidate</span>
 					}
 				}
 
@@ -3577,7 +3620,7 @@
 					<span class="ident">availability_votes</span>,
 					<span class="ident">relay_parent_number</span>,
 					<span class="ident">backers</span>: <span class="ident">backers</span>.<span class="ident">to_bitvec</span>(),
-					<span class="ident">backed_in_number</span>: <span class="ident">check_cx</span>.<span class="ident">now</span>,
+					<span class="ident">backed_in_number</span>: <span class="ident">check_ctx</span>.<span class="ident">now</span>,
 					<span class="ident">backing_group</span>: <span class="ident">group</span>,
 				},
 			);
@@ -3599,9 +3642,9 @@
 		<span class="comment">// `relay_parent_number` is equal to `now`.</span>
 		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
 		<span class="kw">let</span> <span class="ident">relay_parent_number</span> <span class="op">=</span> <span class="ident">now</span>;
-		<span class="kw">let</span> <span class="ident">check_cx</span> <span class="op">=</span> <span class="ident">CandidateCheckContext</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">now</span>, <span class="ident">relay_parent_number</span>);
+		<span class="kw">let</span> <span class="ident">check_ctx</span> <span class="op">=</span> <span class="ident">CandidateCheckContext</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">now</span>, <span class="ident">relay_parent_number</span>);
 
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">check_cx</span>.<span class="ident">check_validation_outputs</span>(
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">check_ctx</span>.<span class="ident">check_validation_outputs</span>(
 			<span class="ident">para_id</span>,
 			<span class="kw-2">&amp;</span><span class="ident">validation_outputs</span>.<span class="ident">head_data</span>,
 			<span class="kw-2">&amp;</span><span class="ident">validation_outputs</span>.<span class="ident">new_validation_code</span>,
@@ -3836,15 +3879,76 @@
 }
 
 <span class="doccomment">/// A collection of data required for checking a candidate.</span>
-<span class="kw">struct</span> <span class="ident">CandidateCheckContext</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CandidateCheckContext</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
 	<span class="ident">config</span>: <span class="ident">configuration::HostConfiguration</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span>,
 	<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>,
 	<span class="ident">relay_parent_number</span>: <span class="ident">T::BlockNumber</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">CandidateCheckContext</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>, <span class="ident">relay_parent_number</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>, <span class="ident">relay_parent_number</span>: <span class="ident">T::BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="self">Self</span> { <span class="ident">config</span>: <span class="op">&lt;</span><span class="ident">configuration::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::config</span>(), <span class="ident">now</span>, <span class="ident">relay_parent_number</span> }
+	}
+
+	<span class="doccomment">/// Execute verification of the candidate.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Assures:</span>
+	<span class="doccomment">///  * correct expected relay parent reference</span>
+	<span class="doccomment">///  * collator signature check passes</span>
+	<span class="doccomment">///  * code hash of commitments matches current code hash</span>
+	<span class="doccomment">///  * para head in the descriptor and commitments match</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verify_backed_candidate</span>(
+		<span class="kw-2">&amp;</span><span class="self">self</span>,
+		<span class="ident">parent_hash</span>: <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Hash</span>,
+		<span class="ident">candidate_idx</span>: <span class="ident">usize</span>,
+		<span class="ident">backed_candidate</span>: <span class="kw-2">&amp;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">para_id</span> <span class="op">=</span> <span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">para_id</span>;
+		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">now</span>;
+
+		<span class="comment">// we require that the candidate is in the context of the parent block.</span>
+		<span class="macro">ensure!</span>(
+			<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">relay_parent</span> <span class="op">=</span><span class="op">=</span> <span class="ident">parent_hash</span>,
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::CandidateNotInParentContext</span>,
+		);
+		<span class="macro">ensure!</span>(
+			<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">check_collator_signature</span>().<span class="ident">is_ok</span>(),
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::NotCollatorSigned</span>,
+		);
+
+		<span class="kw">let</span> <span class="ident">validation_code_hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">paras::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::validation_code_hash_at</span>(<span class="ident">para_id</span>, <span class="ident">now</span>, <span class="prelude-val">None</span>)
+			<span class="comment">// A candidate for a parachain without current validation code is not scheduled.</span>
+			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::UnscheduledCandidate</span>)<span class="question-mark">?</span>;
+		<span class="macro">ensure!</span>(
+			<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">validation_code_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">validation_code_hash</span>,
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidValidationCodeHash</span>,
+		);
+
+		<span class="macro">ensure!</span>(
+			<span class="ident">backed_candidate</span>.<span class="ident">descriptor</span>().<span class="ident">para_head</span> <span class="op">=</span><span class="op">=</span>
+				<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">head_data</span>.<span class="ident">hash</span>(),
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ParaHeadMismatch</span>,
+		);
+
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">check_validation_outputs</span>(
+			<span class="ident">para_id</span>,
+			<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">head_data</span>,
+			<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">new_validation_code</span>,
+			<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">processed_downward_messages</span>,
+			<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">upward_messages</span>,
+			<span class="ident">T::BlockNumber::from</span>(<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">hrmp_watermark</span>),
+			<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">commitments</span>.<span class="ident">horizontal_messages</span>,
+		) {
+			<span class="macro">log::debug!</span>(
+				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+				<span class="string">&quot;Validation outputs checking during inclusion of a candidate {} for parachain `{}` failed: {:?}&quot;</span>,
+				<span class="ident">candidate_idx</span>,
+				<span class="ident">u32::from</span>(<span class="ident">para_id</span>),
+				<span class="ident">err</span>,
+			);
+			<span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">strip_into_dispatch_err</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())<span class="question-mark">?</span>;
+		};
+		<span class="prelude-val">Ok</span>(())
 	}
 
 	<span class="doccomment">/// Check the given outputs after candidate validation on whether it passes the acceptance</span>
@@ -4830,6 +4934,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_b_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::UnscheduledCandidate</span>
 				);
@@ -4885,6 +4990,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed_b</span>, <span class="ident">backed_a</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>(), <span class="ident">chain_b_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::UnscheduledCandidate</span>
 				);
@@ -4918,6 +5024,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::InsufficientBacking</span>
 				);
@@ -4953,6 +5060,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::CandidateNotInParentContext</span>
 				);
@@ -4992,6 +5100,7 @@
 							<span class="ident">thread_a_assignment</span>.<span class="ident">clone</span>(),
 						],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::WrongCollator</span>,
 				);
@@ -5030,6 +5139,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">thread_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::NotCollatorSigned</span>
 				);
@@ -5080,6 +5190,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::CandidateScheduledBeforeParaFree</span>
 				);
@@ -5123,6 +5234,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::CandidateScheduledBeforeParaFree</span>
 				);
@@ -5174,6 +5286,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::PrematureCodeUpgrade</span>
 				);
@@ -5208,6 +5321,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::ValidationDataHashMismatch</span>.<span class="ident">into</span>()),
 				);
@@ -5243,6 +5357,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::InvalidValidationCodeHash</span>
 				);
@@ -5278,6 +5393,7 @@
 						<span class="macro">vec!</span>[<span class="ident">backed</span>],
 						<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 						<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+						<span class="ident">FullCheck::Yes</span>,
 					),
 					<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span><span class="ident">::ParaHeadMismatch</span>
 				);
@@ -5447,6 +5563,7 @@
 					<span class="ident">thread_a_assignment</span>.<span class="ident">clone</span>(),
 				],
 				<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+				<span class="ident">FullCheck::Yes</span>,
 			)
 			.<span class="ident">expect</span>(<span class="string">&quot;candidates scheduled, in order, and backed&quot;</span>);
 
@@ -5637,6 +5754,7 @@
 					<span class="macro">vec!</span>[<span class="ident">backed_a</span>],
 					<span class="macro">vec!</span>[<span class="ident">chain_a_assignment</span>.<span class="ident">clone</span>()],
 					<span class="kw-2">&amp;</span><span class="ident">group_validators</span>,
+					<span class="ident">FullCheck::Yes</span>,
 				)
 				.<span class="ident">expect</span>(<span class="string">&quot;candidates scheduled, in order, and backed&quot;</span>);
 

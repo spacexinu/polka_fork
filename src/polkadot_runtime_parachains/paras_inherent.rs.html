@@ -2183,6 +2183,65 @@
 <span id="2183">2183</span>
 <span id="2184">2184</span>
 <span id="2185">2185</span>
+<span id="2186">2186</span>
+<span id="2187">2187</span>
+<span id="2188">2188</span>
+<span id="2189">2189</span>
+<span id="2190">2190</span>
+<span id="2191">2191</span>
+<span id="2192">2192</span>
+<span id="2193">2193</span>
+<span id="2194">2194</span>
+<span id="2195">2195</span>
+<span id="2196">2196</span>
+<span id="2197">2197</span>
+<span id="2198">2198</span>
+<span id="2199">2199</span>
+<span id="2200">2200</span>
+<span id="2201">2201</span>
+<span id="2202">2202</span>
+<span id="2203">2203</span>
+<span id="2204">2204</span>
+<span id="2205">2205</span>
+<span id="2206">2206</span>
+<span id="2207">2207</span>
+<span id="2208">2208</span>
+<span id="2209">2209</span>
+<span id="2210">2210</span>
+<span id="2211">2211</span>
+<span id="2212">2212</span>
+<span id="2213">2213</span>
+<span id="2214">2214</span>
+<span id="2215">2215</span>
+<span id="2216">2216</span>
+<span id="2217">2217</span>
+<span id="2218">2218</span>
+<span id="2219">2219</span>
+<span id="2220">2220</span>
+<span id="2221">2221</span>
+<span id="2222">2222</span>
+<span id="2223">2223</span>
+<span id="2224">2224</span>
+<span id="2225">2225</span>
+<span id="2226">2226</span>
+<span id="2227">2227</span>
+<span id="2228">2228</span>
+<span id="2229">2229</span>
+<span id="2230">2230</span>
+<span id="2231">2231</span>
+<span id="2232">2232</span>
+<span id="2233">2233</span>
+<span id="2234">2234</span>
+<span id="2235">2235</span>
+<span id="2236">2236</span>
+<span id="2237">2237</span>
+<span id="2238">2238</span>
+<span id="2239">2239</span>
+<span id="2240">2240</span>
+<span id="2241">2241</span>
+<span id="2242">2242</span>
+<span id="2243">2243</span>
+<span id="2244">2244</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Polkadot.</span>
 
@@ -2208,7 +2267,9 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">disputes::DisputesHandler</span>,
-	<span class="ident">inclusion</span>, <span class="ident">initializer</span>,
+	<span class="ident">inclusion</span>,
+	<span class="ident">inclusion</span>::{<span class="ident">CandidateCheckContext</span>, <span class="ident">FullCheck</span>},
+	<span class="ident">initializer</span>,
 	<span class="ident">scheduler</span>::{<span class="self">self</span>, <span class="ident">CoreAssignment</span>, <span class="ident">FreedReason</span>},
 	<span class="ident">shared</span>, <span class="ident">ump</span>,
 };
@@ -2227,21 +2288,21 @@
 	<span class="ident">UncheckedSignedAvailabilityBitfields</span>, <span class="ident">ValidatorId</span>, <span class="ident">ValidatorIndex</span>,
 	<span class="ident">PARACHAINS_INHERENT_IDENTIFIER</span>,
 };
-<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">Rng</span>, <span class="ident">SeedableRng</span>};
+<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">seq::SliceRandom</span>, <span class="ident">SeedableRng</span>};
+
 <span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
-<span class="kw">use</span> <span class="ident">sp_runtime::traits::Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span>;
+<span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span>, <span class="ident">One</span>};
 <span class="kw">use</span> <span class="ident">sp_std</span>::{
 	<span class="ident">cmp::Ordering</span>,
 	<span class="ident">collections</span>::{<span class="ident">btree_map::BTreeMap</span>, <span class="ident">btree_set::BTreeSet</span>},
 	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
 	<span class="ident">vec::Vec</span>,
 };
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">benchmarking</span>;
 
 <span class="kw">const</span> <span class="ident">LOG_TARGET</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;runtime::inclusion-inherent&quot;</span>;
-<span class="kw">const</span> <span class="ident">SKIP_SIG_VERIFY</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">VERIFY_SIGS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WeightInfo</span> {
 	<span class="doccomment">/// Variant over `v`, the count of dispute statements in a dispute statement set. This gives the</span>
@@ -2343,6 +2404,29 @@
 		.<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">saturating_add</span>(<span class="ident">x</span>))
 }
 
+<span class="doccomment">/// A helper trait to allow calling retain while getting access</span>
+<span class="doccomment">/// to the index of the item in the `vec`.</span>
+<span class="kw">trait</span> <span class="ident">IndexedRetain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// Retains only the elements specified by the predicate.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// In other words, remove all elements `e` residing at</span>
+	<span class="doccomment">/// index `i` such that `f(i, &amp;e)` returns `false`. This method</span>
+	<span class="doccomment">/// operates in place, visiting each element exactly once in the</span>
+	<span class="doccomment">/// original order, and preserves the order of the retained elements.</span>
+	<span class="kw">fn</span> <span class="ident">indexed_retain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>);
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IndexedRetain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">indexed_retain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>) {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0_usize</span>;
+		<span class="self">self</span>.<span class="ident">retain</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">item</span><span class="op">|</span> {
+			<span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">idx</span>, <span class="ident">item</span>);
+			<span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1_usize</span>;
+			<span class="ident">ret</span>
+		})
+	}
+}
+
 <span class="doccomment">/// A bitfield concerning concluded disputes for candidates</span>
 <span class="doccomment">/// associated to the core index equivalent to the bit position.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">TypeInfo</span>)]</span>
@@ -2437,25 +2521,24 @@
 			<span class="comment">// (`enter`) and the off-chain checks by the block author (this function). Once we are confident</span>
 			<span class="comment">// in all the logic in this module this check should be removed to optimize performance.</span>
 
-			<span class="kw">let</span> <span class="ident">inherent_data</span> <span class="op">=</span>
-				<span class="kw">match</span> <span class="ident"><span class="self">Self</span>::enter</span>(<span class="ident">frame_system::RawOrigin::None</span>.<span class="ident">into</span>(), <span class="ident">inherent_data</span>.<span class="ident">clone</span>()) {
-					<span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inherent_data</span>,
-					<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="macro">log::error!</span>(
-							<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-							<span class="string">&quot;dropping paras inherent data because they produced \
+			<span class="kw">let</span> <span class="ident">inherent_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::enter_inner</span>(<span class="ident">inherent_data</span>.<span class="ident">clone</span>(), <span class="ident">FullCheck::Skip</span>) {
+				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inherent_data</span>,
+				<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+					<span class="macro">log::error!</span>(
+						<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+						<span class="string">&quot;dropping paras inherent data because they produced \
 							an invalid paras inherent: {:?}&quot;</span>,
-							<span class="ident">err</span>.<span class="ident">error</span>,
-						);
+						<span class="ident">err</span>.<span class="ident">error</span>,
+					);
 
-						<span class="ident">ParachainsInherentData</span> {
-							<span class="ident">bitfields</span>: <span class="ident">Vec::new</span>(),
-							<span class="ident">backed_candidates</span>: <span class="ident">Vec::new</span>(),
-							<span class="ident">disputes</span>: <span class="ident">Vec::new</span>(),
-							<span class="ident">parent_header</span>: <span class="ident">inherent_data</span>.<span class="ident">parent_header</span>,
-						}
-					},
-				};
+					<span class="ident">ParachainsInherentData</span> {
+						<span class="ident">bitfields</span>: <span class="ident">Vec::new</span>(),
+						<span class="ident">backed_candidates</span>: <span class="ident">Vec::new</span>(),
+						<span class="ident">disputes</span>: <span class="ident">Vec::new</span>(),
+						<span class="ident">parent_header</span>: <span class="ident">inherent_data</span>.<span class="ident">parent_header</span>,
+					}
+				},
+			};
 
 			<span class="prelude-val">Some</span>(<span class="ident">Call::enter</span> { <span class="ident">data</span>: <span class="ident">inherent_data</span> })
 		}
@@ -2514,180 +2597,192 @@
 			<span class="macro">ensure!</span>(<span class="op">!</span><span class="ident">Included</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::exists</span>(), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::TooManyInclusionInherents</span>);
 			<span class="ident">Included</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::set</span>(<span class="prelude-val">Some</span>(()));
 
-			<span class="kw">let</span> <span class="ident">ParachainsInherentData</span> {
-				<span class="ident">bitfields</span>: <span class="kw-2">mut</span> <span class="ident">signed_bitfields</span>,
-				<span class="kw-2">mut</span> <span class="ident">backed_candidates</span>,
-				<span class="ident">parent_header</span>,
-				<span class="kw-2">mut</span> <span class="ident">disputes</span>,
-			} <span class="op">=</span> <span class="ident">data</span>;
+			<span class="ident"><span class="self">Self</span>::enter_inner</span>(<span class="ident">data</span>, <span class="ident">FullCheck::Yes</span>)
+		}
+	}
+}
 
-			<span class="macro">log::debug!</span>(
-				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="string">&quot;[enter] bitfields.len(): {}, backed_candidates.len(): {}, disputes.len() {}&quot;</span>,
-				<span class="ident">signed_bitfields</span>.<span class="ident">len</span>(),
-				<span class="ident">backed_candidates</span>.<span class="ident">len</span>(),
-				<span class="ident">disputes</span>.<span class="ident">len</span>()
-			);
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter_inner</span>(
+		<span class="ident">data</span>: <span class="ident">ParachainsInherentData</span><span class="op">&lt;</span><span class="ident">T::Header</span><span class="op">&gt;</span>,
+		<span class="ident">full_check</span>: <span class="ident">FullCheck</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResultWithPostInfo</span> {
+		<span class="kw">let</span> <span class="ident">ParachainsInherentData</span> {
+			<span class="ident">bitfields</span>: <span class="kw-2">mut</span> <span class="ident">signed_bitfields</span>,
+			<span class="kw-2">mut</span> <span class="ident">backed_candidates</span>,
+			<span class="ident">parent_header</span>,
+			<span class="kw-2">mut</span> <span class="ident">disputes</span>,
+		} <span class="op">=</span> <span class="ident">data</span>;
 
-			<span class="comment">// Check that the submitted parent header indeed corresponds to the previous block hash.</span>
-			<span class="kw">let</span> <span class="ident">parent_hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::parent_hash</span>();
-			<span class="macro">ensure!</span>(
-				<span class="ident">parent_header</span>.<span class="ident">hash</span>().<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">parent_hash</span>.<span class="ident">as_ref</span>(),
-				<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParentHeader</span>,
-			);
+		<span class="macro">log::debug!</span>(
+			<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
+			<span class="string">&quot;[enter] bitfields.len(): {}, backed_candidates.len(): {}, disputes.len() {}&quot;</span>,
+			<span class="ident">signed_bitfields</span>.<span class="ident">len</span>(),
+			<span class="ident">backed_candidates</span>.<span class="ident">len</span>(),
+			<span class="ident">disputes</span>.<span class="ident">len</span>()
+		);
 
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">candidate_weight</span> <span class="op">=</span> <span class="ident">backed_candidates_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">backed_candidates</span>);
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitfields_weight</span> <span class="op">=</span> <span class="ident">signed_bitfields_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">signed_bitfields</span>.<span class="ident">len</span>());
-			<span class="kw">let</span> <span class="ident">disputes_weight</span> <span class="op">=</span> <span class="ident">dispute_statements_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">disputes</span>);
+		<span class="comment">// Check that the submitted parent header indeed corresponds to the previous block hash.</span>
+		<span class="kw">let</span> <span class="ident">parent_hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::parent_hash</span>();
+		<span class="macro">ensure!</span>(
+			<span class="ident">parent_header</span>.<span class="ident">hash</span>().<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">parent_hash</span>.<span class="ident">as_ref</span>(),
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::InvalidParentHeader</span>,
+		);
 
-			<span class="kw">let</span> <span class="ident">max_block_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockWeights::get</span>().<span class="ident">max_block</span>;
+		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
 
-			<span class="comment">// Potentially trim inherent data to ensure processing will be within weight limits</span>
-			<span class="kw">let</span> <span class="ident">total_weight</span> <span class="op">=</span> {
-				<span class="kw">if</span> <span class="ident">candidate_weight</span>
-					.<span class="ident">saturating_add</span>(<span class="ident">bitfields_weight</span>)
-					.<span class="ident">saturating_add</span>(<span class="ident">disputes_weight</span>) <span class="op">&gt;</span>
-					<span class="ident">max_block_weight</span>
-				{
-					<span class="comment">// if the total weight is over the max block weight, first try clearing backed</span>
-					<span class="comment">// candidates and bitfields.</span>
-					<span class="ident">backed_candidates</span>.<span class="ident">clear</span>();
-					<span class="ident">candidate_weight</span> <span class="op">=</span> <span class="number">0</span>;
-					<span class="ident">signed_bitfields</span>.<span class="ident">clear</span>();
-					<span class="ident">bitfields_weight</span> <span class="op">=</span> <span class="number">0</span>;
-				}
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">candidate_weight</span> <span class="op">=</span> <span class="ident">backed_candidates_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">backed_candidates</span>);
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitfields_weight</span> <span class="op">=</span> <span class="ident">signed_bitfields_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">signed_bitfields</span>.<span class="ident">len</span>());
+		<span class="kw">let</span> <span class="ident">disputes_weight</span> <span class="op">=</span> <span class="ident">dispute_statements_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">disputes</span>);
 
-				<span class="kw">if</span> <span class="ident">disputes_weight</span> <span class="op">&gt;</span> <span class="ident">max_block_weight</span> {
-					<span class="comment">// if disputes are by themselves overweight already, trim the disputes.</span>
-					<span class="macro">debug_assert!</span>(<span class="ident">candidate_weight</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">bitfields_weight</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+		<span class="kw">let</span> <span class="ident">max_block_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockWeights::get</span>().<span class="ident">max_block</span>;
 
-					<span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="ident">compute_entropy</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">parent_hash</span>);
-					<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand_chacha::ChaChaRng::from_seed</span>(<span class="ident">entropy</span>.<span class="ident">into</span>());
-
-					<span class="kw">let</span> <span class="ident">remaining_weight</span> <span class="op">=</span>
-						<span class="ident">limit_disputes</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">disputes</span>, <span class="ident">max_block_weight</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>);
-					<span class="ident">max_block_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">remaining_weight</span>)
-				} <span class="kw">else</span> {
-					<span class="ident">candidate_weight</span>
-						.<span class="ident">saturating_add</span>(<span class="ident">bitfields_weight</span>)
-						.<span class="ident">saturating_add</span>(<span class="ident">disputes_weight</span>)
-				}
-			};
-
-			<span class="kw">let</span> <span class="ident">expected_bits</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::availability_cores</span>().<span class="ident">len</span>();
-
-			<span class="comment">// Handle disputes logic.</span>
-			<span class="kw">let</span> <span class="ident">current_session</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">shared::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::session_index</span>();
-			<span class="kw">let</span> <span class="ident">disputed_bitfield</span> <span class="op">=</span> {
-				<span class="kw">let</span> <span class="ident">new_current_dispute_sets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">disputes</span>
-					.<span class="ident">iter</span>()
-					.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">session</span> <span class="op">=</span><span class="op">=</span> <span class="ident">current_session</span>)
-					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="ident">s</span>.<span class="ident">session</span>, <span class="ident">s</span>.<span class="ident">candidate_hash</span>))
-					.<span class="ident">collect</span>();
-
-				<span class="comment">// Note that `provide_multi_dispute_data` will iterate, verify, and import each</span>
-				<span class="comment">// dispute; so the input here must be reasonably bounded.</span>
-				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">T::DisputesHandler::provide_multi_dispute_data</span>(<span class="ident">disputes</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-				<span class="kw">if</span> <span class="ident">T::DisputesHandler::is_frozen</span>() {
-					<span class="comment">// The relay chain we are currently on is invalid. Proceed no further on parachains.</span>
-					<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">dispute_statements_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">disputes</span>)).<span class="ident">into</span>())
-				}
-
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freed_disputed</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">new_current_dispute_sets</span>.<span class="ident">is_empty</span>() {
-					<span class="kw">let</span> <span class="ident">concluded_invalid_disputes</span> <span class="op">=</span> <span class="ident">new_current_dispute_sets</span>
-						.<span class="ident">iter</span>()
-						.<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">session</span>, <span class="ident">candidate</span>)<span class="op">|</span> {
-							<span class="ident">T::DisputesHandler::concluded_invalid</span>(<span class="kw-2">*</span><span class="ident">session</span>, <span class="kw-2">*</span><span class="ident">candidate</span>)
-						})
-						.<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">candidate</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">candidate</span>)
-						.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">CandidateHash</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-
-					<span class="kw">let</span> <span class="ident">freed_disputed</span> <span class="op">=</span>
-						<span class="op">&lt;</span><span class="ident">inclusion::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::collect_disputed</span>(<span class="kw-2">&amp;</span><span class="ident">concluded_invalid_disputes</span>)
-							.<span class="ident">into_iter</span>()
-							.<span class="ident">map</span>(<span class="op">|</span><span class="ident">core</span><span class="op">|</span> (<span class="ident">core</span>, <span class="ident">FreedReason::Concluded</span>))
-							.<span class="ident">collect</span>();
-					<span class="ident">freed_disputed</span>
-				} <span class="kw">else</span> {
-					<span class="ident">Vec::new</span>()
-				};
-
-				<span class="comment">// Create a bit index from the set of core indices where each index corresponds to</span>
-				<span class="comment">// a core index that was freed due to a dispute.</span>
-				<span class="kw">let</span> <span class="ident">disputed_bitfield</span> <span class="op">=</span> <span class="ident">create_disputed_bitfield</span>(
-					<span class="ident">expected_bits</span>,
-					<span class="ident">freed_disputed</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">core_index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">core_index</span>),
-				);
-
-				<span class="kw">if</span> <span class="op">!</span><span class="ident">freed_disputed</span>.<span class="ident">is_empty</span>() {
-					<span class="comment">// unstable sort is fine, because core indices are unique</span>
-					<span class="comment">// i.e. the same candidate can&#39;t occupy 2 cores at once.</span>
-					<span class="ident">freed_disputed</span>.<span class="ident">sort_unstable_by_key</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="number">0</span>); <span class="comment">// sort by core index</span>
-					<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::free_cores</span>(<span class="ident">freed_disputed</span>);
-				}
-
-				<span class="ident">disputed_bitfield</span>
-			};
-
-			<span class="comment">// Process new availability bitfields, yielding any availability cores whose</span>
-			<span class="comment">// work has now concluded.</span>
-			<span class="kw">let</span> <span class="ident">freed_concluded</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">inclusion::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::process_bitfields</span>(
-				<span class="ident">expected_bits</span>,
-				<span class="ident">signed_bitfields</span>,
-				<span class="ident">disputed_bitfield</span>,
-				<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::core_para</span>,
-			);
-
-			<span class="comment">// Inform the disputes module of all included candidates.</span>
-			<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
-			<span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">candidate_hash</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">freed_concluded</span> {
-				<span class="ident">T::DisputesHandler::note_included</span>(<span class="ident">current_session</span>, <span class="kw-2">*</span><span class="ident">candidate_hash</span>, <span class="ident">now</span>);
+		<span class="comment">// Potentially trim inherent data to ensure processing will be within weight limits</span>
+		<span class="kw">let</span> <span class="ident">total_weight</span> <span class="op">=</span> {
+			<span class="kw">if</span> <span class="ident">candidate_weight</span>
+				.<span class="ident">saturating_add</span>(<span class="ident">bitfields_weight</span>)
+				.<span class="ident">saturating_add</span>(<span class="ident">disputes_weight</span>) <span class="op">&gt;</span>
+				<span class="ident">max_block_weight</span>
+			{
+				<span class="comment">// if the total weight is over the max block weight, first try clearing backed</span>
+				<span class="comment">// candidates and bitfields.</span>
+				<span class="ident">backed_candidates</span>.<span class="ident">clear</span>();
+				<span class="ident">candidate_weight</span> <span class="op">=</span> <span class="number">0</span>;
+				<span class="ident">signed_bitfields</span>.<span class="ident">clear</span>();
+				<span class="ident">bitfields_weight</span> <span class="op">=</span> <span class="number">0</span>;
 			}
 
-			<span class="kw">let</span> <span class="ident">freed</span> <span class="op">=</span> <span class="ident">collect_all_freed_cores</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">freed_concluded</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
+			<span class="kw">if</span> <span class="ident">disputes_weight</span> <span class="op">&gt;</span> <span class="ident">max_block_weight</span> {
+				<span class="comment">// if disputes are by themselves overweight already, trim the disputes.</span>
+				<span class="macro">debug_assert!</span>(<span class="ident">candidate_weight</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">bitfields_weight</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
 
-			<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::clear</span>();
-			<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::schedule</span>(<span class="ident">freed</span>, <span class="ident">now</span>);
+				<span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="ident">compute_entropy</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">parent_hash</span>);
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand_chacha::ChaChaRng::from_seed</span>(<span class="ident">entropy</span>.<span class="ident">into</span>());
 
-			<span class="kw">let</span> <span class="ident">scheduled</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::scheduled</span>();
-			<span class="kw">let</span> <span class="ident">backed_candidates</span> <span class="op">=</span> <span class="ident">sanitize_backed_candidates</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(
-				<span class="ident">parent_hash</span>,
-				<span class="ident">backed_candidates</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-					<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::DisputesHandler::concluded_invalid</span>(<span class="ident">current_session</span>, <span class="ident">candidate_hash</span>)
-				},
-				<span class="kw-2">&amp;</span><span class="ident">scheduled</span>[..],
+				<span class="kw">let</span> <span class="ident">remaining_weight</span> <span class="op">=</span>
+					<span class="ident">limit_disputes</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">disputes</span>, <span class="ident">max_block_weight</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>);
+				<span class="ident">max_block_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">remaining_weight</span>)
+			} <span class="kw">else</span> {
+				<span class="ident">candidate_weight</span>
+					.<span class="ident">saturating_add</span>(<span class="ident">bitfields_weight</span>)
+					.<span class="ident">saturating_add</span>(<span class="ident">disputes_weight</span>)
+			}
+		};
+
+		<span class="kw">let</span> <span class="ident">expected_bits</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::availability_cores</span>().<span class="ident">len</span>();
+
+		<span class="comment">// Handle disputes logic.</span>
+		<span class="kw">let</span> <span class="ident">current_session</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">shared::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::session_index</span>();
+		<span class="kw">let</span> <span class="ident">disputed_bitfield</span> <span class="op">=</span> {
+			<span class="kw">let</span> <span class="ident">new_current_dispute_sets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">disputes</span>
+				.<span class="ident">iter</span>()
+				.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">session</span> <span class="op">=</span><span class="op">=</span> <span class="ident">current_session</span>)
+				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="ident">s</span>.<span class="ident">session</span>, <span class="ident">s</span>.<span class="ident">candidate_hash</span>))
+				.<span class="ident">collect</span>();
+
+			<span class="comment">// Note that `provide_multi_dispute_data` will iterate, verify, and import each</span>
+			<span class="comment">// dispute; so the input here must be reasonably bounded.</span>
+			<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">T::DisputesHandler::provide_multi_dispute_data</span>(<span class="ident">disputes</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+			<span class="kw">if</span> <span class="ident">T::DisputesHandler::is_frozen</span>() {
+				<span class="comment">// The relay chain we are currently on is invalid. Proceed no further on parachains.</span>
+				<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">dispute_statements_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">disputes</span>)).<span class="ident">into</span>())
+			}
+
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freed_disputed</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">new_current_dispute_sets</span>.<span class="ident">is_empty</span>() {
+				<span class="kw">let</span> <span class="ident">concluded_invalid_disputes</span> <span class="op">=</span> <span class="ident">new_current_dispute_sets</span>
+					.<span class="ident">iter</span>()
+					.<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">session</span>, <span class="ident">candidate</span>)<span class="op">|</span> {
+						<span class="ident">T::DisputesHandler::concluded_invalid</span>(<span class="kw-2">*</span><span class="ident">session</span>, <span class="kw-2">*</span><span class="ident">candidate</span>)
+					})
+					.<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">candidate</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">candidate</span>)
+					.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">CandidateHash</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+
+				<span class="kw">let</span> <span class="ident">freed_disputed</span> <span class="op">=</span>
+					<span class="op">&lt;</span><span class="ident">inclusion::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::collect_disputed</span>(<span class="kw-2">&amp;</span><span class="ident">concluded_invalid_disputes</span>)
+						.<span class="ident">into_iter</span>()
+						.<span class="ident">map</span>(<span class="op">|</span><span class="ident">core</span><span class="op">|</span> (<span class="ident">core</span>, <span class="ident">FreedReason::Concluded</span>))
+						.<span class="ident">collect</span>();
+				<span class="ident">freed_disputed</span>
+			} <span class="kw">else</span> {
+				<span class="ident">Vec::new</span>()
+			};
+
+			<span class="comment">// Create a bit index from the set of core indices where each index corresponds to</span>
+			<span class="comment">// a core index that was freed due to a dispute.</span>
+			<span class="kw">let</span> <span class="ident">disputed_bitfield</span> <span class="op">=</span> <span class="ident">create_disputed_bitfield</span>(
+				<span class="ident">expected_bits</span>,
+				<span class="ident">freed_disputed</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">core_index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">core_index</span>),
 			);
 
-			<span class="comment">// Process backed candidates according to scheduled cores.</span>
-			<span class="kw">let</span> <span class="ident">parent_storage_root</span> <span class="op">=</span> <span class="ident">parent_header</span>.<span class="ident">state_root</span>().<span class="ident">clone</span>();
-			<span class="kw">let</span> <span class="ident">inclusion::ProcessedCandidates</span>::<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span> {
-				<span class="ident">core_indices</span>: <span class="ident">occupied</span>,
-				<span class="ident">candidate_receipt_with_backing_validator_indices</span>,
-			} <span class="op">=</span> <span class="op">&lt;</span><span class="ident">inclusion::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::process_candidates</span>(
-				<span class="ident">parent_storage_root</span>,
-				<span class="ident">backed_candidates</span>,
-				<span class="ident">scheduled</span>,
-				<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::group_validators</span>,
-			)<span class="question-mark">?</span>;
+			<span class="kw">if</span> <span class="op">!</span><span class="ident">freed_disputed</span>.<span class="ident">is_empty</span>() {
+				<span class="comment">// unstable sort is fine, because core indices are unique</span>
+				<span class="comment">// i.e. the same candidate can&#39;t occupy 2 cores at once.</span>
+				<span class="ident">freed_disputed</span>.<span class="ident">sort_unstable_by_key</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="number">0</span>); <span class="comment">// sort by core index</span>
+				<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::free_cores</span>(<span class="ident">freed_disputed</span>);
+			}
 
-			<span class="comment">// The number of disputes included in a block is</span>
-			<span class="comment">// limited by the weight as well as the number of candidate blocks.</span>
-			<span class="ident">OnChainVotes</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::put</span>(<span class="ident">ScrapedOnChainVotes</span>::<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span> {
-				<span class="ident">session</span>: <span class="ident">current_session</span>,
-				<span class="ident">backing_validators_per_candidate</span>: <span class="ident">candidate_receipt_with_backing_validator_indices</span>,
-				<span class="ident">disputes</span>,
-			});
+			<span class="ident">disputed_bitfield</span>
+		};
 
-			<span class="comment">// Note which of the scheduled cores were actually occupied by a backed candidate.</span>
-			<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::occupied</span>(<span class="kw-2">&amp;</span><span class="ident">occupied</span>);
+		<span class="comment">// Process new availability bitfields, yielding any availability cores whose</span>
+		<span class="comment">// work has now concluded.</span>
+		<span class="kw">let</span> <span class="ident">freed_concluded</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">inclusion::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::process_bitfields</span>(
+			<span class="ident">expected_bits</span>,
+			<span class="ident">signed_bitfields</span>,
+			<span class="ident">disputed_bitfield</span>,
+			<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::core_para</span>,
+		);
 
-			<span class="comment">// Give some time slice to dispatch pending upward messages.</span>
-			<span class="comment">// this is max config.ump_service_total_weight</span>
-			<span class="kw">let</span> <span class="ident">_ump_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">ump::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::process_pending_upward_messages</span>();
-
-			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">total_weight</span>).<span class="ident">into</span>())
+		<span class="comment">// Inform the disputes module of all included candidates.</span>
+		<span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">candidate_hash</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">freed_concluded</span> {
+			<span class="ident">T::DisputesHandler::note_included</span>(<span class="ident">current_session</span>, <span class="kw-2">*</span><span class="ident">candidate_hash</span>, <span class="ident">now</span>);
 		}
+
+		<span class="kw">let</span> <span class="ident">freed</span> <span class="op">=</span> <span class="ident">collect_all_freed_cores</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">freed_concluded</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
+
+		<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::clear</span>();
+		<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::schedule</span>(<span class="ident">freed</span>, <span class="ident">now</span>);
+
+		<span class="kw">let</span> <span class="ident">scheduled</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::scheduled</span>();
+		<span class="kw">let</span> <span class="ident">backed_candidates</span> <span class="op">=</span> <span class="ident">sanitize_backed_candidates</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+			<span class="ident">parent_hash</span>,
+			<span class="ident">backed_candidates</span>,
+			<span class="kw">move</span> <span class="op">|</span><span class="ident">_candidate_index</span>: <span class="ident">usize</span>, <span class="ident">backed_candidate</span>: <span class="kw-2">&amp;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+				<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::DisputesHandler::concluded_invalid</span>(<span class="ident">current_session</span>, <span class="ident">backed_candidate</span>.<span class="ident">hash</span>())
+				<span class="comment">// `fn process_candidates` does the verification checks</span>
+			},
+			<span class="kw-2">&amp;</span><span class="ident">scheduled</span>[..],
+		);
+
+		<span class="comment">// Process backed candidates according to scheduled cores.</span>
+		<span class="kw">let</span> <span class="ident">parent_storage_root</span> <span class="op">=</span> <span class="ident">parent_header</span>.<span class="ident">state_root</span>().<span class="ident">clone</span>();
+		<span class="kw">let</span> <span class="ident">inclusion::ProcessedCandidates</span>::<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span> {
+			<span class="ident">core_indices</span>: <span class="ident">occupied</span>,
+			<span class="ident">candidate_receipt_with_backing_validator_indices</span>,
+		} <span class="op">=</span> <span class="op">&lt;</span><span class="ident">inclusion::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::process_candidates</span>(
+			<span class="ident">parent_storage_root</span>,
+			<span class="ident">backed_candidates</span>,
+			<span class="ident">scheduled</span>,
+			<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::group_validators</span>,
+			<span class="ident">full_check</span>,
+		)<span class="question-mark">?</span>;
+
+		<span class="comment">// The number of disputes included in a block is</span>
+		<span class="comment">// limited by the weight as well as the number of candidate blocks.</span>
+		<span class="ident">OnChainVotes</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::put</span>(<span class="ident">ScrapedOnChainVotes</span>::<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span> {
+			<span class="ident">session</span>: <span class="ident">current_session</span>,
+			<span class="ident">backing_validators_per_candidate</span>: <span class="ident">candidate_receipt_with_backing_validator_indices</span>,
+			<span class="ident">disputes</span>,
+		});
+
+		<span class="comment">// Note which of the scheduled cores were actually occupied by a backed candidate.</span>
+		<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::occupied</span>(<span class="kw-2">&amp;</span><span class="ident">occupied</span>);
+
+		<span class="comment">// Give some time slice to dispatch pending upward messages.</span>
+		<span class="comment">// this is max config.ump_service_total_weight</span>
+		<span class="kw">let</span> <span class="ident">_ump_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">ump::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::process_pending_upward_messages</span>();
+
+		<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">total_weight</span>).<span class="ident">into</span>())
 	}
 }
 
@@ -2733,7 +2828,7 @@
 
 		<span class="ident">T::DisputesHandler::filter_multi_dispute_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">disputes</span>);
 
-		<span class="kw">let</span> (<span class="ident">concluded_invalid_disputes</span>, <span class="kw-2">mut</span> <span class="ident">bitfields</span>, <span class="ident">scheduled</span>) <span class="op">=</span>
+		<span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">backed_candidates</span>, <span class="kw-2">mut</span> <span class="ident">bitfields</span>) <span class="op">=</span>
 			<span class="ident">frame_support::storage::with_transaction</span>(<span class="op">|</span><span class="op">|</span> {
 				<span class="comment">// we don&#39;t care about fresh or not disputes</span>
 				<span class="comment">// this writes them to storage, so let&#39;s query it via those means</span>
@@ -2748,9 +2843,13 @@
 						<span class="ident">e</span>
 					});
 
-				<span class="comment">// current concluded invalid disputes, only including the current block&#39;s votes</span>
-				<span class="comment">// TODO why does this say &quot;only including the current block&#39;s votes&quot;? This can include</span>
-				<span class="comment">// remote disputes, right?</span>
+				<span class="comment">// Contains the disputes that are concluded in the current session only,</span>
+				<span class="comment">// since these are the only ones that are relevant for the occupied cores</span>
+				<span class="comment">// and lightens the load on `collect_disputed` significantly.</span>
+				<span class="comment">// Cores can&#39;t be occupied with candidates of the previous sessions, and only</span>
+				<span class="comment">// things with new votes can have just concluded. We only need to collect</span>
+				<span class="comment">// cores with disputes that conclude just now, because disputes that</span>
+				<span class="comment">// concluded longer ago have already had any corresponding cores cleaned up.</span>
 				<span class="kw">let</span> <span class="ident">current_concluded_invalid_disputes</span> <span class="op">=</span> <span class="ident">disputes</span>
 					.<span class="ident">iter</span>()
 					.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">dss</span><span class="op">|</span> <span class="ident">dss</span>.<span class="ident">session</span> <span class="op">=</span><span class="op">=</span> <span class="ident">current_session</span>)
@@ -2761,8 +2860,8 @@
 					.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">_session</span>, <span class="ident">candidate</span>)<span class="op">|</span> <span class="ident">candidate</span>)
 					.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">CandidateHash</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-				<span class="comment">// all concluded invalid disputes, that are relevant for the set of candidates</span>
-				<span class="comment">// the inherent provided</span>
+				<span class="comment">// All concluded invalid disputes, that are relevant for the set of candidates</span>
+				<span class="comment">// the inherent provided.</span>
 				<span class="kw">let</span> <span class="ident">concluded_invalid_disputes</span> <span class="op">=</span> <span class="ident">backed_candidates</span>
 					.<span class="ident">iter</span>()
 					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">backed_candidate</span><span class="op">|</span> <span class="ident">backed_candidate</span>.<span class="ident">hash</span>())
@@ -2789,13 +2888,14 @@
 
 				<span class="comment">// The following 3 calls are equiv to a call to `process_bitfields`</span>
 				<span class="comment">// but we can retain access to `bitfields`.</span>
-				<span class="kw">let</span> <span class="ident">bitfields</span> <span class="op">=</span> <span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+				<span class="kw">let</span> <span class="ident">bitfields</span> <span class="op">=</span> <span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
 					<span class="ident">bitfields</span>,
 					<span class="ident">disputed_bitfield</span>,
 					<span class="ident">expected_bits</span>,
 					<span class="ident">parent_hash</span>,
 					<span class="ident">current_session</span>,
 					<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+					<span class="ident">FullCheck::Skip</span>,
 				);
 
 				<span class="kw">let</span> <span class="ident">freed_concluded</span> <span class="op">=</span>
@@ -2812,31 +2912,45 @@
 				<span class="kw">let</span> <span class="ident">freed</span> <span class="op">=</span> <span class="ident">collect_all_freed_cores</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">freed_concluded</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
 
 				<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::clear</span>();
-				<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::schedule</span>(<span class="ident">freed</span>, <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>());
+				<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
+				<span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::schedule</span>(<span class="ident">freed</span>, <span class="ident">now</span>);
 
 				<span class="kw">let</span> <span class="ident">scheduled</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">scheduler::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::scheduled</span>();
 
+				<span class="kw">let</span> <span class="ident">relay_parent_number</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">-</span> <span class="ident">One::one</span>();
+
+				<span class="kw">let</span> <span class="ident">check_ctx</span> <span class="op">=</span> <span class="ident">CandidateCheckContext</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">now</span>, <span class="ident">relay_parent_number</span>);
+				<span class="kw">let</span> <span class="ident">backed_candidates</span> <span class="op">=</span> <span class="ident">sanitize_backed_candidates</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(
+					<span class="ident">parent_hash</span>,
+					<span class="ident">backed_candidates</span>,
+					<span class="kw">move</span> <span class="op">|</span><span class="ident">candidate_idx</span>: <span class="ident">usize</span>,
+					      <span class="ident">backed_candidate</span>: <span class="kw-2">&amp;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span><span class="op">|</span>
+					      <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+						<span class="comment">// never include a concluded-invalid candidate</span>
+						<span class="ident">concluded_invalid_disputes</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">backed_candidate</span>.<span class="ident">hash</span>()) <span class="op">|</span><span class="op">|</span>
+							<span class="comment">// Instead of checking the candidates with code upgrades twice</span>
+							<span class="comment">// move the checking up here and skip it in the training wheels fallback.</span>
+							<span class="comment">// That way we avoid possible duplicate checks while assuring all</span>
+							<span class="comment">// backed candidates fine to pass on.</span>
+							<span class="ident">check_ctx</span>
+								.<span class="ident">verify_backed_candidate</span>(<span class="ident">parent_hash</span>, <span class="ident">candidate_idx</span>, <span class="ident">backed_candidate</span>)
+								.<span class="ident">is_err</span>()
+					},
+					<span class="kw-2">&amp;</span><span class="ident">scheduled</span>[..],
+				);
+
 				<span class="ident">frame_support::storage::TransactionOutcome::Rollback</span>((
-					<span class="comment">// concluded disputes for backed candidates in this block</span>
-					<span class="ident">concluded_invalid_disputes</span>,
-					<span class="comment">// filtered bitfields,</span>
+					<span class="comment">// filtered backed candidates</span>
+					<span class="ident">backed_candidates</span>,
+					<span class="comment">// filtered bitfields</span>
 					<span class="ident">bitfields</span>,
-					<span class="comment">// updated schedule</span>
-					<span class="ident">scheduled</span>,
 				))
 			});
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backed_candidates</span> <span class="op">=</span> <span class="ident">sanitize_backed_candidates</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(
-			<span class="ident">parent_hash</span>,
-			<span class="ident">backed_candidates</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="ident">candidate_hash</span>: <span class="ident">CandidateHash</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-				<span class="ident">concluded_invalid_disputes</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">candidate_hash</span>)
-			},
-			<span class="kw-2">&amp;</span><span class="ident">scheduled</span>[..],
-		);
-
 		<span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="ident">compute_entropy</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">parent_hash</span>);
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand_chacha::ChaChaRng::from_seed</span>(<span class="ident">entropy</span>.<span class="ident">into</span>());
+
+		<span class="comment">// Assure the maximum block weight is adhered.</span>
 		<span class="kw">let</span> <span class="ident">max_block_weight</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockWeights::get</span>().<span class="ident">max_block</span>;
 		<span class="kw">let</span> <span class="ident">_consumed_weight</span> <span class="op">=</span> <span class="ident">apply_weight_limit</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
 			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">backed_candidates</span>,
@@ -2899,15 +3013,11 @@
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">weight_acc</span> <span class="op">=</span> <span class="number">0</span> <span class="kw">as</span> <span class="ident">Weight</span>;
 
-	<span class="kw">while</span> <span class="op">!</span><span class="ident">preferred_indices</span>.<span class="ident">is_empty</span>() {
-		<span class="comment">// randomly pick an index from the preferred set</span>
-		<span class="kw">let</span> <span class="ident">pick</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="ident">preferred_indices</span>.<span class="ident">len</span>());
-		<span class="comment">// remove the index from the available set of preferred indices</span>
-		<span class="kw">let</span> <span class="ident">preferred_idx</span> <span class="op">=</span> <span class="ident">preferred_indices</span>.<span class="ident">swap_remove</span>(<span class="ident">pick</span>);
-
+	<span class="ident">preferred_indices</span>.<span class="ident">shuffle</span>(<span class="ident">rng</span>);
+	<span class="kw">for</span> <span class="ident">preferred_idx</span> <span class="kw">in</span> <span class="ident">preferred_indices</span> {
 		<span class="comment">// preferred indices originate from outside</span>
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="ident">selectables</span>.<span class="ident">get</span>(<span class="ident">preferred_idx</span>) {
-			<span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">weight_acc</span> <span class="op">+</span> <span class="ident">weight_fn</span>(<span class="ident">item</span>);
+			<span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">weight_acc</span>.<span class="ident">saturating_add</span>(<span class="ident">weight_fn</span>(<span class="ident">item</span>));
 			<span class="kw">if</span> <span class="ident">updated</span> <span class="op">&gt;</span> <span class="ident">weight_limit</span> {
 				<span class="kw">continue</span>
 			}
@@ -2916,14 +3026,10 @@
 		}
 	}
 
-	<span class="kw">while</span> <span class="op">!</span><span class="ident">indices</span>.<span class="ident">is_empty</span>() {
-		<span class="comment">// randomly pick an index</span>
-		<span class="kw">let</span> <span class="ident">pick</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="ident">indices</span>.<span class="ident">len</span>());
-		<span class="comment">// remove the index from the available set of indices</span>
-		<span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">swap_remove</span>(<span class="ident">pick</span>);
-
+	<span class="ident">indices</span>.<span class="ident">shuffle</span>(<span class="ident">rng</span>);
+	<span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="ident">indices</span> {
 		<span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">selectables</span>[<span class="ident">idx</span>];
-		<span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">weight_acc</span> <span class="op">+</span> <span class="ident">weight_fn</span>(<span class="ident">item</span>);
+		<span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">weight_acc</span>.<span class="ident">saturating_add</span>(<span class="ident">weight_fn</span>(<span class="ident">item</span>));
 
 		<span class="kw">if</span> <span class="ident">updated</span> <span class="op">&gt;</span> <span class="ident">weight_limit</span> {
 			<span class="kw">continue</span>
@@ -2939,14 +3045,18 @@
 	(<span class="ident">weight_acc</span>, <span class="ident">picked_indices</span>)
 }
 
-<span class="doccomment">/// Considers an upper threshold that the candidates must not exceed.</span>
+<span class="doccomment">/// Considers an upper threshold that the inherent data must not exceed.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If there is sufficient space, all bitfields and candidates will be included.</span>
+<span class="doccomment">/// If there is sufficient space, all disputes, all bitfields and all candidates</span>
+<span class="doccomment">/// will be included.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Otherwise tries to include all bitfields, and fills in the remaining weight with candidates.</span>
+<span class="doccomment">/// Otherwise tries to include all disputes, and then tries to fill the remaining space with bitfields and then candidates.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If even the bitfields are too large to fit into the `max_weight` limit, bitfields are randomly</span>
-<span class="doccomment">/// picked and _no_ candidates will be included.</span>
+<span class="doccomment">/// The selection process is random. For candidates, there is an exception for code upgrades as they are preferred.</span>
+<span class="doccomment">/// And for disputes, local and older disputes are preferred (see `limit_disputes`).</span>
+<span class="doccomment">/// for backed candidates, since with a increasing number of parachains their chances of</span>
+<span class="doccomment">/// inclusion become slim. All backed candidates  are checked beforehands in `fn create_inherent_inner`</span>
+<span class="doccomment">/// which guarantees sanity.</span>
 <span class="kw">fn</span> <span class="ident">apply_weight_limit</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span> <span class="op">+</span> <span class="ident">inclusion::Config</span><span class="op">&gt;</span>(
 	<span class="ident">candidates</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">bitfields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UncheckedSignedAvailabilityBitfields</span>,
@@ -2989,12 +3099,7 @@
 				<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">backed_candidate_weight</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">c</span>),
 				<span class="ident">remaining_weight</span>,
 			);
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0_usize</span>;
-		<span class="ident">candidates</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">_backed_candidate</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">exists</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">idx</span>).<span class="ident">is_ok</span>();
-			<span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-			<span class="ident">exists</span>
-		});
+		<span class="ident">candidates</span>.<span class="ident">indexed_retain</span>(<span class="op">|</span><span class="ident">idx</span>, <span class="ident">_backed_candidate</span><span class="op">|</span> <span class="ident">indices</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">idx</span>).<span class="ident">is_ok</span>());
 		<span class="comment">// pick all bitfields, and</span>
 		<span class="comment">// fill the remaining space with candidates</span>
 		<span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">acc_candidate_weight</span>.<span class="ident">saturating_add</span>(<span class="ident">total_bitfields_weight</span>);
@@ -3013,12 +3118,7 @@
 		<span class="ident">remaining_weight</span>,
 	);
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0_usize</span>;
-	<span class="ident">bitfields</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">_bitfield</span><span class="op">|</span> {
-		<span class="kw">let</span> <span class="ident">exists</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">idx</span>).<span class="ident">is_ok</span>();
-		<span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-		<span class="ident">exists</span>
-	});
+	<span class="ident">bitfields</span>.<span class="ident">indexed_retain</span>(<span class="op">|</span><span class="ident">idx</span>, <span class="ident">_bitfield</span><span class="op">|</span> <span class="ident">indices</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">idx</span>).<span class="ident">is_ok</span>());
 
 	<span class="ident">total</span>
 }
@@ -3039,15 +3139,16 @@
 <span class="doccomment">/// they were actually checked and filtered to allow using it in both</span>
 <span class="doccomment">/// cases, as `filtering` and `checking` stage.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `CHECK_SIGS` determines if validator signatures are checked. If true, bitfields that have an</span>
-<span class="doccomment">/// invalid signature will be filtered out.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sanitize_bitfields</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident"><span class="kw">crate</span>::inclusion::Config</span>, <span class="kw">const</span> <span class="ident">CHECK_SIGS</span>: <span class="ident">bool</span><span class="op">&gt;</span>(
+<span class="doccomment">/// `full_check` determines if validator signatures are checked. If `::Yes`,</span>
+<span class="doccomment">/// bitfields that have an invalid signature will be filtered out.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sanitize_bitfields</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident"><span class="kw">crate</span>::inclusion::Config</span><span class="op">&gt;</span>(
 	<span class="ident">unchecked_bitfields</span>: <span class="ident">UncheckedSignedAvailabilityBitfields</span>,
 	<span class="ident">disputed_bitfield</span>: <span class="ident">DisputedBitfield</span>,
 	<span class="ident">expected_bits</span>: <span class="ident">usize</span>,
 	<span class="ident">parent_hash</span>: <span class="ident">T::Hash</span>,
 	<span class="ident">session_index</span>: <span class="ident">SessionIndex</span>,
 	<span class="ident">validators</span>: <span class="kw-2">&amp;</span>[<span class="ident">ValidatorId</span>],
+	<span class="ident">full_check</span>: <span class="ident">FullCheck</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UncheckedSignedAvailabilityBitfields</span> {
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitfields</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">unchecked_bitfields</span>.<span class="ident">len</span>());
 
@@ -3067,8 +3168,8 @@
 		<span class="kw">if</span> <span class="ident">unchecked_bitfield</span>.<span class="ident">unchecked_payload</span>().<span class="number">0</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">expected_bits</span> {
 			<span class="macro">log::trace!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="string">&quot;[CHECK_SIGS: {}] bad bitfield length: {} != {:?}&quot;</span>,
-				<span class="ident">CHECK_SIGS</span>,
+				<span class="string">&quot;[{:?}] bad bitfield length: {} != {:?}&quot;</span>,
+				<span class="ident">full_check</span>,
 				<span class="ident">unchecked_bitfield</span>.<span class="ident">unchecked_payload</span>().<span class="number">0</span>.<span class="ident">len</span>(),
 				<span class="ident">expected_bits</span>,
 			);
@@ -3080,8 +3181,8 @@
 		{
 			<span class="macro">log::trace!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="string">&quot;[CHECK_SIGS: {}] bitfield contains disputed cores: {:?}&quot;</span>,
-				<span class="ident">CHECK_SIGS</span>,
+				<span class="string">&quot;[{:?}] bitfield contains disputed cores: {:?}&quot;</span>,
+				<span class="ident">full_check</span>,
 				<span class="ident">unchecked_bitfield</span>.<span class="ident">unchecked_payload</span>().<span class="number">0</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="ident">disputed_bitfield</span>.<span class="number">0</span>.<span class="ident">clone</span>()
 			);
 			<span class="kw">continue</span>
@@ -3092,8 +3193,8 @@
 		<span class="kw">if</span> <span class="op">!</span><span class="ident">last_index</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">last_index</span>: <span class="ident">ValidatorIndex</span><span class="op">|</span> <span class="ident">last_index</span> <span class="op">&lt;</span> <span class="ident">validator_index</span>) {
 			<span class="macro">log::trace!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="string">&quot;[CHECK_SIGS: {}] bitfield validator index is not greater than last: !({:?} &lt; {})&quot;</span>,
-				<span class="ident">CHECK_SIGS</span>,
+				<span class="string">&quot;[{:?}] bitfield validator index is not greater than last: !({:?} &lt; {})&quot;</span>,
+				<span class="ident">full_check</span>,
 				<span class="ident">last_index</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>),
 				<span class="ident">validator_index</span>.<span class="number">0</span>
 			);
@@ -3103,8 +3204,8 @@
 		<span class="kw">if</span> <span class="ident">unchecked_bitfield</span>.<span class="ident">unchecked_validator_index</span>().<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">validators</span>.<span class="ident">len</span>() {
 			<span class="macro">log::trace!</span>(
 				<span class="ident">target</span>: <span class="ident">LOG_TARGET</span>,
-				<span class="string">&quot;[CHECK_SIGS: {}] bitfield validator index is out of bounds: {} &gt;= {}&quot;</span>,
-				<span class="ident">CHECK_SIGS</span>,
+				<span class="string">&quot;[{:?}] bitfield validator index is out of bounds: {} &gt;= {}&quot;</span>,
+				<span class="ident">full_check</span>,
 				<span class="ident">validator_index</span>.<span class="number">0</span>,
 				<span class="ident">validators</span>.<span class="ident">len</span>(),
 			);
@@ -3113,7 +3214,7 @@
 
 		<span class="kw">let</span> <span class="ident">validator_public</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">validators</span>[<span class="ident">validator_index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>];
 
-		<span class="kw">if</span> <span class="ident">CHECK_SIGS</span> {
+		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">FullCheck::Yes</span> <span class="op">=</span> <span class="ident">full_check</span> {
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">signed_bitfield</span>) <span class="op">=</span>
 				<span class="ident">unchecked_bitfield</span>.<span class="ident">try_into_checked</span>(<span class="kw-2">&amp;</span><span class="ident">signing_context</span>, <span class="ident">validator_public</span>)
 			{
@@ -3139,15 +3240,18 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// `candidate_has_concluded_invalid_dispute` must return `true` if the candidate</span>
 <span class="doccomment">/// is disputed, false otherwise</span>
-<span class="kw">fn</span> <span class="ident">sanitize_backed_candidates</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident"><span class="kw">crate</span>::inclusion::Config</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">CandidateHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span>(
+<span class="kw">fn</span> <span class="ident">sanitize_backed_candidates</span><span class="op">&lt;</span>
+	<span class="ident">T</span>: <span class="ident"><span class="kw">crate</span>::inclusion::Config</span>,
+	<span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+<span class="op">&gt;</span>(
 	<span class="ident">relay_parent</span>: <span class="ident">T::Hash</span>,
 	<span class="kw-2">mut</span> <span class="ident">backed_candidates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">candidate_has_concluded_invalid_dispute</span>: <span class="ident">F</span>,
+	<span class="kw-2">mut</span> <span class="ident">candidate_has_concluded_invalid_dispute_or_is_invalid</span>: <span class="ident">F</span>,
 	<span class="ident">scheduled</span>: <span class="kw-2">&amp;</span>[<span class="ident">CoreAssignment</span>],
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BackedCandidate</span><span class="op">&lt;</span><span class="ident">T::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="comment">// Remove any candidates that were concluded invalid.</span>
-	<span class="ident">backed_candidates</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">backed_candidate</span><span class="op">|</span> {
-		<span class="op">!</span><span class="ident">candidate_has_concluded_invalid_dispute</span>(<span class="ident">backed_candidate</span>.<span class="ident">candidate</span>.<span class="ident">hash</span>())
+	<span class="ident">backed_candidates</span>.<span class="ident">indexed_retain</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">idx</span>, <span class="ident">backed_candidate</span><span class="op">|</span> {
+		<span class="op">!</span><span class="ident">candidate_has_concluded_invalid_dispute_or_is_invalid</span>(<span class="ident">idx</span>, <span class="ident">backed_candidate</span>)
 	});
 
 	<span class="comment">// Assure the backed candidate&#39;s `ParaId`&#39;s core is free.</span>
@@ -3842,7 +3946,7 @@
 
 		<span class="attribute">#[<span class="ident">test</span>]</span>
 		<span class="comment">// Ensure that when a block is over weight due to disputes and bitfields, we abort</span>
-		<span class="kw">fn</span> <span class="ident">limit_candidates_over_weight</span>() {
+		<span class="kw">fn</span> <span class="ident">limit_candidates_over_weight_1</span>() {
 			<span class="ident">new_test_ext</span>(<span class="ident">MockGenesisConfig::default</span>()).<span class="ident">execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 				<span class="comment">// Create the inherent data for this block</span>
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispute_statements</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
@@ -3913,7 +4017,7 @@
 
 		<span class="attribute">#[<span class="ident">test</span>]</span>
 		<span class="comment">// Ensure that when a block is over weight due to disputes and bitfields, we abort</span>
-		<span class="kw">fn</span> <span class="ident">limit_candidates_over_weight_overweight</span>() {
+		<span class="kw">fn</span> <span class="ident">limit_candidates_over_weight_0</span>() {
 			<span class="ident">new_test_ext</span>(<span class="ident">MockGenesisConfig::default</span>()).<span class="ident">execute_with</span>(<span class="op">|</span><span class="op">|</span> {
 				<span class="comment">// Create the inherent data for this block</span>
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispute_statements</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
@@ -4056,24 +4160,26 @@
 
 			{
 				<span class="macro">assert_eq!</span>(
-					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Skip</span>,
 					),
 					<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>()
 				);
 				<span class="macro">assert_eq!</span>(
-					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Yes</span>
 					),
 					<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>()
 				);
@@ -4087,25 +4193,27 @@
 				<span class="ident">disputed_bitfield</span>.<span class="number">0</span>.<span class="ident">set</span>(<span class="number">0</span>, <span class="bool-val">true</span>);
 
 				<span class="macro">assert_eq!</span>(
-					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Yes</span>
 					)
 					.<span class="ident">len</span>(),
 					<span class="number">1</span>
 				);
 				<span class="macro">assert_eq!</span>(
-					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+					<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Skip</span>
 					)
 					.<span class="ident">len</span>(),
 					<span class="number">1</span>
@@ -4114,22 +4222,24 @@
 
 			<span class="comment">// bitfield size mismatch</span>
 			{
-				<span class="macro">assert!</span>(<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+				<span class="macro">assert!</span>(<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 					<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 					<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 					<span class="ident">expected_bits</span> <span class="op">+</span> <span class="number">1</span>,
 					<span class="ident">parent_hash</span>,
 					<span class="ident">session_index</span>,
-					<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+					<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+					<span class="ident">FullCheck::Yes</span>
 				)
 				.<span class="ident">is_empty</span>());
-				<span class="macro">assert!</span>(<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+				<span class="macro">assert!</span>(<span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 					<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 					<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 					<span class="ident">expected_bits</span> <span class="op">+</span> <span class="number">1</span>,
 					<span class="ident">parent_hash</span>,
 					<span class="ident">session_index</span>,
-					<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+					<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+					<span class="ident">FullCheck::Skip</span>
 				)
 				.<span class="ident">is_empty</span>());
 			}
@@ -4138,24 +4248,26 @@
 			{
 				<span class="kw">let</span> <span class="ident">shortened</span> <span class="op">=</span> <span class="ident">validator_public</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>;
 				<span class="macro">assert_eq!</span>(
-					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..<span class="ident">shortened</span>]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..<span class="ident">shortened</span>],
+						<span class="ident">FullCheck::Yes</span>,
 					)[..],
 					<span class="kw-2">&amp;</span><span class="ident">unchecked_bitfields</span>[..<span class="ident">shortened</span>]
 				);
 				<span class="macro">assert_eq!</span>(
-					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..<span class="ident">shortened</span>]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..<span class="ident">shortened</span>],
+						<span class="ident">FullCheck::Skip</span>,
 					)[..],
 					<span class="kw-2">&amp;</span><span class="ident">unchecked_bitfields</span>[..<span class="ident">shortened</span>]
 				);
@@ -4167,24 +4279,26 @@
 				<span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">unchecked_bitfields</span>.<span class="ident">swap_remove</span>(<span class="number">0</span>);
 				<span class="ident">unchecked_bitfields</span>.<span class="ident">push</span>(<span class="ident">x</span>);
 				<span class="macro">assert_eq!</span>(
-					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Yes</span>
 					)[..],
 					<span class="kw-2">&amp;</span><span class="ident">unchecked_bitfields</span>[..(<span class="ident">unchecked_bitfields</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>)]
 				);
 				<span class="macro">assert_eq!</span>(
-					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Skip</span>
 					)[..],
 					<span class="kw-2">&amp;</span><span class="ident">unchecked_bitfields</span>[..(<span class="ident">unchecked_bitfields</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>)]
 				);
@@ -4202,24 +4316,26 @@
 					.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>.<span class="ident">set_signature</span>(<span class="ident">ValidatorSignature::default</span>())))
 					.<span class="ident">expect</span>(<span class="string">&quot;we are accessing a valid index&quot;</span>);
 				<span class="macro">assert_eq!</span>(
-					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">VERIFY_SIGS</span><span class="op">&gt;</span>(
+					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Yes</span>
 					)[..],
 					<span class="kw-2">&amp;</span><span class="ident">unchecked_bitfields</span>[..<span class="ident">last_bit_idx</span>]
 				);
 				<span class="macro">assert_eq!</span>(
-					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="ident">SKIP_SIG_VERIFY</span><span class="op">&gt;</span>(
+					<span class="kw-2">&amp;</span><span class="ident">sanitize_bitfields</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>(
 						<span class="ident">unchecked_bitfields</span>.<span class="ident">clone</span>(),
 						<span class="ident">disputed_bitfield</span>.<span class="ident">clone</span>(),
 						<span class="ident">expected_bits</span>,
 						<span class="ident">parent_hash</span>,
 						<span class="ident">session_index</span>,
-						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..]
+						<span class="kw-2">&amp;</span><span class="ident">validator_public</span>[..],
+						<span class="ident">FullCheck::Skip</span>
 					)[..],
 					<span class="kw-2">&amp;</span><span class="ident">unchecked_bitfields</span>[..]
 				);
@@ -4253,7 +4369,8 @@
 				.<span class="ident">unwrap</span>();
 			}
 
-			<span class="kw">let</span> <span class="ident">has_concluded_invalid</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_candidate</span>: <span class="ident">CandidateHash</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> };
+			<span class="kw">let</span> <span class="ident">has_concluded_invalid</span> <span class="op">=</span>
+				<span class="op">|</span><span class="ident">_idx</span>: <span class="ident">usize</span>, <span class="ident">_backed_candidate</span>: <span class="kw-2">&amp;</span><span class="ident">BackedCandidate</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> };
 
 			<span class="kw">let</span> <span class="ident">scheduled</span> <span class="op">=</span> (<span class="number">0_usize</span>..<span class="number">2</span>)
 				.<span class="ident">into_iter</span>()
@@ -4353,7 +4470,8 @@
 					}
 					<span class="ident">set</span>
 				};
-				<span class="kw">let</span> <span class="ident">has_concluded_invalid</span> <span class="op">=</span> <span class="op">|</span><span class="ident">candidate</span>: <span class="ident">CandidateHash</span><span class="op">|</span> <span class="ident">set</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>);
+				<span class="kw">let</span> <span class="ident">has_concluded_invalid</span> <span class="op">=</span>
+					<span class="op">|</span><span class="ident">_idx</span>: <span class="ident">usize</span>, <span class="ident">candidate</span>: <span class="kw-2">&amp;</span><span class="ident">BackedCandidate</span><span class="op">|</span> <span class="ident">set</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">candidate</span>.<span class="ident">hash</span>());
 				<span class="macro">assert_eq!</span>(
 					<span class="ident">sanitize_backed_candidates</span>::<span class="op">&lt;</span><span class="ident">Test</span>, <span class="kw">_</span><span class="op">&gt;</span>(
 						<span class="ident">relay_parent</span>,
