@@ -46,6 +46,7 @@ use service::{
 };
 use sp_arithmetic::traits::SaturatedConversion;
 use sp_blockchain::HeaderBackend;
+use sp_core::Bytes;
 use sp_keyring::Sr25519Keyring;
 use sp_runtime::{codec::Encode, generic, traits::IdentifyAccount, MultiSigner};
 use sp_state_machine::BasicExternalities;
@@ -273,7 +274,7 @@ impl PolkadotTestNode {
 		caller: Sr25519Keyring,
 	) -> Result<String, serde_json::Error> {
 		let extrinsic = construct_extrinsic(&*self.client, call, caller, 0);
-		let payload = hex::encode(extrinsic.encode());
+		let payload: Bytes = extrinsic.encode().into();
 		let rpc = self
 			.rpc_handlers
 			.rpc_query("author_submitExtrinsic", vec![payload])
