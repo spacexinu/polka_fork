@@ -96,8 +96,8 @@ mod participation;
 mod status;
 use status::Clock;
 
-//#[cfg(test)]
-//mod tests;
+#[cfg(test)]
+mod tests;
 
 const LOG_TARGET: &str = "parachain::dispute-coordinator";
 

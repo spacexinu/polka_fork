@@ -103,7 +103,7 @@ async fn activate_leaf(
 }
 
 /// Full participation happy path as seen via the overseer.
-/*pub async fn participation_full_happy_path(ctx_handle: &mut VirtualOverseer) {
+pub async fn participation_full_happy_path(ctx_handle: &mut VirtualOverseer) {
 	recover_available_data(ctx_handle).await;
 	fetch_validation_code(ctx_handle).await;
 	store_available_data(ctx_handle, true).await;
@@ -117,7 +117,7 @@ async fn activate_leaf(
 	},
 	"overseer did not receive candidate validation message",
 	);
-}*/
+}
 
 /// Full participation with failing availability recovery.
 pub async fn participation_missing_availability(ctx_handle: &mut VirtualOverseer) {
