@@ -2347,7 +2347,7 @@
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RococoForTick</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span> (<span class="ident">Rococo::get</span>(), <span class="ident">Parachain</span>(<span class="number">100</span>).<span class="ident">into</span>());
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RococoForTrick</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span> (<span class="ident">Rococo::get</span>(), <span class="ident">Parachain</span>(<span class="number">110</span>).<span class="ident">into</span>());
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RococoForTrack</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span> (<span class="ident">Rococo::get</span>(), <span class="ident">Parachain</span>(<span class="number">120</span>).<span class="ident">into</span>());
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RococoForRockmine</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span> (<span class="ident">Rococo::get</span>(), <span class="ident">Parachain</span>(<span class="number">1001</span>).<span class="ident">into</span>());
+	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RococoForStatemine</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span> (<span class="ident">Rococo::get</span>(), <span class="ident">Parachain</span>(<span class="number">1000</span>).<span class="ident">into</span>());
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RococoForCanvas</span>: (<span class="ident">MultiAssetFilter</span>, <span class="ident">MultiLocation</span>) <span class="op">=</span> (<span class="ident">Rococo::get</span>(), <span class="ident">Parachain</span>(<span class="number">1002</span>).<span class="ident">into</span>());
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxInstructions</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100</span>;
 }
@@ -2355,7 +2355,7 @@
 	<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">RococoForTick</span><span class="op">&gt;</span>,
 	<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">RococoForTrick</span><span class="op">&gt;</span>,
 	<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">RococoForTrack</span><span class="op">&gt;</span>,
-	<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">RococoForRockmine</span><span class="op">&gt;</span>,
+	<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">RococoForStatemine</span><span class="op">&gt;</span>,
 	<span class="ident">xcm_builder::Case</span><span class="op">&lt;</span><span class="ident">RococoForCanvas</span><span class="op">&gt;</span>,
 );
 
@@ -2365,7 +2365,7 @@
 			<span class="ident">Parachain</span>(<span class="number">100</span>).<span class="ident">into</span>(),
 			<span class="ident">Parachain</span>(<span class="number">110</span>).<span class="ident">into</span>(),
 			<span class="ident">Parachain</span>(<span class="number">120</span>).<span class="ident">into</span>(),
-			<span class="ident">Parachain</span>(<span class="number">1001</span>).<span class="ident">into</span>(),
+			<span class="ident">Parachain</span>(<span class="number">1000</span>).<span class="ident">into</span>(),
 			<span class="ident">Parachain</span>(<span class="number">1002</span>).<span class="ident">into</span>(),
 		];
 }
