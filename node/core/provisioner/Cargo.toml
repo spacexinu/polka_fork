@@ -15,4 +15,4 @@ futures-timer = "3.0.2"
 
 [dev-dependencies]
 polkadot-node-subsystem-test-helpers = { path = "../../subsystem-test-helpers" }
-bitvec = { version = "0.20.1", default-features = false, features = [] }
+bitvec = { version = "1.0.1", default-features = false, features = [] }
