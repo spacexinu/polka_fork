@@ -690,9 +690,9 @@ dependencies = [
 
 [[package]]
 name = "bounded-vec"
-version = "0.4.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afdd1dffefe5fc66262a524b91087c43b16e478b2e3dc49eb11b0e2fd6b6ec90"
+checksum = "4c80fdd6d34e584d0874dd274be3f9149ba2260fbdbecc452ed56d78f780a9c3"
 dependencies = [
  "thiserror",
 ]
